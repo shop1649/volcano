@@ -1,0 +1,22 @@
+schema: shortkit.queries/1
+note: >-
+  새 소재 검색어 목록. reference_derived(레퍼런스에서 추적한 키워드/소스 계정)와 user_generic(사용자가 직접 넣은
+  일반 검색어)을 섞지 않는다. reference_derived 는 warehouse/source_accounts.json(레퍼런스 추적 단계가 작성)에서만
+  읽으며 이 파일에 손으로 채우지 않는다. 사용자 검색어 추가는 `shortkit source queries --add "검색어"`.
+reference_derived:
+  status: unmeasured
+  label: 미확보(못 잼)
+  source_file: warehouse/source_accounts.json
+  reason: >-
+    2026-09-24 이 작업 환경에서 youtube.com 이 네트워크 정책으로 차단되어 레퍼런스 채널(@joshuamagazine)의 영상·설명·
+    출처 표기를 한 건도 받지 못함. 그래서 레퍼런스가 반복해서 쓰는 소스 계정·키워드를 추적하지 못했고
+    source_accounts.json 도 없다. 채널 주제를 추측해서 채우지 않는다.
+  impact: >-
+    레퍼런스와 같은 계열의 소재를 찾는 검색어가 없음 → 현재는 사용자 검색어(user_generic)나 직접 URL 입력(add-url)으로만
+    후보를 모을 수 있음. 레퍼런스 추적 후 `shortkit source queries` 가 자동으로 그 키워드/계정을 보여 준다.
+  queries: []
+user_generic: []
+selection:
+  preset: joshuamagazine
+  recent_days: 30
+  weights: {recency: 0.2, intensity: 0.25, reversal: 0.2, quality: 0.15, format_fit: 0.2}

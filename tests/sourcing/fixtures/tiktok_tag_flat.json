@@ -1,0 +1,17 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "_type": "playlist",
+ "id": "synthetictag",
+ "entries": [
+  {
+   "_type": "url",
+   "id": "7400000000000000001",
+   "url": "https://www.tiktok.com/@cam_a/video/7400000000000000001"
+  },
+  {
+   "_type": "url",
+   "id": "7400000000000000002",
+   "url": "https://www.tiktok.com/@cam_b/video/7400000000000000002"
+  }
+ ]
+}

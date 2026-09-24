@@ -6,12 +6,15 @@ music_library_root: assets/library/music
 # 사용자가 제공하는 효과음 창고
 sfx_library_root: assets/library/sfx
 
-# 플랫폼 로그인 쿠키(Netscape 형식, 브라우저 확장으로 내보내기). 로그인은 자동으로 되지 않는다.
-cookies:
-  youtube: null        # 예: cookies/youtube.txt
-  tiktok: null
-  instagram: null
-  reddit: null
+# 소재 검색·다운로드 설정
+sourcing:
+  # 플랫폼 로그인 쿠키(Netscape 형식, 브라우저 확장으로 내보내기, 프로젝트 루트 기준 경로). 로그인은 자동으로 되지 않는다.
+  cookies:
+    youtube: null        # 예: cookies/youtube.txt
+    tiktok: null
+    instagram: null      # Instagram 해시태그/계정 검색은 쿠키 없으면 login_required
+  # Reddit API 규칙에 맞는 설명형 User-Agent
+  user_agent: "shortkit-sourcing/0.1 (personal research; contact: you@example.com)"
 
 # YouTube Data API v3 키를 담은 환경 변수 이름(선택). 키 값 자체를 여기 적지 말 것.
 youtube_api_key_env: YOUTUBE_API_KEY

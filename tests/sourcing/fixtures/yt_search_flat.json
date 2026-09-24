@@ -1,0 +1,30 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "_type": "playlist",
+ "id": "synthetic query",
+ "extractor_key": "YoutubeSearch",
+ "entries": [
+  {
+   "_type": "url",
+   "ie_key": "Youtube",
+   "id": "SYNTHaaaa01",
+   "url": "https://www.youtube.com/shorts/SYNTHaaaa01",
+   "title": "synthetic A",
+   "view_count": 999
+  },
+  {
+   "_type": "url",
+   "ie_key": "Youtube",
+   "id": "SYNTHbbbb02",
+   "url": "https://www.youtube.com/watch?v=SYNTHbbbb02",
+   "title": "synthetic B"
+  },
+  {
+   "_type": "url",
+   "ie_key": "Youtube",
+   "id": "SYNTHcccc03",
+   "url": "https://www.youtube.com/watch?v=SYNTHcccc03",
+   "title": "synthetic C"
+  }
+ ]
+}

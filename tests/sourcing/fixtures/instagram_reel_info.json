@@ -1,0 +1,16 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "id": "C0SYNTHrl01",
+ "title": "synthetic reel",
+ "webpage_url": "https://www.instagram.com/reel/C0SYNTHrl01/",
+ "extractor_key": "Instagram",
+ "description": "credit: @ig_original",
+ "uploader": "ig_reposter",
+ "uploader_id": "123",
+ "like_count": 45000,
+ "comment_count": 300,
+ "timestamp": 1789900000,
+ "duration": 22.5,
+ "width": 720,
+ "height": 1280
+}

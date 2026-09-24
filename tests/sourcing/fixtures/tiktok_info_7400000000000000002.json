@@ -1,0 +1,14 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "id": "7400000000000000002",
+ "title": "synthetic tiktok 2 (likes only)",
+ "webpage_url": "https://www.tiktok.com/@cam_b/video/7400000000000000002",
+ "extractor_key": "TikTok",
+ "description": "",
+ "uploader": "cam_b",
+ "like_count": 77000,
+ "timestamp": 1789000000,
+ "duration": 20,
+ "width": 1080,
+ "height": 1920
+}

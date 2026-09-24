@@ -1,0 +1,22 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "id": "SYNTHaaaa01",
+ "title": "synthetic A (short)",
+ "webpage_url": "https://www.youtube.com/shorts/SYNTHaaaa01",
+ "original_url": "https://www.youtube.com/shorts/SYNTHaaaa01",
+ "extractor_key": "Youtube",
+ "description": "synthetic description\n출처: @orig_cam_kr",
+ "uploader": "Repost Hub",
+ "uploader_id": "@reposthub",
+ "channel": "Repost Hub",
+ "channel_id": "UCsynthetic0000000000001",
+ "view_count": 1520000,
+ "like_count": 88000,
+ "comment_count": 1200,
+ "timestamp": 1790000000,
+ "upload_date": "20260921",
+ "duration": 31.0,
+ "width": 1080,
+ "height": 1920,
+ "fps": 30
+}

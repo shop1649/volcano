@@ -1,0 +1,177 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "kind": "Listing",
+ "data": {
+  "after": null,
+  "dist": 5,
+  "children": [
+   {
+    "kind": "t3",
+    "data": {
+     "id": "syn001",
+     "name": "t3_syn001",
+     "title": "synthetic post syn001",
+     "selftext": "credit: u/someone @cam_origin",
+     "author": "poster_syn001",
+     "author_fullname": "t2_syn001",
+     "subreddit": "synthetic",
+     "subreddit_id": "t5_syn",
+     "permalink": "/r/synthetic/comments/syn001/synthetic_post/",
+     "url": "https://v.redd.it/synthetic001",
+     "domain": "v.redd.it",
+     "created_utc": 1789800000.0,
+     "score": 45210,
+     "ups": 45210,
+     "upvote_ratio": 0.97,
+     "num_comments": 50,
+     "is_video": true,
+     "media": {
+      "reddit_video": {
+       "fallback_url": "https://v.redd.it/synthetic001/DASH_720.mp4",
+       "width": 720,
+       "height": 1280,
+       "duration": 27,
+       "is_gif": false
+      }
+     },
+     "secure_media": {
+      "reddit_video": {
+       "fallback_url": "https://v.redd.it/synthetic001/DASH_720.mp4",
+       "width": 720,
+       "height": 1280,
+       "duration": 27,
+       "is_gif": false
+      }
+     },
+     "over_18": false,
+     "view_count": null,
+     "post_hint": "hosted:video"
+    }
+   },
+   {
+    "kind": "t3",
+    "data": {
+     "id": "syn002",
+     "name": "t3_syn002",
+     "title": "synthetic post syn002",
+     "selftext": "",
+     "author": "poster_syn002",
+     "author_fullname": "t2_syn002",
+     "subreddit": "synthetic",
+     "subreddit_id": "t5_syn",
+     "permalink": "/r/synthetic/comments/syn002/synthetic_post/",
+     "url": "https://www.youtube.com/watch?v=SYNTHdddd04",
+     "domain": "youtube.com",
+     "created_utc": 1789800000.0,
+     "score": 812,
+     "ups": 812,
+     "upvote_ratio": 0.97,
+     "num_comments": 50,
+     "is_video": false,
+     "media": {
+      "type": "youtube.com",
+      "oembed": {
+       "title": "x"
+      }
+     },
+     "secure_media": null,
+     "over_18": false,
+     "view_count": null,
+     "post_hint": "rich:video",
+     "url_overridden_by_dest": "https://www.youtube.com/watch?v=SYNTHdddd04"
+    }
+   },
+   {
+    "kind": "t3",
+    "data": {
+     "id": "syn003",
+     "name": "t3_syn003",
+     "title": "synthetic post syn003",
+     "selftext": "just text",
+     "author": "poster_syn003",
+     "author_fullname": "t2_syn003",
+     "subreddit": "synthetic",
+     "subreddit_id": "t5_syn",
+     "permalink": "/r/synthetic/comments/syn003/synthetic_post/",
+     "url": "https://www.reddit.com/r/synthetic/comments/syn003/",
+     "domain": "self.synthetic",
+     "created_utc": 1789800000.0,
+     "score": 99999,
+     "ups": 1000,
+     "upvote_ratio": 0.97,
+     "num_comments": 50,
+     "is_video": false,
+     "media": null,
+     "secure_media": null,
+     "over_18": false,
+     "view_count": null
+    }
+   },
+   {
+    "kind": "t3",
+    "data": {
+     "id": "syn004",
+     "name": "t3_syn004",
+     "title": "synthetic post syn004",
+     "selftext": "",
+     "author": "poster_syn004",
+     "author_fullname": "t2_syn004",
+     "subreddit": "synthetic",
+     "subreddit_id": "t5_syn",
+     "permalink": "/r/synthetic/comments/syn004/synthetic_post/",
+     "url": "https://i.redd.it/syn004.jpg",
+     "domain": "i.redd.it",
+     "created_utc": 1789800000.0,
+     "score": 5000,
+     "ups": 1000,
+     "upvote_ratio": 0.97,
+     "num_comments": 50,
+     "is_video": false,
+     "media": null,
+     "secure_media": null,
+     "over_18": false,
+     "view_count": null,
+     "post_hint": "image"
+    }
+   },
+   {
+    "kind": "t3",
+    "data": {
+     "id": "syn005",
+     "name": "t3_syn005",
+     "title": "synthetic post syn005",
+     "selftext": "",
+     "author": "poster_syn005",
+     "author_fullname": "t2_syn005",
+     "subreddit": "synthetic",
+     "subreddit_id": "t5_syn",
+     "permalink": "/r/synthetic/comments/syn005/synthetic_post/",
+     "url": "https://www.reddit.com/r/synthetic/comments/syn005/",
+     "domain": "v.redd.it",
+     "created_utc": 1700000000.0,
+     "score": 321,
+     "ups": 1000,
+     "upvote_ratio": 0.97,
+     "num_comments": 50,
+     "is_video": true,
+     "media": null,
+     "secure_media": {
+      "reddit_video": {
+       "width": 1920,
+       "height": 1080,
+       "duration": 61
+      }
+     },
+     "over_18": false,
+     "view_count": 123456,
+     "crosspost_parent_list": [
+      {
+       "author": "first_poster",
+       "permalink": "/r/other/comments/orig01/x/"
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

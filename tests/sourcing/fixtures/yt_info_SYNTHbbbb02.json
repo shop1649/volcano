@@ -1,0 +1,15 @@
+{
+ "_fixture": "SYNTHETIC FIXTURE - hand-written to the documented field names (yt-dlp info dict / Reddit listing JSON). NOT captured from the live platform: the platform is blocked by network policy on the build machine.",
+ "id": "SYNTHbbbb02",
+ "title": "synthetic B",
+ "webpage_url": "https://www.youtube.com/watch?v=SYNTHbbbb02",
+ "extractor_key": "Youtube",
+ "description": "no credit here",
+ "uploader": "Cam Owner",
+ "channel": "Cam Owner",
+ "like_count": 5000,
+ "upload_date": "20240101",
+ "duration": 58.0,
+ "width": 1920,
+ "height": 1080
+}
