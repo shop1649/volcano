@@ -1,6 +1,6 @@
 # test-pipeline-001 편집 프로젝트
 
-- 생성 2026-09-24T18:13:50+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-24T18:27:03+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 21.25s · 마스터 `episodes/test-pipeline-001/output/test-pipeline-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 
@@ -67,6 +67,13 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 - delogo/blur (미리 정리한 중간 파일로 대체)
 - 자막·장식의 스타일/위치/모션(captions.ass 에만 있음)
 - 마스터의 true-peak 리미터
+
+확인하지 못한 가정(못 잼):
+
+- adjust-transform position 단위 = 시퀀스 프레임 높이의 %, y 는 위쪽이 + (FCPXML 관례로 알려진 값; 이 기계에서 확인 못 함)
+- adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 % (확인 못 함)
+- 줌 easing: 마스터는 3차 곡선, FCPXML 은 interp(easeIn/easeOut/ease) 로 근사
+- timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간
 - 전체 음량 이득 +18.60 dB 를 각 오디오 클립 음량에 더해 넣음(마스터 버스 없음)
 - 미디어 경로: 상대 URL — 가져오기에서 미디어를 못 찾으면 `export --absolute` 로 이 컴퓨터 전용 파일을 만든다
 - 검증: 이 기계에 DaVinci Resolve / Final Cut Pro 가 없어 가져오기·렌더 확인 못 함(못 잼). XML 형식과 시간 일관성만 테스트함
@@ -143,8 +150,8 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 - 사람이 직접 보고 들은 확인(청취·시청 확인 안 함)
 - DaVinci Resolve / Final Cut Pro 에서 FCPXML 가져오기·재생(프로그램 없음)
 - OTIO 를 다른 편집기로 가져오기(Kdenlive/Resolve 어댑터 없음)
-- fcpxml: FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)
-- otio: OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)
+- fcpxml: FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인) — 영향: Resolve/FCP 로 가져온 타임라인이 마스터와 다를 수 있음(위치·자르기 단위, easing 곡선, 영역 마스크 없음) → 그 프로그램에서 내보낸 영상은 QA 를 다시 받아야 함
+- otio: OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인) — 영향: 가져오는 편집기마다 해석이 달라 결과가 마스터와 다를 수 있음 → 내보낸 영상은 QA 를 다시 받아야 함
 
 ## 주의
 
@@ -160,8 +167,8 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [sfx_range_unmeasured] 효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 (2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단)
   - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 251개로 렌더합니다(레퍼런스 일치 아님)
 - 프리셋 미측정(못 잼) 값 230개로 만든 편집이다(레퍼런스 일치 아님).
-- plan.yaml 파일 sha256 `676403a680106d73911cf8d4cb2a22926a8fd69f97054a43ff5810e2146b4e63`
-- 승인 상태: 필요=None 승인됨=None
+- plan sha256 `5c00390ef4fa49f7f83c2d37a9544841391b131e13c9b6def787b438a4ca790f`
+- 승인 상태: 필요=False 승인됨=False
 - 소스 v_class: `assets/test/generated/classroom_voice.mp4` sha256=7ca6f09cb32cf87c… 창고 id=None
 - 소스 v_pair: `assets/test/generated/video/head-pose-face-detection-female-and-male.mp4` sha256=650166430c4bf9dd… 창고 id=None
 

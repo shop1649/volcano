@@ -152,6 +152,8 @@ def write(resolved: ResolvedEdit, out_dir: Path, decisions: dict) -> Path:
         L += ["## DaVinci Resolve / Final Cut Pro 에서 편집할 수 있는 것 (FCPXML)", ""]
         L += [f"- {x}" for x in fcp.get("editable", [])]
         L += ["", "FCPXML 로 표현하지 못해 빠지거나 대체된 것:", ""] + [f"- {x}" for x in fcp.get("not_representable", [])]
+        if fcp.get("assumptions"):
+            L += ["", "확인하지 못한 가정(못 잼):", ""] + [f"- {x}" for x in fcp["assumptions"]]
         if fcp.get("loudness_gain_db") is not None:
             L.append(f"- 전체 음량 이득 {fcp['loudness_gain_db']:+.2f} dB 를 각 오디오 클립 음량에 더해 넣음(마스터 버스 없음)")
         L.append(f"- 미디어 경로: {'절대 file:// URL (이 기계 전용, 커밋 금지)' if fcp.get('absolute_urls') else '상대 URL'}"
@@ -198,7 +200,9 @@ def write(resolved: ResolvedEdit, out_dir: Path, decisions: dict) -> Path:
     nv += ["DaVinci Resolve / Final Cut Pro 에서 FCPXML 가져오기·재생(프로그램 없음)",
            "OTIO 를 다른 편집기로 가져오기(Kdenlive/Resolve 어댑터 없음)"]
     for k, o in other.items():
-        nv.append(f"{k}: {o.get('why')}")
+        nv.append(f"{k}: {o.get('why')}" + (f" — 영향: {o['impact']}" if o.get("impact") else ""))
+    if v and v.get("status") == "unmeasured" and v.get("impact"):
+        nv.append(f"MLT 렌더 비교 못 함 — 영향: {v['impact']}")
     L += [f"- {x}" for x in nv] + [""]
     # ---------------------------------------------------------------- notes
     L += ["## 주의", ""]

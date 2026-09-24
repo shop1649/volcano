@@ -527,6 +527,11 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path, absolute: bool 
     dec["editable"] = ["클립 순서·트림·속도/정지(timeMap)", "crossfade(Cross Dissolve)", "위치·크기·줌 키프레임",
                        "clean crop(adjust-crop trim)", "오디오 클립별 음량 키프레임(BGM 덕킹·페이드, 효과음, 원본 소리)",
                        "자막 텍스트(caption 요소, 스타일 없음)"]
+    dec["assumptions"] = [
+        "adjust-transform position 단위 = 시퀀스 프레임 높이의 %, y 는 위쪽이 + (FCPXML 관례로 알려진 값; 이 기계에서 확인 못 함)",
+        "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 % (확인 못 함)",
+        "줌 easing: 마스터는 3차 곡선, FCPXML 은 interp(easeIn/easeOut/ease) 로 근사",
+        "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간"]
     dec["not_representable"] = [
         "영상 영역 마스크(확대 시 영역 밖으로 넘칠 수 있음)", "delogo/blur (미리 정리한 중간 파일로 대체)",
         "자막·장식의 스타일/위치/모션(captions.ass 에만 있음)", "마스터의 true-peak 리미터"]

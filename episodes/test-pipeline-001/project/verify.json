@@ -1,7 +1,7 @@
 {
   "schema": "shortkit.project_verify/1",
   "episode_id": "test-pipeline-001",
-  "checked_at": "2026-09-24T18:05:05+00:00",
+  "checked_at": "2026-09-24T18:25:40+00:00",
   "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.mlt",
   "master": "episodes/test-pipeline-001/output/test-pipeline-001.mp4",
   "thresholds": {
@@ -29,7 +29,7 @@
       "melt",
       "test-pipeline-001.mlt",
       "-consumer",
-      "avformat:../build/verify/test-pipeline-001.melt.25629.tmp.render.mkv",
+      "avformat:../build/verify/test-pipeline-001.melt.26299.tmp.render.mkv",
       "progressive=1",
       "vcodec=libx264",
       "preset=veryfast",
@@ -404,17 +404,19 @@
   "other_formats": {
     "fcpxml": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.fcpxml",
-      "checked_at": "2026-09-24T18:08:18+00:00",
+      "checked_at": "2026-09-24T18:27:03+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
-      "why": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)"
+      "why": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
+      "impact": "Resolve/FCP 로 가져온 타임라인이 마스터와 다를 수 있음(위치·자르기 단위, easing 곡선, 영역 마스크 없음) → 그 프로그램에서 내보낸 영상은 QA 를 다시 받아야 함"
     },
     "otio": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.otio",
-      "checked_at": "2026-09-24T18:08:18+00:00",
+      "checked_at": "2026-09-24T18:27:03+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
-      "why": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)"
+      "why": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
+      "impact": "가져오는 편집기마다 해석이 달라 결과가 마스터와 다를 수 있음 → 내보낸 영상은 QA 를 다시 받아야 함"
     }
   }
 }

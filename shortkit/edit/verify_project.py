@@ -343,6 +343,9 @@ def verify(resolved: ResolvedEdit, master_mp4: Path, project_file: Path, *, thre
     res["status_ko"] = STATUS_KO[status]
     if why:
         res["why"] = why
+    if status == "unmeasured":
+        res["impact"] = ("편집 프로젝트(.mlt)로 다시 렌더한 결과가 마스터 MP4 와 같은지 모름 → Shotcut 에서 수정 후 내보낸 "
+                         "영상은 QA 를 처음부터 다시 받아야 함")
     prev = read_json(project_file.parent / "verify.json", {}) or {}
     if prev.get("other_formats"):
         res["other_formats"] = prev["other_formats"]
@@ -350,6 +353,11 @@ def verify(resolved: ResolvedEdit, master_mp4: Path, project_file: Path, *, thre
     return res
 
 
+NLE_IMPACT = {
+    ".fcpxml": "Resolve/FCP 로 가져온 타임라인이 마스터와 다를 수 있음(위치·자르기 단위, easing 곡선, 영역 마스크 없음) "
+               "→ 그 프로그램에서 내보낸 영상은 QA 를 다시 받아야 함",
+    ".otio": "가져오는 편집기마다 해석이 달라 결과가 마스터와 다를 수 있음 → 내보낸 영상은 QA 를 다시 받아야 함",
+}
 NLE_NOTES = {
     ".fcpxml": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음",
     ".otio": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능)",
@@ -362,7 +370,8 @@ def _record_unrenderable(r: ResolvedEdit, project_file: Path) -> dict:
     ext = project_file.suffix.lower()
     res = {"project_file": _rel(project_file), "checked_at": now_iso(), "status": "unmeasured",
            "status_ko": STATUS_KO["unmeasured"],
-           "why": NLE_NOTES.get(ext, "렌더 검증 방법 없음") + " → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)"}
+           "why": NLE_NOTES.get(ext, "렌더 검증 방법 없음") + " → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
+           "impact": NLE_IMPACT.get(ext, "결과가 마스터와 다를 수 있음")}
     f = project_file.parent / "verify.json"
     d = read_json(f, {}) or {}
     d.setdefault("schema", "shortkit.project_verify/1")

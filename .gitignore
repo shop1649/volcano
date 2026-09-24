@@ -33,3 +33,10 @@ episodes/*/qa/frames/
 # OS
 .DS_Store
 Thumbs.db
+
+# absolute-path project variants (local import only) and regenerable project media
+episodes/*/project/*.local.fcpxml
+episodes/*/project/media/
+episodes/*/output/*.ffmpeg.log
+# per-event SFX fingerprints (regenerable). Catalog centroids presets/*/sfx_fp/*.npy stay tracked.
+presets/*/analysis/*/audio/sfx_fp/

@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-pipeline-001.mlt",
-    "created_at": "2026-09-24T18:05:00+00:00",
+    "created_at": "2026-09-24T18:25:36+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -178,12 +178,12 @@
       "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
     ]
   },
-  "updated_at": "2026-09-24T18:05:05+00:00",
+  "updated_at": "2026-09-24T18:25:40+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-pipeline-001.fcpxml",
-    "created_at": "2026-09-24T18:05:03+00:00",
+    "created_at": "2026-09-24T18:25:38+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -215,6 +215,12 @@
       "오디오 클립별 음량 키프레임(BGM 덕킹·페이드, 효과음, 원본 소리)",
       "자막 텍스트(caption 요소, 스타일 없음)"
     ],
+    "assumptions": [
+      "adjust-transform position 단위 = 시퀀스 프레임 높이의 %, y 는 위쪽이 + (FCPXML 관례로 알려진 값; 이 기계에서 확인 못 함)",
+      "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 % (확인 못 함)",
+      "줌 easing: 마스터는 3차 곡선, FCPXML 은 interp(easeIn/easeOut/ease) 로 근사",
+      "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간"
+    ],
     "not_representable": [
       "영상 영역 마스크(확대 시 영역 밖으로 넘칠 수 있음)",
       "delogo/blur (미리 정리한 중간 파일로 대체)",
@@ -225,7 +231,7 @@
   "otio": {
     "format": "otio",
     "file": "test-pipeline-001.otio",
-    "created_at": "2026-09-24T18:05:04+00:00",
+    "created_at": "2026-09-24T18:25:39+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",
