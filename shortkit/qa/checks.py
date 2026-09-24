@@ -509,32 +509,7 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
               keys=_role_keys(role, ["color", "outline_px", "outline_color", "box.enabled", "highlight_color"]),
               evidence=ev, note="; ".join(notes) + ("; 그림자는 측정하지 않음" if cap.shadow_px else ""))
         # font
-        fnt = m.get("font") or {}
-        if fnt.get("status") == "measured":
-            best_iou = max((s.get("iou") or 0) for s in fnt["scores"])
-            exp_iou = fnt.get("iou_expected") or 0
-            margin = best_iou - exp_iou
-            ceil = _font_ceiling(b, cap.font_name)
-            glyph_h = (m.get("bbox_obs") or [0, 0, 0, 0])[3] / max(1, m.get("lines_found") or 1)
-            big_enough = glyph_h >= 30
-            if margin <= 0.03 and exp_iou >= ceil - 0.12:
-                fst, fnote = "same", ""
-            elif margin > 0.03 and best_iou >= ceil - 0.12:
-                fst, fnote = "different", f"다른 글꼴({fnt.get('best')})이 더 잘 맞음"
-            elif exp_iou < 0.7 and big_enough:
-                fst, fnote = "different", (f"기대 글꼴 IoU {exp_iou} ≪ 같은 글꼴 천장 {ceil} — 다른(대체) 글꼴로 그려진 것으로 보임, "
-                                           "후보 글꼴 중에도 맞는 것 없음")
-            else:
-                fst, fnote = "unmeasured", "글자가 작거나 IoU 가 애매해 판별 불확실"
-            b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name,
-                  observed={"best": fnt.get("best"), "iou_expected": exp_iou, "scores": fnt.get("scores"),
-                            "same_font_ceiling_p10": ceil, "glyph_h": _r(glyph_h, 1)},
-                  tolerance="기대 글꼴 IoU ≥ 천장−0.12 이고 최고와 0.03 이내 → 같다 / 다른 글꼴이 더 맞거나 IoU<0.7(글자 ≥30px) → 다르다",
-                  status=fst, keys=_role_keys(role, ["font_name", "bold"]), evidence=ev, note=fnote)
-        else:
-            b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name, observed=None,
-                  status="unmeasured", keys=_role_keys(role, ["font_name", "bold"]), evidence=ev,
-                  note=fnt.get("reason") or "글꼴 비교 못 함")
+        _font_row(b, cap, m, label, role, ev)
         # timing
         on, off = m.get("onset"), m.get("offset")
         fade_io = (cap.motion_in or {}).get("type") == "fade" or (cap.motion_out or {}).get("type") == "fade"
@@ -637,7 +612,9 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                                       "box.enabled", "box.color", "box.alpha", "box.pad_x", "box.pad_y"]),
                     {"fill_color": fills[0]} if fills else None,
                     lambda o, r, role=role: (_cdist(o["fill_color"], r.get(f"text.roles.{role}.color")) or 999) <= TOL["color_rgb"])
-        fonts = [(m.get("font") or {}).get("best") for m in rc_found if (m.get("font") or {}).get("status") == "measured"]
+        # only an 'identical' verdict names the output font (similar/different/fallback scores do not)
+        fonts = [((m.get("font") or {}).get("identify") or {}).get("top") for m in rc_found
+                 if ((m.get("font") or {}).get("identify") or {}).get("top_verdict") == "identical"]
         b.style_row("caption.font", f"{role}_ref", f"자막 글꼴 [{role}] (레퍼런스 대비)", CAT["font"],
                     _role_keys(role, ["font_name", "bold"]), {"best": fonts[0]} if fonts else None,
                     lambda o, r, role=role: str(o["best"]).replace(" ", "").lower() ==
@@ -657,6 +634,72 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                 ["text.tone.register", "text.tone.sentence_end_examples", "text.tone.emoji", "text.tone.notes"],
                 {"register": tone.get("mode")} if tone.get("n") else None,
                 lambda o, r: o["register"] == r.get("text.tone.register"))
+
+
+FONT_VERDICT_STATUS = {"identical": "same", "different": "different", "similar": "unmeasured", "unmeasured": "unmeasured"}
+
+
+def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> dict:
+    """caption.font row.  'same' ONLY for typography's verdict ``identical`` (IoU >= the same-font
+    ceiling p10 measured under the output's encode settings, margin over the nearest look-alike >
+    noise, per-glyph check passed).  ``similar`` -> 못 잼; ``different`` -> 다르다.  The raw
+    font_iou fallback (no ceiling experiment possible) can report 'different' or 못 잼, never 'same'."""
+    fnt = m.get("font") or {}
+    idt = fnt.get("identify") or {}
+    keys = _role_keys(role, ["font_name", "bold"])
+    item = f"자막 글꼴 {label}"
+    if idt.get("status") == "measured":
+        v = idt.get("verdict") or "unmeasured"
+        st = FONT_VERDICT_STATUS.get(v, "unmeasured")
+        top = idt.get("top")
+        top_is_exp = str(top or "").replace(" ", "").lower() == str(idt.get("expected_canonical") or "").replace(" ", "").lower()
+        reasons = "; ".join(idt.get("reasons") or [])
+        if v == "identical":
+            note = f"판정: 동일(identical) — {reasons}"
+        elif v == "similar":
+            note = ("판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. " + reasons +
+                    ("" if top_is_exp else f"; 가장 잘 맞는 후보는 {top}"))
+        elif v == "different":
+            note = f"판정: 다름(different) — {reasons}" + ("" if top_is_exp else f"; 가장 잘 맞는 후보 {top}")
+        else:
+            note = "판정 못 잼: " + (reasons or idt.get("reason") or "")
+        cond = idt.get("conditions") or {}
+        ce = idt.get("ceiling") or {}
+        return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
+                     observed={"verdict": v, "verdict_ko": idt.get("verdict_ko"), "iou_expected": idt.get("iou_expected"),
+                               "margin": idt.get("margin"), "top": top, "top_verdict": idt.get("top_verdict"),
+                               "ranked": (idt.get("ranked") or [])[:5],
+                               "ceiling": {"p10": ce.get("p10"), "p50": ce.get("p50"), "noise_p90": ce.get("noise_p90"),
+                                           "n": ce.get("n"), "size_bucket": ce.get("size_bucket"),
+                                           "cached": idt.get("ceiling_cached")},
+                               "conditions": {k: cond.get(k) for k in ("label", "crf", "x264_preset", "renderer",
+                                                                       "background", "assumed", "source")}},
+                     tolerance="identical(기대 글꼴 IoU ≥ 출력 인코딩 조건의 같은 글꼴 천장 p10, 차순위 대비 차이 > 잡음, "
+                               "글자별 검사 통과)만 같다 · different(IoU < 천장 p10 − 잡음)는 다르다 · similar 는 못 잼",
+                     status=st, keys=keys, evidence=ev, note=note)
+    if fnt.get("status") == "measured" and fnt.get("scores"):
+        # fallback: raw IoU vs the fonts_report ceiling (reference conditions, not this output's)
+        best_iou = max((s.get("iou") or 0) for s in fnt["scores"])
+        exp_iou = fnt.get("iou_expected") or 0
+        margin = best_iou - exp_iou
+        ceil = _font_ceiling(b, cap.font_name)
+        glyph_h = (m.get("bbox_obs") or [0, 0, 0, 0])[3] / max(1, m.get("lines_found") or 1)
+        why = (idt.get("reason") or "천장 실험(identify) 불가") + " → font_iou 원점수만으로는 같다고 판정하지 않음"
+        if margin > 0.03 and best_iou >= ceil - 0.12:
+            st, note = "different", f"다른 글꼴({fnt.get('best')})이 더 잘 맞음. {why}"
+        elif exp_iou < 0.7 and glyph_h >= 30:
+            st, note = "different", (f"기대 글꼴 IoU {exp_iou} ≪ 같은 글꼴 천장 {ceil} — 다른(대체) 글꼴로 그려진 것으로 보임. {why}")
+        else:
+            st, note = "unmeasured", why
+        return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
+                     observed={"method": "font_iou(대체 방법)", "best": fnt.get("best"), "iou_expected": exp_iou,
+                               "scores": fnt.get("scores"), "same_font_ceiling_p10(fonts_report)": ceil,
+                               "glyph_h": _r(glyph_h, 1)},
+                     tolerance="대체 방법: 다른 글꼴이 0.03 넘게 더 잘 맞거나 IoU<0.7(글자 ≥30px) → 다르다, 그 밖은 못 잼(같다 없음)",
+                     status=st, keys=keys, evidence=ev, note=note)
+    return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name, observed=None,
+                 status="unmeasured", keys=keys, evidence=ev,
+                 note=fnt.get("reason") or idt.get("reason") or "글꼴 비교 못 함")
 
 
 def _font_ceiling(b: RowBuilder, font_name: str) -> float:
