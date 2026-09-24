@@ -1,0 +1,193 @@
+# Candidate fonts for caption rendering and reference font identification.
+#
+# - `fonts`: files fetched by `shortkit doctor --fetch-fonts` (shortkit.fonts.fetch_all) into assets/fonts/
+#   (binaries are git-ignored; the URL + sha256 here are the canonical source).  A file whose sha256 does not
+#   match is never used.
+# - `name` is family + weight exactly as fontconfig / FreeType report it ("Regular" is dropped), and is what
+#   presets use in text.roles.<role>.font_name.  shortkit.fonts.find_font() accepts only an exact face match
+#   (fontconfig rules: case and blanks ignored); there is no fallback.
+# - `system`: faces expected from OS packages (found through fontconfig, not pinned by hash because the file
+#   differs per OS/package version).
+# - status `not_acquired`: fonts popular in Korean shorts that could NOT be obtained/pinned on the build machine.
+#   Only the name is recorded: no URL or hash is invented.  If the reference turns out to use one of them,
+#   identification against the acquired candidates can only return `similar`/`different`, never `identical`.
+schema: shortkit.fonts_manifest/1
+dir: assets/fonts
+fonts:
+- name: Pretendard Black
+  family: Pretendard
+  style: Black
+  file: assets/fonts/Pretendard-Black.otf
+  url: https://raw.githubusercontent.com/orioncactus/pretendard/main/packages/pretendard/dist/public/static/Pretendard-Black.otf
+  sha256: 94628b0bcea8936b6e5c30d98d685eb9bbaffb0fe2ed255542ecc656c248e021
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/orioncactus/pretendard/main/LICENSE
+  source: github orioncactus/pretendard (branch main)
+  status: acquirable
+- name: Pretendard ExtraBold
+  family: Pretendard
+  style: ExtraBold
+  file: assets/fonts/Pretendard-ExtraBold.otf
+  url: https://raw.githubusercontent.com/orioncactus/pretendard/main/packages/pretendard/dist/public/static/Pretendard-ExtraBold.otf
+  sha256: c35fe941b7568d52a96010561540e47f9d3948dfde66ba25bc1908233e0a40cd
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/orioncactus/pretendard/main/LICENSE
+  source: github orioncactus/pretendard (branch main)
+  status: acquirable
+- name: Pretendard Bold
+  family: Pretendard
+  style: Bold
+  file: assets/fonts/Pretendard-Bold.otf
+  url: https://raw.githubusercontent.com/orioncactus/pretendard/main/packages/pretendard/dist/public/static/Pretendard-Bold.otf
+  sha256: 2e91915fab54df71cc9598ebf608b2bdb54c6fe3c066ac61dff0bc44fca71cc7
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/orioncactus/pretendard/main/LICENSE
+  source: github orioncactus/pretendard (branch main)
+  status: acquirable
+- name: Black Han Sans
+  family: Black Han Sans
+  style: Regular
+  file: assets/fonts/BlackHanSans-Regular.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/blackhansans/BlackHanSans-Regular.ttf
+  sha256: 31960809284026681774a8e52dc19ebcad26cf69b0ad9d560f288296fbb52739
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/blackhansans/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Do Hyeon
+  family: Do Hyeon
+  style: Regular
+  file: assets/fonts/DoHyeon-Regular.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/dohyeon/DoHyeon-Regular.ttf
+  sha256: 35644be7f28e0a68a447b1f7af351dcde5674b870f24f7b5f43e26d00b4ab653
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/dohyeon/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Jua
+  family: Jua
+  style: Regular
+  file: assets/fonts/Jua-Regular.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/jua/Jua-Regular.ttf
+  sha256: 769677aef240bfc3b9965f2b50748075bff885e6c6992fc591a3fb268279f898
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/jua/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Gothic A1 Black
+  family: Gothic A1
+  style: Black
+  file: assets/fonts/GothicA1-Black.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/gothica1/GothicA1-Black.ttf
+  sha256: 6398ff5c6923c74cb453390892dcb982ec0a6c43b35da8590a8f32702d8c079d
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/gothica1/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Gothic A1 ExtraBold
+  family: Gothic A1
+  style: ExtraBold
+  file: assets/fonts/GothicA1-ExtraBold.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/gothica1/GothicA1-ExtraBold.ttf
+  sha256: 37a65353a646fea5a1ac90585d1bb8f9b997ecae0b79c4f1f187566f910e3f9d
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/gothica1/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: NanumGothic ExtraBold
+  family: NanumGothic
+  style: ExtraBold
+  file: assets/fonts/NanumGothic-ExtraBold.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-ExtraBold.ttf
+  sha256: 5c4568e5295a8c52bc30e7efa1ea6d2de43556268ef42daba93540a1ece691ae
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Gugi
+  family: Gugi
+  style: Regular
+  file: assets/fonts/Gugi-Regular.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/gugi/Gugi-Regular.ttf
+  sha256: c0b1f979979cfc309fb2438fa9464f96173353e0c4842cc7a5919658184ed9d3
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/gugi/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Sunflower Bold
+  family: Sunflower
+  style: Bold
+  file: assets/fonts/Sunflower-Bold.ttf
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/sunflower/Sunflower-Bold.ttf
+  sha256: 6b033627817f6619433afe82028013dc45a78ff82406b1dbe5b16e1bbc370e0a
+  license: OFL-1.1
+  license_url: https://raw.githubusercontent.com/google/fonts/main/ofl/sunflower/OFL.txt
+  source: github google/fonts (branch main)
+  status: acquirable
+- name: Gmarket Sans Bold
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: G마켓 산스. 이 작업 환경에서 공식 배포 파일을 받아 해시를 고정하지 못함(URL·해시를 지어내지 않음).
+- name: 여기어때 잘난체
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: Jalnan. 공식 배포처에서 받아 해시를 고정하지 못함.
+- name: Tmon몬소리 Black
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: TmonMonsori. 공식 배포처에서 받아 해시를 고정하지 못함.
+- name: 배민 한나체 Pro
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: BM HANNA Pro. 공식 배포처에서 받아 해시를 고정하지 못함. (배민 도현체=Do Hyeon, 주아체=Jua 는 위 목록에 있음)
+- name: S-Core Dream Heavy
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: 에스코어 드림(9 굵기). 공식 배포처에서 받아 해시를 고정하지 못함.
+- name: Cafe24 Ssurround
+  status: not_acquired
+  file: null
+  url: null
+  sha256: null
+  license: null
+  note: 카페24 써라운드. 공식 배포처에서 받아 해시를 고정하지 못함.
+system:
+- name: Noto Sans CJK KR Black
+  package: {apt: fonts-noto-cjk-extra, brew: font-noto-sans-cjk-kr}
+  license: OFL-1.1
+- name: Noto Sans CJK KR Bold
+  package: {apt: fonts-noto-cjk, brew: font-noto-sans-cjk-kr}
+  license: OFL-1.1
+- name: Noto Sans CJK KR Medium
+  package: {apt: fonts-noto-cjk-extra, brew: font-noto-sans-cjk-kr}
+  license: OFL-1.1
+- name: NanumGothic Bold
+  package: {apt: fonts-nanum}
+  license: OFL-1.1
+- name: NanumSquare ExtraBold
+  package: {apt: fonts-nanum-extra}
+  license: OFL-1.1
+- name: NanumSquare Bold
+  package: {apt: fonts-nanum-extra}
+  license: OFL-1.1
+- name: NanumSquareRound ExtraBold
+  package: {apt: fonts-nanum-extra}
+  license: OFL-1.1
+- name: NanumBarunGothic Bold
+  package: {apt: fonts-nanum}
+  license: OFL-1.1

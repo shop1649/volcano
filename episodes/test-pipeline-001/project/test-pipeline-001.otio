@@ -1,0 +1,2977 @@
+{
+    "OTIO_SCHEMA": "Timeline.1",
+    "metadata": {
+        "shortkit": {
+            "canvas": {
+                "background": {
+                    "blur_sigma": 30.0,
+                    "color": "#000000",
+                    "type": "color"
+                },
+                "fps": 30.0,
+                "height": 1920,
+                "safe_margin": {
+                    "bottom": 250.0,
+                    "left": 54.0,
+                    "right": 54.0,
+                    "top": 110.0
+                },
+                "video_region": {
+                    "fit": "cover",
+                    "h": 608.0,
+                    "w": 1080.0,
+                    "x": 0.0,
+                    "y": 656.0
+                },
+                "width": 1080
+            },
+            "captions_file": "captions.ass",
+            "captions_srt": "captions.srt",
+            "duration_s": 21.25,
+            "episode_id": "test-pipeline-001",
+            "frames": 638,
+            "mode": "test",
+            "note": "자막·장식은 captions.ass 한 파일(libass)로 그려짐; OTIO 마커는 위치 표시용",
+            "preset_id": "joshuamagazine-v1",
+            "schema": "shortkit.otio/1"
+        }
+    },
+    "name": "test-pipeline-001",
+    "global_start_time": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "rate": 30.0,
+        "value": 0.0
+    },
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "metadata": {},
+        "name": "tracks",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "enabled": true,
+        "color": null,
+        "children": [
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V1 배경",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "background": {
+                                    "blur_sigma": 30.0,
+                                    "color": "#000000",
+                                    "type": "color"
+                                },
+                                "note": "blur_source 면 흐린 소스를 배경으로(마스터 기준)"
+                            }
+                        },
+                        "name": "배경",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 638.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "배경",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 638.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#000000"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V2 영상",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    330.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": null,
+                                "id": "c_title",
+                                "kind": "caption",
+                                "lines": [
+                                    "움직임 테스트 영상"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "title",
+                                "size_px": 84.0
+                            }
+                        },
+                        "name": "움직임 테스트 영상",
+                        "color": "RED",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 638.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    500.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Bold",
+                                "grounding": null,
+                                "id": "c_desc",
+                                "kind": "caption",
+                                "lines": [
+                                    "파이프라인 검증용 합성 샘플"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "description",
+                                "size_px": 46.0
+                            }
+                        },
+                        "name": "파이프라인 검증용 합성 샘플",
+                        "color": "ORANGE",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    740.0,
+                                    770.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Bold",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "창가 쪽 책상에 앉은 남성",
+                                    "source": "v_class",
+                                    "src_t": 2.0
+                                },
+                                "id": "c_spk",
+                                "kind": "caption",
+                                "lines": [
+                                    "창가 남성"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "speaker",
+                                "size_px": 40.0
+                            }
+                        },
+                        "name": "창가 남성",
+                        "color": "CYAN",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 108.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 9.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_class",
+                                    "src_t": 3.5
+                                },
+                                "id": "c_sit1",
+                                "kind": "caption",
+                                "lines": [
+                                    "창가 남성이 일어선다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "창가 남성이 일어선다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 78.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 39.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_class",
+                                    "src_t": 15.8
+                                },
+                                "id": "c_sit2",
+                                "kind": "caption",
+                                "lines": [
+                                    "다시 자리에 앉는다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "다시 자리에 앉는다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 99.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 123.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_class",
+                                    "src_t": 17.3
+                                },
+                                "id": "c_sit3",
+                                "kind": "caption",
+                                "lines": [
+                                    "뒷줄 남성이 손을 든다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "뒷줄 남성이 손을 든다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 66.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 231.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "heard",
+                                    "note": "소스 오디오에 들어 있는 합성 TTS 한 줄(화면 인물의 말이라고 주장하지 않음)",
+                                    "source": "v_class",
+                                    "src_t": 19.6
+                                },
+                                "id": "c_dlg",
+                                "kind": "caption",
+                                "lines": [
+                                    "\"저기 봐, 들어온다!\""
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "dialogue",
+                                "size_px": 62.0
+                            }
+                        },
+                        "name": "\"저기 봐, 들어온다!\"",
+                        "color": "GREEN",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 66.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 303.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1140.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "두 사람이 고개를 옆으로 기울임",
+                                    "source": "v_pair",
+                                    "src_t": 5.5
+                                },
+                                "id": "c_rx",
+                                "kind": "caption",
+                                "lines": [
+                                    "갸우뚱?"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "reaction",
+                                "size_px": 76.0
+                            }
+                        },
+                        "name": "갸우뚱?",
+                        "color": "MAGENTA",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 72.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 453.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_pair",
+                                    "src_t": 5.5
+                                },
+                                "id": "c_sit4",
+                                "kind": "caption",
+                                "lines": [
+                                    "두 사람이 고개를 기울인다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "두 사람이 고개를 기울인다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 117.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 453.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s1",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 4.0,
+                                "out_start": 0.0,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "1": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "10": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "100": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "101": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "102": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "103": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "104": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "105": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "106": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "107": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "108": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "109": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "11": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "110": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "111": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "112": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "113": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "114": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "115": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "116": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "117": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "118": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "119": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "12": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "13": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "14": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "15": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "16": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "17": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "18": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "19": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "2": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "20": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "21": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "22": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "23": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "24": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "25": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "26": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "27": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "28": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "29": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "3": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "30": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "31": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "32": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "33": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "34": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "35": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "36": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "37": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "38": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "39": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "4": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "40": [
+                                            -47.899,
+                                            635.558,
+                                            1150.976,
+                                            647.424
+                                        ],
+                                        "41": [
+                                            -86.345,
+                                            618.997,
+                                            1207.757,
+                                            679.363
+                                        ],
+                                        "42": [
+                                            -116.73,
+                                            605.908,
+                                            1252.634,
+                                            704.606
+                                        ],
+                                        "43": [
+                                            -140.003,
+                                            595.883,
+                                            1287.006,
+                                            723.941
+                                        ],
+                                        "44": [
+                                            -157.112,
+                                            588.513,
+                                            1312.275,
+                                            738.154
+                                        ],
+                                        "45": [
+                                            -169.005,
+                                            583.389,
+                                            1329.84,
+                                            748.035
+                                        ],
+                                        "46": [
+                                            -176.631,
+                                            580.104,
+                                            1341.103,
+                                            754.37
+                                        ],
+                                        "47": [
+                                            -180.938,
+                                            578.249,
+                                            1347.464,
+                                            757.948
+                                        ],
+                                        "48": [
+                                            -182.874,
+                                            577.415,
+                                            1350.323,
+                                            759.557
+                                        ],
+                                        "49": [
+                                            -183.388,
+                                            577.194,
+                                            1351.082,
+                                            759.984
+                                        ],
+                                        "5": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "50": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "51": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "52": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "53": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "54": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "55": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "56": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "57": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "58": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "59": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "6": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "60": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "61": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "62": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "63": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "64": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "65": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "66": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "67": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "68": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "69": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "7": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "70": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "71": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "72": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "73": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "74": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "75": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "76": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "77": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "78": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "79": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "8": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "80": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "81": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "82": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "83": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "84": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "85": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "86": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "87": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "88": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "89": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "9": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "90": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "91": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "92": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "93": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "94": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "95": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "96": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "97": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "98": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "99": [
+                                            -183.407,
+                                            577.185,
+                                            1351.111,
+                                            760.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        0,
+                                        120
+                                    ],
+                                    "source_time_at_start": 1.5
+                                },
+                                "purpose": "hook",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_class",
+                                "speed": 1.0,
+                                "src_in": 1.5,
+                                "src_out": 5.5,
+                                "src_size": [
+                                    1920,
+                                    1080
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "type": "cut"
+                                },
+                                "zoom": {
+                                    "center_src": [
+                                        1300.0,
+                                        560.0
+                                    ],
+                                    "dur": 0.35,
+                                    "ease": "out",
+                                    "ease_curve": "cubic (render.py)",
+                                    "scale_from": 1.0,
+                                    "scale_to": 1.25,
+                                    "start": 1.3
+                                }
+                            }
+                        },
+                        "name": "s1",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 45.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s2",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 6.8,
+                                    "src_t": 16.8
+                                },
+                                "out_end": 7.5,
+                                "out_start": 4.0,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        120,
+                                        204
+                                    ],
+                                    "source_time_at_start": 14.0
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_class",
+                                "speed": 1.0,
+                                "src_in": 14.0,
+                                "src_out": 16.8,
+                                "src_size": [
+                                    1920,
+                                    1080
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s2",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 84.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 420.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s2",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 6.8,
+                                    "src_t": 16.8
+                                },
+                                "out_end": 7.5,
+                                "out_start": 4.0,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "hold",
+                                    "out_frames": [
+                                        204,
+                                        225
+                                    ],
+                                    "source_time_at_start": 16.798
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_class",
+                                "speed": 1.0,
+                                "src_in": 14.0,
+                                "src_out": 16.8,
+                                "src_size": [
+                                    1920,
+                                    1080
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s2 정지",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 21.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 503.0
+                            }
+                        },
+                        "effects": [
+                            {
+                                "OTIO_SCHEMA": "FreezeFrame.1",
+                                "metadata": {},
+                                "name": "freeze",
+                                "effect_name": "FreezeFrame",
+                                "enabled": true,
+                                "time_scalar": 0.0
+                            }
+                        ],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 13.0,
+                                "out_start": 7.5,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        225,
+                                        383
+                                    ],
+                                    "source_time_at_start": 17.0
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_class",
+                                "speed": 1.0,
+                                "src_in": 17.0,
+                                "src_out": 22.5,
+                                "src_size": [
+                                    1920,
+                                    1080
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 158.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 510.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 13.0,
+                                "out_start": 7.5,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        383,
+                                        390
+                                    ],
+                                    "source_time_at_start": 22.266667
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_class",
+                                "speed": 1.0,
+                                "src_in": 17.0,
+                                "src_out": 22.5,
+                                "src_size": [
+                                    1920,
+                                    1080
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 668.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Transition.1",
+                        "metadata": {
+                            "shortkit": {
+                                "cut_frame": 386,
+                                "ir_overlap_frames": [
+                                    383,
+                                    390
+                                ]
+                            }
+                        },
+                        "name": "crossfade",
+                        "in_offset": {
+                            "OTIO_SCHEMA": "RationalTime.1",
+                            "rate": 30.0,
+                            "value": 3.0
+                        },
+                        "out_offset": {
+                            "OTIO_SCHEMA": "RationalTime.1",
+                            "rate": 30.0,
+                            "value": 4.0
+                        },
+                        "transition_type": "SMPTE_Dissolve"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s4",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 21.25,
+                                "out_start": 12.75,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        383,
+                                        390
+                                    ],
+                                    "source_time_at_start": 3.016667
+                                },
+                                "purpose": "reveal",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_pair",
+                                "speed": 1.0,
+                                "src_in": 3.0,
+                                "src_out": 11.5,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.25,
+                                    "type": "crossfade"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s4",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 4.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 93.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 4297.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/head-pose-face-detection-female-and-male.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s4",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 21.25,
+                                "out_start": 12.75,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        390,
+                                        638
+                                    ],
+                                    "source_time_at_start": 3.25
+                                },
+                                "purpose": "reveal",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_pair",
+                                "speed": 1.0,
+                                "src_in": 3.0,
+                                "src_out": 11.5,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.25,
+                                    "type": "crossfade"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s4",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 248.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 97.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 4297.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/head-pose-face-detection-female-and-male.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V3 플래시",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 224.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "opacity_by_frame": [
+                                    0.4444,
+                                    1.0,
+                                    0.4444
+                                ],
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                }
+                            }
+                        },
+                        "name": "플래시 s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "플래시 s3",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 3.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#FFFFFF"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A1 BGM",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "duck_ranges": [
+                                    [
+                                        10.0,
+                                        12.3
+                                    ]
+                                ],
+                                "envelope_db": [
+                                    [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        6.75,
+                                        0.0
+                                    ],
+                                    [
+                                        6.8,
+                                        -120.0
+                                    ],
+                                    [
+                                        7.45,
+                                        -120.0
+                                    ],
+                                    [
+                                        7.5,
+                                        0.0
+                                    ],
+                                    [
+                                        9.92,
+                                        0.0
+                                    ],
+                                    [
+                                        10.0,
+                                        -10.0
+                                    ],
+                                    [
+                                        12.3,
+                                        -10.0
+                                    ],
+                                    [
+                                        12.6,
+                                        0.0
+                                    ],
+                                    [
+                                        21.25,
+                                        0.0
+                                    ]
+                                ],
+                                "fade_in_s": 0.0,
+                                "fade_out_s": 0.8,
+                                "gain_db": -20.0,
+                                "loudness_gain_db": 18.6,
+                                "section_start_s": 12.0,
+                                "silences": [
+                                    [
+                                        6.8,
+                                        7.45
+                                    ]
+                                ],
+                                "tempo_ratio": 1.0,
+                                "track_id": null
+                            }
+                        },
+                        "name": "BGM",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 638.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 360.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/music_bed_a.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1800.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/music_bed_a.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A2 효과음",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 1.3,
+                                "kind": "sfx_event",
+                                "offset_s": -0.05,
+                                "sfx_id": "fx1",
+                                "sfx_t": 1.25
+                            }
+                        },
+                        "name": "whoosh: 창가 남성이 일어서기 시작함(확대 시작)",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 39.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 6.8,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx2",
+                                "sfx_t": 6.8
+                            }
+                        },
+                        "name": "click: 다시 앉은 순간 화면이 멈춤",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 204.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 7.75,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx3",
+                                "sfx_t": 7.75
+                            }
+                        },
+                        "name": "pop: 뒷줄 남성이 손을 들어 올림",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 232.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 11.0,
+                                "kind": "sfx_event",
+                                "offset_s": -0.1,
+                                "sfx_id": "fx4",
+                                "sfx_t": 10.9
+                            }
+                        },
+                        "name": "ding: 뒷줄 남성이 자리에서 일어섬",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 330.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 15.05,
+                                "kind": "sfx_event",
+                                "offset_s": -0.05,
+                                "sfx_id": "fx5",
+                                "sfx_t": 15.0
+                            }
+                        },
+                        "name": "boing: 두 사람이 동시에 고개를 옆으로 기울임",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 452.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 38.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "창가 남성이 일어서기 시작함(확대 시작)",
+                                "event_t": 1.3,
+                                "gain_db": -8.0,
+                                "id": "fx1",
+                                "loudness_gain_db": 18.6,
+                                "map_status": "unmeasured",
+                                "type": "whoosh"
+                            }
+                        },
+                        "name": "효과음 whoosh",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 14.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/whoosh.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 13.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/whoosh.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 152.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "다시 앉은 순간 화면이 멈춤",
+                                "event_t": 6.8,
+                                "gain_db": -8.0,
+                                "id": "fx2",
+                                "loudness_gain_db": 18.6,
+                                "map_status": "unmeasured",
+                                "type": "click"
+                            }
+                        },
+                        "name": "효과음 click",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/click.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/click.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 25.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "뒷줄 남성이 손을 들어 올림",
+                                "event_t": 7.75,
+                                "gain_db": -8.0,
+                                "id": "fx3",
+                                "loudness_gain_db": 18.6,
+                                "map_status": "unmeasured",
+                                "type": "pop"
+                            }
+                        },
+                        "name": "효과음 pop",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 4.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/pop.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 3.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/pop.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 91.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "뒷줄 남성이 자리에서 일어섬",
+                                "event_t": 11.0,
+                                "gain_db": -8.0,
+                                "id": "fx4",
+                                "loudness_gain_db": 18.6,
+                                "map_status": "unmeasured",
+                                "type": "ding"
+                            }
+                        },
+                        "name": "효과음 ding",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 36.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/ding.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 36.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/ding.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 87.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "두 사람이 동시에 고개를 옆으로 기울임",
+                                "event_t": 15.05,
+                                "gain_db": -8.0,
+                                "id": "fx5",
+                                "loudness_gain_db": 18.6,
+                                "map_status": "unmeasured",
+                                "type": "boing"
+                            }
+                        },
+                        "name": "효과음 boing",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 18.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/boing.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 18.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/boing.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A3 원본 소리",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 300.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "clip_id": "s3",
+                                "fade_s": 0.04,
+                                "gain_db": 0.0,
+                                "loudness_gain_db": 18.6,
+                                "reason": "소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증",
+                                "speed": 1.0,
+                                "stem": "raw"
+                            }
+                        },
+                        "name": "원본 소리 s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 69.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 585.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/classroom_voice.mp4",
+                                        "size": [
+                                            1920,
+                                            1080
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 984.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/classroom_voice.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            }
+        ]
+    }
+}

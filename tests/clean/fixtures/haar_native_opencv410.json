@@ -1,0 +1,134 @@
+{
+ "description": "Native OpenCV 4.10.0 (opencv-python-headless 4.10.0.84, installed into an isolated scratch dir, not the project env) CascadeClassifier.detectMultiScale2(gray, scaleFactor=1.1, minNeighbors=3, minSize=(24,24)) results on frames of the project test videos. Frame: `ffmpeg -ss <t> -i <video> -frames:v 1 x.png` -> cv2.imread -> gray -> INTER_AREA resize to 960 px wide if wider -> equalizeHist. Used to check shortkit.clean.faces.HaarCascade reproduces OpenCV exactly.",
+ "generated_at": "2026-09-24",
+ "rows": "[x, y, w, h, neighbors]",
+ "cases": [
+  {
+   "video": "assets/test/generated/dirty_source.mp4",
+   "t": 3.0,
+   "gray_shape": [
+    540,
+    960
+   ],
+   "gray_sha256": "a664210f9b4cb5c22d8d248c550f368942610de3d3ad0b03bb3ea1507ca83faf",
+   "native": {
+    "frontal": [
+     [
+      130,
+      299,
+      50,
+      50,
+      6
+     ],
+     [
+      263,
+      259,
+      29,
+      29,
+      15
+     ],
+     [
+      324,
+      127,
+      113,
+      113,
+      8
+     ],
+     [
+      467,
+      259,
+      29,
+      29,
+      18
+     ]
+    ],
+    "profile": []
+   }
+  },
+  {
+   "video": "assets/test/generated/video/people-detection.mp4",
+   "t": 5.0,
+   "gray_shape": [
+    432,
+    768
+   ],
+   "gray_sha256": "8570222644a0d3ac4b806d97ef018a5d70d4617ab94b53afe9879a294f75988f",
+   "native": {
+    "frontal": [],
+    "profile": [
+     [
+      618,
+      34,
+      93,
+      93,
+      4
+     ]
+    ]
+   }
+  },
+  {
+   "video": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4",
+   "t": 5.0,
+   "gray_shape": [
+    432,
+    768
+   ],
+   "gray_sha256": "9e06eaf59350cfc1f18a8dacc495e50153675cc8ac4dd67bef0cbf19b159a99c",
+   "native": {
+    "frontal": [
+     [
+      96,
+      116,
+      98,
+      98,
+      31
+     ],
+     [
+      513,
+      87,
+      136,
+      136,
+      60
+     ]
+    ],
+    "profile": [
+     [
+      104,
+      90,
+      137,
+      137,
+      76
+     ],
+     [
+      484,
+      79,
+      145,
+      145,
+      4
+     ]
+    ]
+   }
+  },
+  {
+   "video": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+   "t": 5.0,
+   "gray_shape": [
+    432,
+    768
+   ],
+   "gray_sha256": "0c6c91689a5cc3eba8860c3984e117d2d88227c39109afe17f852d675a99ec31",
+   "native": {
+    "frontal": [
+     [
+      416,
+      176,
+      34,
+      34,
+      8
+     ]
+    ],
+    "profile": []
+   }
+  }
+ ]
+}

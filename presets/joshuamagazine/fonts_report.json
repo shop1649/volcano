@@ -1,0 +1,65 @@
+{
+  "schema": "shortkit.fonts_report/1",
+  "preset_id": "joshuamagazine-v1",
+  "identification": {
+    "status": "unmeasured",
+    "label_ko": "못 잼",
+    "blocker": "레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+    "impact": "글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치",
+    "resolution": "레퍼런스 영상 다운로드 → captions.json 생성 → `shortkit ref fonts` (실제 해상도·비트레이트로 천장 재계산 포함)",
+    "roles": {
+      "title": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Black",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      },
+      "description": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Bold",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      },
+      "situation": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Black",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      },
+      "speaker": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Bold",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      },
+      "dialogue": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Black",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      },
+      "reaction": {
+        "status": "unmeasured",
+        "label_ko": "못 잼",
+        "current_preset_font": "Noto Sans CJK KR Black",
+        "current_value_origin": "provisional",
+        "candidate_ranking": null,
+        "verdict": null
+      }
+    },
+    "skipped": [],
+    "videos": {}
+  },
+  "identification_updated_at": "2026-09-24T18:10:04+00:00",
+  "status": "unmeasured (못 잼): 천장·판정 모두 미측정"
+}

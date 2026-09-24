@@ -1,0 +1,55 @@
+schema: shortkit.plan/1
+episode_id: test-qa-good
+preset_id: joshuamagazine-v1
+format_id: UNCLASSIFIED
+mode: test
+notes: SYNTHETIC QA test episode (tests/qa/qa_synth.py)
+cover:
+  text: 실험 영상 모음
+  frame_t: 0.0
+sources:
+- id: c1_src
+  path: assets/test/generated/video/head-pose-face-detection-female-and-male.mp4
+  protected:
+  - label: 남성 얼굴
+    x: 456
+    y: 80
+    w: 136
+    h: 170
+    start: 10.0
+    end: 12.5
+- id: c2_src
+  path: assets/test/generated/dirty_source.mp4
+- id: c3_src
+  path: assets/test/generated/video/classroom.mp4
+timeline: []
+captions: []
+sfx:
+- id: fx1
+  type: pop
+  t: 0.8
+  event:
+    t: 0.8
+    desc: 상황 자막이 튀어나옴
+    kind: text_pop
+- id: fx2
+  type: whoosh
+  t: 2.25
+  event:
+    t: 2.3
+    desc: 교사가 화면 안으로 걸어 들어옴
+    kind: action
+- id: fx3
+  type: ding
+  t: 5.4
+  event:
+    t: 5.4
+    desc: 반응 자막 '헉!' 등장
+    kind: text_pop
+- id: fx4
+  type: boom
+  t: 5.95
+  event:
+    t: 6.0
+    desc: 교실 확대가 끝나며 강조
+    kind: zoom_in

@@ -1,0 +1,271 @@
+{
+  "mlt": {
+    "format": "mlt",
+    "file": "test-pipeline-001.mlt",
+    "created_at": "2026-09-24T18:05:00+00:00",
+    "warnings": [],
+    "notes": [],
+    "prerendered": [
+      {
+        "kind": "freeze_still",
+        "clip": "s2",
+        "file": "media/s2_hold_c70e38f17851.png",
+        "source_time_s": 16.798,
+        "source_frame_index": 503,
+        "why": "정지(freeze)는 원본의 한 프레임을 이미지로 뽑아 이미지 클립으로 넣음 (melt 7.22 의 freeze 필터는 렌더가 멈추는 문제가 있어 사용하지 않음)"
+      }
+    ],
+    "crossfades": [
+      {
+        "clip": "s4",
+        "frames": [
+          383,
+          390
+        ],
+        "dur_s": 0.25,
+        "on_frame_grid": false
+      }
+    ],
+    "flashes": [
+      {
+        "clip": "s3",
+        "frames": [
+          224,
+          227
+        ],
+        "color": "#FFFFFF",
+        "shape": "alpha = 1 - |t - cut| / (dur/2), 영상 영역에만"
+      }
+    ],
+    "audio": {
+      "bgm": {
+        "status": "있음",
+        "file": "../../../assets/test/generated/music_bed_a.wav",
+        "section_start_s": 12.0,
+        "tempo_ratio": 1.0,
+        "entry_in_frame": 360,
+        "quantization_s": 0.0,
+        "gain_db": -20.0,
+        "fade_in_s": 0.0,
+        "fade_out_s": 0.8,
+        "envelope_points": 10,
+        "duck_ranges": [
+          [
+            10.0,
+            12.3
+          ]
+        ],
+        "silences": [
+          [
+            6.8,
+            7.45
+          ]
+        ],
+        "note": "시작점은 프레임(1/fps) 단위로 맞춰짐; 덕킹/정적 envelope 는 volume level 키프레임"
+      },
+      "sfx": {
+        "placed": 5,
+        "tracks": 1,
+        "skipped_unresolved": [],
+        "note": "효과음 위치는 프레임 단위(1/fps)로 맞춰짐"
+      },
+      "originals": {
+        "clips": 1,
+        "tracks": 1,
+        "stems": [
+          "raw"
+        ]
+      }
+    },
+    "semantics": {
+      "source": "shortkit.edit.render / shortkit.edit.resolve (src_time_at, src_to_region, ease)",
+      "frame_rule": "n 번째 프레임 = n/fps 초, 클립은 out_start-1e-6 <= t < out_end-1e-6 에서 보임"
+    },
+    "captions": {
+      "ass": "captions.ass",
+      "srt": "captions.srt",
+      "notes": [],
+      "srt_count": 9,
+      "roles": [
+        "description",
+        "dialogue",
+        "reaction",
+        "situation",
+        "speaker",
+        "title"
+      ]
+    },
+    "zoom_keyframes": [
+      {
+        "clip": "s1",
+        "mode": "per_frame",
+        "ease": "out",
+        "why": "줌 시작/끝이 프레임 경계에 있지 않거나 조각이 줌 중간에서 나뉨"
+      }
+    ],
+    "foreground_limiter": {
+      "status": "있음",
+      "master_max_reduction_db": 19.922,
+      "measured_max_reduction_db": 19.88,
+      "source": "episodes/test-pipeline-001/build/stems/{originals,sfx}.wav",
+      "how": "마스터 스템과 IR 로 다시 만든 정규화 전 스템의 프레임별 비율 → 효과음/원본 소리 클립의 volume 키프레임",
+      "note": "마스터 리미터는 5 ms 블록 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"
+    },
+    "tracks": [
+      {
+        "track": "V1 배경",
+        "kind": "video",
+        "items": 1
+      },
+      {
+        "track": "V2 영상",
+        "kind": "video",
+        "items": 6
+      },
+      {
+        "track": "V3 플래시",
+        "kind": "video",
+        "items": 1
+      },
+      {
+        "track": "A1 BGM",
+        "kind": "audio",
+        "items": 1
+      },
+      {
+        "track": "A2 효과음",
+        "kind": "audio",
+        "items": 5
+      },
+      {
+        "track": "A3 원본 소리",
+        "kind": "audio",
+        "items": 1
+      }
+    ],
+    "coordinates": "affine/qtcrop/flash rect 은 캔버스 px (profile 해상도 기준), crop 은 SOURCE px, delogo 는 mlt_frame_resolution 기준 px",
+    "profile": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "frames": 638,
+      "display_aspect": "9:16"
+    },
+    "limiter": null,
+    "loudness": {
+      "gain_db": 18.6,
+      "source": "episodes/test-pipeline-001/build/render_report.json",
+      "norm_gain_db": 19.0,
+      "final_trim_db": -0.4,
+      "master_limiter_max_reduction_db": null,
+      "note": "마스터의 정규화 이득 + 최종 트림을 타임라인 volume 필터로 적용"
+    },
+    "editable": [
+      "클립 순서·길이·트림(V2 영상 트랙의 각 조각)",
+      "클립별 위치/크기/줌(Size, Position & Rotate = affine 키프레임)",
+      "원본 정리 crop(Crop: Source)·delogo(avfilter.delogo) 수치",
+      "영상 영역 마스크(Crop: Rectangle = qtcrop)",
+      "crossfade 전환(luma+mix 전환 트랙)",
+      "플래시(V3 트랙의 색 클립, Opacity 키프레임)",
+      "BGM 시작점·이득·덕킹 envelope·페이드(volume 필터)",
+      "효과음 위치·이득(A2)",
+      "원본 소리 구간·이득·페이드(A3)",
+      "전체 음량 이득(타임라인 volume 필터)"
+    ],
+    "baked": [
+      "자막·장식 전체가 ASS 한 파일(captions.ass)로 한 레이어에 그려짐 → 텍스트는 captions.ass 를 Aegisub/텍스트 편집기로 고쳐야 하며 NLE 의 개별 텍스트 클립이 아님",
+      "inpaint 로 지운 소스는 미리 렌더된 중간 파일(warehouse/cache/clean)을 소스로 사용",
+      "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
+    ]
+  },
+  "updated_at": "2026-09-24T18:05:05+00:00",
+  "fcpxml": {
+    "format": "fcpxml",
+    "version": "1.9",
+    "file": "test-pipeline-001.fcpxml",
+    "created_at": "2026-09-24T18:05:03+00:00",
+    "absolute_urls": false,
+    "warnings": [],
+    "prerendered": [],
+    "crossfades": [
+      {
+        "clip": "s4",
+        "offset_frames": 383,
+        "duration_frames": 7,
+        "cut_frame": 386
+      }
+    ],
+    "verified": false,
+    "verification": "이 기계에 DaVinci Resolve / Final Cut Pro 가 없어 가져오기·렌더 확인 못 함(못 잼). XML 형식과 시간 일관성만 테스트함",
+    "loudness_gain_db": 18.6,
+    "zoom": [
+      {
+        "clip": "s1",
+        "keyframes": 4,
+        "ease": "out",
+        "fcp_interp": "easeOut",
+        "note": "FCP 의 ease 곡선은 마스터의 3차 easing 과 같지 않음; 영역 마스크가 없어 확대 시 영역 밖으로 넘칠 수 있음"
+      }
+    ],
+    "editable": [
+      "클립 순서·트림·속도/정지(timeMap)",
+      "crossfade(Cross Dissolve)",
+      "위치·크기·줌 키프레임",
+      "clean crop(adjust-crop trim)",
+      "오디오 클립별 음량 키프레임(BGM 덕킹·페이드, 효과음, 원본 소리)",
+      "자막 텍스트(caption 요소, 스타일 없음)"
+    ],
+    "not_representable": [
+      "영상 영역 마스크(확대 시 영역 밖으로 넘칠 수 있음)",
+      "delogo/blur (미리 정리한 중간 파일로 대체)",
+      "자막·장식의 스타일/위치/모션(captions.ass 에만 있음)",
+      "마스터의 true-peak 리미터"
+    ]
+  },
+  "otio": {
+    "format": "otio",
+    "file": "test-pipeline-001.otio",
+    "created_at": "2026-09-24T18:05:04+00:00",
+    "warnings": [],
+    "prerendered": [],
+    "otio_version": "0.18.1",
+    "verified": false,
+    "verification": "OTIO 는 자체 렌더러가 없어 렌더 동등성 못 잼; 쓰기→읽기 왕복과 구조만 테스트함",
+    "tracks": [
+      {
+        "name": "V1 배경",
+        "kind": "Video",
+        "items": 1
+      },
+      {
+        "name": "V2 영상",
+        "kind": "Video",
+        "items": 8
+      },
+      {
+        "name": "V3 플래시",
+        "kind": "Video",
+        "items": 2
+      },
+      {
+        "name": "A1 BGM",
+        "kind": "Audio",
+        "items": 1
+      },
+      {
+        "name": "A2 효과음",
+        "kind": "Audio",
+        "items": 10
+      },
+      {
+        "name": "A3 원본 소리",
+        "kind": "Audio",
+        "items": 2
+      }
+    ],
+    "markers": {
+      "captions": 9,
+      "sfx_events": 5
+    }
+  }
+}

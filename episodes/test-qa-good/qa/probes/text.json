@@ -1,0 +1,1351 @@
+{
+  "ocr_engine": "5.3.4",
+  "errors": {},
+  "captions": [
+    {
+      "id": "t1",
+      "role": "title",
+      "text": "실험 영상 모음",
+      "start": 0.0,
+      "end": 7.8,
+      "t_rest": 0.12,
+      "expected_bbox": [
+        187.0,
+        193.0,
+        345.0,
+        60.0
+      ],
+      "resolution": [
+        720,
+        1280
+      ],
+      "n_candidates": 1,
+      "mask_px": 7153,
+      "found": true,
+      "line_boxes": [
+        [
+          191,
+          197,
+          337,
+          52
+        ]
+      ],
+      "ocr": "실험 영상 모음",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 11,
+      "outline_ring_fracs": [
+        0.45,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.21,
+      "box_alpha_obs": null,
+      "ink_h": 52,
+      "ink_w": 337,
+      "bbox_obs": [
+        191,
+        197,
+        337,
+        52
+      ],
+      "evidence_frame": "episodes/test-qa-good/qa/frames/cap_t1_0000120.png",
+      "region": [
+        150,
+        177,
+        420,
+        92
+      ],
+      "onset_contrast": 0.3,
+      "onset": 0.0,
+      "onset_note": "첫 프레임부터 표시",
+      "offset": 7.8,
+      "offset_note": "영상 끝까지 표시",
+      "font": {
+        "status": "measured",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.8983,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.8983,
+            "scale": 1.022
+          },
+          {
+            "font": "NanumGothic",
+            "iou": 0.4905,
+            "scale": 0.985
+          },
+          {
+            "font": "Noto Sans CJK KR Regular",
+            "iou": 0.5914,
+            "scale": 1.031
+          }
+        ]
+      }
+    },
+    {
+      "id": "s1",
+      "role": "situation",
+      "text": "두 사람이 고개를 돌린다",
+      "start": 0.8,
+      "end": 2.3,
+      "t_rest": 1.04,
+      "expected_bbox": [
+        136.0,
+        931.0,
+        448.0,
+        49.0
+      ],
+      "resolution": [
+        720,
+        1280
+      ],
+      "n_candidates": 2,
+      "mask_px": 14010,
+      "found": true,
+      "line_boxes": [
+        [
+          140,
+          936,
+          440,
+          40
+        ]
+      ],
+      "ocr": "두 사 람 이 WHS 돌린다",
+      "similarity": 0.7,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 11,
+      "outline_ring_fracs": [
+        0.42,
+        0.97,
+        0.98,
+        0.98,
+        0.99,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.2,
+      "box_alpha_obs": null,
+      "ink_h": 40,
+      "ink_w": 440,
+      "bbox_obs": [
+        140,
+        936,
+        440,
+        40
+      ],
+      "evidence_frame": "episodes/test-qa-good/qa/frames/cap_s1_0001040.png",
+      "region": [
+        91,
+        917,
+        538,
+        78
+      ],
+      "onset_contrast": 252.5,
+      "onset_frame_t": 0.8,
+      "onset": 0.7667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 0.854,
+        "presence_first": 0.358,
+        "dur_s": 0.133,
+        "scales": [
+          0.854,
+          0.895,
+          0.936,
+          0.977,
+          1.002,
+          1.002,
+          1.002,
+          1.002
+        ],
+        "presence": [
+          0.358,
+          0.435,
+          0.541,
+          0.776,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          0.467,
+          0.0
+        ],
+        [
+          0.5,
+          0.0
+        ],
+        [
+          0.533,
+          0.0
+        ],
+        [
+          0.567,
+          0.0
+        ],
+        [
+          0.6,
+          0.0
+        ],
+        [
+          0.633,
+          0.0
+        ],
+        [
+          0.667,
+          0.0
+        ],
+        [
+          0.7,
+          0.0
+        ],
+        [
+          0.733,
+          0.0
+        ],
+        [
+          0.767,
+          0.0
+        ],
+        [
+          0.8,
+          0.358
+        ],
+        [
+          0.833,
+          0.435
+        ],
+        [
+          0.867,
+          0.541
+        ],
+        [
+          0.9,
+          0.776
+        ],
+        [
+          0.933,
+          1.0
+        ],
+        [
+          0.967,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.033,
+          1.0
+        ],
+        [
+          1.067,
+          1.0
+        ],
+        [
+          1.1,
+          1.0
+        ],
+        [
+          1.133,
+          1.0
+        ],
+        [
+          1.167,
+          1.0
+        ],
+        [
+          1.2,
+          1.0
+        ],
+        [
+          1.233,
+          1.0
+        ],
+        [
+          1.267,
+          1.0
+        ],
+        [
+          1.3,
+          1.0
+        ],
+        [
+          1.333,
+          1.0
+        ],
+        [
+          1.367,
+          1.0
+        ]
+      ],
+      "offset": 2.3,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          1.867,
+          1.0
+        ],
+        [
+          1.9,
+          1.0
+        ],
+        [
+          1.933,
+          1.0
+        ],
+        [
+          1.967,
+          1.0
+        ],
+        [
+          2.0,
+          1.0
+        ],
+        [
+          2.033,
+          1.0
+        ],
+        [
+          2.067,
+          1.0
+        ],
+        [
+          2.1,
+          1.0
+        ],
+        [
+          2.133,
+          1.0
+        ],
+        [
+          2.167,
+          1.0
+        ],
+        [
+          2.2,
+          1.0
+        ],
+        [
+          2.233,
+          1.0
+        ],
+        [
+          2.267,
+          1.0
+        ],
+        [
+          2.3,
+          0.0
+        ],
+        [
+          2.333,
+          0.0
+        ],
+        [
+          2.367,
+          0.0
+        ],
+        [
+          2.4,
+          0.0
+        ],
+        [
+          2.433,
+          0.0
+        ],
+        [
+          2.467,
+          0.0
+        ],
+        [
+          2.5,
+          0.0
+        ],
+        [
+          2.533,
+          0.0
+        ],
+        [
+          2.567,
+          0.0
+        ],
+        [
+          2.6,
+          0.0
+        ],
+        [
+          2.633,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.8765,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.8765,
+            "scale": 1.015
+          },
+          {
+            "font": "NanumGothic",
+            "iou": 0.4751,
+            "scale": 0.979
+          },
+          {
+            "font": "Noto Sans CJK KR Regular",
+            "iou": 0.5832,
+            "scale": 1.026
+          }
+        ]
+      }
+    },
+    {
+      "id": "k1",
+      "role": "speaker",
+      "text": "선생님",
+      "start": 2.8,
+      "end": 4.6,
+      "t_rest": 3.07,
+      "expected_bbox": [
+        516.0,
+        468.0,
+        85.0,
+        27.0
+      ],
+      "resolution": [
+        720,
+        1280
+      ],
+      "n_candidates": 10,
+      "mask_px": 45542,
+      "found": true,
+      "line_boxes": [
+        [
+          555,
+          798,
+          22,
+          28
+        ]
+      ],
+      "ocr": "님",
+      "similarity": 0.5,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#E1EAEC",
+      "outline_px_obs": 0,
+      "outline_ring_fracs": [
+        0.04,
+        0.05,
+        0.02,
+        0.0,
+        0.0
+      ],
+      "outline_color": "#7B8184",
+      "outline_bg_same_color_frac": 0.0,
+      "box_inside_luma": 113.2,
+      "box_outside_luma": 90.7,
+      "box_region_color": "#495760",
+      "box_region_std": 54.82,
+      "box_alpha_obs": 0.0,
+      "ink_h": 28,
+      "ink_w": 22,
+      "bbox_obs": [
+        555,
+        798,
+        22,
+        28
+      ],
+      "evidence_frame": "episodes/test-qa-good/qa/frames/cap_k1_0003070.png",
+      "region": [
+        541,
+        784,
+        49,
+        56
+      ],
+      "onset_contrast": 136.7,
+      "onset_frame_t": 2.5667,
+      "onset": 2.5445,
+      "motion_in_obs": {
+        "type": "fade",
+        "scale_first": 0.95,
+        "presence_first": 0.201,
+        "dur_s": null,
+        "scales": [
+          0.95,
+          1.05,
+          2.45,
+          2.45,
+          2.45,
+          1.2,
+          1.2,
+          1.2
+        ],
+        "presence": [
+          0.201,
+          0.504,
+          0.431,
+          0.348,
+          0.299,
+          0.338,
+          0.377,
+          0.494
+        ]
+      },
+      "presence_in": [
+        [
+          2.467,
+          0.18
+        ],
+        [
+          2.5,
+          0.011
+        ],
+        [
+          2.533,
+          0.0
+        ],
+        [
+          2.567,
+          0.201
+        ],
+        [
+          2.6,
+          0.504
+        ],
+        [
+          2.633,
+          0.431
+        ],
+        [
+          2.667,
+          0.348
+        ],
+        [
+          2.7,
+          0.299
+        ],
+        [
+          2.733,
+          0.338
+        ],
+        [
+          2.767,
+          0.377
+        ],
+        [
+          2.8,
+          0.494
+        ],
+        [
+          2.833,
+          0.647
+        ],
+        [
+          2.867,
+          0.64
+        ],
+        [
+          2.9,
+          0.617
+        ],
+        [
+          2.933,
+          0.666
+        ],
+        [
+          2.967,
+          0.653
+        ],
+        [
+          3.0,
+          0.527
+        ],
+        [
+          3.033,
+          0.668
+        ],
+        [
+          3.067,
+          1.0
+        ],
+        [
+          3.1,
+          0.773
+        ],
+        [
+          3.133,
+          0.723
+        ],
+        [
+          3.167,
+          0.682
+        ],
+        [
+          3.2,
+          0.494
+        ],
+        [
+          3.233,
+          0.365
+        ],
+        [
+          3.267,
+          0.534
+        ],
+        [
+          3.3,
+          0.78
+        ],
+        [
+          3.333,
+          0.728
+        ]
+      ],
+      "offset": null,
+      "offset_note": "퇴장 시점이 측정 창 밖",
+      "presence_out": [
+        [
+          4.167,
+          0.476
+        ],
+        [
+          4.2,
+          0.334
+        ],
+        [
+          4.233,
+          0.25
+        ],
+        [
+          4.267,
+          0.165
+        ],
+        [
+          4.3,
+          0.427
+        ],
+        [
+          4.333,
+          1.0
+        ],
+        [
+          4.367,
+          0.621
+        ],
+        [
+          4.4,
+          0.362
+        ],
+        [
+          4.433,
+          0.23
+        ],
+        [
+          4.467,
+          0.171
+        ],
+        [
+          4.5,
+          0.0
+        ],
+        [
+          4.533,
+          0.233
+        ],
+        [
+          4.567,
+          0.259
+        ],
+        [
+          4.6,
+          0.165
+        ],
+        [
+          4.633,
+          0.118
+        ],
+        [
+          4.667,
+          0.264
+        ],
+        [
+          4.7,
+          0.375
+        ],
+        [
+          4.733,
+          0.313
+        ],
+        [
+          4.767,
+          0.224
+        ],
+        [
+          4.8,
+          0.283
+        ],
+        [
+          4.833,
+          0.431
+        ],
+        [
+          4.867,
+          0.474
+        ],
+        [
+          4.9,
+          0.501
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "expected": "Noto Sans CJK KR Bold",
+        "best": "Noto Sans CJK KR Bold",
+        "iou_expected": 0.0,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.0,
+            "scale": null
+          },
+          {
+            "font": "NanumGothic",
+            "iou": 0.0,
+            "scale": null
+          },
+          {
+            "font": "Noto Sans CJK KR Regular",
+            "iou": 0.0,
+            "scale": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "d1",
+      "role": "dialogue",
+      "text": "\"잠깐만요 진짜예요?\"",
+      "start": 2.8,
+      "end": 5.0,
+      "t_rest": 2.92,
+      "expected_bbox": [
+        166.0,
+        931.0,
+        388.0,
+        47.0
+      ],
+      "resolution": [
+        720,
+        1280
+      ],
+      "n_candidates": 1,
+      "mask_px": 5124,
+      "found": true,
+      "line_boxes": [
+        [
+          170,
+          937,
+          380,
+          37
+        ]
+      ],
+      "ocr": "\"' 잠 깐 만요 진 짜 예 요 ?''",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FDE300",
+      "outline_px_obs": 11,
+      "outline_ring_fracs": [
+        0.35,
+        0.99,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#020000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.1,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.35,
+      "box_alpha_obs": null,
+      "ink_h": 37,
+      "ink_w": 380,
+      "bbox_obs": [
+        170,
+        937,
+        380,
+        37
+      ],
+      "evidence_frame": "episodes/test-qa-good/qa/frames/cap_d1_0002920.png",
+      "region": [
+        126,
+        918,
+        469,
+        75
+      ],
+      "onset_contrast": 54.3,
+      "onset_frame_t": 2.4667,
+      "onset": 2.4667,
+      "motion_in_obs": {
+        "type": "fade",
+        "scale_first": null,
+        "presence_first": 0.488,
+        "dur_s": null,
+        "scales": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "presence": [
+          0.488,
+          0.488,
+          0.488,
+          0.488,
+          0.488,
+          0.488,
+          0.488,
+          0.488
+        ]
+      },
+      "presence_in": [
+        [
+          2.467,
+          0.488
+        ],
+        [
+          2.5,
+          0.488
+        ],
+        [
+          2.533,
+          0.488
+        ],
+        [
+          2.567,
+          0.488
+        ],
+        [
+          2.6,
+          0.488
+        ],
+        [
+          2.633,
+          0.488
+        ],
+        [
+          2.667,
+          0.488
+        ],
+        [
+          2.7,
+          0.488
+        ],
+        [
+          2.733,
+          0.488
+        ],
+        [
+          2.767,
+          0.488
+        ],
+        [
+          2.8,
+          0.004
+        ],
+        [
+          2.833,
+          0.0
+        ],
+        [
+          2.867,
+          0.009
+        ],
+        [
+          2.9,
+          0.125
+        ],
+        [
+          2.933,
+          1.0
+        ],
+        [
+          2.967,
+          0.275
+        ],
+        [
+          3.0,
+          0.167
+        ],
+        [
+          3.033,
+          0.318
+        ],
+        [
+          3.067,
+          0.263
+        ],
+        [
+          3.1,
+          0.311
+        ],
+        [
+          3.133,
+          0.445
+        ],
+        [
+          3.167,
+          0.499
+        ],
+        [
+          3.2,
+          0.254
+        ]
+      ],
+      "offset": null,
+      "offset_note": "퇴장 시점이 측정 창 밖",
+      "presence_out": [
+        [
+          4.567,
+          0.0
+        ],
+        [
+          4.6,
+          0.016
+        ],
+        [
+          4.633,
+          0.175
+        ],
+        [
+          4.667,
+          0.315
+        ],
+        [
+          4.7,
+          0.098
+        ],
+        [
+          4.733,
+          0.065
+        ],
+        [
+          4.767,
+          0.157
+        ],
+        [
+          4.8,
+          0.165
+        ],
+        [
+          4.833,
+          0.298
+        ],
+        [
+          4.867,
+          1.0
+        ],
+        [
+          4.9,
+          0.325
+        ],
+        [
+          4.933,
+          0.076
+        ],
+        [
+          4.967,
+          0.135
+        ],
+        [
+          5.0,
+          0.44
+        ],
+        [
+          5.033,
+          0.44
+        ],
+        [
+          5.067,
+          0.44
+        ],
+        [
+          5.1,
+          0.44
+        ],
+        [
+          5.133,
+          0.44
+        ],
+        [
+          5.167,
+          0.44
+        ],
+        [
+          5.2,
+          0.44
+        ],
+        [
+          5.233,
+          0.44
+        ],
+        [
+          5.267,
+          0.44
+        ],
+        [
+          5.3,
+          0.44
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.8904,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.8904,
+            "scale": 1.013
+          },
+          {
+            "font": "NanumGothic",
+            "iou": 0.4427,
+            "scale": 0.988
+          },
+          {
+            "font": "Noto Sans CJK KR Regular",
+            "iou": 0.5413,
+            "scale": 1.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1",
+      "role": "reaction",
+      "text": "헉!",
+      "start": 5.4,
+      "end": 6.6,
+      "t_rest": 5.62,
+      "expected_bbox": [
+        324.0,
+        734.0,
+        69.0,
+        58.0
+      ],
+      "resolution": [
+        720,
+        1280
+      ],
+      "n_candidates": 1,
+      "mask_px": 1128,
+      "found": false,
+      "candidates": [
+        {
+          "box": [
+            329,
+            740,
+            59,
+            46
+          ],
+          "ocr": "a!"
+        }
+      ]
+    }
+  ],
+  "identity": {
+    "forbidden_terms": [
+      "조슈아매거진",
+      "조슈아 매거진",
+      "joshuamagazine",
+      "joshua magazine",
+      "JOSHUA MAGAZINE"
+    ],
+    "sample_times": [
+      0.5,
+      1.25,
+      1.5,
+      2.5,
+      3.5,
+      3.7,
+      4.5,
+      5.5,
+      6.5
+    ],
+    "forbidden_hits": [],
+    "leftovers": [
+      {
+        "t": 2.5,
+        "zone": "video_bottom",
+        "text": "yo",
+        "conf": 54.0,
+        "handle_like": false,
+        "box": [
+          0.0,
+          759.0,
+          580.0,
+          83.0
+        ],
+        "clip_id": "c2"
+      },
+      {
+        "t": 2.5,
+        "zone": "video_bottom",
+        "text": "Mia.",
+        "conf": 48.0,
+        "handle_like": false,
+        "box": [
+          351.0,
+          759.0,
+          229.0,
+          83.0
+        ],
+        "clip_id": "c2"
+      },
+      {
+        "t": 5.5,
+        "zone": "video_top_left",
+        "text": "SS",
+        "conf": 47.0,
+        "handle_like": false,
+        "box": [
+          164.5,
+          437.0,
+          9.0,
+          5.0
+        ],
+        "clip_id": "c3"
+      },
+      {
+        "t": 5.5,
+        "zone": "video_top_left",
+        "text": "eis",
+        "conf": 61.0,
+        "handle_like": false,
+        "box": [
+          218.5,
+          437.0,
+          55.5,
+          17.5
+        ],
+        "clip_id": "c3"
+      },
+      {
+        "t": 6.5,
+        "zone": "video_bottom",
+        "text": "ol",
+        "conf": 75.0,
+        "handle_like": false,
+        "box": [
+          328.0,
+          739.0,
+          60.0,
+          31.0
+        ],
+        "clip_id": "c3"
+      },
+      {
+        "t": 6.5,
+        "zone": "video_top_right",
+        "text": "ia",
+        "conf": 66.0,
+        "handle_like": false,
+        "box": [
+          446.0,
+          437.0,
+          274.0,
+          122.0
+        ],
+        "clip_id": "c3"
+      }
+    ],
+    "leftover_groups": [
+      {
+        "zone": "video_bottom",
+        "clip_id": "c2",
+        "text": "yo",
+        "times": [
+          2.5
+        ],
+        "confs": [
+          54.0
+        ],
+        "box": [
+          0.0,
+          759.0,
+          580.0,
+          83.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "c2",
+        "text": "Mia.",
+        "times": [
+          2.5
+        ],
+        "confs": [
+          48.0
+        ],
+        "box": [
+          351.0,
+          759.0,
+          229.0,
+          83.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_top_left",
+        "clip_id": "c3",
+        "text": "SS",
+        "times": [
+          5.5
+        ],
+        "confs": [
+          47.0
+        ],
+        "box": [
+          164.5,
+          437.0,
+          9.0,
+          5.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_top_left",
+        "clip_id": "c3",
+        "text": "eis",
+        "times": [
+          5.5
+        ],
+        "confs": [
+          61.0
+        ],
+        "box": [
+          218.5,
+          437.0,
+          55.5,
+          17.5
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "c3",
+        "text": "ol",
+        "times": [
+          6.5
+        ],
+        "confs": [
+          75.0
+        ],
+        "box": [
+          328.0,
+          739.0,
+          60.0,
+          31.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_top_right",
+        "clip_id": "c3",
+        "text": "ia",
+        "times": [
+          6.5
+        ],
+        "confs": [
+          66.0
+        ],
+        "box": [
+          446.0,
+          437.0,
+          274.0,
+          122.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      }
+    ],
+    "ocr_calls": 49,
+    "ocr_timeouts": 0
+  },
+  "tone": {
+    "n": 3,
+    "counts": {
+      "음슴체": 1,
+      "반말_구어체": 1,
+      "해요체": 1
+    },
+    "mode": "혼합"
+  },
+  "cover": {
+    "t": 0.0,
+    "source": "first_frame",
+    "text_role": "title",
+    "expected_text": "실험 영상 모음",
+    "ocr": "실험 영상 모음",
+    "similarity": 1.0,
+    "role_caption_visible": true
+  },
+  "status": "measured"
+}

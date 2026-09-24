@@ -1,0 +1,14 @@
+{
+  "schema": "shortkit.ref_high_views/1",
+  "preset_id": "joshuamagazine-v1",
+  "status": "blocked",
+  "blocker": "https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))\")); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U",
+  "captured_at": "2026-09-24T17:56:07+00:00",
+  "method": "yt-dlp 2026.08.19",
+  "channel_url": "https://youtube.com/@joshuamagazine",
+  "videos": [],
+  "n": 0,
+  "threshold": 800000,
+  "checked_at": "2026-09-24T17:56:07+00:00",
+  "unverified": []
+}
