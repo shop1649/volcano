@@ -246,3 +246,16 @@ def build_blur_mock(out_dir: Path, video_dir: Path) -> dict:
              "background": {"type": "blur_source"}}
     tj.write_text(json.dumps(truth, ensure_ascii=False, indent=1), encoding="utf-8")
     return truth
+
+
+def build_hd_mock(out_dir: Path, video_dir: Path) -> tuple[dict, Path]:
+    """The 540x960 mock upscaled to 1080x1920 (lanczos): checks that detection / measurement do not
+    depend on the upload resolution.  Truth = the base truth with px values x2."""
+    truth = build_mock(out_dir, video_dir)
+    mp4 = out_dir / "mockref_hd.mp4"
+    stamp = out_dir / "mockref_hd.version"
+    if not (mp4.is_file() and stamp.is_file() and stamp.read_text().strip() == str(GEN_VERSION)):
+        _run(["ffmpeg", "-hide_banner", "-nostdin", "-v", "error", "-y", "-i", out_dir / "mockref_a.mp4", "-vf",
+              "scale=1080:1920:flags=lanczos", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", mp4])
+        stamp.write_text(str(GEN_VERSION))
+    return truth, mp4

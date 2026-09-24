@@ -10,6 +10,7 @@ Production additionally requires (``complete``):
   P1  no preset key is still unmeasured (provisional) -- unmeasured never becomes complete
   P2  no style-vs-reference row is ``unmeasured``
   P3  the plan is a production plan (test-mode outputs are never publishable)
+  A1  (production) a first episode (episode_index 1) was rendered without an approved proposal
 """
 from __future__ import annotations
 
@@ -17,7 +18,8 @@ from .checks import CAT
 
 
 def evaluate(rows: list[dict], *, mode: str, mp4_sha_measured: str | None, mp4_sha_now: str | None,
-             unmeasured_preset_keys: list[str], production: bool | None = None, checked_at: str | None = None) -> dict:
+             unmeasured_preset_keys: list[str], production: bool | None = None, checked_at: str | None = None,
+             plan: dict | None = None) -> dict:
     from ..util.jsonio import now_iso
 
     production = (mode == "production") if production is None else production
@@ -46,6 +48,10 @@ def evaluate(rows: list[dict], *, mode: str, mp4_sha_measured: str | None, mp4_s
     elif mp4_sha_measured and mp4_sha_now != mp4_sha_measured:
         fails.append({"rule": "G5", "message": "QA 이후 출력 MP4 가 바뀜 — 다시 `shortkit qa run` 필요", "rows": []})
 
+    # first episode of a preset: the proposal must have been approved before rendering
+    ap = (plan or {}).get("approval") or {}
+    if mode == "production" and (plan or {}).get("episode_index") == 1 and ap.get("required", True) and not ap.get("approved"):
+        fails.append({"rule": "A1", "message": "첫 에피소드 제안서가 승인되지 않은 채 렌더됨", "rows": []})
     style_un = [r for r in rows if r.get("kind") == "style_vs_reference" and r["status"] == "unmeasured"]
     prod_fail: list[dict] = []
     if unmeasured_preset_keys:
@@ -88,5 +94,8 @@ def gate_episode(episode_id: str, production: bool | None = None) -> dict:
     sha_now = sha256_file(mp4) if mp4.is_file() else None
     fmt = rep.get("format_id") if rep.get("format_id") not in (None, "UNCLASSIFIED") else None
     pr = load_preset(rep["preset_name"], fmt)
+    from ..util.jsonio import read_yaml
+
     return evaluate(rep["rows"], mode=rep.get("mode", "test"), mp4_sha_measured=rep["output"].get("sha256"),
-                    mp4_sha_now=sha_now, unmeasured_preset_keys=pr.unmeasured_keys(), production=production)
+                    mp4_sha_now=sha_now, unmeasured_preset_keys=pr.unmeasured_keys(), production=production,
+                    plan=read_yaml(ep / "plan.yaml"))

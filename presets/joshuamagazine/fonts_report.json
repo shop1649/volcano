@@ -25,13 +25,14 @@
     "    Noto Sans CJK KR Black vs Pretendard Black: 교차 IoU p50 0.9139, 차이 p10 0.0443, 잡음 p90 0.01, 구분 가능"
   ],
   "method": {
-    "mask": "fill-only (외곽선 제외), 색 투영(외곽선→채움 선분, t>=0.5) + 테두리 접촉 성분 제거 + 외곽선 둘러싸임 검사",
+    "mask": "fill-only(외곽선 제외). 채움/외곽선 밝기(luma) 사이 t>=0.5 → 채움 (yuv420 색차 번짐 때문에 색차는 배경 배제에만 사용; 밝기 차가 작으면 RGB 투영) + 테두리 접촉 성분 제거 + 외곽선 둘러싸임 검사",
     "render": "후보 글꼴을 4배 해상도로 렌더 후 상자 축소(비힌팅·분수 위치), 50% 커버리지 임계",
     "alignment": "크기 ±15% (잉크 높이 맞춤 중심, 5% 격자 → 절반씩 0.3%까지), 이동 1/4px 격자 상호상관",
     "ceiling": "같은 글꼴로 합성 자막 렌더 → 레퍼런스처럼 축소·인코딩·디코딩 → 같은 마스크 추출 → 같은 글꼴 깨끗한 렌더와 IoU",
     "noise": "같은 문구·크기·스타일 반복(부분 픽셀 위치·배경·인코딩 문맥만 다름) IoU 차이(max-min)의 분포",
+    "real_conditions": "`ref fonts`: 실제 다운로드의 해상도·코덱(ffprobe), H.264 이면 자막 매크로블록의 실제 양자화값(ffmpeg -debug qp+mb_type, 기준 프레임에서 마지막으로 부호화된 QP) → 같은 QP 로 재현; 그 외 코덱은 평균 비트레이트(정지 화면에서는 부정확 — 보고서에 표시). 크기는 crop 에서 잰 잉크 높이",
     "verdict": {
-      "identical": "IoU >= 그 글꼴 천장 p10 AND 차순위 대비 차이 > 잡음 p90 AND 글자별 검사 통과(글자 75% 이상이 글자별 천장 p10 이상)",
+      "identical": "IoU >= 그 글꼴 천장 p10 AND 차순위 대비 차이 > 잡음 p90 AND 글자별 검사 통과(글자 50% 이상이 글자별 천장 p10 이상, 그리고 글자별 하한 p10-2x(p50-p10) 미만인 글자 없음)",
       "similar": "제외는 안 되지만 동일 확정 불가 — 프리셋 값으로 쓰지 않음(못 잼 유지)",
       "different": "IoU < 천장 p10 - 잡음 p90"
     }
@@ -59,7 +60,7 @@
         "crf 30"
       ],
       "status": "assumed",
-      "replace_with": "실제 다운로드의 비디오 비트레이트 → bitrate 모드로 재계산"
+      "replace_with": "실제 다운로드: H.264 면 자막 매크로블록의 실제 QP(ffmpeg -debug qp+mb_type) → 같은 QP 로 재계산, 그 외 코덱은 비디오 비트레이트(ffprobe) → bitrate 모드"
     },
     {
       "input": "canvas",
@@ -4567,5 +4568,6 @@
     "skipped": [],
     "videos": {}
   },
-  "impact_if_unmeasured": "글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치"
+  "impact_if_unmeasured": "글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치",
+  "method_note": "method 설명은 현재 코드 기준으로 갱신됨(2026-09-24T18:38:02+00:00). 천장 수치는 같은 코드 경로로 계산된 값이며 Black Han Sans·Noto Sans CJK KR Medium 은 현재 코드로 재실행해 같은 값을 확인함."
 }

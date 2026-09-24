@@ -2,7 +2,7 @@
 
 Stated tolerances (mock is 540x960 @ 30 fps; px are in that resolution):
   video region edges ±4 px; background color RGB distance ≤ 20
-  text bbox edges ±3 px; size_px ±8 %; fill color RGB distance ≤ 25; highlight ≤ 40
+  text bbox edges ±3 px; size (libass Fontsize and em px) ±8 %; fill color RGB distance ≤ 25; highlight ≤ 40
   outline_px ±1.0 px; box alpha ±0.1, box pad ±3 px
   appear / disappear time ±0.07 s (2 frames); motion_in/out duration ±0.05 s; pop scale_from ±0.06
   (reaction: ±0.1 because the first 1/30 s frame is already part-way through a 0.1 s pop)
@@ -96,7 +96,10 @@ def test_caption_items_roles_geometry_style(analyzed):
         tx, ty, tw, th = ev["bbox"]
         assert abs(x - tx) <= 3 and abs(y - ty) <= 3 and abs(x + w - tx - tw) <= 3 and abs(y + h - ty - th) <= 3, \
             (ev["id"], it["bbox"], ev["bbox"])
-        assert st["size_px"] == pytest.approx(ev["size"], rel=0.08), ev["id"]
+        # mock "size" is the libass Fontsize; preset size_px is the em size (renderer convention)
+        assert st["ass_fontsize"] == pytest.approx(ev["size"], rel=0.08), ev["id"]
+        fpe = st["size_calibration"]["fontsize_per_em"]
+        assert st["size_px"] == pytest.approx(ev["size"] / fpe, rel=0.08), ev["id"]
         assert color_dist(st["color"], ev["color"]) <= 25, (ev["id"], st["color"])
         if ev["highlight"]:
             assert st["highlight_color"] and color_dist(st["highlight_color"], ev["highlight"]) <= 40
@@ -121,7 +124,7 @@ def test_caption_items_roles_geometry_style(analyzed):
         if ev.get("lines"):
             assert st["n_lines"] == ev["lines"]
             if ev.get("line_pitch"):
-                assert st["line_spacing"] == pytest.approx(ev["line_pitch"] / ev["size"], abs=0.06)
+                assert st["line_spacing"] == pytest.approx(ev["line_pitch"] / (ev["size"] / fpe), abs=0.09)
     # nothing else was reported as a caption (footage texture was rejected)
     assert len(matched) == len(items), [i["text"] for i in items if i["id"] not in matched]
 
@@ -157,6 +160,7 @@ def test_layout_roles_summary(analyzed):
     assert roles["situation"]["motion_in"]["type"] == "pop"
     assert roles["situation"]["max_lines"] == 2
     assert roles["situation"]["align"] == "center"
+    assert roles["situation"]["valign"] == "middle"      # libass \an5: the block grows both ways
     assert roles["speaker"]["box"]["present"] == "present"
     assert roles["title"]["highlight_presence"] == "present"
     assert out["captions"]["presence"]["reaction"] == "present"
@@ -202,7 +206,10 @@ def test_aggregate_single_mock_video_scaled_to_canvas(analyzed, monkeypatch):
             items[it["key"]] = it
     t = items["text.roles.title.size_px"]
     assert t["status"] == "measured" and t["resolution"] == [1080, 1920]
-    assert t["value"] == pytest.approx(80, rel=0.08)              # 40 px at 540x960 -> x2
+    # Fontsize 40 at 540x960 -> x2 = Fontsize 80 -> em px = 80 / (winAscent+winDescent)/unitsPerEm
+    from shortkit.edit.captions import resolve_font as _rf
+    fpe = _rf("Noto Sans CJK KR Black").face.win_sum / _rf("Noto Sans CJK KR Black").face.units_per_em
+    assert t["value"] == pytest.approx(80 / fpe, rel=0.08)
     assert items["canvas.video_region.y"]["value"] == pytest.approx(600, abs=8)
     assert items["canvas.background.type"]["value"] == "color"
     assert items["motion.zoom.scale_to"]["value"] == pytest.approx(1.3, abs=0.05)
@@ -237,3 +244,65 @@ def test_calibration_refuses_unknown_font():
     if c is not None:       # when the font exists, libass must have rendered exactly that face
         assert c["verified_face"] and c["libass_name"]
     _ = np
+
+
+def test_hd_upload_same_structure(mock_truth, tmp_path, monkeypatch):
+    """Same mock at 1080x1920: roles identical, sizes x2 within ±8 %, timing within 2 frames."""
+    import shutil
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent))
+    import mockref
+    repo = Path(__file__).resolve().parents[2]
+    truth, hd = mockref.build_hd_mock(repo / "assets/test/generated/reference_visual", repo / "assets/test/generated/video")
+    root = tmp_path / "hd"
+    (root / "presets/joshuamagazine").mkdir(parents=True)
+    shutil.copy(repo / "shortkit.root", root / "shortkit.root")
+    shutil.copy(repo / "presets/joshuamagazine/preset.yaml", root / "presets/joshuamagazine/preset.yaml")
+    monkeypatch.setenv("SHORTKIT_ROOT", str(root))
+    from shortkit.cli import main
+    assert main(["ref", "analyze", "--video", str(hd), "--id", "mockhd", "--only", "text"]) == 0
+    cap = json.loads((root / "presets/joshuamagazine/analysis/mockhd/captions.json").read_text("utf-8"))
+    assert cap["resolution"] == [1080, 1920]
+    items = cap["items"]
+    for ev in truth["events"]:
+        ev2 = dict(ev, bbox=[v * 2 for v in ev["bbox"]])
+        it = _match(items, ev2)
+        assert it["role"] == ev["role"], (ev["id"], it["role"])
+        assert it["style"]["ass_fontsize"] == pytest.approx(2 * ev["size"], rel=0.08), ev["id"]
+        assert it["start"] == pytest.approx(ev["start"], abs=0.07) and it["end"] == pytest.approx(ev["end"], abs=0.07)
+    assert len(items) == len(truth["events"])
+
+
+def test_caption_entering_with_a_cut(tmp_path):
+    """A caption that appears on the same frame as a hard cut: start = cut, motion_in = none."""
+    import subprocess
+    from pathlib import Path
+
+    from shortkit.reference import shots, textboxes
+    repo = Path(__file__).resolve().parents[2]
+    V = repo / "assets/test/generated/video"
+    if not (V / "classroom.mp4").is_file():
+        pytest.skip("Intel sample clips missing")
+    ass = tmp_path / "c.ass"
+    ass.write_text("[Script Info]\nScriptType: v4.00+\nPlayResX: 540\nPlayResY: 960\n\n[V4+ Styles]\n"
+                   "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, "
+                   "Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+                   "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+                   "Style: S,Noto Sans CJK KR Black,34,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,"
+                   "1,3,0,5,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
+                   "Effect, Text\nDialogue: 0,0:00:01.50,0:00:03.00,S,,0,0,0,,{\\pos(270,450)}컷과 함께 나온다\n",
+                   encoding="utf-8")
+    mp4 = tmp_path / "cutcap.mp4"   # SYNTHETIC: two Intel clips + one libass caption starting at the cut
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "2", "-t", "1.5", "-i", str(V / "classroom.mp4"), "-ss", "8",
+                    "-t", "1.5", "-i", str(V / "people-detection.mp4"), "-filter_complex",
+                    "[0:v]fps=30,scale=540:960,setsar=1[a];[1:v]fps=30,scale=540:960,setsar=1[b];"
+                    f"[a][b]concat=n=2:v=1:a=0,format=yuv420p,ass={ass}[o]", "-map", "[o]", "-t", "3",
+                    "-c:v", "libx264", "-preset", "veryfast", str(mp4)], check=True)
+    reg = {"video_region": None}
+    sh = shots.analyze(mp4, "cutcap", region=reg, out_dir=tmp_path)
+    assert [c["type"] for c in sh["cuts"]] == ["cut"] and sh["cuts"][0]["t"] == pytest.approx(1.5, abs=0.04)
+    cap, _ = textboxes.analyze(mp4, "cutcap", region=reg, out_dir=tmp_path, save_frames=False)
+    assert len(cap["items"]) == 1
+    it = cap["items"][0]
+    assert it["start"] == pytest.approx(1.5, abs=0.04) and it["motion_in"] == "none"

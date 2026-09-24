@@ -175,7 +175,11 @@ def test_bad_wrong_bgm_section(reports):
     rep = reports["test-qa-bad"]
     r = rows(rep, row_id="audio.bgm:section")
     assert r["status"] == "different"
-    assert r["observed"]["section_start_s"] == pytest.approx(17.0, abs=0.01)
+    # the synthetic bed repeats exactly every 8 s (4 bars) apart from faint random hats, so 17 s and
+    # 25 s are the same sound; either is a correct measurement, 12 s (the plan) is not
+    obs = r["observed"]["section_start_s"]
+    assert min(abs(obs - 17.0 - 8 * k) for k in range(-2, 6)) <= 0.01, obs
+    assert min(abs(obs - 12.0 - 8 * k) for k in range(-2, 6)) > 1.0, obs
 
 
 def test_bad_ducking_outside_kept_dialogue(reports):
@@ -202,7 +206,12 @@ def test_bad_sfx_without_event_and_unknown_sound(reports):
 
 def test_bad_leftover_watermark(reports):
     rep = reports["test-qa-bad"]
-    assert [r["status"] for r in rows(rep, "clean.residual")] == ["different"]
+    r = rows(rep, "clean.residual")
+    assert [x["status"] for x in r] == ["different"]
+    assert r[0]["observed"]["edge_ncc"] >= 0.55
+    # the corner OCR net catches the same account handle independently of the plan's clean ops
+    assert status(rep, "clean.corners:all") == "different"
+    assert status(reports["test-qa-good"], "clean.corners:all") == "same"
 
 
 def test_bad_decoration_position_wrong_but_blink_right(reports):
@@ -253,3 +262,73 @@ def test_cli_gate_and_defects_list(reports):
     d = subprocess.run([sys.executable, "-m", "shortkit", "qa", "defects", "list", "--episode", "test-qa-bad"], cwd=ROOT,
                        capture_output=True, text=True, env=env)
     assert d.returncode == 0 and "D001" in d.stdout
+
+
+# ----------------------------------------------------------------------------- temp project root
+@pytest.fixture()
+def temp_root_with_episodes(reports, tmp_path, monkeypatch):
+    """A throw-away project root: preset copy, the two synthetic episodes, test media symlinked."""
+    import shutil
+
+    root = tmp_path / "proj"
+    root.mkdir()
+    shutil.copy(ROOT / "shortkit.root", root / "shortkit.root")
+    shutil.copytree(ROOT / "presets" / "joshuamagazine", root / "presets" / "joshuamagazine",
+                    ignore=shutil.ignore_patterns("videos", "frames", "stems", "*.wav", "*.mp4"))
+    (root / "assets" / "test").mkdir(parents=True)
+    (root / "assets" / "test" / "generated").symlink_to(ROOT / "assets" / "test" / "generated")
+    for ep in ("test-qa-good", "test-qa-bad"):
+        src = ROOT / "episodes" / ep
+        dst = root / "episodes" / ep
+        (dst / "build").mkdir(parents=True)
+        (dst / "output").mkdir()
+        shutil.copy(src / "build" / "resolved.json", dst / "build" / "resolved.json")
+        shutil.copy(src / "plan.yaml", dst / "plan.yaml")
+        shutil.copy(src / "output" / f"{ep}.mp4", dst / "output" / f"{ep}.mp4")
+        shutil.copytree(src / "qa" / "probes", dst / "qa" / "probes")
+    monkeypatch.setenv("SHORTKIT_ROOT", str(root))
+    return root
+
+
+def test_sheet_with_reference_and_its_analysis(temp_root_with_episodes):
+    """SYNTHETIC reference: the bad render plays the 'reference', with hand-written analysis files."""
+    import shutil
+
+    from PIL import Image
+
+    from shortkit.qa import load_context
+    from shortkit.qa.sheet import make_sheets
+    from shortkit.util.jsonio import read_json, write_json
+
+    root = temp_root_with_episodes
+    (root / "ref").mkdir()
+    shutil.copy(root / "episodes/test-qa-bad/output/test-qa-bad.mp4", root / "ref" / "refvid.mp4")
+    an = root / "presets/joshuamagazine/analysis/refvid"
+    write_json(an / "captions.json", {"video_id": "refvid", "resolution": [720, 1280], "items": [
+        {"start": 0.5, "end": 2.0, "role": "situation", "text": "합성 레퍼런스 자막", "bbox": [100, 900, 500, 50],
+         "motion_in": "pop"}]})
+    write_json(an / "audio" / "sfx_events.json", {"video_id": "refvid", "events": [
+        {"t": 0.8, "dur": 0.1, "type_id": "pop", "class": "edit_sfx", "gain_db": -6}]})
+    ctx = load_context("test-qa-good", reference="ref/refvid.mp4")
+    assert set(ctx.reference_analysis) == {"captions", "audio_sfx_events"}
+    text = read_json(root / "episodes/test-qa-good/qa/probes/text.json")
+    audio = read_json(root / "episodes/test-qa-good/qa/probes/audio.json")
+    files = make_sheets(ctx, text, audio, seconds=4)
+    assert files[0] == "episodes/test-qa-good/qa/compare_sheet.png" and len(files) == 2   # 8 s / 4 s pages
+    im = Image.open(root / files[0])
+    assert im.size[1] > 400
+
+
+def test_defect_recheck_runs_same_check_on_other_episodes(temp_root_with_episodes):
+    from shortkit.qa import defects, load_context
+
+    ctx = load_context("test-qa-bad")
+    fake = {"rows": [{"check_id": "audio.sfx.no_event", "row_id": "audio.sfx.no_event:all", "status": "different",
+                      "required": True, "intended_change": False, "item": "사건 없는 효과음 0", "category": "사건 없는 효과음 0",
+                      "expected": 0, "observed": {"count": 1}, "note": ""}],
+            "gate": {"pass": False, "complete": False}, "output": {"sha256": "x"}}
+    st = defects.sync(ctx, fake, recheck_others=True, quiet=True)
+    assert st["new"] == 1
+    d = defects.load("test-qa-bad")[0]
+    rc = [c for c in d["recheck_same_cases"] if c["episode_id"] == "test-qa-good"]
+    assert rc and rc[0]["verdict"] == "ok" and rc[0]["rows"] == {"audio.sfx.no_event:all": "same"}

@@ -15,6 +15,7 @@ Audio: mixed in numpy (sample exact, deterministic): BGM (tempo pre-step + secti
 from __future__ import annotations
 
 import math
+import json
 import os
 import re
 import subprocess
@@ -581,6 +582,21 @@ def render_video(r: ResolvedEdit, mix_wav: Path, out: Path) -> None:
     os.replace(tmp_out, out)
 
 
+def check_output_fonts(r: ResolvedEdit) -> dict:
+    """Ask libass itself which face it selects for every caption style (no fallback allowed)."""
+    from . import captions as cap_mod
+
+    ass_txt = paths.absp(r.ass_path).read_text(encoding="utf-8")
+    head = ass_txt.partition("[Events]")[0]
+    expected = {}
+    for ln in head.splitlines():
+        if ln.startswith("Style:"):
+            parts = ln.split(":", 1)[1].split(",")
+            if parts[0].strip() != "deco":
+                expected[parts[0].strip()] = parts[1].strip()
+    return cap_mod.verify_libass_fonts(ass_txt, paths.absp(r.fonts_dir), expected)
+
+
 def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False) -> Path:
     """Render the master MP4 (contract API). Writes build/{mix.wav, stems/*.wav, render_report.json}."""
     r = resolved
@@ -590,6 +606,11 @@ def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False) -> Path:
     if not paths.absp(r.ass_path).is_file():
         raise RenderError(f"ASS 파일이 없습니다: {r.ass_path} (resolve 먼저)")
     t0 = now_iso()
+    fontcheck = check_output_fonts(r)
+    if not fontcheck["ok"]:
+        bad = {k: v for k, v in fontcheck["styles"].items() if not v["ok"]}
+        write_json(build / "fontcheck.json", fontcheck)
+        raise RenderError("libass 가 요청한 글꼴을 쓰지 않음(대체 글꼴 사용 금지): " + json.dumps(bad, ensure_ascii=False)[:800])
     audio_rep = mix_audio(r, build)
     out = paths.absp(r.output_path)
     render_video(r, build / "mix.wav", out)
@@ -609,7 +630,7 @@ def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False) -> Path:
                      "vcodec": info.vcodec, "acodec": info.acodec, "audio_rate": info.audio_rate,
                      "audio_channels": info.audio_channels},
            "expected": {"width": W, "height": H, "fps": fps, "duration": r.duration},
-           "audio": audio_rep, "mp4_loudness": mp4_loud, "problems": problems, "mode": r.mode,
+           "audio": audio_rep, "mp4_loudness": mp4_loud, "libass_fontcheck": fontcheck, "problems": problems, "mode": r.mode,
            "allow_unmeasured": allow_unmeasured, "provisional_keys_read": len(r.provisional_keys),
            "note": "이 수치는 기계 측정값이다. 사람이 직접 들어본 청취 확인은 포함되지 않는다."}
     write_json(build / "render_report.json", rep)

@@ -342,7 +342,6 @@ def transcript_keywords(preset: str, vid: str, k: int = 10) -> dict:
 
 # ============================================================================= main
 def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True, lens: bool = True) -> dict:
-    pr = load_preset(preset)
     own = own_identity(preset)
     snap = load_snapshot(preset) or {}
     by_id = {v["video_id"]: v for v in snap.get("videos") or []}
@@ -351,24 +350,20 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
     existing = read_jsonl(excl_path)
     have_urls = {r.get("url") for r in existing if r.get("kind") == "url"}
     have_ph = {(r.get("ref_video_id"), tuple(r.get("phash") or [])) for r in existing if r.get("kind") == "reference_footage"}
-    acc_ev: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    kw_ev: dict[str, list[dict]] = defaultdict(list)
     per_video, new_rows = [], []
     for vid in ids:
         rec = by_id.get(vid) or {}
         meta = read_json(reference_dir(preset) / "meta" / f"{vid}.json") or {}
         ref_url = rec.get("url") or (f"https://www.youtube.com/watch?v={vid}" if meta else None)
         desc = parse_description(meta.get("description") or "", own)
-        found = {"video_id": vid, "description": {"available": bool(meta.get("description")), **desc}}
-        for a in desc["accounts"]:
-            acc_ev[(a["platform"] or "unknown", a["account"])].append({"video_id": vid, "kind": a["kind"],
-                                                                       "text": a["text"]})
-        for tag in desc["hashtags"]:
-            kw_ev[tag].append({"video_id": vid, "kind": "hashtag"})
+        found: dict = {"video_id": vid, "ref_url": ref_url,
+                       "description": {"available": bool(meta.get("description")), **desc}}
+        accs = [{"platform": a["platform"] or "unknown", "account": a["account"], "kind": a["kind"],
+                 "text": a["text"]} for a in desc["accounts"]]
+        kws = [{"keyword": t, "kind": "hashtag"} for t in desc["hashtags"]]
         tk = transcript_keywords(preset, vid)
         found["transcript"] = tk
-        for w in tk["keywords"]:
-            kw_ev[w].append({"video_id": vid, "kind": "transcript"})
+        kws += [{"keyword": w, "kind": "transcript"} for w in tk["keywords"]]
         video = video_path(preset, vid)
         original_urls = [u["url"] for u in desc["urls"] if u["credit_line"] and u["platform"] not in ("youtube",)]
         if video is not None:
@@ -379,9 +374,8 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
             if do_ocr:
                 wm = ocr_watermarks(video, region, ocr_fps, own)
                 found["watermarks"] = wm
-                for a in wm:
-                    acc_ev[(a["platform"], a["account"])].append({"video_id": vid, "kind": "watermark_ocr",
-                                                                  "t": a["frames"][0], "text": a["text"]})
+                accs += [{"platform": a["platform"], "account": a["account"], "kind": "watermark_ocr",
+                          "t": a["frames"][0], "text": a["text"], "verified": False} for a in wm]
             else:
                 found["watermarks"] = None
             if lens:
@@ -390,8 +384,8 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
                 original_urls.append(r["original_url"].strip())
                 plat, acc = platform_of_url(r["original_url"].strip())
                 if acc and not _is_own(acc, own):
-                    acc_ev[(r.get("platform") or plat or "unknown", r.get("account") or acc)].append(
-                        {"video_id": vid, "kind": "lens_manual", "text": r["original_url"], "checked_by": r["checked_by"]})
+                    accs.append({"platform": r.get("platform") or plat or "unknown", "account": r.get("account") or acc,
+                                 "kind": "lens_manual", "text": r["original_url"], "checked_by": r["checked_by"]})
             hs, ts = phashes(video, region, keyframe_times(shots, float(info.duration)))
             if hs and (vid, tuple(hs)) not in have_ph:
                 row = {"kind": "reference_footage", "ref_video_id": vid, "ref_url": ref_url,
@@ -411,34 +405,60 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
                                  "added_by": ADDED_BY})
                 have_urls.add(u)
         found["original_urls"] = sorted(set(original_urls))
+        found["accounts_found"] = accs
+        found["keywords_found"] = kws
         write_json(analysis_dir(preset, vid) / "trace.json", {**found, "traced_at": now_iso()})
         per_video.append(found)
     if new_rows:
         append_jsonl(excl_path, new_rows)
+    out = build_source_accounts(preset, ocr_fps)
+    say(f"출처 추적: 이번 {len(per_video)}편(누적 {out['videos_traced']}편), 계정 {len(out['accounts'])}개, "
+        f"키워드 {len(out['keywords'])}개, 제외 목록에 새 기록 {len(new_rows)}건 → warehouse/")
+    if not per_video:
+        warn("추적할 영상이 없습니다(latest100 스냅샷이 차단 상태이거나 영상이 없음).")
+    out["traced_now"] = len(per_video)
+    return out
+
+
+def build_source_accounts(preset: str, ocr_fps: float = 0.5) -> dict:
+    """warehouse/source_accounts.json from every analysis/*/trace.json (so tracing a subset of
+    videos never drops what earlier runs found).  Nothing is written when no video was traced."""
+    pr = load_preset(preset)
+    acc_ev: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    kw_ev: dict[str, list[dict]] = defaultdict(list)
+    traced = []
+    for tj in sorted((paths.preset_dir(preset) / "analysis").glob("*/trace.json")):
+        d = read_json(tj) or {}
+        vid = d.get("video_id") or tj.parent.name
+        traced.append(vid)
+        for a in d.get("accounts_found") or []:
+            acc_ev[(a.get("platform") or "unknown", a["account"])].append({"video_id": vid, **{
+                k: v for k, v in a.items() if k not in ("platform", "account")}})
+        for k in d.get("keywords_found") or []:
+            kw_ev[k["keyword"]].append({"video_id": vid, "kind": k.get("kind")})
     accounts = []
     for (plat, acc), evs in acc_ev.items():
         vids = sorted({e["video_id"] for e in evs})
         accounts.append({"platform": plat, "account": acc, "frequency": len(vids), "mentions": len(evs),
+                         "verified_by_text": any(e.get("kind") != "watermark_ocr" for e in evs),
                          "evidence": evs[:20]})
     accounts.sort(key=lambda a: (-a["frequency"], -a["mentions"], a["account"].lower()))
     keywords = [{"keyword": k, "frequency": len({e["video_id"] for e in evs}), "evidence": evs[:10]}
                 for k, evs in kw_ev.items()]
     keywords.sort(key=lambda k: (-k["frequency"], k["keyword"]))
+    wh = paths.ensure_dir("warehouse")
     old = read_json(wh / "source_accounts.json") or {}
     out = {"schema": "shortkit.source_accounts/1", "preset_id": pr.preset_id, "built_at": now_iso(),
-           "videos_traced": len(per_video), "video_ids": [p["video_id"] for p in per_video],
-           "status": "measured" if per_video else "unmeasured",
-           "blocker": None if per_video else "추적할 레퍼런스 영상 없음(스냅샷·다운로드 필요)",
+           "videos_traced": len(traced), "video_ids": traced[:500],
+           "status": "measured" if traced else "unmeasured",
+           "blocker": None if traced else "추적할 레퍼런스 영상 없음(스냅샷·다운로드 필요)",
            "accounts": accounts, "keywords": keywords[:100],
            "methods": {"description": "설명란 출처 줄·@핸들·URL·해시태그(채널 자체 핸들 제외)",
                        "watermark_ocr": f"영상 영역의 정지 오버레이 줄(자막 줄 검출기) → tesseract eng psm 7, {ocr_fps} fps, "
-                                        "2프레임 이상 또는 신뢰도 70 이상, 부분 판독은 가장 긴 판독으로 병합",
+                                        "2프레임 이상 또는 신뢰도 70 이상, 비슷한 판독은 병합(검색 단서, 미확인)",
                        "transcript": "analysis/<id>/audio/transcript.json 이 있을 때만",
                        "lens": "수동(lens_results.csv 에 checked_by 가 있는 행만 반영)"},
            "previous_built_at": old.get("built_at")}
-    write_json(wh / "source_accounts.json", out)
-    say(f"출처 추적: 영상 {len(per_video)}편, 계정 {len(accounts)}개, 키워드 {len(keywords)}개, "
-        f"제외 목록에 새 기록 {len(new_rows)}건 → warehouse/")
-    if not per_video:
-        warn("추적할 영상이 없습니다(latest100 스냅샷이 차단 상태이거나 영상이 없음).")
+    if traced:
+        write_json(wh / "source_accounts.json", out)
     return out

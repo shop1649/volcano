@@ -59,8 +59,9 @@ METHOD = {
     "detection": "morphological gradient (>=60) on pixels unchanged since previous sample (<14), horizontal close, "
                  "row-valley split; tracked by IoU>=0.5 and gradient-signature correlation>=0.55",
     "ocr": "tesseract kor+eng --psm 7 on fill mask (black on white, ink height scaled to ~44px)",
-    "size_px": "Hangul ink height (row-profile >= 12% of max) / (ink height per Fontsize unit of the calibration "
-               "font rendered by libass) -> libass Fontsize at the video resolution",
+    "size_px": "Hangul ink height (row-profile >= 12% of max) / (ink height per em px of the calibration font "
+               "rendered by libass) -> font EM size in px at the video resolution (renderer convention; "
+               "libass Fontsize = size_px * (winAscent+winDescent)/unitsPerEm)",
     "outline_px": "sum over distance-transform rings around the fill of the share of outline-colored pixels",
     "box": "4-sided luminance step around the ink bbox (>=15 levels, same sign, pad>=2px); alpha by linear "
            "regression box = a*C + (1-a)*background using the frame before the text appears",
@@ -109,6 +110,14 @@ def calibrate_font(font_name: str) -> dict | None:
     for ass_name in [n for n in (face.postscript, font_name) if n]:
         r = _render_calibration(ass_name, Path(face.path), int(face.index), face.postscript, use_dir)
         if r is not None:
+            # Preset convention (shared with the renderer, shortkit/edit/captions.py): size_px is the EM size in
+            # canvas px; libass Fontsize = size_px * (winAscent+winDescent)/unitsPerEm.  Convert the per-Fontsize
+            # ink ratio into a per-em-px ratio so measured size_px means the same thing the renderer consumes.
+            from ..edit.captions import read_faces
+            fm = read_faces(str(face.path))[int(face.index)]
+            fs_per_em = fm.win_sum / fm.units_per_em
+            r["fontsize_per_em"] = round(fs_per_em, 5)
+            r["ratio_em"] = round(r["ratio"] * fs_per_em, 5)
             r.update({"font": font_name, "libass_name": ass_name, "font_file": _display(face.path),
                       "face_index": int(face.index)})
             _CALIB[font_name] = r
@@ -193,7 +202,7 @@ def detect_lines(rgb: np.ndarray, prev_gray: np.ndarray | None) -> tuple[list[tu
     strong = (grad >= 120).ravel().astype(np.float64)
     area = st0[:, 4].astype(float)
     share = np.bincount(lab0.ravel(), weights=strong, minlength=n0) / np.maximum(area, 1)
-    cx, cy, cw, ch = st0[:, 0], st0[:, 1], st0[:, 2], st0[:, 3]
+    cw, ch = st0[:, 2], st0[:, 3]
     dens0 = area / np.maximum(cw * ch, 1)
     keep = ((share >= 0.3) & (area >= 6) & (ch >= 0.35 * min_h) & (ch <= 0.2 * H)
             & ~((dens0 < 0.1) & (np.maximum(cw, ch) > 2.5 * min_h))     # rectangle outlines, table edges
@@ -244,6 +253,11 @@ def _split_rows(mask: np.ndarray, min_h: int) -> list[tuple[int, int]]:
     if len(parts) <= 1:
         return [(0, h)] if not parts else [parts[0]]
     if any(p[1] < max(min_h, 0.35 * h / len(parts)) for p in parts):
+        return [(0, h)]
+    # real text lines have similar heights and a real gap; the jamo of one big syllable ("헉") do not
+    hs = [p[1] for p in parts]
+    gaps = [parts[i + 1][0] - (parts[i][0] + parts[i][1]) for i in range(len(parts) - 1)]
+    if max(hs) > 1.35 * min(hs) or min(gaps) < 0.1 * min(hs):
         return [(0, h)]
     return parts
 
@@ -297,7 +311,7 @@ class Sample:
     t: float
     idx: int
     bbox: tuple[int, int, int, int]
-    crop: np.ndarray
+    crop: np.ndarray | None
     origin: tuple[int, int]
 
 
@@ -341,14 +355,24 @@ def track_lines(video: Path, fps: float, max_seconds: float | None = None) -> tu
     info = {"n_samples": 0}
     for t, fr in iter_frames(video, fps=fps, duration=max_seconds):
         idx += 1
-        gray = cv2.cvtColor(fr, cv2.COLOR_RGB2GRAY)
-        boxes, mask = detect_lines(fr, prev_gray)
+        # detection runs at a fixed working scale (<= DETECT_H rows) so that thresholds behave the
+        # same for 720p and 1080p uploads; crops and all measurements stay at full resolution
+        H0, W0 = fr.shape[:2]
+        f = min(1.0, DETECT_H / H0)
+        det = fr if f >= 1.0 else cv2.resize(fr, (int(round(W0 * f)), int(round(H0 * f))), interpolation=cv2.INTER_AREA)
+        gray = cv2.cvtColor(det, cv2.COLOR_RGB2GRAY)
+        boxes, mask = detect_lines(det, prev_gray)
         prev_gray = gray
+        if f < 1.0:
+            mask_full = mask
+            boxes = [_upscale_box(b, f, W0, H0) for b in boxes]
+        else:
+            mask_full = mask
         cands = sorted(boxes, key=lambda b: -b[2] * b[3])
         used: set[int] = set()
         still: list[Track] = []
         for b in cands:
-            s = _sig(mask, b)
+            s = _sig(mask_full, _downscale_box(b, f) if f < 1.0 else b)
             best, best_score = None, 0.0
             for tr in active:
                 if tr.id in used:
@@ -369,6 +393,7 @@ def track_lines(video: Path, fps: float, max_seconds: float | None = None) -> tu
                 best = Track(id=len(tracks) + 1)
                 tracks.append(best)
             best.samples.append(smp)
+            _thin_crops(best)
             best.sig = s if best.sig is None else _norm(0.7 * best.sig + 0.3 * s)
             used.add(best.id)
             still.append(best)
@@ -376,6 +401,35 @@ def track_lines(video: Path, fps: float, max_seconds: float | None = None) -> tu
         active = still + [tr for tr in active if tr.id not in used and idx - tr.last.idx <= 1]
     info["n_samples"] = idx + 1
     return [tr for tr in tracks if len(tr.samples) >= 2], info
+
+
+MAX_CROPS = 24
+
+
+def _thin_crops(tr: Track) -> None:
+    """Bound memory for long-lived lines (a title on screen for 60 s at 1080p): keep at most
+    MAX_CROPS stored crops, evenly thinned; the geometry of every sample is kept."""
+    kept = [i for i, sm in enumerate(tr.samples) if sm.crop is not None]
+    if len(kept) <= MAX_CROPS:
+        return
+    for j, i in enumerate(kept[1:-1], 1):
+        if j % 2 == 1:
+            tr.samples[i].crop = None
+
+
+DETECT_H = 960
+
+
+def _upscale_box(b, f: float, W: int, H: int) -> tuple[int, int, int, int]:
+    x, y, w, h = b
+    x0, y0 = max(0, int(np.floor(x / f)) - 1), max(0, int(np.floor(y / f)) - 1)
+    x1, y1 = min(W, int(np.ceil((x + w) / f)) + 1), min(H, int(np.ceil((y + h) / f)) + 1)
+    return (x0, y0, x1 - x0, y1 - y0)
+
+
+def _downscale_box(b, f: float) -> tuple[int, int, int, int]:
+    x, y, w, h = b
+    return (int(round(x * f)), int(round(y * f)), max(1, int(round(w * f))), max(1, int(round(h * f))))
 
 
 def _norm(v: np.ndarray) -> np.ndarray:
@@ -704,7 +758,8 @@ def _ocr_once(fill: np.ndarray, bbox, target_h: float, lang: str = "kor+eng") ->
 # ============================================================================= per-track measurement
 def _measure_track(tr: Track) -> dict | None:
     n = len(tr.samples)
-    picks = sorted({n // 2, n // 4, (3 * n) // 4})
+    with_crop = [i for i, sm in enumerate(tr.samples) if sm.crop is not None]
+    picks = sorted({min(with_crop, key=lambda i: abs(i - k)) for k in (n // 2, n // 4, (3 * n) // 4)})
     meas = []
     for i in picks:
         s = tr.samples[i]
@@ -1003,14 +1058,23 @@ def refine_item(video: Path, item: dict, fps_native: float, sample_dt: float, W:
     res: dict[str, Any] = {"region": R}
     tm_in = _text_masks(seg_in[-1][1], lines_rel) if seg_in else None
     tm_out = _text_masks(seg_out[0][1], lines_rel) if seg_out else None
-    at_video_start = item["start_sample"] <= sample_dt + 1e-6
-    at_video_end = item["end_sample"] >= duration - sample_dt - 1.0 / fps_native - 1e-6
+    # near the ends of the video, check the actual first / last frame instead of assuming
+    at_video_start = bool(item["start_sample"] <= sample_dt + 1e-6 and seg_in and tm_in
+                          and seg_in[0][0] <= 0.5 / fps_native
+                          and _match_rest(seg_in[0][1], seg_in[-1][1], tm_in) >= 0.85)
+    at_video_end = bool(item["end_sample"] >= duration - sample_dt - 1.0 / fps_native - 1e-6 and seg_out and tm_out
+                        and seg_out[-1][0] >= duration - 1.5 / fps_native
+                        and _match_rest(seg_out[-1][1], seg_out[0][1], tm_out) >= 0.85)
     if at_video_start:
         mi = {"type": "unmeasured", "note": "text already on screen at the first frame (motion_in not observable)"}
         res["start"] = 0.0
     else:
         mi = analyze_transition(seg_in, tm_in, "in", fps_native) if (seg_in and tm_in) else \
             {"type": "unmeasured", "note": "text mask not found at rest"}
+        if mi.get("type") == "unmeasured" and seg_in and tm_in and t_a0 in (cuts or []) \
+                and _match_rest(seg_in[0][1], seg_in[-1][1], tm_in) >= 0.85:
+            # fully there on the first frame of the shot: it comes in with the cut
+            mi = {"type": "none", "dur_s": 0.0, "t_edge": seg_in[0][0], "note": "컷과 함께 완전한 상태로 등장"}
         res["start"] = round(float(mi.get("t_zero", mi.get("t_edge", item["start_sample"]))), 3)
     if at_video_end:
         mo = {"type": "unmeasured", "note": "text still on screen at the last frame (motion_out not observable)"}
@@ -1018,6 +1082,9 @@ def refine_item(video: Path, item: dict, fps_native: float, sample_dt: float, W:
     else:
         mo = analyze_transition(seg_out, tm_out, "out", fps_native) if (seg_out and tm_out) else \
             {"type": "unmeasured", "note": "text mask not found at rest"}
+        if mo.get("type") == "unmeasured" and seg_out and tm_out and t_b1 in (cuts or []) \
+                and _match_rest(seg_out[-1][1], seg_out[0][1], tm_out) >= 0.85:
+            mo = {"type": "none", "dur_s": 0.0, "t_edge": seg_out[-1][0], "note": "컷과 함께 사라짐"}
         if "t_zero" in mo:
             res["end"] = round(float(mo["t_zero"]), 3)
         elif mo.get("t_edge") is not None:
@@ -1258,8 +1325,11 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
         st = it["style"]
         hs = [l["ink_h"] for l in it["lines"] if l.get("ink_h") and l["hangul_share"] >= 0.5]
         if cal and hs:
-            st["size_px"] = round(float(np.median(hs)) / cal["ratio"], 1)
-            st["size_calibration"] = {"font": cal["font"], "ratio": cal["ratio"]}
+            st["size_px"] = round(float(np.median(hs)) / cal["ratio_em"], 1)   # em px (renderer convention)
+            st["ass_fontsize"] = round(float(np.median(hs)) / cal["ratio"], 1)  # the equivalent libass Fontsize
+            st["size_calibration"] = {"font": cal["font"], "ratio_per_fontsize": cal["ratio"],
+                                      "ratio_per_em_px": cal["ratio_em"], "fontsize_per_em": cal["fontsize_per_em"],
+                                      "convention": "size_px = em px; ASS Fontsize = size_px*fontsize_per_em"}
         else:
             st["size_px"] = None
             st["size_note"] = "보정 글꼴 없음" if not cal else "한글 비율이 낮은 줄뿐이라 크기 환산 못 함"
@@ -1386,6 +1456,7 @@ def summarize_roles(items: list[dict], duration: float, W: int) -> dict:
         mi_mode = _mode(mi_types)
         mo_mode = _mode(mo_types)
         align = _role_alignment(its)
+        valign = _role_valign(its)
         box_states = [s["box"].get("present") for s in st]
         pboxes = [s["box"] for s in st if s["box"].get("present") == "present"]
         hl = [s["highlight_color"] for s in st if s.get("highlight_color")]
@@ -1393,8 +1464,10 @@ def summarize_roles(items: list[dict], duration: float, W: int) -> dict:
             "n_items": len(its),
             "size_px": _median([s.get("size_px") for s in st]),
             "ink_h_px": _median([s.get("ink_h") for s in st]),
-            "anchor": {"x": _median([_anchor_x(s, align) for s in st]), "y": _median([s["anchor"]["y"] for s in st])},
+            "anchor": {"x": _median([_anchor_x(s, align) for s in st]),
+                       "y": _median([_anchor_y(c, valign) for c in its])},
             "align": align,
+            "valign": valign,
             "color": color_mode([s.get("color") for s in st])["mode"],
             "highlight_color": color_mode(hl)["mode"],
             "highlight_presence": tri_state([bool(s.get("highlight_color")) for s in st]),
@@ -1438,6 +1511,38 @@ def _anchor_x(s: dict, align: str) -> float | None:
     if align == "right":
         return s.get("right")
     return s["anchor"]["x"]
+
+
+def _anchor_y(c: dict, valign: str) -> float:
+    x, y, w, h = c["bbox"]
+    if valign == "top":
+        return float(y)
+    if valign == "bottom":
+        return float(y + h)
+    return float(y + h / 2)
+
+
+def _role_valign(its: list[dict]) -> str:
+    """Which edge stays put when the line count changes: compare 1-line and multi-line items of the
+    role (top / middle / bottom).  Needs both kinds, else unmeasured."""
+    groups: dict[int, list[dict]] = {}
+    for c in its:
+        groups.setdefault(int(c["style"].get("n_lines") or 1), []).append(c)
+    if len(groups) < 2:
+        return "unmeasured"
+    ks = sorted(groups)
+    a, b = groups[ks[0]], groups[ks[-1]]
+
+    def med(cs, f):
+        return float(np.median([f(c["bbox"]) for c in cs]))
+
+    d = {"top": abs(med(a, lambda q: q[1]) - med(b, lambda q: q[1])),
+         "middle": abs(med(a, lambda q: q[1] + q[3] / 2) - med(b, lambda q: q[1] + q[3] / 2)),
+         "bottom": abs(med(a, lambda q: q[1] + q[3]) - med(b, lambda q: q[1] + q[3]))}
+    best = min(d, key=d.get)
+    hmin = min(float(np.median([c["bbox"][3] for c in a])), float(np.median([c["bbox"][3] for c in b])))
+    others = sorted(v for k, v in d.items() if k != best)
+    return best if d[best] <= max(3.0, 0.1 * hmin) and others[0] >= 2 * max(d[best], 1.0) else "unmeasured"
 
 
 def _role_alignment(its: list[dict]) -> str:

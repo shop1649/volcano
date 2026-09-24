@@ -254,3 +254,89 @@ def test_defects_lifecycle(temp_root):
     d = defects.load("e1")[0]
     assert s["verified_now"] == 1 and d["status"] == "fixed" and d["final_gate"]["pass"] is True
     assert [h["event"] for h in d["history"]] == ["found", "fix_submitted", "reopened", "fix_submitted", "verified_fixed"]
+
+
+def test_registry_audit_has_no_style_key_without_a_qa_check(temp_root):
+    """`shortkit preset audit` flags style keys no QA check verifies; with qa.checks.declarations()
+    none may remain (run on a temp copy of the preset: the real registry is not touched)."""
+    config.sync_registry("joshuamagazine", access_logs=[])
+    res = config.audit("joshuamagazine", production=False)
+    assert res["no_qa"] == []
+    reg = config.load_preset("joshuamagazine")
+    assert reg is not None
+    from shortkit.util.jsonio import read_yaml
+
+    ent = read_yaml(temp_root / "presets/joshuamagazine/settings_registry.yaml")["entries"]
+    assert "caption.position" in ent["text.roles.situation.anchor.y"]["qa_checks"]
+    assert "audio.bgm" in ent["audio.bgm.section_start_s"]["qa_checks"]
+
+
+# ----------------------------------------------------------------------------- caption locating (SYNTHETIC image)
+def _caption_image(text, color, xy, size=60, W=720, H=1280):
+    from PIL import Image, ImageDraw, ImageFont
+
+    from shortkit.fonts import find_font, font_face_index
+
+    fp = find_font("Noto Sans CJK KR Black")
+    if fp is None:
+        pytest.skip("Noto Sans CJK KR Black not installed")
+    font = ImageFont.truetype(str(fp), size, index=font_face_index(fp, "Noto Sans CJK KR Black") or 0)
+    im = Image.new("RGB", (W, H), (90, 110, 120))
+    d = ImageDraw.Draw(im)
+    d.text(xy, text, font=font, fill=color, stroke_width=5, stroke_fill=(0, 0, 0), anchor="mm")
+    return np.array(im), d.textbbox(xy, text, font=font, stroke_width=5, anchor="mm")
+
+
+def _cap(text, bbox, color="#FFE400"):
+    from shortkit.edit.ir import CaptionBox
+
+    x0, y0, x1, y1 = bbox
+    return CaptionBox(id="c", role="situation", text=text, lines=[text], start=1.0, end=2.0,
+                      anchor=((x0 + x1) / 2, (y0 + y1) / 2), align="center", valign="middle",
+                      bbox=Rect(x0, y0, x1 - x0, y1 - y0), font_name="Noto Sans CJK KR Black", font_file=None, size_px=60,
+                      color=color, highlight=[], highlight_color="#FFFFFF", outline_px=5, outline_color="#000000",
+                      shadow_px=0, box={"enabled": False}, motion_in={"type": "none"}, motion_out={"type": "none"})
+
+
+def test_locate_caption_finds_moved_and_recoloured_text():
+    from shortkit.qa.probes_text import locate_caption, tesseract_ok
+
+    if not tesseract_ok()[0]:
+        pytest.skip("tesseract kor+eng not available")
+    img, bb = _caption_image("사람들이 모두 멈췄다", (255, 228, 0), (360, 900))
+    loc = locate_caption(img, _cap("사람들이 모두 멈췄다", bb))
+    assert loc["found"] and loc["match"] == "ocr"
+    cx = loc["bbox"][0] + loc["bbox"][2] / 2
+    cy = loc["bbox"][1] + loc["bbox"][3] / 2
+    assert abs(cx - 360) <= 4 and abs(cy - 900) <= 6
+    # drawn 300 px higher than planned: still found, where it really is
+    img2, _ = _caption_image("사람들이 모두 멈췄다", (255, 228, 0), (360, 600))
+    loc2 = locate_caption(img2, _cap("사람들이 모두 멈췄다", bb))
+    assert loc2["found"] and abs(loc2["bbox"][1] + loc2["bbox"][3] / 2 - 600) <= 6
+    # drawn white although the plan says yellow: found colour-agnostically, colour reported
+    img3, _ = _caption_image("사람들이 모두 멈췄다", (255, 255, 255), (360, 900))
+    loc3 = locate_caption(img3, _cap("사람들이 모두 멈췄다", bb))
+    assert loc3["found"] and "계획한 글자색이 아님" in loc3["match"]
+    assert loc3["fill_color"] in ("#FFFFFF", "#FEFEFE", "#FDFDFD")
+
+
+def test_bgm_version_speed_is_told_apart():
+    """SYNTHETIC music beds from `shortkit testassets synth`: music_bed_a_x1.1.wav is bed A sped up
+    1.1x with ffmpeg atempo.  A mix made from the sped-up file must be found as tempo 1.1 of bed A
+    (a different version), and bed B must not be found at all."""
+    gen = paths.project_root() / "assets/test/generated"
+    if not (gen / "music_bed_a_x1.1.wav").is_file():
+        pytest.skip("synthetic music beds missing (run shortkit testassets synth)")
+    sr = pa.SR
+    fast = pa.load_mono(gen / "music_bed_a_x1.1.wav", sr, start=10.0, duration=6.0)
+    a = pa.load_mono(gen / "music_bed_a.wav", sr)
+    fb = pa.find_bgm(fast, a, sr, tempo_center=1.0)
+    cands = {1.0: a, 1.1: pa.load_mono(gen / "music_bed_a.wav", sr, tempo=1.1)}
+    res = {}
+    for r, ref in cands.items():
+        ga = pa.global_align(fast, ref, sr=sr)
+        res[r] = pa.local_match(fast, pa.align_signal(ref, ga["lag"], len(fast)), sr)["q95"]
+    assert res[1.1] >= 0.7 and res[1.0] < 0.7, (res, fb.get("top_tempi"))
+    b = pa.load_mono(gen / "music_bed_b.wav", sr)
+    gb = pa.global_align(fast, b, sr=sr)
+    assert not pa.match_found(pa.local_match(fast, pa.align_signal(b, gb["lag"], len(fast)), sr))

@@ -53,6 +53,13 @@ class FaceMetrics:
     hhea_ascent: int
     hhea_descent: int
     weight: int
+    postscript: str | None = None   # name id 6: the name libass is guaranteed to match exactly
+
+    @property
+    def ass_name(self) -> str:
+        """Name written into ASS styles. libass (fontconfig provider) does NOT resolve fullnames such as
+        'Noto Sans CJK KR Bold' (it silently falls back to DejaVu/WenQuanYi), but it does match PostScript names."""
+        return self.postscript or (self.names[0] if self.names else self.family)
 
     @property
     def win_sum(self) -> int:
@@ -158,7 +165,8 @@ def read_faces(path: str) -> tuple[FaceMetrics, ...]:
         faces.append(FaceMetrics(path=str(path), index=idx, names=list(dict.fromkeys(names)),
                                  family=(fams or [Path(path).stem])[0], style=(styles or ["Regular"])[0],
                                  units_per_em=upem or 1000, win_ascent=wa, win_descent=wd, hhea_ascent=ha,
-                                 hhea_descent=hd, weight=weight))
+                                 hhea_descent=hd, weight=weight,
+                                 postscript=(nm.get(6) or [None])[0]))
     return tuple(faces)
 
 
@@ -671,11 +679,11 @@ def write_ass(path: str | os.PathLike, canvas: dict, captions: list, layouts: di
     doc = AssDoc(int(canvas["width"]), int(canvas["height"]))
     for role, st in role_styles.items():
         f: ResolvedFont = fonts[role]
-        doc.styles.append(style_line(role, st["font_name"], f.face.ass_fontsize(float(st["size_px"])), st["color"],
+        doc.styles.append(style_line(role, f.face.ass_name, f.face.ass_fontsize(float(st["size_px"])), st["color"],
                                      st["outline_color"], st["shadow_color"], f.face.weight,
                                      float(st["outline_px"]), float(st["shadow_px"])))
     # decorations are vector drawings; the style font only has to exist (no fallback lookups)
-    deco_font = next(iter(role_styles.values()))["font_name"] if role_styles else "sans-serif"
+    deco_font = fonts[next(iter(role_styles))].face.ass_name if role_styles else "sans-serif"
     doc.styles.append(style_line("deco", deco_font, 20, "#FFFFFF", "#000000", "#000000", 400, 0, 0))
     for cap in captions:
         doc.events += caption_events(cap, layouts[cap.id], cap.role)
@@ -685,3 +693,55 @@ def write_ass(path: str | os.PathLike, canvas: dict, captions: list, layouts: di
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     Path(path).write_text(txt, encoding="utf-8")
     return txt
+
+
+# ----------------------------------------------------------------------------- libass font-selection guard
+_FONTSELECT_RE = re.compile(r"fontselect: \((?P<req>.+?), (?P<w>\d+), (?P<i>\d+)\) -> (?P<path>.*?), (?P<idx>\d+), (?P<ps>\S+)")
+_FALLBACK_RE = re.compile(r"Glyph 0x(?P<cp>[0-9A-Fa-f]+) not found, selecting one more font for \((?P<req>.+?), ")
+
+
+def verify_libass_fonts(ass_text: str, fonts_dir: str | os.PathLike, expected: dict[str, str],
+                        sample: str = "가나다 ABC 123 !?") -> dict:
+    """Render every style once through ffmpeg/libass with verbose logging and confirm that libass selected
+    exactly the expected face (PostScript name) with no glyph fallback.  ``expected`` maps style name ->
+    PostScript name.  Returns {ok, styles: {style: {requested, selected, fallback}}, log_tail}.
+
+    This checks the OUTPUT renderer's real behaviour instead of trusting our own font resolution."""
+    import tempfile
+
+    from ..util.media import FFMPEG
+
+    head, _, _ = ass_text.partition("[Events]")
+    styles = [ln.split(":", 1)[1].split(",")[0].strip() for ln in head.splitlines() if ln.startswith("Style:")]
+    events = "\n".join(f"Dialogue: 0,0:00:00.00,0:00:01.00,{st},,0,0,0,,{sample}" for st in styles if st in expected)
+    test_ass = head + "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n" + events + "\n"
+    res: dict = {"ok": True, "styles": {}}
+    with tempfile.TemporaryDirectory() as td:
+        ap = Path(td) / "fontcheck.ass"
+        ap.write_text(test_ass, encoding="utf-8")
+        fd = Path(fonts_dir).resolve()
+        proc = subprocess.run([FFMPEG, "-hide_banner", "-nostdin", "-v", "verbose", "-f", "lavfi", "-i",
+                               "color=black:s=640x360:d=0.2", "-vf", f"subtitles=filename=fontcheck.ass:fontsdir={fd}",
+                               "-frames:v", "1", "-f", "null", "-"], cwd=td, capture_output=True, text=True)
+        log = proc.stderr or ""
+    sel: dict[str, list[str]] = {}
+    for m in _FONTSELECT_RE.finditer(log):
+        sel.setdefault(m.group("req"), []).append(m.group("ps"))
+    fb: dict[str, list[str]] = {}
+    for m in _FALLBACK_RE.finditer(log):
+        fb.setdefault(m.group("req"), []).append("U+" + m.group("cp").upper())
+    for st in styles:
+        if st not in expected:
+            continue
+        # the style line's font name is what libass requested
+        req = next((ln.split(":", 1)[1].split(",")[1].strip() for ln in head.splitlines()
+                    if ln.startswith("Style:") and ln.split(":", 1)[1].split(",")[0].strip() == st), None)
+        got = sel.get(req, [])
+        ok = bool(got) and all(_norm(g) == _norm(expected[st]) for g in got) and not fb.get(req)
+        res["styles"][st] = {"requested": req, "expected": expected[st], "selected": got, "fallback_glyphs": fb.get(req, []),
+                             "ok": ok}
+        res["ok"] = res["ok"] and ok
+    if proc.returncode != 0:
+        res["ok"] = False
+        res["error"] = log[-1500:]
+    return res

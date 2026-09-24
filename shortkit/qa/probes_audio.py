@@ -295,35 +295,47 @@ def matched_ncc(x: np.ndarray, s: np.ndarray) -> np.ndarray:
     return num / (ns * np.sqrt(np.maximum(e, 1e-12)))
 
 
-def detect_sfx(res: np.ndarray, templates: dict, sr: int = SR, thr: float = 0.45) -> list[dict]:
+def detect_sfx(res: np.ndarray, templates: dict, sr: int = SR, thr: float = 0.45, max_iter: int = 60) -> list[dict]:
+    """Matching pursuit with normalised matched filters: repeatedly take the best-matching
+    (template, time) over all known SFX files, record it, subtract its fitted copy, and search
+    again.  Subtracting stops a tonal SFX's own tail from being detected as a second sound."""
     from scipy.signal import find_peaks
 
-    cand = []
-    for key, tp in templates.items():
-        s = tp["audio"]
-        if len(s) < 16:
+    r = res.astype(np.float64).copy()
+    tps = {k: v for k, v in templates.items() if len(v["audio"]) >= 16}
+    out: list[dict] = []
+    for _ in range(max_iter):
+        best = None
+        for key, tp in tps.items():
+            s = tp["audio"]
+            c = matched_ncc(r, s)
+            if not len(c):
+                continue
+            pk, props = find_peaks(c, height=thr, distance=max(1, int(0.05 * sr)))
+            if not len(pk):
+                continue
+            j = int(np.argmax(props["peak_heights"]))
+            if best is None or props["peak_heights"][j] > best[0]:
+                best = (float(props["peak_heights"][j]), key, int(pk[j]))
+        if best is None:
+            break
+        h, key, p = best
+        s = tps[key]["audio"].astype(np.float64)
+        seg = r[p:p + len(s)]
+        g = float((seg * s[:len(seg)]).sum() / max(1e-12, float((s[:len(seg)] ** 2).sum())))
+        r[p:p + len(s)] -= g * s[:len(seg)]
+        if any(o["key"] == key and abs(o["t"] - p / sr) < 0.02 for o in out):
+            continue                       # numerical re-hit of the same event
+        if g <= 0:
+            continue                       # anti-correlated leftover, not a sound
+        # a same-type hit inside an earlier detection's span that is much weaker is that sound's
+        # own tail left over after subtraction (e.g. a limiter changed its envelope), not a new one
+        if any(o["key"] == key and o["t"] <= p / sr < o["t"] + o["len"] and g < 0.5 * o["gain"] for o in out):
             continue
-        # trim leading silence of the file so t = audible start
-        c = matched_ncc(res, s)
-        if not len(c):
-            continue
-        # one detection per sound: tonal SFX correlate with themselves at small lags
-        pk, props = find_peaks(c, height=thr, distance=max(1, int(max(0.12, 0.8 * len(s) / sr) * sr)))
-        for p, h in zip(pk, props["peak_heights"]):
-            seg = res[p:p + len(s)].astype(np.float64)
-            g = float((seg * s).sum() / max(1e-12, float((s.astype(np.float64) ** 2).sum())))
-            cand.append({"t": p / sr, "key": key, "type": tp["type"], "file": tp.get("file"), "ncc": float(h),
-                         "gain": g, "len": len(s) / sr})
-    cand.sort(key=lambda d: -d["ncc"])
-    acc: list[dict] = []
-    for d in cand:
-        clash = [a for a in acc if abs(a["t"] - d["t"]) < 0.04]
-        if clash and not (all(a["type"] != d["type"] for a in clash) and d["ncc"] >= 0.7 and
-                          all(a["ncc"] >= 0.7 for a in clash)):
-            continue
-        acc.append(d)
-    acc.sort(key=lambda d: d["t"])
-    return acc
+        out.append({"t": p / sr, "key": key, "type": tps[key]["type"], "file": tps[key].get("file"), "ncc": h,
+                    "gain": g, "len": len(s) / sr})
+    out.sort(key=lambda d: d["t"])
+    return out
 
 
 def place(template: np.ndarray, t: float, g: float, n: int, sr: int = SR) -> np.ndarray:
@@ -333,6 +345,42 @@ def place(template: np.ndarray, t: float, g: float, n: int, sr: int = SR) -> np.
     if b > a >= 0:
         out[a:b] = g * template[:b - a]
     return out
+
+
+def lowpass(x: np.ndarray, sr: int = SR, fc: float = 5000.0) -> np.ndarray:
+    """Zero-phase low-pass.  AAC keeps the waveform of the low band; above ~5 kHz it may replace
+    noise-like content (perceptual noise substitution), which breaks waveform matching of noisy
+    SFX (whoosh, scratch) and biases their gains low."""
+    from scipy.signal import butter, sosfiltfilt
+
+    if len(x) < 64:
+        return x.astype(np.float32)
+    sos = butter(6, fc, btype="low", fs=sr, output="sos")
+    return sosfiltfilt(sos, x.astype(np.float64)).astype(np.float32)
+
+
+def sfx_joint_gain(y: np.ndarray, t: float, tmpl: np.ndarray, cols: list[np.ndarray], sr: int = SR,
+                   win: float = FINE) -> float | None:
+    """Gain of one SFX occurrence from a joint least-squares fit over its span: one coefficient
+    for the SFX, one per short window for every other known signal (their gains may vary)."""
+    a = int(round(t * sr))
+    b = min(len(y), a + len(tmpl))
+    if b - a < 16:
+        return None
+    L = max(1, int(win * sr))
+    X = [np.r_[tmpl[:b - a]].astype(np.float64)]
+    for c in cols:
+        seg = c[a:b].astype(np.float64)
+        if float(np.abs(seg).max(initial=0)) < 1e-6:
+            continue
+        for w0 in range(0, b - a, L):
+            piece = np.zeros(b - a)
+            piece[w0:w0 + L] = seg[w0:w0 + L]
+            if float((piece ** 2).sum()) > 1e-9:
+                X.append(piece)
+    A = np.stack(X, axis=1)
+    g, *_ = np.linalg.lstsq(A, y[a:b].astype(np.float64), rcond=None)
+    return float(g[0])
 
 
 def _energy_db(x: np.ndarray, hop: int, L: int) -> np.ndarray:
@@ -631,11 +679,15 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
         _, _, r1 = window_ls(y, cols, sr, FINE)
     else:
         r1 = y.copy()
-    dets = detect_sfx(r1, templates, sr) if templates else []
+    # SFX matching in the low band (see lowpass())
+    tpl_lp = {k: dict(v, audio=lowpass(v["audio"], sr)) for k, v in templates.items()}
+    dets = detect_sfx(lowpass(r1, sr), tpl_lp, sr) if templates else []
+    out["sfx_band"] = "0-5 kHz (AAC 고역 잡음 대체 영향 제외)"
     for d in dets:
         d["t"] = round(d["t"], 4)
         d["gain_db_file"] = rnd(20 * math.log10(max(1e-9, abs(d["gain"]))), 2)
     # ---------------- pass 2 LS with the detected SFX placed
+    templates_by_det = [templates[d["key"]]["audio"] for d in dets]
     sfx_cols = [place(templates[d["key"]]["audio"], d["t"], 1.0, n, sr) for d in dets]
     all_cols = cols + sfx_cols
     if all_cols:
@@ -723,7 +775,14 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
                             [(r["t"] - WIN / 2, r["t"] + WIN / 2) for r in orig_rows if r["present"]], gap=0.01)]}
     # ---------------- SFX gains relative to the BGM heard at the same moment
     env = _planned_bgm_env(ctx)
+    y_lp = lowpass(y, sr) if dets else y
+    cols_lp = [lowpass(c, sr) for c in cols] if dets else cols
     for i, d in enumerate(dets):
+        jg = sfx_joint_gain(y_lp, d["t"], lowpass(templates_by_det[i], sr), cols_lp, sr)
+        if jg is not None:
+            d["gain"] = jg
+            d["gain_db_file"] = rnd(20 * math.log10(max(1e-9, abs(jg))), 2)
+            d["gain_method"] = "joint LS over the SFX span"
         if bgm_al is not None and ref_g:
             d["gain_db_rel_bgm_plateau"] = rnd(20 * math.log10(max(1e-9, abs(d["gain"])) / ref_g), 2)
             a_, b_ = d["t"], d["t"] + max(0.05, min(d["len"], 0.5))
@@ -742,6 +801,22 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
     out["sfx"] = {"detections": dets, "threshold_ncc": 0.45}
     # ---------------- unexplained onsets in the final residual
     exclude = [(d["t"] - 0.05, d["t"] + d["len"] + 0.05) for d in dets] + [(a - 0.1, b + 0.1) for a, b in kept]
+    # fast gain changes of the BGM itself (edges of measured ducks/silences, planned envelope steps,
+    # fades) leave fit error there, not a new sound.  (Not "wherever the fitted gain jumps": an
+    # unknown sound itself perturbs the fitted gain and would hide itself.)
+    if bgm_al is not None:
+        edges = []
+        for a, b in (b_info.get("ducked_ranges_obs") or []) + (b_info.get("silent_ranges_obs") or []):
+            edges += [a, b]
+        if bgm is not None:
+            for a, b in list(bgm.duck_ranges or []) + list(bgm.silences or []):
+                edges += [float(a), float(b)]
+            pts = [(float(t), float(v)) for t, v in (bgm.envelope or [])]
+            for (t0, v0), (t1, v1) in zip(pts, pts[1:]):
+                if abs(v1 - v0) >= 3.0:
+                    edges += [t0, t1]
+            edges += [float(bgm.fade_in_s or 0), T - float(bgm.fade_out_s or 0)]
+        exclude += [(e - 0.12, e + 0.12) for e in edges]
     try:
         out["unexplained_onsets"] = unexplained_onsets(r2, y, sr, exclude, model=(y - r2).astype(np.float32))
     except Exception as e:

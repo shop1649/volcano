@@ -1,7 +1,17 @@
 schema: shortkit.formats/1
 preset_id: joshuamagazine-v1
 status: unmeasured
-blocker: "2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함"
-basis: {snapshot_file: presets/joshuamagazine/reference/latest100.json, captured_at: null, n_videos: 0, labeled: 0}
-rule: "전개 구조가 실제로 다른 것만 별도 포맷. 도입 방식만 다른 것은 같은 포맷의 intro_variants 로 기록"
+blocker: '2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify
+  prepare` 후 영상을 본 사람이 채워야 함'
+basis:
+  snapshot_file: presets/joshuamagazine/reference/latest100.json
+  captured_at: '2026-09-24T17:56:07+00:00'
+  snapshot_status: blocked
+  n_videos: 0
+  labeled: 0
+  labels_file: presets/joshuamagazine/format_labels.csv
+  rejected_labels: 0
+rule: 전개 구조가 실제로 다른 것만 별도 포맷. 도입 방식만 다른 것은 같은 포맷의 intro_variants 로 기록
 table: []
+assignments: {}
+built_at: '2026-09-24T18:30:14+00:00'

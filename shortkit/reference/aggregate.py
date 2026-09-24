@@ -206,13 +206,18 @@ def _load_videos(preset: str, ids: list[str], membership: dict[str, str]) -> dic
     return out
 
 
-def aggregate(preset: str, ids: list[str] | None = None) -> dict:
+def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = False) -> dict:
+    """``include_long``: also use long-form (``kind: video``) uploads; by default only Shorts (and
+    videos whose kind is unknown) are measured, because this preset reproduces Shorts editing."""
     pr = load_preset(preset)
     Wc, Hc = int(pr.get("canvas.width")), int(pr.get("canvas.height"))
     roles = [r for r in pr.section("text.roles").keys()]
     membership = load_membership(preset)
     snap = load_snapshot(preset) or {}
     ids = ids if ids is not None else resolve_ids(preset, set_name="analyzed")
+    kinds = {v["video_id"]: v.get("kind") for v in snap.get("videos") or []}
+    excluded_long = [v for v in ids if kinds.get(v) == "video"] if not include_long else []
+    ids = [v for v in ids if v not in excluded_long]
     videos = _load_videos(preset, ids, membership)
     no_data = snapshot_blocker(preset) if not videos else None
     canvas_res = [Wc, Hc]
@@ -295,6 +300,8 @@ def aggregate(preset: str, ids: list[str] | None = None) -> dict:
                     add("max_width_px", vid, d, round(lay["max_width_px"] * sc[0], 1), t, fr)
             if lay.get("align") not in (None, "unmeasured"):
                 add("anchor.align", vid, d, lay["align"], t, fr)
+            if lay.get("valign") not in (None, "unmeasured"):
+                add("anchor.valign", vid, d, lay["valign"], t, fr)
             add("color", vid, d, lay.get("color"), t, fr)
             if lay.get("highlight_color"):
                 add("highlight_color", vid, d, lay["highlight_color"], t, fr)
@@ -343,8 +350,12 @@ def aggregate(preset: str, ids: list[str] | None = None) -> dict:
                           "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, " + m, rb, canvas_res, digits=2))
         G.append(num_item(pre + "anchor.x", R.get("anchor.x", []), "px",
                           "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, " + m, rb, canvas_res, digits=1))
-        G.append(num_item(pre + "anchor.y", R.get("anchor.y", []), "px", "잉크 상자(여러 줄은 전체) 세로 중심, " + m, rb,
+        G.append(num_item(pre + "anchor.y", R.get("anchor.y", []), "px",
+                          "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), " + m, rb,
                           canvas_res, digits=1))
+        G.append(cat_item(pre + "anchor.valign", R.get("anchor.valign", []),
+                          "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)", blk(
+                              f"'{role}': 한 줄과 여러 줄 자막이 모두 있는 영상 없음")))
         G.append(cat_item(pre + "anchor.align", R.get("anchor.align", []),
                           "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소", blk(
                               f"'{role}': 정렬을 가를 수 있는 자료(여러 줄·폭이 다른 자막) 없음")))
@@ -463,6 +474,8 @@ def aggregate(preset: str, ids: list[str] | None = None) -> dict:
     snap_ok = snap.get("status") in ("ok", "partial")
     if snap_ok:
         for v in snap.get("videos") or []:
+            if v.get("kind") == "video" and not include_long:
+                continue
             if v.get("duration") is not None:
                 S.append({"video_id": v["video_id"], "format_id": membership.get(v["video_id"]),
                           "value": float(v["duration"]), "t": None, "frame": None})
@@ -498,6 +511,7 @@ def aggregate(preset: str, ids: list[str] | None = None) -> dict:
     mdir = paths.preset_dir(preset) / "measurements"
     written = {}
     basis = {"n_videos_analyzed": len(videos), "video_ids": sorted(videos)[:200],
+             "excluded_long_form": excluded_long,
              "formats_assigned": sum(1 for d in videos.values() if d["format_id"]),
              "canvas_resolution": canvas_res}
     for group, items in groups.items():

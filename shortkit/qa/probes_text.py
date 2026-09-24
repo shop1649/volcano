@@ -113,27 +113,52 @@ def ink_mask(img: np.ndarray, cap, tol: float = 80.0) -> np.ndarray:
         near = cv2.dilate(om.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool)
         m &= near
     elif (cap.box or {}).get("enabled"):
-        m &= box_regions(img, float(cap.size_px or 30))
+        m &= inside_dark_box(img, float(cap.size_px or 30))
     return m
 
 
-def box_regions(img: np.ndarray, size_px: float) -> np.ndarray:
-    """Mask of dark, rectangular label boxes (text holes closed) -- where box captions can be."""
+def inside_dark_box(img: np.ndarray, size_px: float) -> np.ndarray:
+    """Pixels with box-darkened pixels on BOTH sides (above & below, or left & right) within a
+    fraction of the text size: true for strokes inside a label box, false for the bright
+    background just outside the box border."""
     cv2 = _cv2()
     g = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    dark = (g < 110).astype(np.uint8)
-    k = max(3, int(size_px * 0.5))
-    closed = cv2.morphologyEx(dark, cv2.MORPH_CLOSE, np.ones((k, k), np.uint8))
-    n, lab, st, _ = cv2.connectedComponentsWithStats(closed, connectivity=4)
-    out = np.zeros(g.shape, bool)
-    for i in range(1, n):
-        x, y, w, h, a = st[i]
-        if h < 0.6 * size_px or h > 5 * size_px or w < 0.8 * h or w > g.shape[1] * 0.98:
-            continue
-        if a / float(w * h) < 0.75:
-            continue
-        out[y + 2:y + h - 2, x + 2:x + w - 2] = True
-    return out
+    d = (g < 110).astype(np.int32)
+    k = max(3, int(size_px * 0.45))
+    H, W = d.shape
+
+    def before(axis):
+        cs = np.cumsum(d, axis=axis)
+        pad = np.zeros_like(cs)
+        if axis == 0:
+            sh = np.zeros_like(cs)
+            sh[1:] = cs[:-1]
+            lo = np.zeros_like(cs)
+            lo[k + 1:] = cs[:-k - 1]
+        else:
+            sh = np.zeros_like(cs)
+            sh[:, 1:] = cs[:, :-1]
+            lo = np.zeros_like(cs)
+            lo[:, k + 1:] = cs[:, :-k - 1]
+        del pad
+        return (sh - lo) > 0
+
+    def after(axis):
+        f = np.flip(d, axis=axis)
+        cs = np.cumsum(f, axis=axis)
+        if axis == 0:
+            sh = np.zeros_like(cs)
+            sh[1:] = cs[:-1]
+            lo = np.zeros_like(cs)
+            lo[k + 1:] = cs[:-k - 1]
+        else:
+            sh = np.zeros_like(cs)
+            sh[:, 1:] = cs[:, :-1]
+            lo = np.zeros_like(cs)
+            lo[:, k + 1:] = cs[:, :-k - 1]
+        return np.flip((sh - lo) > 0, axis=axis)
+
+    return (before(0) & after(0)) | (before(1) & after(1))
 
 
 def _line_candidates(m: np.ndarray, line_h: float) -> list[list[int]]:
@@ -184,13 +209,36 @@ def expected_lines(cap) -> list[str]:
     return lines
 
 
+def generic_text_mask(img: np.ndarray) -> np.ndarray:
+    """Bright, saturated-or-white text next to dark pixels (outline/box) -- colour-agnostic, used
+    only when the caption is not found in its planned colours."""
+    cv2 = _cv2()
+    g = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+    bright = (g >= 150) | ((hsv[..., 2] >= 200) & (hsv[..., 1] >= 120))
+    dark = cv2.dilate((g <= 70).astype(np.uint8), np.ones((7, 7), np.uint8)).astype(bool)
+    return bright & dark
+
+
 def locate_caption(frame: np.ndarray, cap, max_ocr: int = 10) -> dict:
-    """Find the caption in a full canvas frame.  Returns measured bbox (fill ink), lines, OCR text."""
+    """Find the caption in a full canvas frame.  Returns measured bbox (fill ink), lines, OCR text.
+    First with the planned fill colours; if that fails, colour-agnostically (then the caption is
+    reported with the colour it really has)."""
+    res = _locate(frame, cap, ink_mask(frame, cap), max_ocr)
+    if res.get("found"):
+        return res
+    alt = _locate(frame, cap, generic_text_mask(frame), max_ocr)
+    if alt.get("found") and alt.get("match") == "ocr":
+        alt["match"] = "ocr(계획한 글자색이 아님)"
+        return alt
+    return res
+
+
+def _locate(frame: np.ndarray, cap, m: np.ndarray, max_ocr: int) -> dict:
     lines = expected_lines(cap)
     n_lines = max(1, len(lines))
     ex, ey, ew, eh = cap.bbox.x, cap.bbox.y, cap.bbox.w, cap.bbox.h
     line_h = max(8.0, (eh / n_lines) * 0.8 if eh > 0 else cap.size_px * 0.62)
-    m = ink_mask(frame, cap)
     cands = _line_candidates(m, line_h)
     ecx, ecy = ex + ew / 2, ey + eh / 2
     cands.sort(key=lambda b: math.hypot(b[0] + b[2] / 2 - ecx, b[1] + b[3] / 2 - ecy))
@@ -540,7 +588,25 @@ def _motion_in(ts, frs, p, i0, rest, mask, cap, fps) -> dict:
 
 
 # ----------------------------------------------------------------------------- font
-def measure_font(frame: np.ndarray, cap, bbox) -> dict:
+def recolor_blend(img: np.ndarray, src_rgb, dst_rgb, base_rgb) -> np.ndarray:
+    """Map pixels lying on the base->src colour line (src-coloured text anti-aliased into the
+    outline) onto the base->dst line with the same blend fraction."""
+    p = img.astype(np.float32)
+    b = np.array(base_rgb, np.float32)
+    v = np.array(src_rgb, np.float32) - b
+    vv = float((v * v).sum()) or 1.0
+    a = np.clip(((p - b) * v).sum(axis=2) / vv, 0.0, 1.0)
+    proj = b + a[..., None] * v
+    near_line = np.sqrt(((p - proj) ** 2).sum(axis=2)) < 60.0
+    d_src = np.sqrt(((p - np.array(src_rgb, np.float32)) ** 2).sum(axis=2))
+    d_dst = np.sqrt(((p - np.array(dst_rgb, np.float32)) ** 2).sum(axis=2))
+    sel = near_line & (a > 0.08) & (d_src < d_dst)
+    out = p.copy()
+    out[sel] = b + a[sel][:, None] * (np.array(dst_rgb, np.float32) - b)
+    return np.clip(out + 0.5, 0, 255).astype(np.uint8)
+
+
+def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None) -> dict:
     try:
         from ..reference.typography import font_iou  # type: ignore
     except Exception as e:
@@ -555,9 +621,19 @@ def measure_font(frame: np.ndarray, cap, bbox) -> dict:
     if exp_path is None or not exp_path.exists():
         return {"status": "unmeasured", "reason": f"기대 글꼴 파일을 찾지 못함: {cap.font_name}"}
     x, y, w, h = bbox
-    pad = int(float(cap.outline_px or 0) + 6)
+    boxed = bool((cap.box or {}).get("enabled"))
+    pad = 3 if boxed else int(float(cap.outline_px or 0) + 6)     # stay inside a label box
     crop = frame[max(0, y - pad):y + h + pad, max(0, x - pad):x + w + pad]
     text = "\n".join(expected_lines(cap))
+    # highlighted words use another fill colour: paint them in the main fill colour so the font
+    # comparison sees the whole line
+    if cap.highlight and hex_rgb(cap.highlight_color):
+        crop = recolor_blend(crop, hex_rgb(cap.highlight_color), hex_rgb(cap.color, (255, 255, 255)),
+                             hex_rgb(cap.outline_color, (0, 0, 0)))
+    # the colour around the glyphs: outline colour, or the (measured) box colour for label boxes
+    around = hex_rgb(cap.outline_color) if cap.outline_px else None
+    if boxed and loc and loc.get("box_region_color"):
+        around = hex_rgb(loc["box_region_color"])
     # fonts are passed by exact NAME so .ttc collections resolve to the right face
     cands = [cap.font_name]
     if find_font is not None:
@@ -581,8 +657,7 @@ def measure_font(frame: np.ndarray, cap, bbox) -> dict:
                     target = font_ref(exp_path, font_face_index(exp_path, cap.font_name) or 0)
                 except Exception:
                     target = name
-            r = font_iou(crop, text, target, cap.size_px, fill_rgb=hex_rgb(cap.color),
-                         outline_rgb=hex_rgb(cap.outline_color) if cap.outline_px else None)
+            r = font_iou(crop, text, target, cap.size_px, fill_rgb=hex_rgb(cap.color), outline_rgb=around)
             scores.append({"font": name, "iou": rnd((r or {}).get("iou"), 4), "scale": rnd((r or {}).get("scale"), 3)})
         except Exception as e:
             scores.append({"font": name, "error": f"{type(e).__name__}: {e}"[:200]})
@@ -729,8 +804,12 @@ def probe_identity(ctx: QAContext, captions: list[dict], step: float = 1.0) -> d
             groups.append({"zone": lo["zone"], "clip_id": lo["clip_id"], "text": lo["text"], "times": [lo["t"]],
                            "confs": [lo["conf"]], "box": lo["box"], "handle_like": lo["handle_like"]})
     for gp in groups:
-        gp["persistent"] = (len(gp["times"]) >= 2 and len(norm_text(gp["text"])) >= 3
-                            and (max(gp["confs"]) >= 60 or gp["handle_like"]))
+        nt = norm_text(gp["text"])
+        wordish = len(nt) >= 3 and len(set(nt)) >= 2 and bool(re.search(r"[가-힣aeiouy0-9]", nt))
+        # an account handle / URL in a corner is a source overlay even when read only once;
+        # other text must repeat at the same place with a confident read
+        gp["persistent"] = bool(gp["handle_like"] and len(nt) >= 3) or (len(gp["times"]) >= 2 and wordish
+                                                                        and max(gp["confs"]) >= 70)
     return {"forbidden_terms": forbidden, "sample_times": samples, "forbidden_hits": hits, "leftovers": leftovers[:200],
             "leftover_groups": groups, "ocr_calls": _OCR_STATS["calls"], "ocr_timeouts": _OCR_STATS["timeouts"]}
 
@@ -771,7 +850,7 @@ def probe_captions(ctx: QAContext) -> list[dict]:
                     item.update(measure_timing(ctx, cap, loc, frame))
                 except Exception as e:
                     item["timing_error"] = f"{type(e).__name__}: {e}"[:300]
-                item["font"] = measure_font(frame, cap, loc["bbox"])
+                item["font"] = measure_font(frame, cap, loc["bbox"], loc)
         except Exception as e:
             item["found"] = False
             item["error"] = f"{type(e).__name__}: {e}"[:300]

@@ -118,7 +118,7 @@ def cmd_classify_build(args) -> int:
 def cmd_aggregate(args) -> int:
     from .aggregate import aggregate
     ids = _ids(args) if (args.ids or args.set) else None
-    r = aggregate(args.preset, ids)
+    r = aggregate(args.preset, ids, include_long=args.include_long)
     return 0 if r["videos"] else 3
 
 
@@ -126,7 +126,7 @@ def cmd_trace(args) -> int:
     from .trace_sources import trace
     ids = _ids(args)
     r = trace(args.preset, ids, ocr_fps=args.ocr_fps, do_ocr=not args.no_ocr, lens=not args.no_lens)
-    return 0 if r["videos_traced"] else 3
+    return 0 if r["traced_now"] else 3
 
 
 def _sel(p: argparse.ArgumentParser, default_set: str | None = "latest100") -> None:
@@ -175,6 +175,7 @@ def register(p) -> None:
 
     g = sub.add_parser("aggregate", help="영상별 측정 → measurements/visual_*.json (전체·포맷별 n/p10/p50/p90)")
     _sel(g, default_set=None)
+    g.add_argument("--include-long", action="store_true", help="긴 영상(kind=video)도 포함(기본: 쇼츠만)")
     g.set_defaults(func=cmd_aggregate)
 
     t = sub.add_parser("trace", help="레퍼런스 소재 출처 추적(설명란·워터마크 OCR·렌즈용 키프레임) → warehouse/")

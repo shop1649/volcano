@@ -132,3 +132,31 @@ def test_watermark_ocr_finds_handle():
     assert all(w["verified"] is False and w["variants"] for w in wm)
     assert all(len(w["frames"]) >= 2 or w["conf"] >= 70 for w in wm)
     assert max(len(h["frames"]) for h in hits) >= 3
+
+
+def test_subset_trace_keeps_earlier_accounts(ref_video):
+    """Tracing another video later must not drop accounts found earlier (built from all trace.json)."""
+    proj, vid = ref_video
+    T.trace("joshuamagazine", [vid], do_ocr=False, lens=False)
+    write_json(proj / P / "reference/meta/other000001.json", {"video_id": "other000001",
+                                                               "description": "출처: instagram @second_source"})
+    out = T.trace("joshuamagazine", ["other000001"], do_ocr=False, lens=False)
+    accs = {a["account"] for a in out["accounts"]}
+    assert {"@real_uploader_1", "@second_source"} <= accs and out["videos_traced"] == 2
+    ig = next(a for a in out["accounts"] if a["account"] == "@second_source")
+    assert ig["platform"] == "instagram" and ig["verified_by_text"] is True
+
+
+def test_no_videos_writes_nothing(proj):
+    out = T.trace("joshuamagazine", [], do_ocr=False)
+    assert out["status"] == "unmeasured" and not (proj / "warehouse/source_accounts.json").exists()
+
+
+def test_transcript_keywords_when_file_exists(proj):
+    """SYNTHETIC transcript file in the agreed place (analysis/<id>/audio/transcript.json)."""
+    vid = "trvid000001"
+    write_json(proj / P / f"analysis/{vid}/audio/transcript.json",
+               {"segments": [{"text": "고양이 가 냉장고 위로 점프"}, {"text": "고양이 가 떨어졌다 냉장고"}]})
+    k = T.transcript_keywords("joshuamagazine", vid)
+    assert k["status"] == "measured" and k["keywords"][:2] == ["고양이", "냉장고"]
+    assert T.transcript_keywords("joshuamagazine", "nofile00001")["status"] == "unmeasured"

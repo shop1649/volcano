@@ -4,7 +4,7 @@
   "fine_window_s": 0.05,
   "errors": {},
   "duration": 21.2693,
-  "mix_rms_db": -15.83,
+  "mix_rms_db": -18.84,
   "loudness": {
     "integrated_lufs": -14.4,
     "lra": 4.4,
@@ -42,41 +42,86 @@
       "found": true,
       "tempo": 1.0,
       "offset": 37.9995,
-      "env_score": 0.6724,
+      "env_score": 0.6454,
       "runner_up_same_tempo": {
         "offset": 30.0,
-        "score": 0.671
+        "score": 0.6445
       },
       "top_tempi": [
         [
           1.0,
-          0.6724
+          0.6454
         ],
         [
           1.005,
-          0.22
+          0.2163
         ],
         [
           0.995,
-          0.1971
+          0.1924
         ],
         [
           1.015,
-          0.1663
+          0.1682
         ],
         [
           0.985,
-          0.1655
+          0.1664
         ]
       ]
     },
-    "offset_method": "waveform cross-correlation",
+    "tempo_candidates": {
+      "1.0": {
+        "ncc": 0.7087,
+        "n": 84,
+        "q95": 0.9999,
+        "q70": 0.9997,
+        "explained": 0.5556,
+        "explained_null": 0.0249
+      },
+      "1.005": {
+        "ncc": 0.128,
+        "n": 84,
+        "q95": 0.8132,
+        "q70": 0.3574,
+        "explained": 0.0964,
+        "explained_null": 0.0253
+      },
+      "0.995": {
+        "ncc": 0.0965,
+        "n": 67,
+        "q95": 0.5413,
+        "q70": 0.2201,
+        "explained": 0.0381,
+        "explained_null": 0.0397
+      },
+      "1.015": {
+        "ncc": 0.1152,
+        "n": 67,
+        "q95": 0.558,
+        "q70": 0.2574,
+        "explained": 0.0542,
+        "explained_null": 0.0359
+      }
+    },
+    "planned_tempo_waveform_ncc": 0.7087,
     "waveform_ncc": 0.7087,
+    "local_match": {
+      "n": 84,
+      "q95": 0.9999,
+      "q70": 0.9997,
+      "explained": 0.5556,
+      "explained_null": 0.0249
+    },
+    "found": true,
+    "offset_method": "waveform cross-correlation",
     "tempo_obs": 1.0,
     "section_start_obs": 12.0,
     "runner_up_section": {
       "section_start_s": 36.0,
-      "ncc": 0.708
+      "ncc": 0.708,
+      "explained": 0.5544,
+      "q95": 0.9999
     },
     "status": "measured",
     "plateau_gain": 0.850288,
@@ -196,7 +241,7 @@
       ],
       [
         7.124,
-        NaN
+        -120.0
       ],
       [
         7.374,
@@ -256,11 +301,11 @@
       ],
       [
         10.874,
-        -10.01
+        -10.0
       ],
       [
         11.124,
-        -10.0
+        -9.99
       ],
       [
         11.374,
@@ -268,15 +313,15 @@
       ],
       [
         11.624,
-        -9.54
+        -9.56
       ],
       [
         11.874,
-        -10.0
+        -9.99
       ],
       [
         12.124,
-        -10.01
+        -10.0
       ],
       [
         12.374,
@@ -458,7 +503,7 @@
       ],
       [
         0.375,
-        -0.01
+        -0.0
       ],
       [
         0.425,
@@ -782,7 +827,7 @@
       ],
       [
         4.423,
-        0.03
+        0.02
       ],
       [
         4.473,
@@ -982,43 +1027,43 @@
       ],
       [
         6.922,
-        NaN
+        -120.0
       ],
       [
         6.972,
-        NaN
+        -120.0
       ],
       [
         7.022,
-        NaN
+        -120.0
       ],
       [
         7.072,
-        NaN
+        -120.0
       ],
       [
         7.122,
-        NaN
+        -120.0
       ],
       [
         7.172,
-        NaN
+        -120.0
       ],
       [
         7.222,
-        NaN
+        -120.0
       ],
       [
         7.272,
-        NaN
+        -120.0
       ],
       [
         7.322,
-        NaN
+        -120.0
       ],
       [
         7.372,
-        NaN
+        -120.0
       ],
       [
         7.422,
@@ -1302,7 +1347,7 @@
       ],
       [
         10.92,
-        -10.29
+        -10.22
       ],
       [
         10.97,
@@ -1318,7 +1363,7 @@
       ],
       [
         11.12,
-        -10.02
+        -9.92
       ],
       [
         11.17,
@@ -1326,7 +1371,7 @@
       ],
       [
         11.22,
-        -10.25
+        -10.24
       ],
       [
         11.27,
@@ -1338,7 +1383,7 @@
       ],
       [
         11.37,
-        -9.59
+        -9.58
       ],
       [
         11.42,
@@ -1350,7 +1395,7 @@
       ],
       [
         11.52,
-        -9.72
+        -9.69
       ],
       [
         11.57,
@@ -1358,7 +1403,7 @@
       ],
       [
         11.62,
-        -11.7
+        -11.75
       ],
       [
         11.67,
@@ -1370,11 +1415,11 @@
       ],
       [
         11.77,
-        -9.9
+        -9.89
       ],
       [
         11.82,
-        -10.0
+        -10.03
       ],
       [
         11.87,
@@ -2489,7 +2534,12 @@
         21.24
       ]
     ],
-    "silent_ranges_obs": [],
+    "silent_ranges_obs": [
+      [
+        6.797,
+        7.497
+      ]
+    ],
     "duck_threshold_db": -5.0,
     "audible_span_obs": [
       0.025,
@@ -2512,6 +2562,7 @@
     "pop:assets/test/generated/sfx/pop.wav",
     "whoosh:assets/test/generated/sfx/whoosh.wav"
   ],
+  "sfx_band": "0-5 kHz (AAC 고역 잡음 대체 영향 제외)",
   "originals": {
     "tracks": [
       {
@@ -2569,8 +2620,8 @@
       {
         "t": 10.624,
         "clip_id": "s3",
-        "gain": 2.34019,
-        "gain_db": 7.39,
+        "gain": 2.33963,
+        "gain_db": 7.38,
         "contrib_db": -0.96,
         "kept_expected": true,
         "gain_db_mix_scale": -11.21,
@@ -2579,27 +2630,27 @@
       {
         "t": 10.874,
         "clip_id": "s3",
-        "gain": 2.02602,
-        "gain_db": 6.13,
-        "contrib_db": -3.94,
+        "gain": 2.01112,
+        "gain_db": 6.07,
+        "contrib_db": -4.01,
         "kept_expected": true,
-        "gain_db_mix_scale": -12.46,
+        "gain_db_mix_scale": -12.52,
         "present": true
       },
       {
         "t": 11.124,
         "clip_id": "s3",
-        "gain": 2.34008,
+        "gain": 2.33759,
         "gain_db": 7.38,
-        "contrib_db": -5.66,
+        "contrib_db": -5.67,
         "kept_expected": true,
-        "gain_db_mix_scale": -11.21,
+        "gain_db_mix_scale": -11.22,
         "present": true
       },
       {
         "t": 11.374,
         "clip_id": "s3",
-        "gain": 1.95093,
+        "gain": 1.9505,
         "gain_db": 5.8,
         "contrib_db": -0.94,
         "kept_expected": true,
@@ -2609,21 +2660,21 @@
       {
         "t": 11.624,
         "clip_id": "s3",
-        "gain": 2.38651,
-        "gain_db": 7.56,
-        "contrib_db": -1.28,
+        "gain": 2.39254,
+        "gain_db": 7.58,
+        "contrib_db": -1.26,
         "kept_expected": true,
-        "gain_db_mix_scale": -11.04,
+        "gain_db_mix_scale": -11.01,
         "present": true
       },
       {
         "t": 11.874,
         "clip_id": "s3",
-        "gain": 2.73527,
-        "gain_db": 8.74,
-        "contrib_db": -2.1,
+        "gain": 2.70895,
+        "gain_db": 8.66,
+        "contrib_db": -2.18,
         "kept_expected": true,
-        "gain_db_mix_scale": -9.85,
+        "gain_db_mix_scale": -9.94,
         "present": true
       }
     ],
@@ -2640,237 +2691,75 @@
         "t": 1.2522,
         "type": "whoosh",
         "file": "assets/test/generated/sfx/whoosh.wav",
-        "ncc": 0.6197699098599024,
-        "gain": 0.3531981073898612,
+        "ncc": 0.8515873487527338,
+        "gain": 0.34623089767872584,
         "len": 0.44598639455782313,
-        "gain_db_file": -9.04,
-        "gain_db_rel_bgm_plateau": -7.63,
-        "gain_db_mix_scale": -27.63
+        "gain_db_file": -9.21,
+        "gain_method": "joint LS over the SFX span",
+        "gain_db_rel_bgm_plateau": -7.8,
+        "bgm_local_gain_db_rel_plateau": 0.0,
+        "gain_db_mix_scale": -27.8,
+        "gain_reference": "local_bgm"
       },
       {
         "t": 6.8,
         "type": "click",
         "file": "assets/test/generated/sfx/click.wav",
-        "ncc": 0.992202650813197,
-        "gain": 0.7720686508547867,
+        "ncc": 0.9904466411585952,
+        "gain": 0.5472737097440622,
         "len": 0.0799092970521542,
-        "gain_db_file": -2.25,
-        "gain_db_rel_bgm_plateau": -0.84,
-        "gain_db_mix_scale": -20.84
+        "gain_db_file": -5.24,
+        "gain_method": "joint LS over the SFX span",
+        "gain_db_rel_bgm_plateau": -3.83,
+        "gain_db_mix_scale": -23.83,
+        "gain_reference": "bgm_plateau (BGM 없음/정적 구간)"
       },
       {
         "t": 7.75,
         "type": "pop",
         "file": "assets/test/generated/sfx/pop.wav",
-        "ncc": 0.9433718828626456,
-        "gain": 1.1668355485485116,
+        "ncc": 0.9435261407936265,
+        "gain": 0.8253809541171295,
         "len": 0.1199546485260771,
-        "gain_db_file": 1.34,
-        "gain_db_rel_bgm_plateau": 2.75,
-        "gain_db_mix_scale": -17.25
-      },
-      {
-        "t": 10.6945,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.5165988882015453,
-        "gain": 0.7595187428757181,
-        "len": 1.199954648526077,
-        "gain_db_file": -2.39,
-        "gain_db_rel_bgm_plateau": -0.98,
-        "gain_db_mix_scale": -20.98
-      },
-      {
-        "t": 10.8151,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.7300367640224884,
-        "gain": 1.0779508344316953,
-        "len": 1.199954648526077,
-        "gain_db_file": 0.65,
-        "gain_db_rel_bgm_plateau": 2.06,
-        "gain_db_mix_scale": -17.94
+        "gain_db_file": -1.67,
+        "gain_method": "joint LS over the SFX span",
+        "gain_db_rel_bgm_plateau": -0.26,
+        "bgm_local_gain_db_rel_plateau": -0.05,
+        "gain_db_mix_scale": -20.21,
+        "gain_reference": "local_bgm"
       },
       {
         "t": 10.9357,
         "type": "ding",
         "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.9486263392395062,
-        "gain": 1.3718303455601464,
+        "ncc": 0.9486676704436484,
+        "gain": 0.9699001476481048,
         "len": 1.199954648526077,
-        "gain_db_file": 2.75,
-        "gain_db_rel_bgm_plateau": 4.15,
-        "gain_db_mix_scale": -15.85
-      },
-      {
-        "t": 11.095,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.917046153605195,
-        "gain": 0.6259688878617009,
-        "len": 1.199954648526077,
-        "gain_db_file": -4.07,
-        "gain_db_rel_bgm_plateau": -2.66,
-        "gain_db_mix_scale": -22.66
-      },
-      {
-        "t": 11.2156,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.8823985413012503,
-        "gain": 0.458303718219099,
-        "len": 1.199954648526077,
-        "gain_db_file": -6.78,
-        "gain_db_rel_bgm_plateau": -5.37,
-        "gain_db_mix_scale": -25.37
-      },
-      {
-        "t": 11.3885,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.8072799416802471,
-        "gain": 0.3095334140996621,
-        "len": 1.199954648526077,
-        "gain_db_file": -10.19,
-        "gain_db_rel_bgm_plateau": -8.78,
-        "gain_db_mix_scale": -28.78
-      },
-      {
-        "t": 11.5091,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.852512745142364,
-        "gain": 0.2996711970075311,
-        "len": 1.199954648526077,
-        "gain_db_file": -10.47,
-        "gain_db_rel_bgm_plateau": -9.06,
-        "gain_db_mix_scale": -29.06
-      },
-      {
-        "t": 11.6767,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.8000330426543361,
-        "gain": 0.19355078122267358,
-        "len": 1.199954648526077,
-        "gain_db_file": -14.26,
-        "gain_db_rel_bgm_plateau": -12.86,
-        "gain_db_mix_scale": -32.86
-      },
-      {
-        "t": 11.7973,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.8958693385565395,
-        "gain": 0.20329032601521702,
-        "len": 1.199954648526077,
-        "gain_db_file": -13.84,
-        "gain_db_rel_bgm_plateau": -12.43,
-        "gain_db_mix_scale": -32.43
-      },
-      {
-        "t": 11.9179,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.7910306684325689,
-        "gain": 0.11897483098300356,
-        "len": 1.199954648526077,
-        "gain_db_file": -18.49,
-        "gain_db_rel_bgm_plateau": -17.08,
-        "gain_db_mix_scale": -37.08
-      },
-      {
-        "t": 12.0385,
-        "type": "ding",
-        "file": "assets/test/generated/sfx/ding.wav",
-        "ncc": 0.5111062446224021,
-        "gain": 0.038132431236816276,
-        "len": 1.199954648526077,
-        "gain_db_file": -28.37,
-        "gain_db_rel_bgm_plateau": -26.97,
-        "gain_db_mix_scale": -46.97
+        "gain_db_file": -0.27,
+        "gain_method": "joint LS over the SFX span",
+        "gain_db_rel_bgm_plateau": 1.14,
+        "bgm_local_gain_db_rel_plateau": -10.06,
+        "gain_db_mix_scale": -18.8,
+        "gain_reference": "local_bgm"
       },
       {
         "t": 15.0,
         "type": "boing",
         "file": "assets/test/generated/sfx/boing.wav",
-        "ncc": 0.8663835244185559,
-        "gain": 1.6554477319111287,
+        "ncc": 0.8663928932991706,
+        "gain": 1.1506560076655497,
         "len": 0.599954648526077,
-        "gain_db_file": 4.38,
-        "gain_db_rel_bgm_plateau": 5.79,
-        "gain_db_mix_scale": -14.21
+        "gain_db_file": 1.22,
+        "gain_method": "joint LS over the SFX span",
+        "gain_db_rel_bgm_plateau": 2.63,
+        "bgm_local_gain_db_rel_plateau": 0.07,
+        "gain_db_mix_scale": -17.44,
+        "gain_reference": "local_bgm"
       }
     ],
     "threshold_ncc": 0.45
   },
-  "unexplained_onsets": [
-    {
-      "t": 2.235,
-      "level_db_rel_mix": -21.0,
-      "rise_db": 32.6
-    },
-    {
-      "t": 2.744,
-      "level_db_rel_mix": -23.8,
-      "rise_db": 22.3
-    },
-    {
-      "t": 3.243,
-      "level_db_rel_mix": -21.2,
-      "rise_db": 14.9
-    },
-    {
-      "t": 3.737,
-      "level_db_rel_mix": -23.7,
-      "rise_db": 25.7
-    },
-    {
-      "t": 4.749,
-      "level_db_rel_mix": -23.2,
-      "rise_db": 27.7
-    },
-    {
-      "t": 5.243,
-      "level_db_rel_mix": -22.5,
-      "rise_db": 16.9
-    },
-    {
-      "t": 6.73,
-      "level_db_rel_mix": -10.6,
-      "rise_db": 26.0
-    },
-    {
-      "t": 7.478,
-      "level_db_rel_mix": -18.6,
-      "rise_db": 83.0
-    },
-    {
-      "t": 9.898,
-      "level_db_rel_mix": -18.7,
-      "rise_db": 14.8
-    },
-    {
-      "t": 13.739,
-      "level_db_rel_mix": -23.6,
-      "rise_db": 18.5
-    },
-    {
-      "t": 14.741,
-      "level_db_rel_mix": -22.1,
-      "rise_db": 14.2
-    },
-    {
-      "t": 18.234,
-      "level_db_rel_mix": -21.2,
-      "rise_db": 32.6
-    },
-    {
-      "t": 20.239,
-      "level_db_rel_mix": -23.8,
-      "rise_db": 18.3
-    }
-  ],
-  "residual_rms_db_rel_mix": -16.34,
+  "unexplained_onsets": [],
+  "residual_rms_db_rel_mix": -15.68,
   "status": "measured"
 }

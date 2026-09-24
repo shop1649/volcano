@@ -75,6 +75,8 @@ _DECL: dict[str, list[str]] = {
     "decor.brightness": ["decorations.*.blink_hz", "decorations.*.color"],
     "identity.forbidden_text": ["identity_exclusions.forbidden_text", "identity_exclusions.own_branding"],
     "identity.logo_templates": ["identity_exclusions.logo_templates_dir"],
+    "identity.reference_footage": [],
+    "caption.reveal": [],
     "clean.corners": [],
     "clean.residual": [],
     "cover_up.protected": [],
@@ -225,6 +227,8 @@ class RowBuilder:
                "tolerance": tolerance, "status": status, "intended_change": bool(intended_change),
                "change_ref": change_ref, "evidence": evidence or {}, "note": note, "required": bool(required),
                "keys": keys}
+        if status == "unmeasured":
+            row["impact"] = _impact(keys, category, kind)
         self.rows.append(row)
         return row
 
@@ -277,6 +281,41 @@ class RowBuilder:
             return True
         except KeyError:
             return False
+
+
+CAT_IMPACT = {
+    CAT["text_pos"]: "자막 위치·크기를 출력에서 확인하지 못함 → 가림·어긋남이 남아 있을 수 있음",
+    CAT["font"]: "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음",
+    CAT["cap_timing"]: "자막 등장·퇴장 시각을 확인하지 못함",
+    CAT["cut"]: "컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음",
+    CAT["motion"]: "확대·정지·전환이 계획대로인지 확인하지 못함",
+    CAT["music"]: "BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가",
+    CAT["original"]: "원음이 필요한 곳에만 나오는지 확인하지 못함",
+    CAT["logo"]: "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
+    CAT["sfx_count"]: "효과음 종류·개수를 확인하지 못함",
+    CAT["sfx_offset"]: "효과음과 사건의 시차를 확인하지 못함",
+    CAT["sfx_no_event"]: "사건 없는 효과음이 없는지 확인하지 못함",
+    CAT["deco"]: "장식 위치·깜빡임을 확인하지 못함",
+    CAT["identity"]: "레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험",
+    CAT["cover_up"]: "얼굴·손·핵심 물체를 가리는지 확인하지 못함",
+    CAT["loudness"]: "최종 음량을 확인하지 못함",
+    CAT["cap_style"]: "자막 색·외곽선·박스를 확인하지 못함",
+    CAT["cap_text"]: "자막 문구·말투를 확인하지 못함",
+    CAT["cap_motion"]: "자막 등장 모션을 확인하지 못함",
+    CAT["canvas"]: "화면 구성을 확인하지 못함",
+    CAT["structure"]: "길이·표지 구성을 확인하지 못함",
+}
+
+
+def _impact(keys: list[str], category: str, kind: str = "output_vs_plan") -> str:
+    if keys and kind == "style_vs_reference":
+        try:
+            from ..config import impact_of
+
+            return impact_of(keys[0])
+        except Exception:
+            pass
+    return CAT_IMPACT.get(category, "판정 불가 — 완료로 볼 수 없음")
 
 
 def _role_keys(role: str, names: list[str]) -> list[str]:
@@ -475,16 +514,22 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
             best_iou = max((s.get("iou") or 0) for s in fnt["scores"])
             exp_iou = fnt.get("iou_expected") or 0
             margin = best_iou - exp_iou
-            if margin <= 0.03:
-                fst = "same" if exp_iou >= 0.45 else "unmeasured"
-                fnote = "" if fst == "same" else "기대 글꼴이 가장 잘 맞지만 IoU 가 낮아 판별 불확실"
+            ceil = _font_ceiling(b, cap.font_name)
+            glyph_h = (m.get("bbox_obs") or [0, 0, 0, 0])[3] / max(1, m.get("lines_found") or 1)
+            big_enough = glyph_h >= 30
+            if margin <= 0.03 and exp_iou >= ceil - 0.12:
+                fst, fnote = "same", ""
+            elif margin > 0.03 and best_iou >= ceil - 0.12:
+                fst, fnote = "different", f"다른 글꼴({fnt.get('best')})이 더 잘 맞음"
+            elif exp_iou < 0.7 and big_enough:
+                fst, fnote = "different", (f"기대 글꼴 IoU {exp_iou} ≪ 같은 글꼴 천장 {ceil} — 다른(대체) 글꼴로 그려진 것으로 보임, "
+                                           "후보 글꼴 중에도 맞는 것 없음")
             else:
-                fst = "different" if best_iou >= 0.6 else "unmeasured"
-                fnote = (f"다른 글꼴({fnt.get('best')})이 더 잘 맞음" if fst == "different"
-                         else f"다른 글꼴({fnt.get('best')})이 약간 더 맞지만 IoU<0.6 이라 판별 불확실")
+                fst, fnote = "unmeasured", "글자가 작거나 IoU 가 애매해 판별 불확실"
             b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name,
-                  observed={"best": fnt.get("best"), "iou_expected": exp_iou, "scores": fnt.get("scores")},
-                  tolerance="기대 글꼴 IoU 가 최고와 0.03 이내·≥0.45 → 같다 / 다른 글꼴이 0.03 넘게 높고 IoU≥0.6 → 다르다",
+                  observed={"best": fnt.get("best"), "iou_expected": exp_iou, "scores": fnt.get("scores"),
+                            "same_font_ceiling_p10": ceil, "glyph_h": _r(glyph_h, 1)},
+                  tolerance="기대 글꼴 IoU ≥ 천장−0.12 이고 최고와 0.03 이내 → 같다 / 다른 글꼴이 더 맞거나 IoU<0.7(글자 ≥30px) → 다르다",
                   status=fst, keys=_role_keys(role, ["font_name", "bold"]), evidence=ev, note=fnote)
         else:
             b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name, observed=None,
@@ -532,6 +577,28 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                   keys=_role_keys(role, ["motion_in.type", "motion_in.dur_s", "motion_in.scale_from", "motion_in.offset_px"]),
                   evidence={"t": m.get("onset"), "frame": m.get("evidence_frame")},
                   note="slide/offset 는 측정하지 않음" if et not in ("pop", "fade", "none") else "")
+    # information order: captions shown before the reveal must not contain its keywords
+    rv = (ctx.plan or {}).get("reveal") or {}
+    if rv.get("t") is not None and rv.get("keywords"):
+        from .probes_text import _fuzzy_contains
+
+        hits, basis = [], []
+        for cap in ctx.resolved.captions:
+            m = meas.get(cap.id) or {}
+            on = m.get("onset") if m.get("onset") is not None else cap.start
+            if on >= float(rv["t"]) - 1e-6:
+                continue
+            ocr_ok = m.get("found") and (m.get("similarity") or 0) >= TOL["text_sim"]
+            txt = m.get("ocr") if ocr_ok else cap.text
+            basis.append("OCR" if ocr_ok else "계획문구")
+            for kw in rv["keywords"]:
+                if _fuzzy_contains(txt or "", kw) >= 0.85:
+                    hits.append({"caption": cap.id, "onset": on, "keyword": kw, "basis": "OCR" if ocr_ok else "계획문구"})
+        b.add("caption.reveal", "reveal", "반전 전에 반전 내용을 미리 말하지 않음", CAT["cap_text"],
+              expected={"reveal_t": rv["t"], "keywords": rv["keywords"]}, observed={"hits": hits},
+              tolerance="반전 시각 전 자막에 키워드 0건", status="same" if not hits else "different",
+              evidence={"t": hits[0]["onset"]} if hits else {"t": rv["t"]},
+              note=("일부 자막은 OCR 이 불확실해 계획 문구로 확인" if "계획문구" in basis else "출력 OCR 문구로 확인"))
     # tone
     tone = tp.get("tone") or {}
     reg = b.pget("text.tone.register")
@@ -590,6 +657,30 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                 ["text.tone.register", "text.tone.sentence_end_examples", "text.tone.emoji", "text.tone.notes"],
                 {"register": tone.get("mode")} if tone.get("n") else None,
                 lambda o, r: o["register"] == r.get("text.tone.register"))
+
+
+def _font_ceiling(b: RowBuilder, font_name: str) -> float:
+    """Same-font IoU ceiling (p10) from presets/<name>/fonts_report.json (reference typography
+    module); 0.85 when there is no report."""
+    from ..util.jsonio import read_json
+
+    if not hasattr(b, "_ceil_cache"):
+        b._ceil_cache = read_json(b.ctx.preset.dir / "fonts_report.json") or {}
+    rep = b._ceil_cache
+    vals, allv = [], []
+    for cond in (rep.get("ceilings") or {}).values():
+        if not isinstance(cond, dict):
+            continue
+        for fname, ent in cond.items():
+            if isinstance(ent, dict) and ent.get("p10") is not None:
+                allv.append(float(ent["p10"]))
+                if str(fname).replace(" ", "").lower() == str(font_name).replace(" ", "").lower():
+                    vals.append(float(ent["p10"]))
+    if vals:
+        return round(min(vals), 3)
+    if allv:
+        return round(min(allv), 3)
+    return 0.85
 
 
 def _has_pos_override(b: RowBuilder, cap) -> bool:
@@ -697,26 +788,36 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
                 b.add("video.zoom", c.id, f"확대(줌) [{c.id}]", CAT["motion"], expected=exp or "줌 없음", observed=None,
                       status="unmeasured", keys=keys, note=it.get("reason", ""), required=bool(exp))
                 continue
+            fin = it.get("zoom_ratio_corrected") or it["measured_final_ratio"]
             if exp:
-                ratio_ok = abs(it["measured_final_ratio"] - it["expected_final_ratio"]) <= TOL["zoom_ratio"]
+                ratio_ok = abs(fin - it["expected_final_ratio"]) <= TOL["zoom_ratio"]
                 t50_ok = (it.get("measured_t50") is not None and it.get("expected_t50") is not None and
                           abs(it["measured_t50"] - it["expected_t50"]) <= it["tolerance"]["t50_s"])
-                obs = {k: it.get(k) for k in ("measured_final_ratio", "measured_t50", "measured_dur", "measured_ease",
-                                              "measured_center_canvas", "max_abs_err")}
+                obs = {k: it.get(k) for k in ("measured_final_ratio", "source_ratio", "zoom_ratio_corrected", "measured_t50",
+                                              "measured_dur", "measured_ease", "measured_center_canvas", "max_abs_err")}
                 b.add("video.zoom", c.id, f"확대(줌) [{c.id}]", CAT["motion"],
                       expected={"final_ratio": it["expected_final_ratio"], "t50": it.get("expected_t50"),
                                 "dur": exp["dur"], "ease": exp["ease"], "center_canvas": exp.get("center_canvas")},
                       observed=obs, tolerance=f"배율 ±{TOL['zoom_ratio']}, 중간 시점 ±{it['tolerance']['t50_s']:.2f}s",
                       status="same" if ratio_ok and t50_ok else "different", keys=keys,
                       evidence={"t": it.get("measured_t50")},
-                      note="ORB+RANSAC 유사변환 배율(출력 프레임끼리 비교)")
+                      note="ORB+RANSAC 유사변환 배율(출력 프레임끼리 비교, 소스 자체의 배율 변화로 나눔)")
             else:
                 dev = it.get("measured_max_dev") or 0.0
                 reliable = (it.get("n_samples") or 0) >= 10 and (it.get("median_inliers") or 0) >= 40 and \
                     (it.get("measured_spread") or 0) <= 0.02
-                st = "same" if dev <= 0.05 else ("different" if (dev > 0.08 and reliable) else "unmeasured")
+                corr = it.get("zoom_ratio_corrected")
+                if dev > 0.05 and corr is not None and abs(corr - 1.0) <= 0.05:
+                    st = "same"            # the source itself changed scale (subject/camera motion)
+                elif dev <= 0.05:
+                    st = "same"
+                elif dev > 0.08 and reliable and corr is not None and abs(corr - 1.0) > 0.08:
+                    st = "different"
+                else:
+                    st = "unmeasured"
                 b.add("video.zoom", c.id, f"줌 없음 확인 [{c.id}]", CAT["motion"], expected={"final_ratio": 1.0},
-                      observed={"max_dev": dev, "median_inliers": it.get("median_inliers"), "spread": it.get("measured_spread")},
+                      observed={"max_dev": dev, "final_ratio": it.get("measured_final_ratio"), "source_ratio": it.get("source_ratio"),
+                                "corrected": corr, "median_inliers": it.get("median_inliers"), "spread": it.get("measured_spread")},
                       tolerance="배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다)", status=st, required=False,
                       note="소스 자체의 카메라 줌도 여기에 잡힘" + ("; 특징점 추정이 불안정해 판정 보류" if st == "unmeasured" else ""))
         mc = b.pget("motion.zoom.max_consecutive")
@@ -744,7 +845,8 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
                 note = "" if o else "출력에서 반복 프레임 구간을 찾지 못함"
             b.add("video.freeze", e["clip_id"], f"정지(프리즈) [{e['clip_id']}]", CAT["motion"],
                   expected={"start": e["start"], "hold": e["hold"]},
-                  observed={"start": o["start"], "hold": _r(o["end"] - o["start"], 3), "mean_diff": o.get("mean_diff")} if o else None,
+                  observed={"presence": "present", "start": o["start"], "hold": _r(o["end"] - o["start"], 3),
+                            "mean_diff": o.get("mean_diff")} if o else {"presence": "absent"},
                   tolerance="시작 ±2프레임, 길이 ±3프레임(소스가 정지한 구간은 허용)", status=st,
                   keys=["motion.freeze.hold_s"], evidence={"t": e["start"]}, note=note)
         un = [r for r in fz.get("unexpected") or [] if r.get("source_static") is not True]
@@ -859,6 +961,35 @@ def rows_identity(b: RowBuilder, probes: dict) -> None:
     tdir = b.pget("identity_exclusions.logo_templates_dir")
     b.add("identity.logo_templates", "all", "레퍼런스 로고 템플릿 없음", CAT["identity"],
           **_logo_template_check(ctx, tdir))
+    # the footage itself must be a different recording from the reference's
+    b.add("identity.reference_footage", "all", "레퍼런스와 같은 녹화(영상) 재사용 없음", CAT["identity"],
+          **_reference_footage_check(ctx))
+
+
+def _reference_footage_check(ctx) -> dict:
+    """pHash keyframes of the OUTPUT video region vs warehouse/exclusions.jsonl reference_footage
+    fingerprints (sourcing's own match rule).  No fingerprints -> 못 잼."""
+    mode = getattr(ctx.resolved, "mode", "test")
+    try:
+        from ..sourcing import exclusions as ex
+        from .probes_video import region_union
+    except Exception as e:
+        return {"status": "unmeasured", "required": mode == "production", "observed": None,
+                "note": f"shortkit.sourcing.exclusions 사용 불가({type(e).__name__})"}
+    x, y, w, h = region_union(ctx)
+    try:
+        kf = ex.keyframe_hashes(ctx.mp4, n=24, region={"x": x, "y": y, "w": w, "h": h})
+        res = ex.check(keyframes=kf)
+    except Exception as e:
+        return {"status": "unmeasured", "required": mode == "production", "observed": None,
+                "note": f"지문 비교 실패: {type(e).__name__}: {e}"[:300]}
+    obs = {k: res.get(k) for k in ("excluded", "matched_ref_video_id", "distance", "matched_keyframes", "n_keyframes",
+                                   "n_refs", "method")}
+    obs["region"] = {"rect": [x, y, w, h], "resolution": [ctx.info.width, ctx.info.height]}
+    st = "unmeasured" if res.get("excluded") is None else ("different" if res["excluded"] else "same")
+    return {"expected": {"same_recording_as_reference": False}, "observed": obs, "status": st,
+            "required": mode == "production", "tolerance": "pHash 거리 ≤ 10 인 키프레임 3장 미만",
+            "note": res.get("note") or ""}
 
 
 def _logo_template_check(ctx, tdir) -> dict:
@@ -939,11 +1070,7 @@ def rows_cover_up(b: RowBuilder, probes: dict) -> None:
             on = c.get("onset") if c.get("onset") is not None else c["start"]
             off = c.get("offset") if c.get("offset") is not None else c["end"]
             overlays.append({"id": c["id"], "kind": "caption", "start": on, "end": off, "bbox": c["bbox_obs"]})
-    for d in (vp.get("decorations") or {}).get("items") or []:
-        dd = next((x for x in ctx.resolved.decorations if x.id == d["id"]), None)
-        bu = (d.get("position") or {}).get("bbox_union")
-        if dd is not None and bu:
-            overlays.append({"id": d["id"], "kind": "decoration", "start": dd.start, "end": dd.end, "bbox": bu})
+    deco_cover = {d["id"]: d.get("protected_cover") or {} for d in (vp.get("decorations") or {}).get("items") or []}
     prot = vp.get("protected")
     checked_protected = False
     if prot:
@@ -953,17 +1080,25 @@ def rows_cover_up(b: RowBuilder, probes: dict) -> None:
         for i, p in enumerate(prot):
             hits = []
             for o in overlays:
-                if min(o["end"], p["end"]) - max(o["start"], p["start"]) <= 0:
+                if p["rect"] is None or min(o["end"], p["end"]) - max(o["start"], p["start"]) <= 0:
                     continue
                 inter = rect_intersection(o["bbox"], p["rect"])
                 area = p["rect"][2] * p["rect"][3]
                 if area > 0 and inter / area > 0.05:
                     hits.append({"overlay": o["id"], "kind": o["kind"], "covered_frac": round(inter / area, 3)})
-            b.add("cover_up.protected", f"{p['clip_id']}#{i}", f"보호 영역 가림 [{p.get('label')}·{p['clip_id']}]", CAT["cover_up"],
-                  expected={"rect": p["rect"], "t": [p["start"], p["end"]], "covered": False},
-                  observed={"hits": hits}, tolerance="보호 영역 면적의 5% 초과 가림 0건",
-                  status="same" if not hits else "different", evidence={"t": p["start"]},
-                  note="보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것, 자막·장식 bbox 는 출력에서 측정")
+            for did, pc in deco_cover.items():       # decorations: their own pixels, frame by frame
+                v = pc.get(str(i)) or pc.get(i)
+                if v and v["max_frac"] > 0.05:
+                    hits.append({"overlay": did, "kind": "decoration", "covered_frac": v["max_frac"], "t": v["t"]})
+            vis = p.get("visible_frac")
+            cropped = vis is not None and vis < 0.5
+            b.add("cover_up.protected", f"{p['clip_id']}#{i}", f"보호 영역 가림·잘림 [{p.get('label')}·{p['clip_id']}]", CAT["cover_up"],
+                  expected={"rect": p["rect"], "resolution": [ctx.canvas_w, ctx.canvas_h], "t": [p["start"], p["end"]],
+                            "covered": False, "visible_frac_min": 0.5},
+                  observed={"hits": hits, "visible_frac": vis}, tolerance="보호 영역 면적의 5% 초과 가림 0건, 화면 안에 50% 이상",
+                  status="same" if not hits and not cropped else "different", evidence={"t": p["start"]},
+                  note="보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), "
+                       "자막·장식 bbox 는 출력에서 측정" + ("; 보호 대상이 화면 밖으로 잘림" if cropped else ""))
     else:
         b.add("cover_up.protected", "none", "보호 영역(얼굴·손·물체) 가림", CAT["cover_up"], status="unmeasured",
               required=False, note="plan 에 보호 영역(sources[].protected) 선언 없음")
@@ -1012,9 +1147,15 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
               observed=None, status="unmeasured", keys=bkeys[:3], note=bi.get("reason", ""))
     else:
         found = bool(bi.get("found"))
+        pth = str(bgm.path or "")
+        if "/analysis/" in pth or "/stems/" in pth or pth.startswith("presets/"):
+            b.add("audio.bgm", "clean_file", "BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지)", CAT["music"],
+                  expected="음원 창고의 깨끗한 파일", observed={"path": pth}, status="different",
+                  note="레퍼런스 분석 폴더/스템 경로의 파일을 BGM 으로 사용함")
         b.add("audio.bgm", "file", "BGM 곡·버전 일치(파형 대조)", CAT["music"],
               expected={"path": bgm.path, "track_id": bgm.track_id},
-              observed={"waveform_ncc": bi.get("waveform_ncc"), "local_match": bi.get("local_match"),
+              observed={"presence": "present" if found else "absent", "waveform_ncc": bi.get("waveform_ncc"),
+                        "local_match": bi.get("local_match"),
                         "tempo_candidates": bi.get("tempo_candidates")},
               tolerance="0.25초 창별 파형 상관 q95 ≥ 0.7 (무관한 음악 < 0.5)", status="same" if found else "different",
               keys=["audio.bgm.track_id", "audio.bgm.title", "audio.bgm.version"],
@@ -1206,15 +1347,34 @@ def _rows_original(b: RowBuilder, ap: dict) -> None:
         ok = frac >= TOL["orig_present_frac"]
         b.add("audio.original", f"kept{i}", f"보존 원음 [{o.clip_id} {o.out_start:.2f}–{o.out_end:.2f}s]", CAT["original"],
               expected={"present": True, "gain_db": o.gain_db, "stem": o.stem, "reason": o.reason},
-              observed={"present_fraction": _r(frac, 3), "gain_db_mix_scale": _r(g, 2)},
+              observed={"presence": "present" if frac >= TOL["orig_present_frac"] else ("absent" if frac == 0 else "partial"),
+                        "present_fraction": _r(frac, 3), "gain_db_mix_scale": _r(g, 2)},
               tolerance=f"창의 {int(TOL['orig_present_frac'] * 100)}% 이상에서 원음 확인", status="same" if ok else "different",
               keys=["audio.original.keep_gain_db", "audio.original.fade_s"], evidence={"t": o.out_start},
               note="원음 이득은 BGM 기준 믹스 척도 추정(BGM 없으면 없음)")
+    # music embedded in the source must be removed from kept original sound (separate first)
+    srcs = {x.get("id"): x for x in ((ctx.plan or {}).get("sources") or [])}
+    for i, o in enumerate(ctx.resolved.audio.originals):
+        c = next((x for x in ctx.resolved.clips if x.id == o.clip_id), None)
+        src = srcs.get(c.source_id) if c is not None else None
+        hem = (src or {}).get("has_embedded_music")
+        if hem is False:
+            st, note = "same", "소스에 음악 없음(plan 기록)"
+        elif hem is None:
+            st, note = "unmeasured", "소스에 음악이 섞여 있는지 판정 기록 없음(plan sources[].has_embedded_music)"
+        elif o.stem == "raw":
+            st, note = "different", "음악이 섞인 원본 소리를 분리하지 않고 그대로 사용"
+        else:
+            st, note = "unmeasured", "보컬 분리 스템 사용 — 분리 품질은 사람이 들어서 확인해야 함(청취 확인 안 함)"
+        b.add("audio.original", f"music{i}", f"보존 원음 속 음악 제거 [{o.clip_id}]", CAT["original"],
+              expected={"embedded_music_removed": True}, observed={"has_embedded_music": hem, "stem": o.stem, "path": o.path},
+              status=st, keys=["audio.original.remove_embedded_music"], note=note, required=(hem is None or st == "different"))
     leak = [w for w in wins if w["present"] and not any(a - fade - 0.2 <= w["t"] <= c + fade + 0.2 for a, c in kept)]
     leak_r = [[_r(w["t"] - 0.125), _r(w["t"] + 0.125)] for w in leak]
     b.add("audio.original", "off", "원음 OFF 구간에 원음 없음(기본 OFF)", CAT["original"],
           expected={"kept_only": [list(x) for x in kept]},
-          observed={"leak_windows": leak_r[:20], "sources_without_audio": silent_src},
+          observed={"presence_outside_kept": "present" if leak else "absent", "leak_windows": leak_r[:20],
+                    "sources_without_audio": silent_src},
           tolerance="0개 창", status="same" if not leak else "different", keys=["audio.original.default"],
           evidence={"t": leak[0]["t"]} if leak else {},
           note=("소스에 소리가 없는 클립: " + ", ".join(silent_src)) if silent_src else "")

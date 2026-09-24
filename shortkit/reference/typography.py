@@ -1280,7 +1280,8 @@ def assumptions_for(conds: Sequence[Conditions], exp: dict) -> list[dict]:
         {"input": "codec", "value": c0.codec, "status": "assumed" if c0.assumed else "measured",
          "replace_with": "실제 다운로드의 비디오 코덱(avc1/vp9/av01, ffprobe)"},
         {"input": "rate_control", "value": rc, "status": "assumed" if c0.assumed else "measured",
-         "replace_with": "실제 다운로드의 비디오 비트레이트 → bitrate 모드로 재계산"},
+         "replace_with": "실제 다운로드: H.264 면 자막 매크로블록의 실제 QP(ffmpeg -debug qp+mb_type) → 같은 QP 로 재계산, "
+                         "그 외 코덱은 비디오 비트레이트(ffprobe) → bitrate 모드"},
         {"input": "canvas", "value": list(c0.canvas), "status": "preset(provisional)",
          "replace_with": "측정된 canvas 해상도(레퍼런스 편집 해상도는 직접 알 수 없음: 다운로드 해상도와 같다고 가정)"},
         {"input": "caption_sizes_px", "value": exp["sample_design"]["sizes_px_canvas"], "resolution": list(c0.canvas),
@@ -1294,6 +1295,26 @@ def assumptions_for(conds: Sequence[Conditions], exp: dict) -> list[dict]:
         {"input": "strings", "value": exp["sample_design"]["strings"], "status": "synthetic",
          "replace_with": "그대로 사용 가능(레퍼런스 문구가 아닌 합성 문구)"},
     ]
+
+
+def method_description() -> dict:
+    """Human-readable (Korean) description of the method and verdict rules, stored in the report."""
+    return {
+        "mask": "fill-only(외곽선 제외). 채움/외곽선 밝기(luma) 사이 t>=0.5 → 채움 (yuv420 색차 번짐 때문에 색차는 "
+                "배경 배제에만 사용; 밝기 차가 작으면 RGB 투영) + 테두리 접촉 성분 제거 + 외곽선 둘러싸임 검사",
+        "render": f"후보 글꼴을 {UPSAMPLE}배 해상도로 렌더 후 상자 축소(비힌팅·분수 위치), 50% 커버리지 임계",
+        "alignment": f"크기 ±{SCALE_RANGE:.0%} (잉크 높이 맞춤 중심, 5% 격자 → 절반씩 0.3%까지), 이동 1/{UPSAMPLE}px 격자 상호상관",
+        "ceiling": "같은 글꼴로 합성 자막 렌더 → 레퍼런스처럼 축소·인코딩·디코딩 → 같은 마스크 추출 → 같은 글꼴 깨끗한 렌더와 IoU",
+        "noise": "같은 문구·크기·스타일 반복(부분 픽셀 위치·배경·인코딩 문맥만 다름) IoU 차이(max-min)의 분포",
+        "real_conditions": "`ref fonts`: 실제 다운로드의 해상도·코덱(ffprobe), H.264 이면 자막 매크로블록의 실제 양자화값"
+                           "(ffmpeg -debug qp+mb_type, 기준 프레임에서 마지막으로 부호화된 QP) → 같은 QP 로 재현; "
+                           "그 외 코덱은 평균 비트레이트(정지 화면에서는 부정확 — 보고서에 표시). 크기는 crop 에서 잰 잉크 높이",
+        "verdict": {"identical": "IoU >= 그 글꼴 천장 p10 AND 차순위 대비 차이 > 잡음 p90 AND 글자별 검사 통과"
+                                 f"(글자 {GLYPH_PASS_SHARE:.0%} 이상이 글자별 천장 p10 이상, 그리고 글자별 하한 "
+                                 "p10-2x(p50-p10) 미만인 글자 없음)",
+                    "similar": "제외는 안 되지만 동일 확정 불가 — 프리셋 값으로 쓰지 않음(못 잼 유지)",
+                    "different": "IoU < 천장 p10 - 잡음 p90"},
+    }
 
 
 def write_ceiling_report(preset, exp: dict, conds: Sequence[Conditions], command: str) -> Path:
@@ -1311,18 +1332,7 @@ def write_ceiling_report(preset, exp: dict, conds: Sequence[Conditions], command
         "summary_ko": ([("가정 조건(실제 레퍼런스 다운로드 아님)으로 계산한 IoU 천장입니다. 레퍼런스 자막 crop 은 못 잼 → "
                          "글꼴 판정은 못 잼.") if assumed else "실제 레퍼런스 조건으로 계산한 IoU 천장입니다."]
                        + summarize_experiment(exp)),
-        "method": {
-            "mask": "fill-only (외곽선 제외), 색 투영(외곽선→채움 선분, t>=0.5) + 테두리 접촉 성분 제거 + 외곽선 둘러싸임 검사",
-            "render": f"후보 글꼴을 {UPSAMPLE}배 해상도로 렌더 후 상자 축소(비힌팅·분수 위치), 50% 커버리지 임계",
-            "alignment": f"크기 ±{SCALE_RANGE:.0%} (잉크 높이 맞춤 중심, 5% 격자 → 절반씩 0.3%까지), 이동 1/{UPSAMPLE}px 격자 상호상관",
-            "ceiling": "같은 글꼴로 합성 자막 렌더 → 레퍼런스처럼 축소·인코딩·디코딩 → 같은 마스크 추출 → 같은 글꼴 깨끗한 렌더와 IoU",
-            "noise": "같은 문구·크기·스타일 반복(부분 픽셀 위치·배경·인코딩 문맥만 다름) IoU 차이(max-min)의 분포",
-            "verdict": {"identical": "IoU >= 그 글꼴 천장 p10 AND 차순위 대비 차이 > 잡음 p90 AND 글자별 검사 통과"
-                                     f"(글자 {GLYPH_PASS_SHARE:.0%} 이상이 글자별 천장 p10 이상, 그리고 글자별 하한 "
-                                     "p10-2x(p50-p10) 미만인 글자 없음)",
-                        "similar": "제외는 안 되지만 동일 확정 불가 — 프리셋 값으로 쓰지 않음(못 잼 유지)",
-                        "different": "IoU < 천장 p10 - 잡음 p90"},
-        },
+        "method": method_description(),
         "assumptions": assumptions_for(conds, exp),
         "candidates": {"evaluated": exp["fonts"], "missing": exp["missing"],
                        "not_acquired": _not_acquired()},

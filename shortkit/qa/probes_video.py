@@ -163,6 +163,10 @@ def scan(ctx: QAContext, width: int = 540, zoom_every: int = 1) -> dict:
     decos = list(ctx.resolved.decorations)
     deco_state = {d.id: {"bg": None, "rows": [], "rgb": hex_rgb((d.style or {}).get("color"), (255, 42, 42))}
                   for d in decos}
+    try:
+        prot = protected_rects_canvas(ctx) if decos else []
+    except Exception:
+        prot = []
     fps = ctx.fps
     n_samples = 12
     sample_times = [ctx.info.duration * (i + 0.5) / n_samples for i in range(n_samples)]
@@ -223,7 +227,20 @@ def scan(ctx: QAContext, width: int = 540, zoom_every: int = 1) -> dict:
             if st["bg"] is not None:
                 m = m & ~cv2.dilate(st["bg"].astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool)
             rot = _deco_expected_kf(d, t).get("rotation") or 0.0
-            st["rows"].append(_deco_measure(t, fr, m, s, d.kind, rot))
+            row = _deco_measure(t, fr, m, s, d.kind, rot)
+            # how much of each declared protected area do the decoration's own pixels cover?
+            cov = {}
+            for pi, pr in enumerate(prot):
+                if pr.get("rect") is None or not (pr["start"] <= t <= pr["end"]):
+                    continue
+                px, py, pw, ph = pr["rect"]
+                x0_, y0_ = int(px * s), int(py * s)
+                x1_, y1_ = int(math.ceil((px + pw) * s)), int(math.ceil((py + ph) * s))
+                area = max(1, (x1_ - x0_) * (y1_ - y0_))
+                cov[pi] = round(float(m[max(0, y0_):y1_, max(0, x0_):x1_].sum()) / area, 4)
+            if cov:
+                row["prot_cover"] = cov
+            st["rows"].append(row)
     return {"scale": s, "region": [rx, ry, rw, rh], "times": np.array(times), "thumbs": thumbs,
             "luma": np.array(luma), "luma_full": np.array(luma_full), "rgb": np.array(rgbm),
             "hists": np.array(hists), "samples": samples, "zoom_rows": zoom_rows,
@@ -705,6 +722,15 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
             fy = [r[3] for r in rows if r[3] is not None]
             if fx and fy:
                 item["measured_center_canvas"] = [rnd(float(np.median(fx)), 1), rnd(float(np.median(fy)), 1)]
+        # the picture can also change scale because the SOURCE moves (people walking to the camera,
+        # camera zoom): measure the same thing on the source frames and divide it out
+        try:
+            sr_ = source_scale(ctx, c, float(arr[0, 0]), float(arr[-1, 0]))
+        except Exception:
+            sr_ = None
+        item["source_ratio"] = rnd(sr_, 4) if sr_ else None
+        if sr_:
+            item["zoom_ratio_corrected"] = rnd(item["measured_final_ratio"] / sr_, 4)
         item["status"] = "measured"
         item["tolerance"] = {"ratio": 0.04, "t50_s": max(0.1, 3 * fr)}
         out.append(item)
@@ -715,6 +741,33 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
         run = run + 1 if zf else 0
         best = max(best, run)
     return {"clips": out, "max_consecutive_measured": best}
+
+
+def source_scale(ctx: QAContext, clip, t0: float, t1: float, work_w: int = 540) -> float | None:
+    """Similarity-transform scale between the SOURCE frames shown at output times t0 and t1,
+    both fitted into the clip region WITHOUT the plan's zoom."""
+    from .. import paths
+
+    cv2 = _cv2()
+    p = paths.absp(clip.source_path)
+    if not p.is_file():
+        return None
+    rx, ry, rw, rh = rect_xywh(clip.region)
+    k = work_w / rw
+    wh = max(8, int(round(rh * k)))
+    tr = clip_transform(clip, None)
+    M = np.array([[tr["s"] * k, 0, (tr["tx"] - rx) * k], [0, tr["s"] * k, (tr["ty"] - ry) * k]], np.float32)
+    ims = []
+    for t in (t0, t1):
+        f = grab(p, src_time(clip, t))
+        ims.append(cv2.cvtColor(cv2.warpAffine(f, M, (work_w, wh), flags=cv2.INTER_AREA), cv2.COLOR_RGB2GRAY))
+    orb = cv2.ORB_create(nfeatures=700, fastThreshold=12)
+    k0, d0 = orb.detectAndCompute(ims[0], None)
+    k1, d1 = orb.detectAndCompute(ims[1], None)
+    est = _similarity(k0, d0, k1, d1)
+    if est is None or est[3] < 15:
+        return None
+    return float(est[0])
 
 
 def _zoom_center_canvas(c) -> list[float] | None:
@@ -804,6 +857,12 @@ def analyze_decorations(ctx: QAContext, sc: dict) -> dict:
                               "cv": rnd(float(level.std() / max(1e-6, level.mean())) if len(level) else None, 3),
                               "curve": [[rnd(a, 3), rnd(b, 3)] for a, b in list(zip(ts, level))[:: max(1, len(ts) // 60)]],
                               "span_s": rnd(span, 3)}
+        pc: dict = {}
+        for r in inside:
+            for pi, v in (r.get("prot_cover") or {}).items():
+                if v > pc.get(pi, {}).get("max_frac", -1):
+                    pc[pi] = {"max_frac": v, "t": r["t"]}
+        item["protected_cover"] = pc
         item["status"] = "measured"
         out.append(item)
     return {"items": out}
@@ -1084,6 +1143,7 @@ def analyze_residual(ctx: QAContext) -> dict:
                 obs.append(row)
             it["samples"] = obs
             vis = [o for o in obs if o.get("visible")]
+            it["resolution"] = [ctx.info.width, ctx.info.height]
             if not vis:
                 it.update(status="measured", residual=False, note="정리 영역이 출력 화면 밖(잘림)")
             elif any("residual" in o for o in vis):
@@ -1238,9 +1298,12 @@ def protected_rects_canvas(ctx: QAContext) -> list[dict]:
             t1 = min(c.out_end, c.out_start + (s1 - c.src_in) / sp)
             mid = (t0 + t1) / 2
             mr = map_src_rect(c, pr, mid)
-            if mr is not None:
-                out.append({"label": pr.get("label"), "clip_id": c.id, "start": rnd(t0), "end": rnd(t1),
-                            "rect": [rnd(v, 1) for v in mr]})
+            tr = clip_transform(c, mid)
+            full_area = float(pr["w"]) * float(pr["h"]) * tr["s"] * tr["s"]
+            vis = (mr[2] * mr[3] / full_area) if (mr is not None and full_area > 0) else 0.0
+            out.append({"label": pr.get("label"), "clip_id": c.id, "start": rnd(t0), "end": rnd(t1),
+                        "rect": [rnd(v, 1) for v in mr] if mr is not None else None, "visible_frac": rnd(min(1.0, vis), 3),
+                        "resolution": [ctx.canvas_w, ctx.canvas_h]})
     return out
 
 

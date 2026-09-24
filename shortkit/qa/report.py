@@ -55,6 +55,41 @@ def run_probes(ctx: QAContext, families: set[str], quiet: bool = False) -> tuple
     return probes, timing
 
 
+def measurement_stats(ctx: QAContext, rows: list[dict], probes: dict) -> dict:
+    """{n, p10, p50, p90} of the measured errors, overall and for this episode's format."""
+    from ..util.stats import pstats
+
+    def errs(check, fn):
+        out = []
+        for r in rows:
+            if r["check_id"] == check and r.get("observed") and r["status"] != "unmeasured":
+                try:
+                    v = fn(r)
+                except (KeyError, TypeError, IndexError):
+                    v = None
+                if v is not None:
+                    out.append(abs(float(v)))
+        return out
+
+    import math
+
+    series = {
+        "caption_center_error_px": errs("caption.position", lambda r: math.hypot(r["observed"].get("dx") or 0,
+                                                                                r["observed"].get("dy") or 0)),
+        "caption_onset_error_s": errs("caption.timing", lambda r: (r["observed"]["onset"] - r["expected"]["start"])
+                                      if r["observed"].get("onset") is not None else None),
+        "caption_offset_error_s": errs("caption.timing", lambda r: (r["observed"]["offset"] - r["expected"]["end"])
+                                       if r["observed"].get("offset") is not None else None),
+        "sfx_time_error_s": errs("audio.sfx.placement", lambda r: (r["observed"]["t"] - r["expected"]["t"])
+                                 if "t" in (r.get("observed") or {}) else None),
+        "sfx_event_offset_s": errs("audio.sfx.offset", lambda r: r["observed"]["offset"]),
+        "cut_time_error_s": errs("video.cuts", lambda r: (r["observed"]["t"] - r["expected"]["t"])
+                                 if isinstance(r.get("expected"), dict) and r["observed"].get("t") is not None else None),
+    }
+    fmt = ctx.resolved.format_id or "UNCLASSIFIED"
+    return {k: {"overall": pstats(v, 4), "by_format": {fmt: pstats(v, 4)}} for k, v in series.items()}
+
+
 def summarize(rows: list[dict]) -> dict:
     c = Counter(r["status"] for r in rows)
     by_cat: dict = OrderedDict()
@@ -118,13 +153,15 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         "required_categories": {c: ("있음" if any(r["category"] == c for r in rows) else "해당 없음")
                                 for c in REQUIRED_CATEGORIES},
         "unmeasured": [{"row_id": r["row_id"], "item": r["item"], "required": r["required"], "kind": r["kind"],
-                        "reason": r.get("note") or ""} for r in rows if r["status"] == "unmeasured"],
+                        "reason": r.get("note") or "", "impact": r.get("impact") or ""}
+                       for r in rows if r["status"] == "unmeasured"],
+        "stats": measurement_stats(ctx, rows, probes),
         "preset_unmeasured_keys": {"count": len(unmeasured_keys), "keys": unmeasured_keys},
         "rows": rows, "sheets": sheets, "probes": probe_files,
         "probe_errors": {k: v.get("errors") for k, v in probes.items() if isinstance(v, dict) and v.get("errors")},
     }
     rep["gate"] = gate_mod.evaluate(rows, mode=ctx.resolved.mode, mp4_sha_measured=sha, mp4_sha_now=sha,
-                                    unmeasured_preset_keys=unmeasured_keys)
+                                    unmeasured_preset_keys=unmeasured_keys, plan=ctx.plan)
     write_json(ctx.qa_dir / "report.json", rep)
     try:
         from . import defects
@@ -251,7 +288,8 @@ def render_md(rep: dict) -> str:
     if not un:
         L.append("- 없음")
     for u in un:
-        L.append(f"- {'**필수** ' if u['required'] else ''}{u['item']} (`{u['row_id']}`): {u['reason'] or '이유 기록 없음'}")
+        L.append(f"- {'**필수** ' if u['required'] else ''}{u['item']} (`{u['row_id']}`): {u['reason'] or '이유 기록 없음'}"
+                 + (f" — 제작 영향: {u['impact']}" if u.get("impact") else ""))
     if rep.get("probe_errors"):
         L.append("")
         L.append("## 측정 오류")
@@ -273,4 +311,7 @@ def render_md(rep: dict) -> str:
     L.append("---")
     L.append("판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음). "
              "레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.")
+    L.append("")
+    L.append("오디오 판정은 모두 기계 측정(파형 대조·최소제곱·정합 필터·EBU R128)이다. 사람이 직접 들어 본 청취 확인은 "
+             "이 보고서에 포함되어 있지 않다.")
     return "\n".join(L) + "\n"

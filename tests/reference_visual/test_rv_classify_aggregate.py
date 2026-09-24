@@ -241,3 +241,42 @@ def test_identity_mark_is_not_a_title():
              item("학생들이 모여 있다", [300, 1400, 480, 40], 2, 5, 30)]
     assign_roles(items, 30.0, 1920, None, identity_texts=["조슈아매거진", "joshuamagazine"])
     assert [i["role"] for i in items] == ["identity_mark", "title", "situation"]
+
+
+def test_long_form_uploads_excluded_by_default(fivevids):
+    root = fivevids
+    snap = json.loads((root / P / "reference/latest100.json").read_text("utf-8"))
+    snap["videos"][5]["kind"] = "video"                 # vid0000006 is a long-form upload
+    write_json(root / P / "reference/latest100.json", snap)
+    r = A.aggregate("joshuamagazine")
+    assert r["videos"] == 5
+    d = json.loads((root / P / "measurements/visual_text.json").read_text("utf-8"))
+    assert d["basis"]["excluded_long_form"] == ["vid0000006"]
+    assert A.aggregate("joshuamagazine", include_long=True)["videos"] == 6
+
+
+def test_track_crop_memory_is_bounded():
+    import numpy as np
+
+    from shortkit.reference.textboxes import MAX_CROPS, Sample, Track, _thin_crops
+    tr = Track(id=1)
+    for i in range(300):
+        tr.samples.append(Sample(t=i * 0.2, idx=i, bbox=(0, 0, 10, 10), crop=np.zeros((4, 4, 3), np.uint8),
+                                 origin=(0, 0)))
+        _thin_crops(tr)
+    kept = [s for s in tr.samples if s.crop is not None]
+    assert len(kept) <= MAX_CROPS and tr.samples[0].crop is not None and tr.samples[-1].crop is not None
+
+
+def test_dialogue_by_speech_overlap():
+    """Band captions without quote marks become dialogue when they overlap kept speech (audio analysis)."""
+    from shortkit.reference.textboxes import assign_roles
+
+    def item(text, start, end):
+        return {"text": text, "bbox": [300, 1400, 480, 40], "start": start, "end": end,
+                "style": {"ink_h": 30, "color": "#FFFFFF", "box": {"present": "absent"}}}
+
+    items = [item("학생들이 모여 있다", 1.0, 3.0), item("이거 진짜야", 5.0, 6.5), item("그리고 끝났다", 8.0, 9.0)]
+    assign_roles(items, 30.0, 1920, speech=[(4.8, 6.6)])
+    assert [i["role"] for i in items] == ["situation", "dialogue", "situation"]
+    assert "말소리" in items[1]["role_reason"]

@@ -95,7 +95,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
         dur = float(c.get("dur") or 0.0)
         excl.append((t - 1.5 / fps, t + dur + 1.5 / fps))
     mask = None
-    grays, stats = [], []
+    stats = []
     orb = cv2.ORB_create(nfeatures=600, fastThreshold=12)
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     prev = None
@@ -208,12 +208,12 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
     for a, b in freeze_runs:
         in_freeze[a:b + 1] = True
     win = max(4, int(round(0.5 * fps)))
-    speed_checked = False
+    speed_checked = 0
     for a, b in shot_ranges:
         idx = [k for k in range(n) if a <= stats[k]["t"] < b and not stats[k]["skip"] and not in_freeze[k]]
         if len(idx) < 2 * win + 2:
             continue
-        speed_checked = True
+        speed_checked += 1
         # 1 = clearly new frame (visible motion), 0 = duplicate, NaN = too little motion to tell
         # (a still scene is not frame duplication)
         u = np.array([1.0 if stats[k]["changed"] >= move_thr else (0.0 if stats[k]["changed"] <= still_thr else np.nan)
@@ -262,6 +262,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
            "region_used": reg, "analysis_width": WIDTH, "method": METHOD, "analyzed_at": now_iso(),
            "zoom_analysable_share": round(cover, 3), "still_runs_not_freeze": rejected_still,
            "events": events, "presence": presence,
+           "speed_shots_checked": speed_checked,
            "presence_note": "speed 는 프레임 복제 방식만 검출 가능 → 못 찾으면 '없다'가 아니라 '못 잼'"}
     write_json(d / "motion.json", res)
     return res
