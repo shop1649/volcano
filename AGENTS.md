@@ -91,7 +91,10 @@ python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자
 #    (intro_type=도입 방식, structure_type=전개 구조, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
 python -m shortkit ref classify build              # formats.yaml: 전개 구조별 포맷, 도입만 다른 것은 intro_variants, 대표 영상
 python -m shortkit ref aggregate                   # measurements/visual_*.json (전체·포맷별 n/p10/p50/p90, 해상도, 근거 시각)
-python -m shortkit ref audio-measure               # measurements/audio.json (BGM 곡·버전·속도·구간·크기, 덕킹)
+python -m shortkit ref audio-measure               # measurements/audio.json (BGM 곡·버전·속도·구간·크기·반복, 덕킹, 음량, 원음·정적 페이드, 효과음 크기)
+#  ▶ 자동 측정이 안 되는 항목(장식 스타일·이모지·표지)은 영상을 본 사람이 manual_observations.csv 에 (video_id, t, key, value,
+#    observed_by, watched=yes) 로 기록 → 
+python -m shortkit ref manual-aggregate            # measurements/manual.json
 python -m shortkit ref fonts                       # 글꼴: IoU 상한(같은 글꼴의 한계) 먼저 → 후보 검증(동일/유사/다름)
 python -m shortkit ref sfx-catalog --emotion-template   # 효과음 카탈로그(편당 개수 p10/p50/p90, 직전 자막, 화면 사건, 감정, 자리 규칙, 표본 3편)
 #  ▶ 감정(emotion)은 영상을 본 사람이 sfx_emotion_labels.csv 에 채운 것만 사용
@@ -104,6 +107,7 @@ python -m shortkit preset audit                    # 미측정·코드 미연결
 python -m shortkit preset unresolved               # unresolved.md 갱신
 ```
 
+- `ref collect/download/analyze/aggregate/trace/classify` 의 종료 코드 3 = 레퍼런스 데이터 없음(차단/비어 있음). 못 잼 파일은 기록된다.
 - Google Lens 는 자동화하지 않는다: `analysis/<id>/lens/` 키프레임으로 사람이/에이전트가 검색한 결과를 `source add-url` 로 넣는다.
 - BGM 은 곡명만 맞으면 안 된다: `bgm.json` 의 track·version·tempo·section 네 항목이 모두 일치해야 일치.
 

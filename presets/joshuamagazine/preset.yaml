@@ -243,6 +243,7 @@ audio:
     fade_in_s: 0.0
     fade_out_s: 0.8
     loop: false
+    loop_xfade_s: 0.05  # 규칙(측정 대상 아님): loop=true 일 때 되감기 지점 등전력 크로스페이드 길이
   original:
     default: off           # 원본 소리는 기본 OFF. 중요 대사/말하는 구간만 plan 에서 keep
     keep_gain_db: 0.0      # 임시값(못 잼). 최종 프로그램 음량에서 살린 원음 레벨(녹음된 원본 소리 대비 dB)

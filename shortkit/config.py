@@ -62,6 +62,7 @@ NON_MEASURED: dict[str, str] = {
     "text.tone.notes": "meta",
     "structure.formats_file": "infra",
     "audio.loudness.tolerance_lu": "rule",
+    "audio.bgm.loop_xfade_s": "rule",
     "audio.loudness.max_limiter_db": "rule",
 }
 

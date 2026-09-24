@@ -279,3 +279,23 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
 - **OCR**: run tesseract with `OMP_THREAD_LIMIT=1` (shared machines otherwise stall).
 - **Faces**: OpenCV ≥5 wheels have no Haar cascades; `shortkit clean fetch-models` stores sha256-pinned XMLs in
   `warehouse/cache/models/haarcascades/`; `shortkit.clean.faces` runs them (numpy implementation if cv2 lacks CascadeClassifier).
+
+### 12.1 Coverage-round additions
+- **Access logs**: every episode command saves `episodes/<id>/build/preset_access_<command>.json`; QA saves
+  `episodes/<id>/qa/preset_access.json`; `config.all_access_logs()` collects all of them for `preset sync`.
+  API: `resolve_episode(episode_id, preset=None)`, `render(resolved, *, allow_unmeasured=False, preset=None)`,
+  `plan.approval_state_for(plan, preset)` is the approval gate (a production plan without episode_index counts as a first episode).
+- **Measurement groups** add `manual` (`presets/<p>/manual_observations.csv` rows with `watched=yes` + `observed_by`
+  → `ref manual-aggregate` → `measurements/manual.json`) for decoration style, `text.tone.emoji`, `cover.*`.
+  `config.load_measurement_items` is the only loader: measured beats unmeasured; two measured items for one key raise.
+- **New per-video analysis fields**: motion.json zoom events `ease_fit`, `recenter_fit`, `scale_curve`, `decorations` (experimental
+  automatic detector); shots.json flash `scope`; `analysis/<id>/audio/loudness.json`; bgm.json `match.loop`; original.json
+  `original_edges`, `kept_speech_level`, `silences.items[].ramps`. Re-run `ref analyze` without `--skip-existing` for old analyses.
+- **Level semantics**: `audio.original.keep_gain_db` = kept speech loudness relative to programme loudness (LU); renderer gain
+  = T + keep_gain_db − L_src. Ramp keys are expressed in the renderer's shapes (silence: dB-linear 0→−120 dB; kept originals: linear amplitude).
+- **Exporters** read `build/fg_gain.json` (fallback: stems / `render.pre_norm_stems`); MLT adds +3.01 dB to mono clips because
+  melt upmixes mono at −3 dB (measured on melt 7.22). `project/verify.json` carries `master_sha256` and warns when the master is older
+  than resolved.json.
+- **Reference download** caps the SHORT side (`format_sort res:<N>`), so vertical Shorts come at 1080×1920.
+- **Exit code 3** from `ref collect/download/analyze/aggregate/trace/classify` means "no reference data (blocked or empty)" — the
+  unmeasured files were still written.
