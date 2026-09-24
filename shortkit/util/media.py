@@ -95,7 +95,9 @@ def probe(path: str | os.PathLike) -> ProbeInfo:
 
 def read_audio(path: str | os.PathLike, sr: int = 22050, mono: bool = True, start: float | None = None,
                duration: float | None = None) -> np.ndarray:
-    """Decode audio to float32 numpy (mono: shape [n]; stereo: [n, 2]). Silent array if no audio."""
+    """Decode audio to float32 numpy (mono: shape [n]; stereo: [n, 2]). Silent array if no audio.
+
+    Channel convention: mono -> stereo duplicates at unity gain; stereo -> mono is (L+R)/2."""
     info = probe(path)
     ch = 1 if mono else 2
     if not info.has_audio:
@@ -107,7 +109,17 @@ def read_audio(path: str | os.PathLike, sr: int = 22050, mono: bool = True, star
     args += ["-i", str(path)]
     if duration is not None:
         args += ["-t", f"{duration:.6f}"]
-    args += ["-vn", "-ac", str(ch), "-ar", str(sr), "-f", "f32le", "-"]
+    # Explicit channel convention (ffmpeg's defaults are -3 dB for mono->stereo and 0.707*(L+R) for
+    # stereo->mono, which silently shifts levels):  a mono file on a stereo timeline plays at unity on
+    # both channels, and a stereo file is downmixed as (L+R)/2.  QA measures with the same convention.
+    src_ch = int(info.audio_channels or 1)
+    if mono and src_ch == 2:
+        args += ["-vn", "-af", "pan=mono|c0=0.5*c0+0.5*c1"]
+    elif not mono and src_ch == 1:
+        args += ["-vn", "-af", "pan=stereo|c0=c0|c1=c0"]
+    else:
+        args += ["-vn"]
+    args += ["-ac", str(ch), "-ar", str(sr), "-f", "f32le", "-"]
     raw = run([FFMPEG, "-hide_banner", "-nostdin", "-v", "error", *args]).stdout
     a = np.frombuffer(raw, dtype=np.float32).copy()
     return a if mono else a.reshape(-1, 2)
