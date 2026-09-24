@@ -76,19 +76,104 @@ cp local.example.yaml local.yaml     # 효과음/음악 창고, 쿠키 경로
 
 ### A. 레퍼런스 분석 (네트워크 필요)
 
-<!-- COMMANDS-A -->
+먼저 `python -m shortkit doctor --network` 로 youtube.com·googlevideo.com 접속을 확인한다. 막혀 있으면 A 는 진행하지 말고
+그 사실을 기록한다(성공한 척 금지).
+
+```bash
+python -m shortkit ref collect                     # 최신 100편·게시일·조회수 고정 → reference/latest100.json (이미 ok 스냅샷이면 유지)
+                                                   #   + all_videos.json(참고), high_views.json(조회수 ≥ 800,000, 확인일 포함)
+python -m shortkit ref download --set latest100    # 영상 받기(≤1080p, 소리 포함) → reference/videos/, downloads.jsonl(sha256)
+python -m shortkit ref download --set high_views   # 80만 이상 영상 전부
+python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/색/외곽선/박스/모션/역할)·화면 모션 → analysis/<id>/
+python -m shortkit ref audio-analyze --all         # 최신 50편: Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트
+python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자료 + format_labels.csv(빈 줄)
+#  ▶ 에이전트/사람이 analysis/<id>/review/ 를 "실제로 보고" format_labels.csv 를 채운다
+#    (intro_type=도입 방식, structure_type=전개 구조, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
+python -m shortkit ref classify build              # formats.yaml: 전개 구조별 포맷, 도입만 다른 것은 intro_variants, 대표 영상
+python -m shortkit ref aggregate                   # measurements/visual_*.json (전체·포맷별 n/p10/p50/p90, 해상도, 근거 시각)
+python -m shortkit ref audio-measure               # measurements/audio.json (BGM 곡·버전·속도·구간·크기, 덕킹)
+python -m shortkit ref fonts                       # 글꼴: IoU 상한(같은 글꼴의 한계) 먼저 → 후보 검증(동일/유사/다름)
+python -m shortkit ref sfx-catalog --emotion-template   # 효과음 카탈로그(편당 개수 p10/p50/p90, 직전 자막, 화면 사건, 감정, 자리 규칙, 표본 3편)
+#  ▶ 감정(emotion)은 영상을 본 사람이 sfx_emotion_labels.csv 에 채운 것만 사용
+python -m shortkit ref sfx-map                     # 효과음 창고(local.yaml sfx_library_root)와 연결: 있음/없음/못 잼
+python -m shortkit ref bgm-identify --video <id>   # 깨끗한 음악 창고(assets/library/music/index.yaml)와 대조
+python -m shortkit ref trace                       # 설명란·워터마크 OCR·렌즈용 키프레임 → warehouse/source_accounts.json, exclusions.jsonl
+python -m shortkit preset apply-measurements       # 측정값 → measured.yaml (preset.yaml 은 그대로, 층으로 덮음)
+python -m shortkit preset sync                     # 레지스트리: 근거→측정값→코드→검사 연결 갱신
+python -m shortkit preset audit                    # 미측정·코드 미연결·검사 미연결 키 확인
+python -m shortkit preset unresolved               # unresolved.md 갱신
+```
+
+- Google Lens 는 자동화하지 않는다: `analysis/<id>/lens/` 키프레임으로 사람이/에이전트가 검색한 결과를 `source add-url` 로 넣는다.
+- BGM 은 곡명만 맞으면 안 된다: `bgm.json` 의 track·version·tempo·section 네 항목이 모두 일치해야 일치.
+
 
 ### B. 새 소재 창고
 
-<!-- COMMANDS-B -->
+```bash
+python -m shortkit source queries                  # 검색어: 레퍼런스 역추적분(source_accounts.json) + 사용자 추가분
+python -m shortkit source search -q "<키워드>" --platform youtube tiktok instagram reddit --limit 30 [--recent]
+python -m shortkit source log                      # 플랫폼별 접속 상태(ok/blocked/login_required) — 막히면 다른 플랫폼/수동 URL 로 계속
+python -m shortkit source add-url <URL> [--file <직접 받은 파일>]   # 수동 수집(렌즈·다른 경로로 찾은 원본)
+python -m shortkit source list --sort views        # 플랫폼별 "확인된" 조회수 순(조회수 모름은 뒤, 좋아요≠조회수, 확인일 표시)
+python -m shortkit source exclude-check <ID|파일>   # 레퍼런스가 쓴 촬영본과 같은 녹화면 제외(키워드는 같아도 됨)
+#  ▶ 후보 영상을 실제로 보고 기록(강도·반전·포맷 적합). 보지 않은 후보는 선택할 수 없다.
+python -m shortkit source review <ID> --watched-by <이름> --intensity 1-5 --reversal 1-5 --format-fit 1-5 --notes "몇 초에 무슨 일"
+python -m shortkit source select <ID> --by <이름>   # 최신성·강도·반전·화질·포맷 적합으로 최종 선별(선정 이유 자동 기록)
+python -m shortkit source download <ID>            # warehouse/sources/ + sha256 + 제외 재검사 (원작자·재게시자·URL 기록 유지)
+python -m shortkit clean detect --source warehouse/sources/<파일>   # 원본 로고·출처 오버레이·원어 자막(상단 좌우·내부 컷)
+python -m shortkit clean plan   --source warehouse/sources/<파일>   # 깨끗한 원본 → 크롭(인물·동작 보호) → 국소 복원 순으로 결정
+```
+
 
 ### C. 에피소드 제작 (첫 편 승인 → 후속편)
 
-<!-- COMMANDS-C -->
+```bash
+python -m shortkit episode new <ep-id> --mode production --format <F?> --index 1   # 첫 편
+#  ▶ plan.yaml 작성 규칙
+#    - 소스 영상을 처음부터 끝까지 보고 들은 뒤 작성. 모든 자막에 grounding(무엇을 보고/들었는지) 기록.
+#    - 역할 구분(title/description/situation/speaker/dialogue/reaction), 반전은 reveal 로 보호.
+#    - 얼굴·손·핵심 물체는 sources[].protected 에 기록(자막이 가리면 검증 실패).
+#    - 원음은 기본 OFF. 살릴 구간만 timeline[].original_audio.keep + reason. 원본 음악 여부 has_embedded_music 기록.
+#    - 효과음은 사건(event t/desc)이 있을 때만, 사건과 ±0.3초, 포맷 관측 범위 안의 개수·종류.
+#    - clean 블록은 `clean plan` 결과를 붙인다.
+python -m shortkit episode validate <ep-id>
+python -m shortkit episode proposal <ep-id>        # 첫 편 승인용: 소재·구간 시트·표지 문구·제목 후보 3종·효과음 배치표
+#  ▶ 사용자 승인 후에만:
+python -m shortkit episode approve <ep-id> --by <승인자>
+python -m shortkit episode render <ep-id>          # 마스터 MP4 (미측정 프리셋·미승인·미해결 효과음이면 거부)
+python -m shortkit episode export <ep-id>          # 편집 프로젝트: MLT(Shotcut/Kdenlive, melt 렌더로 검증), FCPXML, OTIO, captions.ass/srt
+python -m shortkit qa run --episode <ep-id> --reference presets/joshuamagazine/reference/videos/<대표영상>.mp4 --reference-id <id>
+python -m shortkit qa defects list --episode <ep-id>   # 결함마다 고침 → 같은 사례 재검사 → 최종 관문
+python -m shortkit qa gate --episode <ep-id> --production
+```
+
+- 첫 편에서 고친 스타일은 프리셋(요청 변경이면 requested_changes.yaml, 측정 오류면 재측정)에 반영하고 후속편은 같은 프리셋으로 만든다.
+- 후속편(`--index 2..`)은 승인 없이 지정 포맷·편수까지 진행한다. 이미 승인된 기획의 수정은 재승인하지 않는다.
+- 검수표의 "다르다" 중 요청하지 않은 차이는 고친 뒤 다시 검사한다. "못 잼"은 완료로 올리지 않는다.
+- 에이전트는 소리를 듣지 못한다. 오디오는 기계 측정만 기록하고 "사람 청취 필요"를 남긴다.
+
 
 ## 6. 파일 지도
 
-<!-- FILEMAP -->
+| 경로 | 내용 |
+|---|---|
+| `shortkit/` | 코드. `reference/`(수집·측정·분류·글꼴·오디오·효과음), `sourcing/`(소재 창고), `clean/`(로고·자막 제거), `edit/`(plan·렌더·편집 프로젝트), `qa/`(출력 검수) |
+| `presets/joshuamagazine/preset.yaml` | 고정 스타일(현재 전부 임시값) |
+| `presets/joshuamagazine/measured.yaml` | 측정값 층(apply-measurements 가 생성) |
+| `presets/joshuamagazine/requested_changes.yaml` | 사용자가 지정한 변경(의도한 변경) |
+| `presets/joshuamagazine/settings_registry.yaml` | 설정별 근거→측정→코드→검사 연결과 상태 |
+| `presets/joshuamagazine/reference/` | 최신 100편 스냅샷, 전체 목록, 80만+ 목록, 수집 로그, WebSearch 참고 기록 |
+| `presets/joshuamagazine/{formats.yaml, sfx_catalog.json, sfx_map.yaml, fonts_report.json, measurements/}` | 포맷 분류, 효과음 카탈로그·창고 연결, 글꼴, 측정값 |
+| `presets/joshuamagazine/unresolved.md` | 미확정 항목·제작 영향·해결 상태 |
+| `warehouse/` | 소재 후보(candidates.jsonl), 검색 기록, 제외 목록, 출처 계정, 오버레이 기록 |
+| `episodes/<id>/` | plan.yaml, proposal.md, output/*.mp4, project/(편집 프로젝트), qa/(검수표·비교 시트·결함) |
+| `assets/fonts/manifest.yaml` | 후보 글꼴(sha256 고정, `doctor --fetch-fonts`) |
+| `assets/library/{music,sfx}/` | 사용자 제공 깨끗한 음악·효과음 창고 |
+| `docs/CONTRACT.md` | 모듈 간 인터페이스 계약 |
+| `docs/VALIDATION.md` | 실제로 돌려 본 검증과 검증하지 않은 환경 |
+| `PRESET_BUNDLE.md` | 다른 컴퓨터용 단일 MD(복원 명령 포함) |
+
 
 ## 7. 재개
 
