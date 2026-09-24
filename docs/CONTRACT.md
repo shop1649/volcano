@@ -48,7 +48,7 @@ Hard rules from the user (verbatim intent; they are acceptance criteria):
   strip. Table: 같다/다르다/못 잼, intended changes marked separately. Unmeasured never becomes
   complete.
 
-### Environment facts (this build machine, 2026-09-24)
+### Environment facts (first build machine only, 2026-09-24 — other machines differ; never hard-code these paths)
 - Network policy blocks youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com,
   reddit.com, lens.google.com, namu.wiki, freesound.org, pixabay.com, dl.fbaipublicfiles.com
   (Demucs weights), huggingface.co, archive.org. Allowed: github.com / raw.githubusercontent.com
@@ -244,3 +244,38 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
 - `shortkit.qa.checks.declarations() -> dict[str, list[str]]`.
 - `shortkit.edit.resolve.resolve_episode(episode_id) -> ResolvedEdit` (writes build/resolved.json, captions.ass, preset_access.json);
   `shortkit.edit.render.render(resolved) -> Path`.
+
+## 12. As-built conventions (decided during integration — binding)
+
+- **Font names in ASS**: styles use the face's PostScript name (libass does not resolve fullnames such as
+  "Noto Sans CJK KR Bold" and silently falls back). `shortkit.edit.render.check_output_fonts` asks libass itself
+  (ffmpeg -v verbose fontselect) and the render is refused on any substitution or glyph fallback.
+- **size_px** = font EM size in canvas px (renderer: ASS Fontsize = size_px × (winAscent+winDescent)/unitsPerEm;
+  line pitch = size_px × line_spacing). The reference analyzer writes size_px in the same unit (plus `ass_fontsize`).
+- **box.pad_x/pad_y** = box edge − visible ink edge (ink incl. outline).
+- **Audio gain semantics**: `audio.bgm.gain_db`, `audio.sfx.gain_db_default`, plan `sfx[].gain_db`, `audio.original.keep_gain_db`
+  are levels at the FINAL program loudness; final loudness normalisation is a small trim. BGM is never reduced by a limiter.
+- **Measurement groups** (file names under measurements/): `visual_{canvas,text,tone,motion,structure}` (reference visual),
+  `audio` (`ref audio-measure`), `font_identity` (`ref fonts`; value only when the verdict is identical).
+- **captions.json** items may carry `role_reason, t_rep, lines[] {text,bbox,ink_h,ocr_conf,hangul_share}, frame, ocr_conf,
+  motion_out, style{...}`; role `identity_mark` = text matching `identity_exclusions.forbidden_text` (never a style sample).
+- **formats.yaml**: `table[].members` (alias `videos`) and top-level `assignments {video_id: format_id}`.
+- **Exclusions**: reference footage is registered with `shortkit.sourcing.exclusions.add_reference_footage(...)` so reference and
+  candidate hashing are identical (grayscale ≤480 px, flat frames skipped, borders trimmed, footage-region crop).
+- **source_accounts.json**: `{status, blocker, traced_at, accounts:[{platform, handle, url, count, evidence:[{ref_video_id,t}],
+  verified_by_text}], keywords:[{keyword, platforms, count, evidence}]}`.
+- **candidates.jsonl** extra fields: platform_id, views_field, views_history[], views_note, likes_checked_at, reddit_score,
+  original_author_basis, credits[], reviews[] {watched_by, watched_at, intensity, reversal, format_fit, notes, watermark, format_id,
+  original_published_at, watched_file_sha256}, selection {at, by, accepted_unmeasured[]}, status_history[], used_in[], download{},
+  quality{}, optional `alternates` (clean originals of the same content). Status transitions are enforced in code.
+- **Library paths** outside the project are stored as `$music_library_root/...` / `$sfx_library_root/...` tokens
+  (expanded with `shortkit.reference.separation.resolve_stored`), never as absolute paths.
+- **sfx_events.json** `events` also contain `class: intentional_silence` (fp null); `unmeasured_coverage` lists intervals where SFX
+  could not be measured (no vocals stem) — per-video counts there are lower bounds.
+- **Project export**: `project/verify.json` holds the MLT melt-render comparison at top level; FCPXML/OTIO are under `other_formats`
+  (always unmeasured here — no NLE available); `project/export_decisions.json` records every export decision (keys mlt/fcpxml/otio)
+  and feeds the generated project README.
+- **Overlay provenance**: `warehouse/overlays/<source sha256>.json` (tracked) + `warehouse/overlays/<sha>/` crops (ignored).
+- **OCR**: run tesseract with `OMP_THREAD_LIMIT=1` (shared machines otherwise stall).
+- **Faces**: OpenCV ≥5 wheels have no Haar cascades; `shortkit clean fetch-models` stores sha256-pinned XMLs in
+  `warehouse/cache/models/haarcascades/`; `shortkit.clean.faces` runs them (numpy implementation if cv2 lacks CascadeClassifier).

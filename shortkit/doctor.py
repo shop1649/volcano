@@ -138,8 +138,9 @@ def check_tools() -> list[Item]:
     if tess:
         rc, out = _run([tess, "--list-langs"])
         items.append(Item("tool", "tesseract", True, True, tess))
-        items.append(Item("tool", "tesseract lang:kor", True, "kor" in out.split(), "ok" if "kor" in out.split() else "없음",
-                          _hint("tesseract")))
+        for lang in ("kor", "eng"):
+            items.append(Item("tool", f"tesseract lang:{lang}", True, lang in out.split(),
+                              "ok" if lang in out.split() else "없음", _hint("tesseract")))
     else:
         items.append(Item("tool", "tesseract", True, False, "없음 — 글자 위치·자막·워터마크 측정/QA 불가", _hint("tesseract")))
     for t, req, why in [("fpcalc", False, "BGM 지문(선택)"), ("espeak-ng", False, "테스트용 한국어 TTS(선택)"),
@@ -208,8 +209,44 @@ def check_project() -> list[Item]:
     return items
 
 
-def run_all(network: bool) -> list[Item]:
-    items = check_python() + check_tools() + check_fonts() + check_project()
+def check_models(load_demucs: bool = False) -> list[Item]:
+    items: list[Item] = []
+    try:
+        from .clean import faces
+
+        for kind in ("frontal", "profile"):
+            p = faces.find_cascade(kind)
+            items.append(Item("model", f"face cascade:{kind}", False, p is not None,
+                              "ok" if p else "없음 — 얼굴 가림/크롭 보호 검사가 못 잼으로 남음",
+                              "python -m shortkit clean fetch-models (PyPI wheel 에서 sha256 고정 XML 추출)"))
+    except Exception as e:
+        items.append(Item("model", "face cascade", False, False, f"확인 실패: {e}"))
+    try:
+        import importlib.util as ilu
+
+        have = ilu.find_spec("demucs") is not None and ilu.find_spec("torch") is not None
+        if not have:
+            items.append(Item("model", "demucs(htdemucs)", False, False, "demucs/torch 미설치 — 효과음 카탈로그·원음 분리 못 잼",
+                              "bash scripts/setup.sh --demucs (또는 pip install demucs)"))
+        elif load_demucs:
+            from .reference.separation import SeparationUnavailable, get_separator
+
+            try:
+                get_separator("demucs")._load()
+                items.append(Item("model", "demucs(htdemucs)", False, True, "모델 로드 성공"))
+            except SeparationUnavailable as e:
+                items.append(Item("model", "demucs(htdemucs)", False, False, str(e),
+                                  "dl.fbaipublicfiles.com 접속 허용 필요(첫 실행 때 가중치 다운로드)"))
+        else:
+            items.append(Item("model", "demucs(htdemucs)", False, None,
+                              "설치됨 — 가중치 로드는 `doctor --load-demucs` 로 확인(첫 실행 때 다운로드)"))
+    except Exception as e:
+        items.append(Item("model", "demucs", False, False, f"확인 실패: {e}"))
+    return items
+
+
+def run_all(network: bool, load_demucs: bool = False) -> list[Item]:
+    items = check_python() + check_tools() + check_fonts() + check_models(load_demucs) + check_project()
     if network:
         items += check_network()
     return items
@@ -218,6 +255,7 @@ def run_all(network: bool) -> list[Item]:
 def register(p: argparse.ArgumentParser) -> None:
     p.add_argument("--network", action="store_true", help="플랫폼 호스트 접속 가능 여부도 점검")
     p.add_argument("--fetch-fonts", action="store_true", help="assets/fonts/manifest.yaml 의 후보 글꼴 다운로드(sha256 검증)")
+    p.add_argument("--load-demucs", action="store_true", help="demucs 가중치까지 실제로 불러와 확인(네트워크 필요할 수 있음)")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_doctor)
 
@@ -231,7 +269,7 @@ def cmd_doctor(args) -> int:
             print(json.dumps(res, ensure_ascii=False, indent=1, default=str))
         except Exception as e:
             print(f"글꼴 다운로드 실패: {e}")
-    items = run_all(args.network)
+    items = run_all(args.network, args.load_demucs)
     if args.json:
         print(json.dumps([asdict(i) for i in items], ensure_ascii=False, indent=1))
     else:
