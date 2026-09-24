@@ -330,6 +330,10 @@ def plan_loudness(st: Stems, target_lufs: float, ceiling_db: float, max_limiter_
     c = db2lin(ceiling_db)
     cap = limiter_gain_cap(bp, fp, ceiling_db, max_limiter_db)
     out["cap_gain_db"] = None if math.isinf(cap) else _db(cap)
+    bpk = float(np.abs(bp).max()) if bp.size else 0.0
+    bgm_cap = math.inf if bpk <= 1e-12 else c / bpk          # the BGM alone must stay under the ceiling
+    out["cap_reason"] = (None if math.isinf(cap) else
+                         "bgm_peak" if bgm_cap <= cap * (1 + 1e-6) else "foreground_limit")
     if pre.get("integrated_lufs") is None or pre["integrated_lufs"] < -69.0:
         g = min(1.0, cap)          # (near) silence: no normalisation, but never over the ceiling
         out["silent"] = True
@@ -391,13 +395,14 @@ def mix_audio(r: ResolvedEdit, build: Path) -> dict:
         if lp.get("silent"):
             rep["warnings"].append("믹스가 무음에 가까워 음량 정규화를 하지 않음")
         rep["norm_gain_db"] = _db(g)
-        red = float(-20 * np.log10(max(1e-9, float(k.min())))) if len(k) else 0.0
+        red = max(0.0, float(-20 * np.log10(max(1e-9, float(k.min()))))) if len(k) else 0.0
         rep["fg_limiter_max_reduction_db"] = round(red, 3)
         rep["limiter_max_reduction_db"] = 0.0      # no limiter ever touches the BGM / whole mix
         rep["bgm_limited"] = False
         rep["limiter"] = {"max_limiter_db": max_lim, "fg_max_reduction_db": round(red, 3),
                           "fg_samples_limited": int((k < 1.0 - 1e-6).sum()),
                           "gain_cap_db": lp["cap_gain_db"], "capped_by_limiter_rule": bool(lp["capped"]),
+                          "cap_reason": lp.get("cap_reason"),
                           "applies_to": "kept originals + SFX only (BGM never limited)"}
         if red > max_lim + 0.01:
             raise RenderError(f"내부 오류: 전경 리미터 감쇠 {red:.2f} dB > 허용 {max_lim} dB")
@@ -406,7 +411,7 @@ def mix_audio(r: ResolvedEdit, build: Path) -> dict:
             rg = st.info["sfx_ranges"].get(s.id)
             if not rg or rg[1] <= rg[0]:
                 continue
-            rd = round(float(-20 * np.log10(max(1e-9, float(k[rg[0]:rg[1]].min())))), 2)
+            rd = round(max(0.0, float(-20 * np.log10(max(1e-9, float(k[rg[0]:rg[1]].min()))))), 2)
             sfx_lim.append({"id": s.id, "type": s.type, "t": s.t, "plan_gain_db": s.gain_db, "reduction_db": rd,
                             "final_gain_db": round(s.gain_db + 20 * math.log10(g) - rd, 2)})
         rep["sfx_limiting"] = sfx_lim
@@ -442,10 +447,13 @@ def mix_audio(r: ResolvedEdit, build: Path) -> dict:
         rep["loudness"] = {"target_lufs": target, "tolerance_lu": tol, "pre_norm_lufs": lp["pre"].get("integrated_lufs"),
                            "wanted_norm_gain_db": lp["wanted_gain_db"], "norm_gain_db": rep["norm_gain_db"],
                            "limiter_gain_cap_db": lp["cap_gain_db"], "capped_by_limiter_rule": bool(lp["capped"]),
+                           "cap_reason": lp.get("cap_reason") if lp["capped"] else None,
                            "final_trim_db": rep["final_trim_db"], "mix_lufs": got, "shortfall_lu": shortfall,
                            "status": "ok"}
         if got is not None and (shortfall > tol or got - target > tol):
-            why = (f"전경 리미터 최대 {max_lim} dB 규칙 때문에 전체 이득을 {lp['cap_gain_db']} dB 로 제한"
+            why = ("BGM 자체 피크가 true-peak 한도에 닿아(리미터로 BGM 을 줄이지 않음) 전체 이득을 "
+                   f"{lp['cap_gain_db']} dB 로 제한" if lp["capped"] and lp.get("cap_reason") == "bgm_peak" else
+                   f"전경 리미터 최대 {max_lim} dB 규칙 때문에 전체 이득을 {lp['cap_gain_db']} dB 로 제한"
                    if lp["capped"] or rep["final_trim_db"] < 0 else "정규화 반복이 목표에 수렴하지 못함")
             msg = (f"목표 음량 {target} LUFS 에 못 맞춤(측정 {got} LUFS, 부족 {shortfall} LU > 허용 {tol} LU): {why}"
                    " → BGM/효과음/원음 레벨 균형 조정 필요")

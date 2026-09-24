@@ -311,7 +311,7 @@
     <filter id="filter16" in="360" out="997">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
-      <property name="level">-20</property>
+      <property name="level">0</property>
     </filter>
     <filter id="filter17" in="360" out="997">
       <property name="mlt_service">volume</property>
@@ -341,13 +341,7 @@
     <filter id="filter19" in="0" out="12">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
-      <property name="level">-8</property>
-    </filter>
-    <filter id="filter20" in="0" out="12">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=-4.013;1=-9.009;2=-12.468;3=-13.899;4=-15.07;5=-16.631;6=-18.876;7=-19.143;8=-17.173;9=-12.921;10=-7.363;11=-2.848;12=-1.127</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
+      <property name="level">-12</property>
     </filter>
     <property name="shortkit:event">1.300s 창가 남성이 일어서기 시작함(확대 시작)</property>
   </producer>
@@ -358,16 +352,10 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 click (fx2)</property>
-    <filter id="filter21" in="0" out="1">
+    <filter id="filter20" in="0" out="1">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
-    </filter>
-    <filter id="filter22" in="0" out="1">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=-7.783;1=-2.014</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
     </filter>
     <property name="shortkit:event">6.800s 다시 앉은 순간 화면이 멈춤</property>
   </producer>
@@ -378,16 +366,10 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 pop (fx3)</property>
-    <filter id="filter23" in="0" out="2">
+    <filter id="filter21" in="0" out="2">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
-    </filter>
-    <filter id="filter24" in="0" out="2">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=-9.284;1=-4.538;2=-0.926</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
     </filter>
     <property name="shortkit:event">7.750s 뒷줄 남성이 손을 들어 올림</property>
   </producer>
@@ -398,16 +380,10 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 ding (fx4)</property>
-    <filter id="filter25" in="0" out="35">
+    <filter id="filter22" in="0" out="35">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
-    </filter>
-    <filter id="filter26" in="0" out="35">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=-10.416;1=-6.509;2=-4.963;3=-4.525;4=-4.637;5=-6.762;6=-9.912;7=-11.345;8=-11.39;9=-10.806;10=-10.027;11=-8.662;12=-9.515;13=-13.169;14=-14.465;15=-13.031;16=-11.924;17=-9.962;18=-6.632;19=-4.669;20=-4.989;21=-8.548;22=-13.016;23=-12.893;24=-11.501;25=-9.89;26=-4.984;27=-1.023;28=0;35=0</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
     </filter>
     <property name="shortkit:event">11.000s 뒷줄 남성이 자리에서 일어섬</property>
   </producer>
@@ -418,16 +394,10 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 boing (fx5)</property>
-    <filter id="filter27" in="0" out="17">
+    <filter id="filter23" in="0" out="17">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
-    </filter>
-    <filter id="filter28" in="0" out="17">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=-12.391;1=-10.185;2=-7.131;3=-5.038;5=-2.038;6=-0.73;7=-0.129;8=-0.002;17=0</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
     </filter>
     <property name="shortkit:event">15.050s 두 사람이 동시에 고개를 옆으로 기울임</property>
   </producer>
@@ -453,24 +423,18 @@
     <property name="seekable">1</property>
     <property name="shotcut:caption">원본 소리 s3 (raw)</property>
     <property name="video_index">-1</property>
-    <filter id="filter29" in="585" out="653">
+    <filter id="filter24" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">0</property>
     </filter>
-    <filter id="filter30" in="585" out="653">
-      <property name="mlt_service">volume</property>
-      <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=0;2=0;3=-2.35;4=-6.133;5=-9.241;6=-14.331;7=-16.094;8=-14.799;9=-8.989;10=-3.525;11=-4.423;12=-8.771;13=-8.035;14=-4.669;15=-1.259;16=-0.209;17=-2.087;18=-5.805;19=-9.399;20=-12.186;21=-13.309;22=-13.264;23=-12.677;24=-11.894;25=-11.786;26=-12.66;27=-10.416;28=-6.509;29=-4.963;30=-4.525;31=-4.637;32=-6.762;33=-9.912;34=-11.345;35=-11.39;36=-10.806;37=-10.027;38=-8.662;39=-9.515;40=-13.169;41=-14.465;42=-13.031;43=-11.924;44=-9.962;45=-6.632;46=-4.669;47=-4.989;48=-8.548;49=-13.016;50=-12.893;51=-11.501;52=-9.89;53=-4.984;54=-1.023;55=0;68=0</property>
-      <property name="shortkit:role">master foreground safety limiter</property>
-    </filter>
-    <filter id="filter31" in="585" out="653">
+    <filter id="filter25" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">fadeInVolume</property>
       <property name="level">0=-1.584;1=0;2=0</property>
       <property name="shotcut:animIn">1</property>
     </filter>
-    <filter id="filter32" in="585" out="653">
+    <filter id="filter26" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">fadeOutVolume</property>
       <property name="level">0=0;66=0;67=-1.584;68=-120</property>
@@ -563,15 +527,15 @@
       <property name="threads">0</property>
       <property name="always_active">1</property>
     </transition>
-    <filter id="filter34">
+    <filter id="filter28">
       <property name="mlt_service">avfilter.subtitles</property>
       <property name="av.filename">captions.ass</property>
       <property name="av.fontsdir">../build/fonts</property>
       <property name="shortkit:role">captions+decorations (one ASS layer, same file as the master)</property>
     </filter>
-    <filter id="filter35">
+    <filter id="filter29">
       <property name="mlt_service">volume</property>
-      <property name="level">18.6</property>
+      <property name="level">-0.067</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="shortkit:role">loudness normalization gain (master render)</property>
     </filter>

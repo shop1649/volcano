@@ -12,19 +12,19 @@ Kerning: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: title,Noto Sans CJK KR Black,121.63,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: description,Noto Sans CJK KR Bold,66.61,&H00E6E6E6,&H00E6E6E6,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,4,0,5,0,0,0,1
-Style: speaker,Noto Sans CJK KR Bold,57.92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
-Style: situation,Noto Sans CJK KR Black,95.57,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: dialogue,Noto Sans CJK KR Black,89.78,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: reaction,Noto Sans CJK KR Black,110.05,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,7,0,5,0,0,0,1
-Style: deco,Noto Sans CJK KR Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,400,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
+Style: title,NotoSansCJKkr-Black,121.63,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: description,NotoSansCJKkr-Bold,66.61,&H00E6E6E6,&H00E6E6E6,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,4,0,5,0,0,0,1
+Style: speaker,NotoSansCJKkr-Bold,57.92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
+Style: situation,NotoSansCJKkr-Black,95.57,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: dialogue,NotoSansCJKkr-Black,89.78,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: reaction,NotoSansCJKkr-Black,110.05,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,7,0,5,0,0,0,1
+Style: deco,NotoSansCJKkr-Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,400,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 2,0:00:00.00,0:00:21.25,title,,0,0,0,,{\an5\pos(540,330)}움직임 테스트 영상
 Dialogue: 2,0:00:00.00,0:00:04.00,description,,0,0,0,,{\an5\pos(540,500)\fad(200,0)}파이프라인 검증용 합성 샘플
-Dialogue: 1,0:00:00.30,0:00:03.90,speaker,,0,0,0,,{\an5\pos(739.87,772.94)\fad(150,150)\bord0\shad0\blur0\1c&H000000&\1a&H59&\p3}m 0 0 l 736 0 736 204 0 204{\p0}
+Dialogue: 1,0:00:00.30,0:00:03.90,speaker,,0,0,0,,{\an7\pos(650,748)\fad(150,150)\bord0\shad0\blur0\1c&H000000&\1a&H59&\p3}m 0 0 l 712 0 712 196 0 196{\p0}
 Dialogue: 2,0:00:00.30,0:00:03.90,speaker,,0,0,0,,{\an5\pos(740,770)\fad(150,150)}창가 남성
 Dialogue: 2,0:00:01.30,0:00:03.90,situation,,0,0,0,,{\an5\move(540,1430,540,1430,0,120)\fscx85\fscy85\t(0,120,\fscx100\fscy100)}창가 남성이 일어선다
 Dialogue: 2,0:00:04.10,0:00:07.40,situation,,0,0,0,,{\an5\move(540,1430,540,1430,0,120)\fscx85\fscy85\t(0,120,\fscx100\fscy100)}다시 자리에 앉는다

@@ -78,7 +78,7 @@ _DECL: dict[str, list[str]] = {
     "identity.reference_footage": [],
     "caption.reveal": [],
     "clean.corners": [],
-    "clean.residual": [],
+    "clean.residual": ["render.clean.blur_sigma_ratio"],   # blur ops: the blurred overlay must not be readable
     "cover_up.protected": [],
     "cover_up.faces": [],
     "audio.bgm": ["audio.bgm.*"],
@@ -1076,6 +1076,7 @@ def _logo_template_check(ctx, tdir) -> dict:
 
 def rows_residual(b: RowBuilder, probes: dict) -> None:
     vp = probes.get("video") or {}
+    _rows_provenance(b, vp)
     rs = vp.get("residual")
     if rs is None:
         if any(c.delogo or c.inpaint or c.blur for c in b.ctx.resolved.clips):
@@ -1101,6 +1102,74 @@ def rows_residual(b: RowBuilder, probes: dict) -> None:
               status="different" if it.get("residual") else "same",
               evidence={"t": best.get("t")}, note=it.get("note", "") +
               ("" if rs.get("clean_verify_available") else " (shortkit.clean.verify 없음 → 자체 측정)"))
+
+
+KIND_KO = {"logo": "로고", "watermark": "워터마크", "source_overlay": "출처 오버레이", "burned_subtitle": "원어 자막"}
+CORNER_KO = {"top_left": "좌상단", "top_right": "우상단", "bottom_left": "좌하단", "bottom_right": "우하단"}
+
+
+def _rows_provenance(b: RowBuilder, vp: dict) -> None:
+    """Rows from the overlay provenance records (warehouse/overlays/<source sha256>.json): every
+    recorded original overlay in the part of a source the episode uses is looked for in the final
+    MP4; the record's own unmeasured checks (text-free static logos, corners) stay 못 잼 here."""
+    ctx = b.ctx
+    mode = getattr(ctx.resolved, "mode", "test")
+    pv = vp.get("provenance")
+    if pv is None:
+        err = (vp.get("errors") or {}).get("provenance")
+        if err:
+            b.add("clean.residual", "prov:error", "원본 오버레이 잔류(출처 기록 대조)", CAT["logo"], status="unmeasured",
+                  note=err)
+        return
+    if pv.get("status") != "measured":
+        b.add("clean.residual", "prov:unavailable", "원본 오버레이 잔류(출처 기록 대조)", CAT["logo"], status="unmeasured",
+              required=mode == "production", note=pv.get("reason") or "")
+        return
+    for ent in pv.get("sources") or []:
+        sid = ent["source_id"]
+        if ent.get("status") != "measured":
+            b.add("clean.residual", f"prov:{sid}", f"원본 오버레이 검출 기록 [{sid}]", CAT["logo"],
+                  expected={"record": "warehouse/overlays/<sha256>.json", "sha256": ent.get("sha256")}, observed=None,
+                  status="unmeasured", required=mode == "production",
+                  note=(ent.get("reason") or "") + " — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용)")
+            continue
+        for it in ent.get("items") or []:
+            kind = KIND_KO.get(it.get("kind"), it.get("kind"))
+            subj = f"prov:{sid}:{it['overlay_id']}@{it['clip_id']}"
+            label = f"원본 {kind} 잔류 [{it['overlay_id']} {str(it.get('text') or '')[:14]}·{it['clip_id']}] (출처 기록 대조)"
+            exp = {"residual": False, "rect_src": it.get("rect_src"), "resolution_src": it.get("resolution_src"),
+                   "src_range_used": it.get("src_range_used"), "record": ent.get("record")}
+            if it.get("status") != "measured":
+                b.add("clean.residual", subj, label, CAT["logo"], expected=exp, observed=None, status="unmeasured",
+                      note=it.get("reason") or "")
+                continue
+            obs = {"residual": it.get("residual"), "how": it.get("how"), "max_ncc": it.get("max_ncc"),
+                   "ocr_hits": it.get("ocr_hits"), "rect_out": it.get("rect_out"), "resolution_out": it.get("resolution_out"),
+                   "times": it.get("times"), "mapping": it.get("mapping")}
+            thr = it.get("thresholds") or {}
+            b.add("clean.residual", subj, label, CAT["logo"], expected=exp, observed=obs,
+                  tolerance=(f"clean.verify.residual_score: 경사 NCC < {thr.get('ncc', 0.5)} 이고 같은 글자 OCR 0건"
+                             if it.get("how") == "pixels" else "잘라내기로 화면 밖(기하 계산)"),
+                  status="different" if it.get("residual") else "same",
+                  evidence={"t": (it.get("times") or [None])[0]},
+                  note=("원본 오버레이가 최종 화면에 남아 있음" if it.get("residual") else
+                        ("잘라내기로 제거됨" if it.get("how") == "removed_by_crop" else "")))
+        for cu in ent.get("carried_unmeasured") or []:
+            chk = cu["check"]
+            if chk == "static_graphics":
+                item = f"글자 없는 고정 로고 검사 [{sid}] (출처 기록)"
+            elif chk == "text_overlays":
+                item = f"글자 오버레이 검사 [{sid}] (출처 기록)"
+            else:
+                cn = chk.split(":", 1)[1]
+                what = "·".join({"text": "글자", "graphic": "글자 없는 로고"}[k] for k in cu.get("unmeasured") or [])
+                item = f"원본 {CORNER_KO.get(cn, cn)} {what} [{sid}] (출처 기록)"
+            b.add("clean.residual", f"prov:{sid}:{chk}", item, CAT["logo"],
+                  expected={"checked": True}, observed={k: v for k, v in cu.items() if k not in ("reason", "impact")},
+                  status="unmeasured", required=True,
+                  note="출처 기록에서 못 잼: " + str(cu.get("reason") or cu.get("doc_status") or "") +
+                       (f" — 제작 영향: {cu['impact']}" if cu.get("impact") else "") +
+                       (f" (코너 캡처: {cu['crop']})" if cu.get("crop") else ""))
 
 
 def rows_cover_up(b: RowBuilder, probes: dict) -> None:
@@ -1154,10 +1223,20 @@ def rows_cover_up(b: RowBuilder, probes: dict) -> None:
     probes.setdefault("video", {})["faces"] = fres
     if fres.get("status") == "measured":
         hits = fres.get("covered") or []
+        unsampled = fres.get("unsampled_captions") or []
+        n_faces = sum(len(x.get("faces") or []) for x in fres.get("faces") or [])
         b.add("cover_up.faces", "detector", "얼굴 가림(얼굴 검출)", CAT["cover_up"], expected={"covered": 0},
-              observed={"detector": fres.get("detector"), "frames": fres.get("frames"), "hits": hits[:10]},
-              tolerance="얼굴 면적 10% 초과 가림 0건", status="same" if not hits else "different",
-              evidence={"t": hits[0]["t"]} if hits else {})
+              observed={"detector": fres.get("detector"), "frames": fres.get("frames"),
+                        "sample_times": fres.get("sample_times"), "faces_detected": n_faces, "hits": hits[:10],
+                        "unsampled_captions": unsampled,
+                        "min_face_px_canvas": fres.get("min_face_px_canvas"), "resolution": fres.get("resolution")},
+              tolerance="얼굴 면적 10% 초과 가림 0건 (자막이 영상 위에 보이는 동안 ≤1초 간격 검사)",
+              status="different" if hits else ("unmeasured" if unsampled else "same"),
+              evidence={"t": hits[0]["t"]} if hits else {},
+              note=(fres.get("method") or "") +
+                   ("" if (fres.get("frames") or unsampled) else " — 영상 위에 겹친 자막이 없어 가릴 수 있는 얼굴 없음") +
+                   (" — 초당 1장 한도 때문에 검사하지 못한 짧은 자막: " +
+                    ", ".join(f"{u['overlay']}({u['start']}–{u['end']}s)" for u in unsampled) if unsampled else ""))
     else:
         b.add("cover_up.faces", "detector", "얼굴 가림(얼굴 검출)", CAT["cover_up"], status="unmeasured",
               required=not checked_protected, note=(fres.get("reason") or "") +
@@ -1188,8 +1267,10 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
     elif bi.get("status") != "measured":
         b.add("audio.bgm", "file", "BGM 곡·버전 일치", CAT["music"], expected={"path": bgm.path if bgm else None},
               observed=None, status="unmeasured", keys=bkeys[:3], note=bi.get("reason", ""))
+        _bgm_match_row(b, bgm, bi)
     else:
         found = bool(bi.get("found"))
+        bm = _bgm_match(b, bgm, bi)
         pth = str(bgm.path or "")
         if "/analysis/" in pth or "/stems/" in pth or pth.startswith("presets/"):
             b.add("audio.bgm", "clean_file", "BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지)", CAT["music"],
@@ -1202,7 +1283,9 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
                         "tempo_candidates": bi.get("tempo_candidates")},
               tolerance="0.25초 창별 파형 상관 q95 ≥ 0.7 (무관한 음악 < 0.5)", status="same" if found else "different",
               keys=["audio.bgm.track_id", "audio.bgm.title", "audio.bgm.version"],
-              note="출력 믹스에서 계획한 음악 파일의 파형을 찾음" if found else "계획한 음악 파일의 파형이 출력에서 확인되지 않음(다른 곡/버전?)")
+              note=("출력 믹스에서 계획한 음악 파일의 파형을 찾음" if found else
+                    "계획한 음악 파일의 파형이 출력에서 확인되지 않음(다른 곡/버전?)") + f" | is_match 4요소: {bm['parts_ko']}")
+        _bgm_match_row(b, bgm, bi, bm)
         if not found:
             for sub, it_ in (("tempo", "BGM 속도(버전)"), ("section", "BGM 사용 구간"), ("ducking", "BGM 덕킹·정적")):
                 b.add("audio.bgm" if sub != "ducking" else "audio.ducking", sub, it_, CAT["music"], status="unmeasured",
@@ -1249,11 +1332,14 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
                   observed={"fade_in_s": fi, "fade_out_s": fo, "audible_span": span},
                   tolerance=f"±{TOL['fade_s'] + 0.05:.2f}s", status="same" if ok else "different",
                   keys=["audio.bgm.fade_in_s", "audio.bgm.fade_out_s"], required=False, note="0.05초 창 LS 이득 곡선에서 측정")
-        b.style_row("audio.bgm", "bgm_ref", "BGM 곡·버전·속도·구간 (레퍼런스 대비)", CAT["music"], bkeys,
-                    {"tempo": to, "section_start_s": so} if to is not None else None,
-                    lambda o, r: abs(o["tempo"] - float(r.get("audio.bgm.tempo_ratio") or 1)) <= TOL["bgm_tempo"] and
-                    abs(o["section_start_s"] - float(r.get("audio.bgm.section_start_s") or 0)) <= TOL["bgm_section_s"],
-                    note="레퍼런스 곡 식별(제목·버전·속도·구간)이 필요")
+        lib = _library_entry(bgm.track_id)
+        # found in the mix = the library file of that track id -> its library title/version apply
+        ref_obs = {"track_id": bgm.track_id, "title": lib.get("title"), "version": lib.get("version"),
+                   "tempo_ratio": to, "section_start_s": so} if to is not None else None
+        b.style_row("audio.bgm", "bgm_ref", "BGM 곡·버전·속도·구간 (레퍼런스 대비)", CAT["music"], bkeys, ref_obs,
+                    _bgm_ref_compare,
+                    note="audio_bgm.is_match: 곡(track_id/제목)·버전·속도·구간이 모두 레퍼런스와 같아야 같다"
+                         + ("" if bgm.track_id else "; 계획이 파일 경로로 BGM 을 지정해 라이브러리 곡 id 가 없음 → 곡 일치는 못 잼"))
         _rows_ducking(b, ap, bi)
     _rows_original(b, ap)
     _rows_sfx(b, ap)
@@ -1273,6 +1359,91 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
         b.style_row("audio.loudness", "loudness_ref", "음량 (레퍼런스 대비)", CAT["loudness"],
                     ["audio.loudness.integrated_lufs", "audio.loudness.true_peak_db"], {"integrated_lufs": il},
                     lambda o, r: abs(o["integrated_lufs"] - float(r.get("audio.loudness.integrated_lufs"))) <= tol_lu)
+
+
+BGM_PART_KO = {"track_id": "곡", "song": "곡", "title": "곡(제목)", "version": "버전", "tempo_ratio": "속도",
+               "section_start_s": "구간"}
+
+
+def _bgm_parts_ko(checks: dict) -> str:
+    ko = {True: "같다", False: "다르다", None: "못 잼"}
+    return ", ".join(f"{BGM_PART_KO.get(k, k)}={ko[v]}" for k, v in checks.items())
+
+
+def _bgm_match(b: RowBuilder, bgm, bi: dict) -> dict:
+    """The user's BGM rule through ``shortkit.reference.audio_bgm.is_match``: same track AND same
+    version AND tempo within tolerance AND same section (a different part of the same song is NOT a
+    match).  Expected = the plan (file/library track, tempo, section); observed = the output mix.
+    The planned file's waveform found in the mix identifies the recording (= that track and that
+    version); its absence says the recording differs without telling which of the two."""
+    ident = (bgm.track_id or bgm.path) if bgm is not None else None
+    # the planned recording IS one version of the song: the file identifies it
+    ver = f"file:{bgm.path}" if bgm is not None and bgm.path else None
+    expected = {"track_id": ident, "version": ver,
+                "tempo_ratio": float(bgm.tempo_ratio) if bgm is not None else None,
+                "section_start_s": float(bgm.section_start_s) if bgm is not None else None}
+    st = bi.get("status")
+    if st == "measured" and bi.get("found"):
+        so = bi.get("section_start_obs")
+        ru = bi.get("runner_up_section")
+        q_best = (bi.get("local_match") or {}).get("q95") or 0.0
+        n_best = bi.get("waveform_ncc") or 0.0
+        equiv = ru is not None and (ru.get("q95") or 0) >= q_best - 0.01 and (ru.get("ncc") or 0) >= n_best - 0.005
+        sec = so
+        if (so is not None and expected["section_start_s"] is not None and equiv
+                and abs(so - expected["section_start_s"]) > TOL["bgm_section_s"]
+                and abs(ru["section_start_s"] - expected["section_start_s"]) <= TOL["bgm_section_s"]):
+            sec = ru["section_start_s"]          # the music repeats exactly: both positions sound the same
+        observed = {"track_id": ident, "version": ver, "tempo_ratio": bi.get("tempo_obs"), "section_start_s": sec}
+        basis = "계획한 음원 파일의 파형이 출력에서 확인됨(같은 녹음 → 곡·버전 같음)"
+    elif st == "measured":
+        observed = {"track_id": "(계획한 음원의 파형 없음)", "version": None, "tempo_ratio": None, "section_start_s": None}
+        basis = "계획한 음원 파일의 파형이 출력에 없음 → 곡 또는 버전이 다름(둘 중 무엇인지는 못 잼)"
+    else:
+        observed = {"track_id": None, "version": None, "tempo_ratio": None, "section_start_s": None}
+        basis = bi.get("reason") or "BGM 측정 실패"
+    try:
+        from ..reference.audio_bgm import is_match
+
+        r = is_match(expected, observed, tempo_tol=TOL["bgm_tempo"], offset_tol_s=TOL["bgm_section_s"])
+    except Exception as e:  # the rule itself must not be re-implemented silently
+        return {"status": "unmeasured", "checks": {}, "expected": expected, "observed": observed,
+                "parts_ko": "판정 못 함", "basis": f"shortkit.reference.audio_bgm.is_match 사용 불가: {type(e).__name__}: {e}"}
+    return {"status": r["status"], "checks": r["checks"], "expected": expected, "observed": observed,
+            "tolerance": r.get("tolerance"), "parts_ko": _bgm_parts_ko(r["checks"]), "basis": basis}
+
+
+def _bgm_match_row(b: RowBuilder, bgm, bi: dict, bm: dict | None = None) -> None:
+    if bgm is None or not getattr(bgm, "path", None):
+        return
+    bm = bm or _bgm_match(b, bgm, bi)
+    b.add("audio.bgm", "match", "BGM 일치(곡 AND 버전 AND 속도 AND 구간, audio_bgm.is_match)", CAT["music"],
+          expected=bm["expected"], observed={"observed": bm["observed"], "checks": bm["checks"]},
+          tolerance=f"네 요소가 모두 같아야 같다(속도 ±{TOL['bgm_tempo']}, 구간 시작 ±{TOL['bgm_section_s']}s; 같은 곡 다른 부분은 다르다)",
+          status=bm["status"], keys=["audio.bgm.track_id", "audio.bgm.version", "audio.bgm.tempo_ratio",
+                                     "audio.bgm.section_start_s"],
+          evidence={"t": 0.0}, note=f"{bm['parts_ko']} — {bm['basis']}")
+
+
+def _library_entry(track_id: str | None) -> dict:
+    if not track_id:
+        return {}
+    try:
+        from ..edit.audio import lookup_track
+
+        return dict(lookup_track(track_id)[1] or {})
+    except Exception:
+        return {}
+
+
+def _bgm_ref_compare(o: dict, r: dict):
+    """style_row compare for the reference BGM: audio_bgm.is_match against the measured preset values."""
+    from ..reference.audio_bgm import is_match
+
+    exp = {"track_id": r.get("audio.bgm.track_id"), "title": r.get("audio.bgm.title"), "version": r.get("audio.bgm.version"),
+           "tempo_ratio": r.get("audio.bgm.tempo_ratio"), "section_start_s": r.get("audio.bgm.section_start_s")}
+    res = is_match(exp, o, tempo_tol=TOL["bgm_tempo"], offset_tol_s=TOL["bgm_section_s"])
+    return {"same": True, "different": False}.get(res["status"])
 
 
 def _fade_len(curve, start: bool) -> float | None:

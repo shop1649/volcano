@@ -2240,8 +2240,8 @@
                                 ],
                                 "fade_in_s": 0.0,
                                 "fade_out_s": 0.8,
-                                "gain_db": -20.0,
-                                "loudness_gain_db": 18.6,
+                                "gain_db": 0.0,
+                                "loudness_gain_db": -0.067,
                                 "section_start_s": 12.0,
                                 "silences": [
                                     [
@@ -2483,9 +2483,9 @@
                             "shortkit": {
                                 "event_desc": "창가 남성이 일어서기 시작함(확대 시작)",
                                 "event_t": 1.3,
-                                "gain_db": -8.0,
+                                "gain_db": -12.0,
                                 "id": "fx1",
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "map_status": "unmeasured",
                                 "type": "whoosh"
                             }
@@ -2568,7 +2568,7 @@
                                 "event_t": 6.8,
                                 "gain_db": -8.0,
                                 "id": "fx2",
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "map_status": "unmeasured",
                                 "type": "click"
                             }
@@ -2651,7 +2651,7 @@
                                 "event_t": 7.75,
                                 "gain_db": -8.0,
                                 "id": "fx3",
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "map_status": "unmeasured",
                                 "type": "pop"
                             }
@@ -2734,7 +2734,7 @@
                                 "event_t": 11.0,
                                 "gain_db": -8.0,
                                 "id": "fx4",
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "map_status": "unmeasured",
                                 "type": "ding"
                             }
@@ -2817,7 +2817,7 @@
                                 "event_t": 15.05,
                                 "gain_db": -8.0,
                                 "id": "fx5",
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "map_status": "unmeasured",
                                 "type": "boing"
                             }
@@ -2912,7 +2912,7 @@
                                 "clip_id": "s3",
                                 "fade_s": 0.04,
                                 "gain_db": 0.0,
-                                "loudness_gain_db": 18.6,
+                                "loudness_gain_db": -0.067,
                                 "reason": "소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증",
                                 "speed": 1.0,
                                 "stem": "raw"

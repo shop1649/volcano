@@ -31,15 +31,17 @@ def _bbox(mask: np.ndarray) -> tuple[int, int, int, int]:
     return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
 
 
-@pytest.mark.parametrize("outline_px", [0, 5])
-def test_box_pad_measured_from_pixels(root, plan, outline_px):
+@pytest.mark.parametrize("outline_px,motion", [(0, "none"), (5, "none"), (5, "pop"), (3, "slide_up")])
+def test_box_pad_measured_from_pixels(root, plan, outline_px, motion):
     from shortkit.edit.resolve import resolve_episode
 
     set_preset(root, "text.roles.speaker.box", {"enabled": True, "color": "#0000FF", "alpha": 1.0, "pad_x": 14, "pad_y": 6})
     set_preset(root, "text.roles.speaker.outline_px", outline_px)
     set_preset(root, "text.roles.speaker.color", "#FFFFFF")
     set_preset(root, "text.roles.speaker.outline_color", "#000000")
-    set_preset(root, "text.roles.speaker.motion_in", {"type": "none", "dur_s": 0.0, "scale_from": 1.0, "offset_px": 0})
+    set_preset(root, "text.roles.speaker.motion_in", {"type": motion, "dur_s": 0.0 if motion == "none" else 0.12,
+                                                      "scale_from": 0.85 if motion == "pop" else 1.0,
+                                                      "offset_px": 40 if motion == "slide_up" else 0})
     set_preset(root, "text.roles.speaker.motion_out", {"type": "none", "dur_s": 0.0})
     plan["captions"] = [{"id": "c_spk", "role": "speaker", "text": "창가 남성 Ag", "start": 0.0, "end": 2.0,
                          "pos": [540, 400], "grounding": {"kind": "seen", "source": "a", "src_t": 1.0}}]
@@ -63,12 +65,13 @@ def test_box_pad_measured_from_pixels(root, plan, outline_px):
     ix0, iy0, ix1, iy1 = _bbox(ink)
     pads = {"left": ix0 - bx0, "right": bx1 - ix1, "top": iy0 - by0, "bottom": by1 - iy1}
     exp_x, exp_y = cap.box["pad_x"], cap.box["pad_y"]
-    tol = 1.5
-    print("DEBUG", outline_px, "box", (bx0, by0, bx1, by1), "ink", (ix0, iy0, ix1, iy1), "ir_bbox",
-          (cap.bbox.x, cap.bbox.y, cap.bbox.x + cap.bbox.w, cap.bbox.y + cap.bbox.h), "rect", cap.box["rect"])
+    # the box is drawn on whole pixels (libass snaps fractional drawing edges), so the pad measured
+    # from pixels is the preset pad exactly (to the pixel)
+    tol = 0.5
     assert abs(pads["left"] - exp_x) <= tol and abs(pads["right"] - exp_x) <= tol, (pads, exp_x)
     assert abs(pads["top"] - exp_y) <= tol and abs(pads["bottom"] - exp_y) <= tol, (pads, exp_y)
     # the IR ink bbox (incl. outline) is where libass really drew the ink
+    assert cap.box["rect"] == [bx0, by0, bx1 - bx0, by1 - by0]
     b = cap.bbox
     assert abs(ix0 - b.x) <= tol and abs(ix1 - (b.x + b.w)) <= tol, ((ix0, ix1), (b.x, b.x + b.w))
     assert abs(iy0 - b.y) <= tol and abs(iy1 - (b.y + b.h)) <= tol, ((iy0, iy1), (b.y, b.y + b.h))

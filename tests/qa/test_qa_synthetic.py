@@ -138,11 +138,26 @@ def test_good_audio(reports):
         assert status(rep, f"audio.sfx.placement:{fx}:gain") == "same", fx
     sec = rows(rep, row_id="audio.bgm:section")["observed"]["section_start_s"]
     assert sec == pytest.approx(12.0, abs=0.01)
+    # user rule through audio_bgm.is_match: track AND version AND tempo AND section
+    m = rows(rep, row_id="audio.bgm:match")
+    assert m["status"] == "same"
+    assert m["observed"]["checks"] == {"track_id": True, "version": True, "tempo_ratio": True, "section_start_s": True}
+    assert "곡=같다, 버전=같다, 속도=같다, 구간=같다" in m["note"]
+    assert "is_match 4요소: 곡=같다, 버전=같다, 속도=같다, 구간=같다" in rows(rep, row_id="audio.bgm:file")["note"]
+
+
+def _op_rows(rep):
+    """per-op residual rows (the plan's own clean ops), not the provenance rows"""
+    return [r for r in rows(rep, "clean.residual") if not r["row_id"].startswith("clean.residual:prov:")]
 
 
 def test_good_residual_identity_cover_up(reports):
     rep = reports["test-qa-good"]
-    assert [r["status"] for r in rows(rep, "clean.residual")] == ["same"]
+    assert [r["status"] for r in _op_rows(rep)] == ["same"]
+    # sources never scanned by `shortkit clean detect` (no warehouse/overlays record): honest 못 잼
+    for r in rows(rep, "clean.residual"):
+        if r["row_id"].startswith("clean.residual:prov:") and r["observed"] is None:
+            assert r["status"] == "unmeasured" and "clean detect" in r["note"]
     assert status(rep, "identity.forbidden_text:all") == "same"
     assert status(rep, "cover_up.protected:c1#0") == "same"
 
@@ -175,6 +190,11 @@ def test_bad_wrong_bgm_section(reports):
     rep = reports["test-qa-bad"]
     r = rows(rep, row_id="audio.bgm:section")
     assert r["status"] == "different"
+    # same file (track + version) at the same tempo but another part of the song is NOT a match
+    m = rows(rep, row_id="audio.bgm:match")
+    assert m["status"] == "different"
+    assert m["observed"]["checks"] == {"track_id": True, "version": True, "tempo_ratio": True, "section_start_s": False}
+    assert "곡=같다, 버전=같다, 속도=같다, 구간=다르다" in m["note"]
     # the synthetic bed repeats exactly every 8 s (4 bars) apart from faint random hats, so 17 s and
     # 25 s are the same sound; either is a correct measurement, 12 s (the plan) is not
     obs = r["observed"]["section_start_s"]
@@ -206,7 +226,7 @@ def test_bad_sfx_without_event_and_unknown_sound(reports):
 
 def test_bad_leftover_watermark(reports):
     rep = reports["test-qa-bad"]
-    r = rows(rep, "clean.residual")
+    r = _op_rows(rep)
     assert [x["status"] for x in r] == ["different"]
     assert r[0]["observed"]["edge_ncc"] >= 0.55
     # the corner OCR net catches the same account handle independently of the plan's clean ops
@@ -231,6 +251,48 @@ def test_bad_gate_fails_and_defects_recorded(reports):
                 "decor.position:dc1"):
         assert rid in ids, rid
     assert all(d["status"] == "open" and d["final_gate"]["pass"] is False for d in items)
+
+
+def test_font_rows_same_only_for_identical_verdict(reports):
+    """caption.font: typography.identify_many against a ceiling measured for THIS output's encode
+    settings (x264 SEI: crf 18, veryfast); 'same' only for the verdict identical."""
+    for ep, rep in reports.items():
+        fr = [r for r in rows(rep, "caption.font") if not r["row_id"].endswith("_ref")]
+        assert len(fr) == 5, ep
+        for r in fr:
+            v = (r["observed"] or {}).get("verdict")
+            assert (r["status"] == "same") == (v == "identical"), (ep, r["row_id"], r["status"], v)
+            if v is not None:
+                cond = r["observed"]["conditions"]
+                assert cond["crf"] == 18 and cond["x264_preset"] == "veryfast", cond
+                assert cond["assumed"] is False
+    # the synthetic renders use exactly the planned faces (production libass path) -> identical
+    good = reports["test-qa-good"]
+    for cid in ("t1", "s1", "k1", "d1", "r1"):
+        r = rows(good, row_id=f"caption.font:{cid}")
+        assert r["status"] == "same" and r["observed"]["verdict"] == "identical", (cid, r["observed"], r["note"])
+        assert r["observed"]["top"] == r["expected"] or r["observed"]["top"].replace(" ", "") == r["expected"].replace(" ", "")
+
+
+def test_faces_detected_with_clean_faces_at_most_1fps_while_captions_over_picture(reports):
+    from shortkit.clean.faces import find_cascade
+
+    if find_cascade("frontal") is None:
+        pytest.skip("Haar cascades not fetched here (python -m shortkit clean fetch-models)")
+    good = rows(reports["test-qa-good"], row_id="cover_up.faces:detector")
+    bad = rows(reports["test-qa-bad"], row_id="cover_up.faces:detector")
+    for r in (good, bad):
+        assert "shortkit.clean.faces" in r["observed"]["detector"]
+        ts = r["observed"]["sample_times"]
+        assert all(b - a >= 1.0 - 1e-6 for a, b in zip(ts, ts[1:])), ts            # <= 1 fps
+        assert len(ts) <= 8                                                          # 7.8 s video
+    # GOOD: captions over the picture only 2.8-4.6 (speaker label) and 5.4-6.6 (reaction); no face covered
+    assert all(2.8 <= t <= 4.6 or 5.4 <= t <= 6.6 for t in good["observed"]["sample_times"]), good["observed"]
+    assert good["status"] == "same" and good["observed"]["faces_detected"] > 0
+    # BAD: the situation caption moved over the two faces (0.8-2.3 s) -> found through the source frame
+    assert bad["status"] == "different"
+    hits = bad["observed"]["hits"]
+    assert any(h["overlay"] == "s1" and 0.8 <= h["t"] <= 2.3 for h in hits), hits
 
 
 # ----------------------------------------------------------------------------- report files / CLI

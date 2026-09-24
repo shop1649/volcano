@@ -41,7 +41,11 @@ DUR = 7.8
 SR = 48000
 FONT_BLACK = "Noto Sans CJK KR Black"
 FONT_BOLD = "Noto Sans CJK KR Bold"
-ASS_SCALE = 1.448            # libass Fontsize per em for Noto Sans CJK (ascent+descent)
+# Fonts are written the way the production renderer (shortkit.edit.captions / edit.render) writes them:
+# PostScript face name, Fontsize = size_px * (winAscent+winDescent)/unitsPerEm, Bold = face weight,
+# a fontsdir holding exactly those faces, ffmpeg's `subtitles` filter, bt709 conversion.  (ffmpeg's
+# `ass` filter lays glyphs out ~2 % wider than `subtitles`, so the synthetic truth must use the same
+# path as production for the font check -- whose ceiling emulates production -- to be meaningful.)
 
 CLIPS = [
     dict(id="c1", source=f"{GEN}/video/head-pose-face-detection-female-and-male.mp4", src_in=10.0, src_out=12.5,
@@ -107,19 +111,38 @@ def _ring(r_out: float, r_in: float, n: int = 48) -> str:
     return poly(r_out, False) + " " + poly(r_in, True)
 
 
+def _face(name: str):
+    from shortkit.edit.captions import resolve_font
+
+    return resolve_font(name).face
+
+
+def link_fonts(fonts_dir: Path) -> None:
+    """fontsdir with exactly the caption faces (like shortkit.edit.resolve.link_fonts)."""
+    import os
+
+    fonts_dir.mkdir(parents=True, exist_ok=True)
+    for name in sorted({c["font"] for c in CAPTIONS}):
+        f = Path(_face(name).path)
+        dst = fonts_dir / f.name
+        if not dst.exists():
+            os.symlink(f, dst)
+
+
 def build_ass(bad: bool, rest_only: bool = False) -> str:
     """Our own ASS (captions + decoration).  rest_only: every caption without motion, one per
     second, used to derive the ground-truth ink bboxes on a black canvas."""
     styles = []
     for c in CAPTIONS:
-        fs = c["size"] * ASS_SCALE
+        face = _face(c["font"])
+        fs = face.ass_fontsize(c["size"])
         if c.get("box"):
-            styles.append(f"Style: {c['id']},{c['font']},{fs:.2f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
-                          f"{_ass_color('#000000', 0x59)},&H00000000,0,0,0,0,100,100,0,0,3,6,0,5,0,0,0,1")
+            styles.append(f"Style: {c['id']},{face.ass_name},{fs:.3f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
+                          f"{_ass_color('#000000', 0x59)},&H00000000,{face.weight},0,0,0,100,100,0,0,3,6,0,5,0,0,0,1")
         else:
-            styles.append(f"Style: {c['id']},{c['font']},{fs:.2f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
-                          f"&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,{c['outline']},0,5,0,0,0,1")
-    styles.append("Style: deco,Noto Sans CJK KR Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1")
+            styles.append(f"Style: {c['id']},{face.ass_name},{fs:.3f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
+                          f"&H00000000,&H00000000,{face.weight},0,0,0,100,100,0,0,1,{c['outline']},0,5,0,0,0,1")
+    styles.append(f"Style: deco,{_face(FONT_BLACK).ass_name},20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1")
     ev = []
     for i, c in enumerate(CAPTIONS):
         x, y = c["anchor"]
@@ -153,11 +176,12 @@ def build_ass(bad: bool, rest_only: bool = False) -> str:
             ev.append(f"Dialogue: 0,{_ass_time(a)},{_ass_time(b)},deco,,0,0,0,,{{\\an7{mv}\\bord0\\shad0\\1c{_ass_color(d['color'])}\\p1}}"
                       f"{_ring(r, r - d['stroke'])}{{\\p0}}")
             k += 1
-    return ("[Script Info]\nScriptType: v4.00+\nPlayResX: %d\nPlayResY: %d\nWrapStyle: 2\nScaledBorderAndShadow: yes\n\n"
+    return ("[Script Info]\nScriptType: v4.00+\nPlayResX: %d\nPlayResY: %d\nLayoutResX: %d\nLayoutResY: %d\n"
+            "WrapStyle: 2\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\nKerning: yes\n\n"
             "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, "
             "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, "
             "MarginL, MarginR, MarginV, Encoding\n%s\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, "
-            "MarginV, Effect, Text\n%s\n") % (W, H, "\n".join(styles), "\n".join(ev))
+            "MarginV, Effect, Text\n%s\n") % (W, H, W, H, "\n".join(styles), "\n".join(ev))
 
 
 def _decode(src: Path, until: float, size: tuple[int, int], delogo: dict | None) -> tuple[list[np.ndarray], float]:
@@ -277,9 +301,11 @@ def caption_truth_bboxes(work: Path) -> dict[str, list[float]]:
 
     ass = work / "rest.ass"
     ass.write_text(build_ass(False, rest_only=True), encoding="utf-8")
+    link_fonts(work / "fonts")
     mp4 = work / "rest.mp4"
     subprocess.run([FFMPEG, "-v", "error", "-y", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={len(CAPTIONS)}",
-                    "-vf", f"ass={ass.name}", "-c:v", "libx264", "-preset", "veryfast", "-crf", "12", "-pix_fmt", "yuv444p",
+                    "-vf", f"subtitles=filename={ass.name}:fontsdir=fonts", "-c:v", "libx264", "-preset", "veryfast",
+                    "-crf", "12", "-pix_fmt", "yuv444p",
                     mp4.name], check=True, cwd=str(work))
     out = {}
     frames = read_frames(mp4, [i + 0.45 for i in range(len(CAPTIONS))])
@@ -377,9 +403,14 @@ def render_episode(episode_id: str, bad: bool = False) -> dict:
         srcs[c["id"]] = _decode(root / c["source"], c["src_out"] + 0.3, size, dl)
     out = ep / "output" / f"{episode_id}.mp4"
     n_frames = int(round(DUR * FPS))
+    link_fonts(ep / "build" / "fonts")
+    vf = (f"subtitles=filename={ass.relative_to(root).as_posix()}:fontsdir={(ep / 'build' / 'fonts').relative_to(root).as_posix()},"
+          "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p")
     cmd = [FFMPEG, "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-framerate", str(FPS),
-           "-i", "-", "-i", str(wav), "-vf", f"ass={ass.relative_to(root).as_posix()}", "-map", "0:v", "-map", "1:a",
-           "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+           "-i", "-", "-i", str(wav), "-vf", vf, "-map", "0:v", "-map", "1:a",
+           "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p",
+           "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv",
+           "-c:a", "aac", "-b:a", "192k",
            "-ar", str(SR), "-ac", "2", "-t", f"{DUR:.3f}", str(out)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, cwd=str(root))
     rx, ry, rw, rh = (int(v) for v in REGION)

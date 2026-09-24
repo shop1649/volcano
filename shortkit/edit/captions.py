@@ -476,6 +476,14 @@ def style_line(name: str, fontname: str, fontsize: float, color: str, outline_co
             f"{_f(outline)},{_f(shadow)},5,0,0,0,1")
 
 
+def role_style_line(role: str, st: dict, font: "ResolvedFont") -> str:
+    """The ASS style line of a caption role (PostScript font name, win-metric font size)."""
+    f = font
+    return style_line(role, f.face.ass_name, f.face.ass_fontsize(float(st["size_px"])), st["color"],
+                      st["outline_color"], st["shadow_color"], f.face.weight,
+                      float(st["outline_px"]), float(st["shadow_px"]))
+
+
 def highlight_markup(line: str, words: list[str], base_color: str, hl_color: str) -> str:
     """Wrap every occurrence of the highlight words in colour overrides (same font -> metrics unchanged)."""
     if not words:
@@ -522,11 +530,7 @@ def caption_events(cap, layout: Layout, style_name: str) -> list[AssEvent]:
     evs: list[AssEvent] = []
     box = cap.box or {}
     if box.get("enabled") and box.get("rect"):
-        x, y, w, h = box["rect"]
-        cmds, _, _, _, _ = _drawing([[(0, 0), (w, 0), (w, h), (0, h)]])
-        tag = (f"{{\\an5{motion(x + w / 2.0, y + h / 2.0)}{fad}\\bord0\\shad0\\blur0"
-               f"\\1c{ass_bgr(box['color'])}\\1a&H{int(round((1 - float(box['alpha'])) * 255)):02X}&\\p3}}")
-        evs.append(AssEvent(1, cap.start, cap.end, style_name, tag + cmds + "{\\p0}"))
+        evs += box_events(cap, style_name, fad_out, in_type, in_ms, mi)
     for lb in layout.lines:
         if not lb.text:
             continue
@@ -534,6 +538,105 @@ def caption_events(cap, layout: Layout, style_name: str) -> list[AssEvent]:
         body = highlight_markup(lb.text, list(cap.highlight or []), cap.color, cap.highlight_color)
         evs.append(AssEvent(2, cap.start, cap.end, style_name, f"{{\\an5{motion(px, py)}{fad}}}{body}"))
     return evs
+
+
+def box_events(cap, style_name: str, fad_out_ms: int, in_type: str, in_ms: int, mi: dict) -> list[AssEvent]:
+    """Caption box = ``box.rect`` (ink bbox incl. outline + pad per side, integer canvas px).
+
+    libass snaps the edges of a drawing placed at a fractional / centred (\\an5) position outward
+    to whole pixels (a 243 px box came out 244 px), so AT REST the box is drawn with \\an7 at its
+    integer top-left corner -- its pixel edges are then exactly the rect.  A pop (scale) motion
+    needs the centre as the scaling origin, so it gets its own \\an5 event for the motion only."""
+    x, y, w, h = (float(v) for v in cap.box["rect"])
+    cmds, _, _, _, _ = _drawing([[(0, 0), (w, 0), (w, h), (0, h)]])
+    look = (f"\\bord0\\shad0\\blur0\\1c{ass_bgr(cap.box['color'])}"
+            f"\\1a&H{int(round((1 - float(cap.box['alpha'])) * 255)):02X}&\\p3")
+    body = cmds + "{\\p0}"
+    fin = in_ms if in_type == "fade" else 0
+    evs: list[AssEvent] = []
+    rest_start = cap.start
+    if in_type == "pop" and in_ms > 0:
+        cx, cy = x + w / 2.0, y + h / 2.0
+        sc = float(mi.get("scale_from") or 1.0)
+        pct = _f(sc * 100)
+        t_end = min(cap.end, cap.start + in_ms / 1000.0)
+        evs.append(AssEvent(1, cap.start, t_end, style_name,
+                            f"{{\\an5\\pos({_f(cx)},{_f(cy)})\\fscx{pct}\\fscy{pct}\\t(0,{in_ms},\\fscx100\\fscy100)"
+                            f"{look}}}" + body))
+        rest_start = t_end
+    if in_type == "slide_up" and in_ms > 0:
+        off = float(mi.get("offset_px") or 0)
+        pos = f"\\move({_f(x)},{_f(y + off)},{_f(x)},{_f(y)},0,{in_ms})"
+    else:
+        pos = f"\\pos({_f(x)},{_f(y)})"
+    fad = f"\\fad({fin},{fad_out_ms})" if (fin or fad_out_ms) else ""
+    if cap.end > rest_start:
+        evs.append(AssEvent(1, rest_start, cap.end, style_name, f"{{\\an7{pos}{fad}{look}}}" + body))
+    return evs
+
+
+def box_rect_from_ink(ink: tuple[float, float, float, float], pad_x: float, pad_y: float) -> list[int]:
+    """Box rect [x, y, w, h] (integer px) = ink bbox (x0, y0, x1, y1; incl. outline) + pad per side."""
+    x0, y0, x1, y1 = ink
+    bx0, by0 = int(round(x0 - pad_x)), int(round(y0 - pad_y))
+    bx1, by1 = int(round(x1 + pad_x)), int(round(y1 + pad_y))
+    return [bx0, by0, bx1 - bx0, by1 - by0]
+
+
+def libass_ink_bboxes(width: int, height: int, styles: dict[str, str], jobs: list[dict],
+                      font_files: Iterable[str | os.PathLike], threshold: int = 128) -> list[tuple[int, int, int, int] | None]:
+    """Ink bbox (x0, y0, x1, y1; x1/y1 exclusive, canvas px) of captions AS LIBASS DRAWS THEM:
+    each job ``{style, outline, lines: [(text, px, py)]}`` is rendered alone (white fill AND white
+    outline on black, no shadow, at rest) through ffmpeg/libass, and the pixels with >= 50 %
+    coverage give the bbox.  This is the "visible ink incl. outline" the reference analyzer
+    measures, so box pads computed from it match a pixel measurement of our own output."""
+    import tempfile
+
+    from ..util.media import FFMPEG
+
+    if not jobs:
+        return []
+    doc = AssDoc(int(width), int(height))
+    doc.styles = list(styles.values())
+    for i, j in enumerate(jobs):
+        for text, px, py in j["lines"]:
+            if not text:
+                continue
+            doc.events.append(AssEvent(0, i * 0.1, (i + 1) * 0.1, j["style"],
+                                       f"{{\\an5\\pos({_f(px)},{_f(py)})\\bord{_f(float(j.get('outline') or 0))}"
+                                       f"\\shad0\\blur0\\1c&HFFFFFF&\\3c&HFFFFFF&\\1a&H00&\\3a&H00&}}{text}"))
+    n = len(jobs)
+    with tempfile.TemporaryDirectory(prefix="shortkit_ink_") as td:
+        tdp = Path(td)
+        fd = tdp / "fonts"
+        fd.mkdir()
+        for f in font_files:
+            src = Path(f)
+            dst = fd / src.name
+            if not dst.exists():
+                try:
+                    dst.symlink_to(src.resolve())
+                except OSError:
+                    shutil.copyfile(src, dst)
+        (tdp / "ink.ass").write_text(doc.render(), encoding="utf-8")
+        proc = subprocess.run([FFMPEG, "-hide_banner", "-nostdin", "-v", "error", "-f", "lavfi", "-i",
+                               f"color=c=black:s={int(width)}x{int(height)}:r=10:d={n * 0.1 + 0.05:.2f}",
+                               "-vf", "format=rgb24,subtitles=filename=ink.ass:fontsdir=fonts", "-frames:v", str(n),
+                               "-f", "rawvideo", "-pix_fmt", "gray", "-"], cwd=td, capture_output=True)
+    if proc.returncode != 0:
+        raise FontError("libass 잉크 측정 렌더 실패: " + proc.stderr.decode("utf-8", "replace")[-600:])
+    import numpy as np
+
+    fs = int(width) * int(height)
+    buf = proc.stdout
+    if len(buf) < n * fs:
+        raise FontError(f"libass 잉크 측정: 프레임 {len(buf) // fs}/{n} 개만 나옴")
+    out: list[tuple[int, int, int, int] | None] = []
+    for i in range(n):
+        fr = np.frombuffer(buf[i * fs:(i + 1) * fs], np.uint8).reshape(int(height), int(width))
+        ys, xs = np.nonzero(fr >= threshold)
+        out.append(None if len(xs) == 0 else (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1))
+    return out
 
 
 # ----------------------------------------------------------------------------- decorations
@@ -678,10 +781,7 @@ def write_ass(path: str | os.PathLike, canvas: dict, captions: list, layouts: di
     """Write the single ASS file used by ffmpeg (and MLT). Returns the text."""
     doc = AssDoc(int(canvas["width"]), int(canvas["height"]))
     for role, st in role_styles.items():
-        f: ResolvedFont = fonts[role]
-        doc.styles.append(style_line(role, f.face.ass_name, f.face.ass_fontsize(float(st["size_px"])), st["color"],
-                                     st["outline_color"], st["shadow_color"], f.face.weight,
-                                     float(st["outline_px"]), float(st["shadow_px"])))
+        doc.styles.append(role_style_line(role, st, fonts[role]))
     # decorations are vector drawings; the style font only has to exist (no fallback lookups)
     deco_font = fonts[next(iter(role_styles))].face.ass_name if role_styles else "sans-serif"
     doc.styles.append(style_line("deco", deco_font, 20, "#FFFFFF", "#000000", "#000000", 400, 0, 0))

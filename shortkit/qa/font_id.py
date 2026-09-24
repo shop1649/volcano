@@ -162,13 +162,14 @@ def _ass_doc(W: int, Hs: int, style: str, events: list[str]) -> str:
 
 
 def libass_samples(ctx, font: str, size: float, fill: tuple, outline: tuple | None, outline_px: float,
-                   box: tuple | None, strings, crf: float, preset: str, fps: float, seed: int = 7):
+                   box: tuple | None, strings, crf: float, preset: str, fps: float, seed: int = 7,
+                   font_file: str | None = None):
     """typography.Sample list rendered like the production renderer (see module doc)."""
     from ..edit import captions as capmod
     from ..reference import typography as ty
     from ..util.media import FFMPEG
 
-    face = capmod.resolve_font(font).face
+    face = capmod.resolve_font(font, font_file).face
     W = int(ctx.canvas_w)
     k = FRAMES_PER_SAMPLE
     Hs = int(math.ceil(size * 2.6 / 16.0)) * 16
@@ -185,12 +186,19 @@ def libass_samples(ctx, font: str, size: float, fill: tuple, outline: tuple | No
         evs.append(f"Dialogue: 2,{capmod.ass_time(j * k / fps)},{capmod.ass_time((j + 1) * k / fps)},s,,0,0,0,,"
                    f"{{\\an5\\pos({x:.2f},{y:.2f})}}{s}")
     bgs, bg_desc = _bg_strips(ctx, n, W, Hs, seed, box)
-    black = np.zeros((Hs, W, 3), np.uint8)
+    # plain canvas for locating the fill ink: far from the fill colour (dark fills on white)
+    luma = 0.2126 * fill[0] + 0.7152 * fill[1] + 0.0722 * fill[2]
+    black = np.full((Hs, W, 3), 0 if luma > 110 else 255, np.uint8)
     with tempfile.TemporaryDirectory(prefix="sk_qa_font_") as td:
         tdp = Path(td)
         (tdp / "fonts").mkdir()
         os.symlink(face.path, tdp / "fonts" / Path(face.path).name)
-        (tdp / "c.ass").write_text(_ass_doc(W, Hs, style, evs), encoding="utf-8")
+        ass_txt = _ass_doc(W, Hs, style, evs)
+        (tdp / "c.ass").write_text(ass_txt, encoding="utf-8")
+        # the emulation is only valid if libass really draws the expected face (no substitution)
+        chk = capmod.verify_libass_fonts(ass_txt, tdp / "fonts", {"s": face.ass_name})
+        if not chk.get("ok"):
+            raise RuntimeError(f"libass 가 기대 글꼴({face.ass_name})을 쓰지 않음: {chk.get('styles')}")
         base = [FFMPEG, "-hide_banner", "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
                 "-s", f"{W}x{Hs}", "-framerate", f"{fps:g}", "-i", "-"]
         # 1) lossless render on black: where the fill ink is (crop box, like the QA crop)
@@ -273,8 +281,21 @@ def nearest_fonts(expected: str, k: int = N_NEAREST) -> list[str]:
     return names
 
 
+def expected_ref(font: str, font_file: str | None = None):
+    """typography.FontRef of the face the renderer uses (font_file wins over the name lookup)."""
+    from .. import paths
+    from ..reference import typography as ty
+
+    if font_file:
+        from ..edit.captions import resolve_font
+
+        f = resolve_font(font, font_file).face
+        return ty.FontRef(name=ty.font_ref(paths.absp(font_file), f.index).name, path=str(f.path), index=f.index)
+    return ty.font_ref(font)
+
+
 def ceiling_for(ctx, font: str, size_px: float, fill: tuple, outline: tuple | None, outline_px: float,
-                box: tuple | None) -> tuple[dict, dict, bool]:
+                box: tuple | None, font_file: str | None = None) -> tuple[dict, dict, bool]:
     """(ceiling, conditions, from_cache) for ``font`` under the output's encode settings."""
     from ..reference import typography as ty
 
@@ -285,7 +306,9 @@ def ceiling_for(ctx, font: str, size_px: float, fill: tuple, outline: tuple | No
     assumed = preset is None
     preset = preset or "medium"
     b = size_bucket(size_px)
-    fr = ty.font_ref(font)
+    fr = expected_ref(font, font_file)
+    if box is not None:     # measured label-box colour: quantised so near-identical boxes share a ceiling
+        box = tuple(int(min(255, max(0, round(float(v) / 8.0) * 8))) for v in box)
     frac = round(float(outline_px) / float(size_px), 3) if (outline is not None and size_px) else 0.0
     style = {"kind": "box" if box is not None else ("outline" if outline is not None else "plain"),
              "fill": list(fill), "outline": list(outline) if outline is not None else None, "outline_frac": frac,
@@ -304,7 +327,7 @@ def ceiling_for(ctx, font: str, size_px: float, fill: tuple, outline: tuple | No
     if hit is not None:
         return hit["ceiling"], cond.to_dict(), True
     samples, bg = libass_samples(ctx, font, float(b), fill, outline, frac * b, box, ty.DEFAULT_STRINGS[:3],
-                                 float(enc["crf"]), preset, fps)
+                                 float(enc["crf"]), preset, fps, font_file=font_file)
     if len(samples) < 4:
         raise RuntimeError(f"천장 실험 샘플 부족({len(samples)}개)")
     c = ty.ceiling(fr, cond, samples=samples, color_mode="given", keep_rows=True)
@@ -323,11 +346,12 @@ def identify_caption_font(ctx, cap, crop: np.ndarray, text: str, fill: tuple, ar
     """typography.identify_many on one output crop; verdict of the EXPECTED font."""
     from ..reference import typography as ty
 
-    exp_ref = ty.font_ref(cap.font_name)
+    font_file = getattr(cap, "font_file", None)
+    exp_ref = expected_ref(cap.font_name, font_file)
     outline = None if boxed else (around if (cap.outline_px and around is not None) else None)
     box = around if boxed else None
     ceil, cond, cached = ceiling_for(ctx, cap.font_name, float(cap.size_px), tuple(fill), outline,
-                                     float(cap.outline_px or 0.0), box)
+                                     float(cap.outline_px or 0.0), box, font_file=font_file)
     try:
         others = nearest_fonts(cap.font_name)
     except Exception as e:  # the look-alike list is a strengthening, never a reason to skip

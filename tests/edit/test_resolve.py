@@ -169,5 +169,14 @@ def test_inpaint_produces_cleaned_intermediate(root, plan):
     write_plan(root, plan)
     r = resolve_episode("t1")
     c = r.clips[0]
-    assert c.source_path.startswith("warehouse/cache/clean/a_") and (root / c.source_path).is_file()
+    # the cleaner's own cache naming (warehouse/cache/clean/<source sha256>_<ops hash>.mp4), not an ad-hoc name
+    from shortkit import paths
+    from shortkit.clean.apply import cache_path
+
+    exp = paths.relp(cache_path(root / plan["sources"][0]["path"], plan["sources"][0]["clean"]["inpaint"]))
+    assert c.source_path == exp and exp.startswith(f"warehouse/cache/clean/{plan['sources'][0]['sha256']}_")
+    assert (root / c.source_path).is_file() and (root / (c.source_path + ".json")).is_file()
     assert c.inpaint and c.inpaint[0].w == 50
+    # a second resolve reuses the cached intermediate (same path, file untouched)
+    mtime = (root / c.source_path).stat().st_mtime_ns
+    assert resolve_episode("t1").clips[0].source_path == exp and (root / exp).stat().st_mtime_ns == mtime

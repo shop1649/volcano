@@ -1,6 +1,6 @@
 # 미확정 항목·제작 영향·해결 상태
 
-자동 생성: `shortkit preset unresolved` (2026-09-24T19:14:33+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물.
+자동 생성: `shortkit preset unresolved` (2026-09-24T19:48:47+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물.
 
 못 잼 = 측정하지 못함. 못 잼 항목은 임시값으로만 테스트 렌더가 가능하고, QA 에서 완료로 승격되지 않는다.
 

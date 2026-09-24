@@ -69,7 +69,7 @@ def base_plan(root: Path, mode: str = "test") -> dict:
     return {
         "schema": "shortkit.plan/1", "episode_id": "t1", "preset_id": "joshuamagazine-v1",
         "format_id": "UNCLASSIFIED", "mode": mode, "episode_index": 2,
-        "cover": {"text": "표지", "frame_t": 0.0}, "title_candidates": ["가", "나", "다"],
+        "cover": {"text": "테스트 제목", "frame_t": 0.0}, "title_candidates": ["가", "나", "다"],
         "sources": [
             {"id": "a", "path": f"{M}/src_a.mp4", "sha256": sha(root / M / "src_a.mp4"), "warehouse_id": None,
              "has_embedded_music": False, "vocals_path": None,

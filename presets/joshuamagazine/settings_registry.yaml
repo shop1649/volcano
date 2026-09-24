@@ -1,6 +1,6 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-24T19:14:32+00:00'
+synced_at: '2026-09-24T19:48:45+00:00'
 legend:
   status:
     measured: 레퍼런스에서 측정
@@ -6054,7 +6054,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - video.zoom
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
@@ -6195,7 +6196,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - video.transitions
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
@@ -6350,7 +6352,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/resolve.py:<dictcomp>
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
@@ -6363,7 +6366,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/resolve.py:<dictcomp>
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
@@ -6376,7 +6380,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/resolve.py:<dictcomp>
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
@@ -6471,8 +6476,10 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
-    qa_checks: []
+    code:
+    - shortkit/edit/resolve.py:resolve_clips
+    qa_checks:
+    - clean.residual
     impact_if_unmeasured: 원본 정리(흐림) 강도가 달라 가린 영역이 더/덜 보일 수 있음
     resolution_state: blocked_network
   audio.sample_rate:
@@ -6525,7 +6532,8 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.loudness
     impact_if_unmeasured: null
@@ -6538,7 +6546,8 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.loudness
     impact_if_unmeasured: null
@@ -6651,7 +6660,7 @@ entries:
     scope: fixed
     category: style
     status: unmeasured
-    value: -20.0
+    value: 0.0
     value_origin: provisional
     evidence: []
     measurement:
@@ -7115,7 +7124,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_cover
     qa_checks:
     - cover.frame
     impact_if_unmeasured: 표지 구성 불일치
@@ -7128,7 +7138,8 @@ entries:
     value_origin: provisional
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_cover
     qa_checks:
     - cover.frame
     impact_if_unmeasured: 표지 구성 불일치

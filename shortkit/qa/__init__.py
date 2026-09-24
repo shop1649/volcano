@@ -6,7 +6,12 @@ measurements are compared with; it is never taken as evidence that the output is
 
 Modules
     probes_text   caption OCR / ink bbox / onset-offset / motion_in / font / identity text
-    probes_video  cuts & transitions / zoom / freeze / decorations / faces / logo residual /
+    font_id       caption font verdict: typography.identify_many with the same-font IoU ceiling
+                  measured for THIS output's encode settings (x264 SEI crf/preset, libass path)
+    probes_video  cuts & transitions / zoom / freeze / decorations / faces (shortkit.clean.faces
+                  Haar on output + source frames, <= 1 fps while captions are over the picture) /
+                  logo residual (plan clean ops, and overlay provenance records
+                  warehouse/overlays/<source sha256>.json via clean.verify.residual_score) /
                   source mapping / canvas layout
     probes_audio  BGM search (file, tempo, section) + per-window least-squares gains, original
                   audio presence, SFX matched filter, unexplained onsets, loudness
@@ -150,7 +155,10 @@ def clip_transform(clip, t: float | None = None) -> dict:
     Convention (documented; the renderer must match it and QA measures whether it does):
     the source (after ``crop``) is scaled uniformly to cover/contain ``region`` and centred in
     it; a zoom scales the fitted picture by z(t) about the canvas position of
-    ``zoom.center_src`` clamped into the region (that point stays put).  Returns
+    ``zoom.center_src`` clamped into the region (that point stays put).  With ``zoom.recenter``
+    (preset motion.zoom.recenter) that point instead moves to the region centre with the same eased
+    progress, and for ``fit = cover`` the translation is clamped so the picture keeps covering the
+    region -- the same contract as ``shortkit.edit.resolve.src_to_region``.  Returns
     {s, tx, ty, visible:[x,y,w,h]} with canvas = s * src + (tx, ty).
     """
     rx, ry, rw, rh = rect_xywh(clip.region)
@@ -161,17 +169,29 @@ def clip_transform(clip, t: float | None = None) -> dict:
         cx, cy, cw, ch = 0.0, 0.0, float(sw), float(sh)
     if cw <= 0 or ch <= 0:
         cw, ch = float(sw), float(sh)
-    s = max(rw / cw, rh / ch) if (clip.fit or "cover") == "cover" else min(rw / cw, rh / ch)
+    cover = (clip.fit or "cover") == "cover"
+    s = max(rw / cw, rh / ch) if cover else min(rw / cw, rh / ch)
     tx = rx + rw / 2.0 - (cx + cw / 2.0) * s
     ty = ry + rh / 2.0 - (cy + ch / 2.0) * s
     z = zoom_scale(clip, t) if t is not None else 1.0
     if clip.zoom is not None and abs(z - 1.0) > 1e-6:
         px, py = clip.zoom.center_src
-        ox = min(max(px * s + tx, rx), rx + rw)     # canvas position of the zoom centre (fixed)
+        ox = min(max(px * s + tx, rx), rx + rw)     # canvas position of the zoom centre (un-zoomed)
         oy = min(max(py * s + ty, ry), ry + rh)
-        tx = ox - (ox - tx) * z
-        ty = oy - (oy - ty) * z
-        s = s * z
+        if getattr(clip.zoom, "recenter", False):
+            w = zoom_progress(clip, t)                  # the centre travels to the region centre
+            qx, qy = ox + (rx + rw / 2.0 - ox) * w, oy + (ry + rh / 2.0 - oy) * w
+            s = s * z
+            tx, ty = qx - s * px, qy - s * py
+            if cover:                                   # the picture keeps covering the region
+                if s * cw >= rw:
+                    tx = min(rx - s * cx, max(rx + rw - s * (cx + cw), tx))
+                if s * ch >= rh:
+                    ty = min(ry - s * cy, max(ry + rh - s * (cy + ch), ty))
+        else:                                           # fixed point: the centre stays put
+            tx = ox - (ox - tx) * z
+            ty = oy - (oy - ty) * z
+            s = s * z
     vis_x0 = max(rx, cx * s + tx)
     vis_y0 = max(ry, cy * s + ty)
     vis_x1 = min(rx + rw, (cx + cw) * s + tx)
@@ -204,6 +224,19 @@ def zoom_scale(clip, t: float | None) -> float:
     if z.dur <= 0 or t >= t0 + z.dur:
         return float(z.scale_to)
     return float(z.scale_from) + (float(z.scale_to) - float(z.scale_from)) * ease_value((t - t0) / z.dur, z.ease)
+
+
+def zoom_progress(clip, t: float | None) -> float:
+    """Eased zoom progress 0..1 at output time t (0 before the zoom starts, 1 after it ends)."""
+    z = clip.zoom
+    if z is None or t is None:
+        return 0.0
+    t0 = clip.out_start + float(z.start)
+    if t <= t0:
+        return 0.0
+    if z.dur <= 0 or t >= t0 + z.dur:
+        return 1.0
+    return ease_value((t - t0) / z.dur, z.ease)
 
 
 def map_src_rect(clip, rect, t: float | None = None) -> list[float] | None:

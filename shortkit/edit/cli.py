@@ -251,6 +251,12 @@ def _render(args) -> int:
         for row in mark_sources_used(plan):
             _log(args.episode_id, {"event": "warehouse_used", **row})
             print(f"  [창고] {row['warehouse_id']}: " + ("사용함(used) 기록" if row["ok"] else f"기록 실패 — {row['error']}"))
+    au = rep.get("audio") or {}
+    lo = au.get("loudness") or {}
+    if lo:
+        print(f"  [음량] 정규화 이득 {au.get('norm_gain_db')} dB (원했던 값 {lo.get('wanted_norm_gain_db')} dB), "
+              f"전경 리미터 최대 {au.get('fg_limiter_max_reduction_db')} dB / 한도 {(au.get('limiter') or {}).get('max_limiter_db')} dB, "
+              f"BGM 리미터 없음, mix {lo.get('mix_lufs')} LUFS (부족 {lo.get('shortfall_lu')} LU, {lo.get('status')})")
     ml = rep.get("mp4_loudness") or {}
     print(f"렌더 완료: {paths.relp(out)}  {rep['probe']['width']}x{rep['probe']['height']} "
           f"{rep['probe']['fps']}fps {rep['probe']['duration']:.2f}s, 음량 {ml.get('integrated_lufs')} LUFS "

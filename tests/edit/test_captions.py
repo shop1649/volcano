@@ -49,7 +49,8 @@ def test_style_fontsize_from_win_metrics(root, plan):
     f = resolve_font(pr.get("text.roles.situation.font_name"))
     exp = pr.get("text.roles.situation.size_px") * (f.face.win_ascent + f.face.win_descent) / f.face.units_per_em
     m = re.search(r"^Style: situation,([^,]+),([\d.]+),", ass, re.M)
-    assert m.group(1) == pr.get("text.roles.situation.font_name")
+    # libass resolves PostScript names exactly (full names fall back silently), so the style carries it
+    assert f.face.postscript and m.group(1) == f.face.postscript == f.face.ass_name
     assert float(m.group(2)) == pytest.approx(exp, abs=0.01)
 
 

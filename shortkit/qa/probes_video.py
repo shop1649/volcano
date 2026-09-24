@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from . import (QAContext, clip_at, clip_transform, ease_value, hex_rgb, map_src_rect, rect_xywh, rgb_hex, rnd,
+from . import (QAContext, clip_at, clip_transform, ease_value, hex_rgb, map_src_rect, rect_iou, rect_xywh, rgb_hex, rnd,
                src_time, zoom_scale)
 
 THUMB_W = 96
@@ -1067,11 +1067,20 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
 
 
 # ----------------------------------------------------------------------------- logo residual
+def original_source_path(ctx: QAContext, c) -> Path:
+    """Absolute path of the ORIGINAL source of clip ``c`` (plan sources[].path), falling back to
+    ``clip.source_path`` (which may be a cleaned intermediate)."""
+    from .. import paths
+
+    for s in (ctx.plan or {}).get("sources") or []:
+        if s.get("id") == c.source_id and s.get("path"):
+            return paths.absp(s["path"])
+    return paths.absp(c.source_path)
+
+
 def analyze_residual(ctx: QAContext) -> dict:
     """For every clip with clean ops, check the mapped region of the output for what was
     supposed to be removed (edge-template NCC vs the original source crop + OCR)."""
-    from .. import paths
-
     cv2 = _cv2()
     items = []
     verify = _clean_verify()
@@ -1080,7 +1089,9 @@ def analyze_residual(ctx: QAContext) -> dict:
         ops = [("delogo", r) for r in c.delogo] + [("inpaint", r) for r in c.inpaint] + [("blur", r) for r in c.blur]
         if not ops:
             continue
-        p = paths.absp(c.source_path)
+        # compare with the ORIGINAL source: for inpaint ops clip.source_path is the cleaned intermediate
+        # (warehouse/cache/clean/...), whose pixels are already inpainted and would match the output
+        p = original_source_path(ctx, c)
         for kind, r in ops:
             s0 = max(c.src_in, r.start if r.start is not None else c.src_in)
             s1 = min(c.src_out, r.end if r.end is not None else c.src_out)
@@ -1154,6 +1165,227 @@ def analyze_residual(ctx: QAContext) -> dict:
     return {"items": items, "clean_verify_available": verify is not None}
 
 
+# ----------------------------------------------------------------------------- overlay provenance
+PROV_MARGIN_S = 0.1
+
+
+def _transition_guard(ctx: QAContext, c, t: float) -> bool:
+    """True when ``t`` is safely inside clip ``c`` alone (no crossfade/flash of it or the next clip)."""
+    fr = 1.0 / ctx.fps
+    if clip_at(ctx.resolved, t) is not c:
+        return False
+    clips = ctx.resolved.clips
+    i = next((k for k, x in enumerate(clips) if x is c), None)
+    for x in ([c] + ([clips[i + 1]] if i is not None and i + 1 < len(clips) else [])):
+        tr = x.transition_in
+        d = float(getattr(tr, "dur", 0) or 0)
+        if getattr(tr, "type", "cut") in ("flash", "crossfade") and d > 0:
+            if x.out_start - d / 2 - 2 * fr <= t <= x.out_start + d + 2 * fr:
+                return False
+    return c.out_start + fr <= t <= c.out_end - fr
+
+
+def _prov_times(ctx: QAContext, c, s0: float, s1: float, n: int = 3) -> tuple[list[float], list[float]]:
+    """Output times inside clip ``c`` whose SOURCE time lies in [s0, s1]: (no-zoom times, zoom times)."""
+    fr = 1.0 / ctx.fps
+    grid = np.arange(c.out_start + fr, c.out_end - fr, max(fr, 0.05))
+    ok = [float(t) for t in grid if s0 + PROV_MARGIN_S <= src_time(c, float(t)) <= s1 - PROV_MARGIN_S
+          and _transition_guard(ctx, c, float(t))]
+    plain = [t for t in ok if c.zoom is None or abs(zoom_scale(c, t) - 1.0) < 1e-4]
+    zoomed = [t for t in ok if t not in plain]
+
+    def spread(v):
+        if len(v) <= n:
+            return [round(t, 3) for t in v]
+        return [round(v[int(round(q * (len(v) - 1)))], 3) for q in np.linspace(0.15, 0.85, n)]
+    return spread(plain), spread(zoomed)
+
+
+def _source_sha(ctx: QAContext, sid: str, ps: dict) -> tuple[str | None, str]:
+    from .. import paths
+    from ..util.hashing import sha256_file
+
+    if ps.get("sha256"):
+        return str(ps["sha256"]), "plan sources[].sha256"
+    p = paths.absp(ps["path"]) if ps.get("path") else None
+    if p is not None and p.is_file():
+        return sha256_file(p), "소스 파일 sha256 계산"
+    return None, "소스 경로·sha256 없음"
+
+
+def _visible_template(ctx: QAContext, c, o: dict, rect_out: dict, t_ref: float | None) -> tuple[str | None, bool]:
+    """Template png for the part of the overlay that is visible on the canvas (the stored template
+    is the whole SOURCE rect; a crop that cuts it would otherwise stretch the template)."""
+    from .. import paths
+
+    cv2 = _cv2()
+    tpl = o.get("template")
+    if not tpl or not paths.absp(tpl).is_file():
+        return None, False
+    tr = clip_transform(c, t_ref)
+    s, tx, ty = tr["s"], tr["tx"], tr["ty"]
+    r = o["rect"]
+    vx0 = (rect_out["x"] - tx) / s
+    vy0 = (rect_out["y"] - ty) / s
+    vx1 = (rect_out["x"] + rect_out["w"] - tx) / s
+    vy1 = (rect_out["y"] + rect_out["h"] - ty) / s
+    rw, rh = float(r["w"]), float(r["h"])
+    frac = max(0.0, min(vx1, r["x"] + rw) - max(vx0, r["x"])) * max(0.0, min(vy1, r["y"] + rh) - max(vy0, r["y"])) / max(1.0, rw * rh)
+    if frac >= 0.97:
+        return tpl, False
+    img = cv2.imread(str(paths.absp(tpl)), cv2.IMREAD_COLOR)
+    if img is None:
+        return None, False
+    ky, kx = img.shape[0] / max(1.0, rh), img.shape[1] / max(1.0, rw)
+    x0 = int(max(0, math.floor((max(vx0, r["x"]) - r["x"]) * kx)))
+    y0 = int(max(0, math.floor((max(vy0, r["y"]) - r["y"]) * ky)))
+    x1 = int(min(img.shape[1], math.ceil((min(vx1, r["x"] + rw) - r["x"]) * kx)))
+    y1 = int(min(img.shape[0], math.ceil((min(vy1, r["y"] + rh) - r["y"]) * ky)))
+    if x1 - x0 < 4 or y1 - y0 < 4:
+        return None, True
+    out = ctx.frames_dir / f"prov_tmpl_{c.id}_{o.get('id')}.png"
+    cv2.imwrite(str(out), img[y0:y1, x0:x1])
+    return paths.relp(out), True
+
+
+def analyze_provenance(ctx: QAContext) -> dict:
+    """Original overlays recorded by ``shortkit clean detect`` for each SOURCE
+    (warehouse/overlays/<source sha256>.json: rect/template/text/start/end in SOURCE px/time) are
+    looked for in the FINAL MP4 with ``shortkit.clean.verify.residual_score``.  Rects are mapped
+    with ``clean.verify.source_rect_to_canvas`` at output times inside the clip's source range
+    (outside transitions; while a zoom is active QA's own zoom-aware mapping is used instead).
+    The document's own unmeasured checks (static text-free logos, corners) are carried along."""
+    from .. import paths
+    from . import tesseract_env
+
+    try:
+        from ..clean.detect import load_overlays, overlays_path
+        from ..clean.verify import residual_score, source_rect_to_canvas
+    except Exception as e:
+        return {"status": "unavailable", "reason": f"shortkit.clean 사용 불가({type(e).__name__}: {e})"[:300], "sources": []}
+    plan_srcs = {s.get("id"): s for s in (ctx.plan or {}).get("sources") or []}
+    by_src: dict = {}
+    for c in ctx.resolved.clips:
+        by_src.setdefault(c.source_id, []).append(c)
+    W, H = ctx.info.width, ctx.info.height
+    out_sources = []
+    for sid, clips in by_src.items():
+        ps = plan_srcs.get(sid) or {"path": clips[0].source_path}
+        sha, how = _source_sha(ctx, sid, ps)
+        ent: dict = {"source_id": sid, "path": ps.get("path"), "sha256": sha, "sha256_from": how, "items": []}
+        out_sources.append(ent)
+        if sha is None:
+            ent.update(status="unmeasured", reason=how)
+            continue
+        doc = load_overlays(sha)
+        ent["record"] = paths.relp(overlays_path(sha)) if doc is not None else None
+        if doc is None or "overlays" not in doc:
+            ent.update(status="no_record", reason=(f"출처 기록 없음(warehouse/overlays/{sha[:12]}….json) — "
+                                                   f"`python -m shortkit clean detect --source {ps.get('path')}`"))
+            continue
+        ent["status"] = "measured"
+        res_src = (doc.get("source") or {}).get("resolution")
+        used = [[float(c.src_in), float(c.src_out)] for c in clips]
+        ent["used_src_ranges"] = used
+        for o in doc.get("overlays") or []:
+            rres = o.get("resolution") or res_src
+            for c in clips:
+                rect = dict(o["rect"])
+                sw, sh = c.src_size
+                if rres and sw and (int(rres[0]), int(rres[1])) != (int(sw), int(sh)):
+                    kx, ky = sw / float(rres[0]), sh / float(rres[1])
+                    rect = {"x": rect["x"] * kx, "y": rect["y"] * ky, "w": rect["w"] * kx, "h": rect["h"] * ky}
+                o_end = float(o["end"]) if o.get("end") is not None else float(c.src_out)
+                s0, s1 = max(float(c.src_in), float(o.get("start") or 0.0)), min(float(c.src_out), o_end)
+                it = {"overlay_id": o.get("id"), "kind": o.get("kind"), "text": o.get("text"), "clip_id": c.id,
+                      "rect_src": {k: rnd(rect[k], 1) for k in ("x", "y", "w", "h")},
+                      "resolution_src": list(rres) if rres else [sw, sh], "overlay_src_range": [o.get("start"), o.get("end")],
+                      "src_range_used": [rnd(s0), rnd(s1)], "template": o.get("template")}
+                if s1 - s0 <= 2 * PROV_MARGIN_S:
+                    continue                              # overlay not in the part of the source this clip uses
+                ent["items"].append(it)
+                plain, zoomed = _prov_times(ctx, c, s0, s1)
+                if not plain and not zoomed:
+                    it.update(status="unmeasured", residual=None, reason="출력에서 이 구간을 전환 없이 보여 주는 프레임이 없음")
+                    continue
+                if plain:
+                    ro = source_rect_to_canvas(rect, c)
+                    it["mapping"] = "clean.verify.source_rect_to_canvas"
+                    if ro is None:
+                        it.update(status="measured", residual=False, how="removed_by_crop", times=plain,
+                                  note="잘라내기/영상 영역 밖이라 출력 화면에 없음(기하 계산)")
+                        continue
+                    groups = [(plain, ro)]
+                else:
+                    it["mapping"] = "qa.map_src_rect(줌 적용 좌표)"
+                    groups = []
+                    for t in zoomed:
+                        mr = map_src_rect(c, rect, t)
+                        if mr is not None:
+                            groups.append(([t], {"x": mr[0], "y": mr[1], "w": mr[2], "h": mr[3]}))
+                    if not groups:
+                        it.update(status="measured", residual=False, how="removed_by_crop", times=zoomed,
+                                  note="줌·잘라내기로 출력 화면 밖(기하 계산)")
+                        continue
+                per, stats = [], []
+                for times, ro in groups:
+                    tpl, cropped = _visible_template(ctx, c, {**o, "rect": rect}, ro, times[0] if c.zoom else None)
+                    try:
+                        with tesseract_env():
+                            r = residual_score(ctx.mp4, ro, tpl, times, o.get("text"))
+                    except Exception as e:
+                        stats.append(None)
+                        per.append({"times": times, "error": f"{type(e).__name__}: {e}"[:300]})
+                        continue
+                    stats.append(r)
+                    per.append({"times": times, "rect_out": {k: rnd(ro[k], 1) for k in ("x", "y", "w", "h")},
+                                "template": tpl, "template_cropped": cropped, "max_ncc": r.get("max_ncc"),
+                                "ocr_hits": r.get("ocr_hits"), "residual": r.get("residual"), "status": r.get("status"),
+                                "per_time": r.get("per_time")})
+                ok = [r for r in stats if r is not None and r.get("status") == "measured"]
+                it.update(how="pixels", resolution_out=[W, H], checks=per,
+                          times=[t for g in groups for t in g[0]],
+                          rect_out={k: rnd(groups[0][1][k], 1) for k in ("x", "y", "w", "h")},
+                          max_ncc=max((r["max_ncc"] for r in ok if r.get("max_ncc") is not None), default=None),
+                          ocr_hits=sum(int(r.get("ocr_hits") or 0) for r in ok),
+                          thresholds=(ok[0].get("thresholds") if ok else None))
+                if not ok:
+                    it.update(status="unmeasured", residual=None,
+                              reason="residual_score 가 측정하지 못함(템플릿·OCR 모두 없음/실패)")
+                else:
+                    it.update(status="measured", residual=any(bool(r.get("residual")) for r in ok))
+        # the record's own unmeasured checks, restricted to the source ranges this episode uses
+        checks = doc.get("checks") or {}
+        shots = {sh.get("id"): sh for sh in doc.get("shots") or []}
+        sg = checks.get("static_graphics") or {}
+        carried = []
+        if sg and sg.get("status") != "measured":
+            um = [shots.get(i) or {"id": i} for i in sg.get("shots_unmeasured") or []]
+            hit = [x for x in um if x.get("start") is None or any(min(b_, float(x.get("end") or 1e9)) - max(a_, float(x.get("start") or 0))
+                                                                   > 0 for a_, b_ in used)]
+            if hit or not um:
+                carried.append({"check": "static_graphics", "status": "unmeasured", "doc_status": sg.get("status"),
+                                "reason": sg.get("reason"), "impact": sg.get("impact"),
+                                "shots": [{k: x.get(k) for k in ("id", "start", "end")} for x in hit]})
+        to = checks.get("text_overlays") or {}
+        if to and to.get("status") != "measured":
+            carried.append({"check": "text_overlays", "status": "unmeasured", "doc_status": to.get("status"),
+                            "reason": to.get("reason"), "impact": to.get("impact")})
+        for name, cc in (doc.get("corners") or {}).items():
+            um = [k for k in ("text", "graphic") if cc.get(k) == "unmeasured"]
+            if not um:
+                continue
+            reg = cc.get("region") or {}
+            vis = [c.id for c in clips if reg and source_rect_to_canvas(reg, c) is not None]
+            if reg and not vis:
+                continue                              # this corner is cropped away in every clip
+            carried.append({"check": f"corner:{name}", "status": "unmeasured", "unmeasured": um, "region": reg,
+                            "resolution": cc.get("resolution"), "crop": cc.get("crop"), "visible_in_clips": vis,
+                            "reason": sg.get("reason") if "graphic" in um else to.get("reason")})
+        ent["carried_unmeasured"] = carried
+    return {"status": "measured", "sources": out_sources}
+
+
 def text_similarity(a: str | None, b: str | None) -> float:
     import re
 
@@ -1180,8 +1412,11 @@ def _call_verify(fn, ctx: QAContext, rect_out, t: float, tmpl: np.ndarray, text:
     png = ctx.frames_dir / f"residual_tmpl_{int(t * 1000):07d}.png"
     cv2.imwrite(str(png), cv2.cvtColor(tmpl, cv2.COLOR_RGB2BGR))
     x, y, w, h = rect_out
+    from . import tesseract_env
+
     try:
-        res = fn(ctx.mp4, {"x": x, "y": y, "w": w, "h": h, "start": t - 0.05, "end": t + 0.05}, png, [t], text or None)
+        with tesseract_env():
+            res = fn(ctx.mp4, {"x": x, "y": y, "w": w, "h": h, "start": t - 0.05, "end": t + 0.05}, png, [t], text or None)
     except Exception as e:
         return {"error": f"{type(e).__name__}: {e}"[:300]}
     out = {"raw": _jsonable(res), "template": paths.relp(png)}
@@ -1207,10 +1442,20 @@ def _jsonable(v):
 
 
 # ----------------------------------------------------------------------------- faces / protected
+FETCH_MODELS_HINT = "`python -m shortkit clean fetch-models` 로 고정된(sha256) Haar 캐스케이드를 받으면 측정됨"
+FACE_ANALYSIS_W = 480          # detection width of the visible picture (canvas px -> analysis px)
+FACE_MIN_PX = 20               # smallest face at analysis scale
+
+
 def face_detector():
-    """Haar cascade from cv2.data when this OpenCV build ships it (4.x wheels), else a YuNet
-    model file the user placed at $SHORTKIT_FACE_MODEL or assets/models/.  QA never downloads a
-    model.  Returns (name, detect(img_rgb)->[[x,y,w,h]]) or (None, reason)."""
+    """(name, detect(img_rgb) -> [[x, y, w, h], ...] in img px) or (None, reason).
+
+    1. ``cv2.CascadeClassifier`` + ``cv2.data`` XML (OpenCV 4.x wheels);
+    2. ``shortkit.clean.faces`` -- the numpy Haar evaluator on the pinned cascades that
+       ``shortkit clean fetch-models`` put in warehouse/cache/models/haarcascades (frontal + profile
+       + mirrored profile, NMS), the same detector the cleaning step uses (OpenCV 5 has no cascades);
+    3. a YuNet ONNX model the user placed at $SHORTKIT_FACE_MODEL or assets/models/.
+    QA never downloads a model."""
     cv2 = _cv2()
     casc_dir = getattr(getattr(cv2, "data", None), "haarcascades", None)
     if hasattr(cv2, "CascadeClassifier") and casc_dir:
@@ -1222,7 +1467,22 @@ def face_detector():
                     g = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
                     return [list(map(float, r)) for r in cc.detectMultiScale(g, 1.1, 5, minSize=(24, 24))]
 
-                return "haar_frontalface_default", det
+                return "haar_frontalface_default(cv2)", det
+    missing_note = ""
+    try:
+        from ..clean import faces as cf
+
+        dets, missing = cf.load_detectors()
+        if dets and "frontal" not in missing:
+            def det(img, dets=dets):
+                return [[float(d["x"]), float(d["y"]), float(d["w"]), float(d["h"])]
+                        for d in cf.detect_faces_in_frame(img, dets, min_face_px=FACE_MIN_PX, min_neighbors=4)]
+
+            kinds = "+".join(d.kind for d in dets)
+            return f"shortkit.clean.faces haar {kinds} ({dets[0].backend})", det
+        missing_note = f"Haar 캐스케이드 없음({', '.join(missing) or '?'}; {cf.MODELS_DIR})"
+    except Exception as e:  # clean module unavailable: fall through to YuNet / unmeasured
+        missing_note = f"shortkit.clean.faces 사용 불가({type(e).__name__}: {e})"[:200]
     cands = []
     if os.environ.get("SHORTKIT_FACE_MODEL"):
         cands.append(Path(os.environ["SHORTKIT_FACE_MODEL"]))
@@ -1246,38 +1506,139 @@ def face_detector():
                 return [] if faces is None else [list(map(float, f[:4])) for f in faces]
 
             return f"yunet:{m.name}", det
-    return None, ("얼굴 검출기 없음: 이 OpenCV 빌드(cv2 %s)에는 Haar cascade(CascadeClassifier/cv2.data)가 없고, "
-                  "얼굴 모델 파일(assets/models/face_detection_yunet*.onnx 또는 $SHORTKIT_FACE_MODEL)도 없음" % cv2.__version__)
+    return None, (f"얼굴 검출기 없음: 이 OpenCV 빌드(cv2 {cv2.__version__})에는 Haar cascade(CascadeClassifier/cv2.data)가 없고, "
+                  f"{missing_note}. {FETCH_MODELS_HINT}")
 
 
-def analyze_faces(ctx: QAContext, overlays: list[dict], sample_fps: float = 2.0) -> dict:
-    """overlays: [{id, kind, start, end, bbox:[x,y,w,h] (MEASURED in the output)}]"""
+def _detect_in_rect(det, img: np.ndarray, rect, analysis_w: int = FACE_ANALYSIS_W) -> list[list[float]]:
+    """Faces inside ``rect`` ([x, y, w, h] px of ``img``), returned in ``img`` px."""
+    cv2 = _cv2()
+    H, W = img.shape[:2]
+    x0, y0 = max(0, int(math.floor(rect[0]))), max(0, int(math.floor(rect[1])))
+    x1, y1 = min(W, int(math.ceil(rect[0] + rect[2]))), min(H, int(math.ceil(rect[1] + rect[3])))
+    if x1 - x0 < 24 or y1 - y0 < 24:
+        return []
+    sub = img[y0:y1, x0:x1]
+    k = min(1.0, analysis_w / float(x1 - x0))
+    if k < 1.0:
+        sub = cv2.resize(sub, (max(1, int(round((x1 - x0) * k))), max(1, int(round((y1 - y0) * k)))),
+                         interpolation=cv2.INTER_AREA)
+    return [[x0 + f[0] / k, y0 + f[1] / k, f[2] / k, f[3] / k] for f in det(np.ascontiguousarray(sub))]
+
+
+def face_sample_plan(ctx: QAContext, overlays: list[dict], sample_fps: float = 1.0) -> tuple[list[float], list[dict]]:
+    """(times, unsampled): output times to look for faces -- at most ``sample_fps`` (capped at 1)
+    per second, samples at least 1/fps apart, and only while a caption is visible over the picture
+    (a caption outside every clip's video region cannot cover a face in the footage).  A caption
+    window that cannot get a sample of its own without breaking the rate (a < 1 s caption right after
+    another sample) is returned in ``unsampled`` so the report can say it was not checked."""
+    from . import rect_intersection
+
+    fps = min(1.0, max(1e-3, float(sample_fps)))
+    step = 1.0 / fps
+    T = float(ctx.info.duration)
+    wins = []
+    for o in overlays:
+        if not o.get("bbox") or o.get("end") is None or o.get("start") is None:
+            continue
+        a, e = max(0.0, float(o["start"])), min(T, float(o["end"]))
+        if e <= a:
+            continue
+        if not any(rect_intersection(o["bbox"], c.region) > 0 and c.out_start < e and c.out_end > a
+                   for c in ctx.resolved.clips):
+            continue
+        wins.append((a, e, o.get("id")))
+    times: list[float] = []
+    unsampled: list[dict] = []
+    last = -1e9
+    for a, e, oid in sorted(wins):
+        t = max(a + min(step / 2.0, (e - a) / 2.0), last + step)
+        while t <= e + 1e-9:
+            times.append(round(t, 3))
+            last = t
+            t += step
+        if not any(a - 1e-6 <= u <= e + 1e-6 for u in times):
+            unsampled.append({"overlay": oid, "start": rnd(a), "end": rnd(e)})
+    return times, unsampled
+
+
+def face_sample_times(ctx: QAContext, overlays: list[dict], sample_fps: float = 1.0) -> list[float]:
+    return face_sample_plan(ctx, overlays, sample_fps)[0]
+
+
+def analyze_faces(ctx: QAContext, overlays: list[dict], sample_fps: float = 1.0) -> dict:
+    """Do captions cover faces?  overlays: [{id, kind, start, end, bbox:[x,y,w,h] (MEASURED in the output)}]
+
+    Faces are detected at <= 1 fps, only while captions are over the picture, two ways:
+    (a) in the OUTPUT frame (visible picture area of the clip on top), and (b) in the SOURCE frame
+    shown at that moment, mapped to canvas px with the clip geometry -- a caption that fully covers
+    a face hides it from (a), so (b) is what finds it.  A hit = caption box covering > 10 % of a face.
+    """
+    from .. import paths
+    from . import rect_intersection
+
     name, det = face_detector()
     res: dict = {"detector": name}
     if name is None:
         res["status"] = "unmeasured"
         res["reason"] = det
         return res
-    hits = []
-    n_frames = 0
-    T = ctx.info.duration
-    t = 0.25
-    while t < T:
-        active = [o for o in overlays if o["start"] <= t <= o["end"] and o.get("bbox")]
-        if active:
+    fps = min(1.0, float(sample_fps))
+    times, unsampled = face_sample_plan(ctx, overlays, fps)
+    hits, faces_log = [], []
+    for t in times:
+        active = [o for o in overlays if o.get("bbox") and o["start"] <= t <= o["end"]]
+        c = clip_at(ctx.resolved, t)
+        if not active or c is None:
+            continue
+        vis = clip_transform(c, t)["visible"]
+        found = []
+        ok_paths = 0
+        try:
             fr = grab(ctx.mp4, t)
-            faces = det(fr)
-            n_frames += 1
-            for f in faces:
-                for o in active:
-                    from . import rect_intersection
-
-                    inter = rect_intersection(f, o["bbox"])
-                    if inter > 0.1 * f[2] * f[3]:
-                        hits.append({"t": rnd(t, 2), "face": [rnd(v, 1) for v in f], "overlay": o["id"],
-                                     "covered_frac": rnd(inter / (f[2] * f[3]), 3)})
-        t += 1.0 / sample_fps
-    res.update(status="measured", frames=n_frames, covered=hits)
+            found += [{"rect": f, "from": "output"} for f in _detect_in_rect(det, fr, vis)]
+            ok_paths += 1
+        except Exception as e:
+            res.setdefault("errors", []).append(f"t={t}: output {type(e).__name__}: {e}"[:200])
+        sp = paths.absp(c.source_path)
+        if sp.is_file():
+            try:
+                tr = clip_transform(c, t)
+                s, tx, ty = tr["s"], tr["tx"], tr["ty"]
+                sf = grab(sp, src_time(c, t))
+                # the part of the source that is visible on the canvas
+                src_vis = [(vis[0] - tx) / s, (vis[1] - ty) / s, vis[2] / s, vis[3] / s]
+                for f in _detect_in_rect(det, sf, src_vis, analysis_w=int(round(FACE_ANALYSIS_W))):
+                    mr = map_src_rect(c, {"x": f[0], "y": f[1], "w": f[2], "h": f[3]}, t)
+                    # a face also found in the output frame is kept once (the output detection)
+                    if mr is not None and not any(g["from"] == "output" and rect_iou(g["rect"], mr) > 0.4 for g in found):
+                        found.append({"rect": mr, "from": "source", "rect_src": [rnd(v, 1) for v in f]})
+                ok_paths += 1
+            except Exception as e:
+                res.setdefault("errors", []).append(f"t={t}: source {type(e).__name__}: {e}"[:200])
+        if ok_paths < 2:
+            # without the source frame a fully covered face is invisible: this moment is not checked
+            unsampled.append({"overlay": ",".join(o["id"] for o in active), "start": rnd(t), "end": rnd(t),
+                              "reason": "출력/소스 프레임을 읽지 못함"})
+        faces_log.append({"t": t, "clip_id": c.id, "faces": [{"rect": [rnd(v, 1) for v in f["rect"]], "from": f["from"]}
+                                                           for f in found]})
+        for f in found:
+            fx = f["rect"]
+            area = fx[2] * fx[3]
+            if area <= 0:
+                continue
+            for o in active:
+                inter = rect_intersection(fx, o["bbox"])
+                if inter > 0.1 * area:
+                    hits.append({"t": rnd(t, 2), "face": [rnd(v, 1) for v in fx], "face_from": f["from"],
+                                 "overlay": o["id"], "covered_frac": rnd(inter / area, 3)})
+    res.update(status="measured", frames=len(times), sample_times=times, sample_fps_max=fps, covered=hits,
+               unsampled_captions=unsampled,
+               faces=faces_log, resolution=[ctx.info.width, ctx.info.height],
+               min_face_px_canvas=rnd(FACE_MIN_PX * max((c.region.w for c in ctx.resolved.clips), default=ctx.canvas_w)
+                                      / FACE_ANALYSIS_W, 1),
+               method="얼굴: 출력 프레임 + 같은 순간의 소스 프레임(자막이 덮은 얼굴은 출력에서 안 보임)을 캔버스 좌표로 옮겨 검출; "
+                      "자막 상자: 출력에서 측정")
     return res
 
 
@@ -1324,7 +1685,7 @@ def probe_video(ctx: QAContext) -> dict:
         except Exception as e:  # a failing analysis becomes 'unmeasured' rows, never a crash
             res["errors"][name] = f"{type(e).__name__}: {e}"
     res["_scan"] = sc                      # in-memory only (dropped before saving)
-    for name, fn in (("mapping", analyze_mapping), ("residual", analyze_residual)):
+    for name, fn in (("mapping", analyze_mapping), ("residual", analyze_residual), ("provenance", analyze_provenance)):
         try:
             res[name] = fn(ctx)
         except Exception as e:

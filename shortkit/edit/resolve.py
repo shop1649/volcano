@@ -534,9 +534,7 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
         ctx.layouts[c["id"]] = lay
         ix, iy, iw, ih = (round(v, 2) for v in lay.ink)
         box = {k: st["box"][k] for k in ("enabled", "color", "alpha", "pad_x", "pad_y")}
-        box["rect"] = ([round(ix - float(box["pad_x"]), 2), round(iy - float(box["pad_y"]), 2),
-                        round(iw + 2 * float(box["pad_x"]), 2), round(ih + 2 * float(box["pad_y"]), 2)]
-                       if box["enabled"] else None)
+        box["rect"] = None       # boxed captions: set from the libass-measured ink below (place_boxes)
         caps.append(CaptionBox(
             id=c["id"], role=role, text="\n".join(lb.text for lb in lay.lines), lines=[lb.text for lb in lay.lines],
             start=round(start, 6), end=round(end, 6), anchor=anchor, align=st["align"], valign=st["valign"],
@@ -548,7 +546,39 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
             grounding=c.get("grounding"), line_spacing=float(st["line_spacing"]), shadow_color=st["shadow_color"],
             weight=int(font.face.weight), lines_pos=[(round(lb.center[0], 3), round(lb.center[1], 3))
                                                      for lb in lay.lines]))
+    place_boxes(ctx, caps, canvas)
     return caps
+
+
+def place_boxes(ctx: ResolveContext, caps: list[CaptionBox], canvas: dict) -> None:
+    """Caption boxes = ink bbox INCLUDING the outline + pad_x / pad_y per side, where the ink bbox is
+    what libass really draws (``captions.libass_ink_bboxes``, >= 50 % coverage) -- the same quantity
+    the reference analyzer measures as ``box edge - ink edge``.  The PIL layout bbox is 0.5-1.5 px
+    looser than libass' ink, so it is not used for the box.  The measured ink also becomes the
+    caption's ``bbox``.  Rect edges are integer px (drawn exactly by ``captions.box_events``)."""
+    boxed = [c for c in caps if c.box.get("enabled")]
+    if not boxed:
+        return
+    styles = {c.role: cap_mod.role_style_line(c.role, ctx.role_styles[c.role], ctx.fonts[c.role]) for c in boxed}
+    jobs = [{"style": c.role, "outline": c.outline_px,
+             "lines": [(lb.text, lb.center[0], lb.center[1]) for lb in ctx.layouts[c.id].lines]} for c in boxed]
+    try:
+        inks = cap_mod.libass_ink_bboxes(int(canvas["width"]), int(canvas["height"]), styles, jobs,
+                                         sorted({ctx.fonts[c.role].face.path for c in boxed}))
+    except Exception as e:           # no silent fallback to an approximate box
+        for c in boxed:
+            ctx.issues.append(issue("error", "box_ink_unmeasured", f"자막 박스 위치 계산용 libass 잉크 측정 실패: "
+                                    f"{type(e).__name__}: {str(e)[:300]}", f"captions[{c.id}]"))
+        return
+    for c, ink in zip(boxed, inks):
+        if ink is None:
+            ctx.issues.append(issue("error", "box_ink_unmeasured", "libass 가 이 자막의 글자를 그리지 않았습니다(빈 잉크)",
+                                    f"captions[{c.id}]"))
+            continue
+        x0, y0, x1, y1 = ink
+        c.bbox = Rect(float(x0), float(y0), float(x1 - x0), float(y1 - y0))
+        c.box["ink_source"] = "libass(>=50% coverage)"
+        c.box["rect"] = cap_mod.box_rect_from_ink(ink, float(c.box["pad_x"]), float(c.box["pad_y"]))
 
 
 DECO_KEYS = {"arrow": ("color", "size_px", "outline_px", "outline_color", "blink_hz",
@@ -566,9 +596,9 @@ def resolve_decorations(plan: dict, preset: config.Preset, issues: list[dict]) -
         present = set(iter(sec))
         optional = DECO_KEYS.get(f"{kind}_optional", ())
         st = {k: sec[k] for k in DECO_KEYS[kind] + optional if k in present}
-        for k in DECO_KEYS[kind]:
-            if k not in st:
-                issues.append(issue("error", "deco_key_missing", f"프리셋 키 없음: decorations.{kind}.{k}", where))
+        missing = [k for k in DECO_KEYS[kind] if k not in st]
+        for k in missing:
+            issues.append(issue("error", "deco_key_missing", f"프리셋 키 없음: decorations.{kind}.{k}", where))
         for k in present:
             if k not in DECO_KEYS[kind] + optional:
                 issues.append(issue("warn", "preset_key_unsupported", f"렌더러가 구현하지 않은 프리셋 키: decorations.{kind}.{k}",
@@ -586,6 +616,8 @@ def resolve_decorations(plan: dict, preset: config.Preset, issues: list[dict]) -
                         "w": k.get("w"), "h": k.get("h"), "rotation": k.get("rotation")})
         blink = d.get("blink_hz")
         blink = float(st.get("blink_hz") or 0.0) if blink is None else float(blink)
+        if missing:
+            continue                 # never draw a decoration with a guessed style (error reported above)
         out.append(Decoration(id=d["id"], kind=kind, start=start, end=end, keyframes=kfs, blink_hz=blink, style=st))
     return out
 
@@ -673,6 +705,9 @@ def layout_record(ctx: ResolveContext) -> dict:
             "line_pitch_px": round(lay.pitch, 3), "asc_px": round(lay.asc_px, 3), "desc_px": round(lay.desc_px, 3),
             "shadow_color": st["shadow_color"], "bold": st["bold"],
             "block": [round(v, 2) for v in lay.block], "ink": [round(v, 2) for v in lay.ink],
+            "bbox": [round(c.bbox.x, 2), round(c.bbox.y, 2), round(c.bbox.w, 2), round(c.bbox.h, 2)],
+            "bbox_source": c.box.get("ink_source") or "PIL layout (outline stroke incl.)",
+            "box_rect": c.box.get("rect"),
             "lines": [{"text": lb.text, "left": round(lb.left, 2), "top": round(lb.top, 2), "width": round(lb.width, 2),
                        "height": round(lb.height, 2), "baseline": round(lb.baseline, 2),
                        "center": [round(lb.center[0], 2), round(lb.center[1], 2)],
