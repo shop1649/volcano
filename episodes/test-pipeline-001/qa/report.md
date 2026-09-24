@@ -1,22 +1,23 @@
 # QA 보고서 — test-pipeline-001
 
-- 측정 대상: `episodes/test-pipeline-001/output/test-pipeline-001.mp4` (sha256 `459c922f3926091a…`, 1080x1920, 21.27s)
+- 측정 대상: `episodes/test-pipeline-001/output/test-pipeline-001.mp4` (sha256 `c391c32bb3574c40…`, 1080x1920, 21.27s)
 - 원칙: 최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스: 없음(못 잼)
-- 측정 시각: 2026-09-24T18:52:57+00:00 / 도구: OCR=5.3.4, 얼굴검출=얼굴 검출기 없음: 이 OpenCV 빌드(cv2 5.0.0)에는 Haar cascade(CascadeClassifier/cv2.data)가 없고, 얼굴 모델 파일(assets/models/face_detection_yunet*.onnx 또는 $SHORTKIT_FACE_MODEL)도 없음
+- 측정 시각: 2026-09-24T19:51:32+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
 ## 최종 관문: **불합격**
-- ✗ G1: 의도하지 않은 차이(다르다) 8건 — caption.font:c_desc, caption.font:c_spk, audio.sfx.placement:fx1:gain, audio.sfx.placement:fx2:gain, audio.sfx.placement:fx3:gain, audio.sfx.placement:fx4:gain, audio.sfx.placement:fx5:gain, cover.frame:frame
-- △ P1: 프리셋 미측정(임시값) 키 251개
+- ✗ G1: 의도하지 않은 차이(다르다) 6건 — caption.font:c_sit4, audio.sfx.placement:fx1:gain, audio.sfx.placement:fx2:gain, audio.sfx.placement:fx3:gain, audio.sfx.placement:fx4:gain, audio.sfx.placement:fx5:gain
+- ✗ G2: 필수 항목 못 잼 1건 — 못 잼은 완료가 아님 — caption.font:c_sit3
+- △ P1: 프리셋 미측정(임시값) 키 257개
 - △ P2: 레퍼런스 대비 못 잼 53건
 - △ P3: 테스트 모드 출력(파이프라인 검증용) — 게시 불가
 
 ## 요약
-- 전체 209행: 같다 144 / 다르다 8 (의도한 변경 0, 의도하지 않음 8) / 못 잼 57
-- 계획 대비(출력이 계획대로인가): {'same': 144, 'different': 8, 'unmeasured': 4}
+- 전체 212행: 같다 147 / 다르다 6 (의도한 변경 0, 의도하지 않음 6) / 못 잼 59
+- 계획 대비(출력이 계획대로인가): {'same': 147, 'unmeasured': 6, 'different': 6}
 - 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 53}
-- 프리셋 미측정(임시값) 키: 251개
+- 프리셋 미측정(임시값) 키: 257개
 
 | 분류 | 같다 | 다르다 | 못 잼 |
 |---|---:|---:|---:|
@@ -24,22 +25,22 @@
 | 글자 위치 | 18 | 0 | 12 |
 | 자막 내용·말투 | 11 | 0 | 2 |
 | 자막 스타일 | 9 | 0 | 6 |
-| 폰트 | 7 | 2 | 6 |
+| 폰트 | 7 | 1 | 7 |
 | 자막 타이밍 | 9 | 0 | 6 |
 | 자막 등장·퇴장 모션 | 9 | 0 | 6 |
 | 컷 | 8 | 0 | 0 |
 | 모션(확대·정지·전환) | 11 | 0 | 3 |
 | 움직이는 장식(위치/밝기 각각) | 2 | 0 | 1 |
 | 식별 요소 | 1 | 0 | 2 |
-| 로고 잔류 | 1 | 0 | 0 |
-| 얼굴·손·물체 가림 | 22 | 0 | 1 |
-| 음악 구간 | 10 | 0 | 2 |
+| 로고 잔류 | 1 | 0 | 2 |
+| 얼굴·손·물체 가림 | 23 | 0 | 0 |
+| 음악 구간 | 11 | 0 | 2 |
 | 원음 | 3 | 0 | 1 |
 | 효과음 종류별 개수 | 10 | 5 | 2 |
 | 사건과의 시차 | 5 | 0 | 0 |
 | 사건 없는 효과음 0 | 2 | 0 | 0 |
 | 음량 | 1 | 0 | 1 |
-| 구성·표지 | 1 | 1 | 3 |
+| 구성·표지 | 2 | 0 | 3 |
 
 ## 검사표
 
@@ -61,10 +62,10 @@
 |---|---|---|---|---|---|---|
 | 자막 위치 [c_title·title] "움직임 테스트 영상" | 못 잼 | {"center":[540.1,335.1],"bbox":[205.6,288.6,669.0,93.0],"resolution":[1080,1920]} | {"center":[541.0,335.5],"bbox":[216,297,650,77],"resolution":[1080,1920],"dx":0.9,"dy":0.… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) |
 | 자막 크기·줄 수 [c_title·title] "움직임 테스트 영상" | 못 잼 | {"fill_h":81.0,"lines":1,"max_width_px":980.0,"max_lines":2,"size_px":84.0} | {"fill_h":77,"fill_w":650,"lines":1,"size_px_est":79.9} | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
-| 자막 위치 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"center":[540.0,503.6],"bbox":[266.5,477.1,547.0,53.0],"resolution":[1080,1920]} | {"center":[540.5,502.5],"bbox":[197,479,687,47],"resolution":[1080,1920],"dx":0.5,"dy":-1… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) |
-| 자막 크기·줄 수 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"fill_h":45.0,"lines":1,"max_width_px":980.0,"max_lines":1,"size_px":46.0} | {"fill_h":47,"fill_w":687,"lines":1,"size_px_est":48.0} | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
-| 자막 위치 [c_spk·speaker] "창가 남성" | — | {"center":[739.9,772.9],"bbox":[661.9,753.4,156.0,39.0],"resolution":[1080,1920]} | {"center":[737.5,772.0],"bbox":[644,751,187,42],"resolution":[1080,1920],"dx":-2.4,"dy":-… | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 에피소드 위치 지정(pos) |
-| 자막 크기·줄 수 [c_spk·speaker] "창가 남성" | 못 잼 | {"fill_h":39.0,"lines":1,"max_width_px":420.0,"max_lines":1,"size_px":40.0} | {"fill_h":42,"fill_w":187,"lines":1,"size_px_est":43.1} | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
+| 자막 위치 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"center":[540.0,503.6],"bbox":[266.5,477.1,547.0,53.0],"resolution":[1080,1920]} | {"center":[540.0,503.0],"bbox":[273,482,534,42],"resolution":[1080,1920],"dx":0.0,"dy":-0… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) |
+| 자막 크기·줄 수 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"fill_h":45.0,"lines":1,"max_width_px":980.0,"max_lines":1,"size_px":46.0} | {"fill_h":42,"fill_w":534,"lines":1,"size_px_est":42.9} | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
+| 자막 위치 [c_spk·speaker] "창가 남성" | — | {"center":[739.0,772.5],"bbox":[664.0,754.0,150.0,37.0],"resolution":[1080,1920]} | {"center":[739.5,772.5],"bbox":[665,754,149,37],"resolution":[1080,1920],"dx":0.5,"dy":0.… | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 에피소드 위치 지정(pos) |
+| 자막 크기·줄 수 [c_spk·speaker] "창가 남성" | 못 잼 | {"fill_h":37.0,"lines":1,"max_width_px":420.0,"max_lines":1,"size_px":40.0} | {"fill_h":37,"fill_w":149,"lines":1,"size_px_est":40.0} | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
 | 자막 위치 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | {"center":[540.2,1433.8],"bbox":[245.7,1395.8,589.0,76.0],"resolution":[1080,1920]} | {"center":[541.0,1434.0],"bbox":[255,1403,572,62],"resolution":[1080,1920],"dx":0.8,"dy":… | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) |
 | 자막 크기·줄 수 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | {"fill_h":64.0,"lines":1,"max_width_px":960.0,"max_lines":2,"size_px":66.0} | {"fill_h":62,"fill_w":572,"lines":1,"size_px_est":63.9} | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
 | 자막 위치 [c_sit2·situation] "다시 자리에 앉는다" | 못 잼 | {"center":[540.0,1433.8],"bbox":[276.0,1395.8,528.0,76.0],"resolution":[1080,1920]} | {"center":[542.5,1434.0],"bbox":[288,1403,509,62],"resolution":[1080,1920],"dx":2.5,"dy":… | 같다 | 아니오 | t=4.34s [프레임](frames/cap_c_sit2_0004340.png) |
@@ -77,8 +78,8 @@
 | 자막 크기·줄 수 [c_rx·reaction] "갸우뚱?" | 못 잼 | {"fill_h":73.0,"lines":1,"max_width_px":900.0,"max_lines":1,"size_px":76.0} | {"fill_h":69,"fill_w":242,"lines":1,"size_px_est":71.8} | 같다 | 아니오 | t=15.32s [프레임](frames/cap_c_rx_0015319.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
 | 자막 위치 [c_sit4·situation] "두 사람이 고개를 기울인다" | 못 잼 | {"center":[539.9,1433.8],"bbox":[177.4,1395.8,725.0,76.0],"resolution":[1080,1920]} | {"center":[541.0,1434.0],"bbox":[187,1403,708,62],"resolution":[1080,1920],"dx":1.1,"dy":… | 같다 | 아니오 | t=15.34s [프레임](frames/cap_c_sit4_0015339.png) |
 | 자막 크기·줄 수 [c_sit4·situation] "두 사람이 고개를 기울인다" | 못 잼 | {"fill_h":64.0,"lines":1,"max_width_px":960.0,"max_lines":2,"size_px":66.0} | {"fill_h":62,"fill_w":708,"lines":1,"size_px_est":63.9} | 같다 | 아니오 | t=15.34s [프레임](frames/cap_c_sit4_0015339.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
-| 자막 위치 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.anchor.x":540,"text.roles.description.anchor.y":500,"text.roles.… | {"x":540.5,"y":502.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.description.anchor.x, text.roles.descr… |
-| 자막 크기 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.size_px":46,"text.roles.description.line_spacing":1.15,"text.rol… | {"size_px_est":48.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.description.size_px, text.roles.descri… |
+| 자막 위치 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.anchor.x":540,"text.roles.description.anchor.y":500,"text.roles.… | {"x":540.0,"y":503.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.description.anchor.x, text.roles.descr… |
+| 자막 크기 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.size_px":46,"text.roles.description.line_spacing":1.15,"text.rol… | {"size_px_est":42.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.description.size_px, text.roles.descri… |
 | 자막 위치 [dialogue] (레퍼런스 대비) | 못 잼 | {"text.roles.dialogue.anchor.x":540,"text.roles.dialogue.anchor.y":1430,"text.roles.dialo… | {"x":540.0,"y":1437.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.dialogue.anchor.x, text.roles.dialogue… |
 | 자막 크기 [dialogue] (레퍼런스 대비) | 못 잼 | {"text.roles.dialogue.size_px":62,"text.roles.dialogue.line_spacing":1.15,"text.roles.dia… | {"size_px_est":59.3} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.dialogue.size_px, text.roles.dialogue.… |
 | 자막 위치 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.anchor.x":540,"text.roles.reaction.anchor.y":1140,"text.roles.react… | {"x":540.0,"y":1145.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.reaction.anchor.x, text.roles.reaction… |
@@ -86,7 +87,7 @@
 | 자막 위치 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.anchor.x":540,"text.roles.situation.anchor.y":1430,"text.roles.sit… | {"x":541.2,"y":1434.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.situation.anchor.x, text.roles.situati… |
 | 자막 크기 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.size_px":66,"text.roles.situation.line_spacing":1.15,"text.roles.s… | {"size_px_est":63.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.size_px, text.roles.situatio… |
 | 자막 위치 [speaker] (레퍼런스 대비) | 못 잼 | {"text.roles.speaker.anchor.x":540,"text.roles.speaker.anchor.y":700,"text.roles.speaker.… | — | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.speaker.anchor.x, text.roles.speaker.a… |
-| 자막 크기 [speaker] (레퍼런스 대비) | 못 잼 | {"text.roles.speaker.size_px":40,"text.roles.speaker.line_spacing":1.1,"text.roles.speake… | {"size_px_est":43.1} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.speaker.size_px, text.roles.speaker.li… |
+| 자막 크기 [speaker] (레퍼런스 대비) | 못 잼 | {"text.roles.speaker.size_px":40,"text.roles.speaker.line_spacing":1.1,"text.roles.speake… | {"size_px_est":40.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.speaker.size_px, text.roles.speaker.li… |
 | 자막 위치 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.anchor.x":540,"text.roles.title.anchor.y":330,"text.roles.title.anchor… | {"x":541.0,"y":335.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.title.anchor.x, text.roles.title.ancho… |
 | 자막 크기 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.size_px":84,"text.roles.title.line_spacing":1.18,"text.roles.title.max… | {"size_px_est":79.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.title.size_px, text.roles.title.line_s… |
 
@@ -95,7 +96,7 @@
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
 | 자막 문구(OCR) [c_title·title] "움직임 테스트 영상" | — | 움직임 테스트 영상 | {"ocr":"움직임 테스트 영상","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
-| 자막 문구(OCR) [c_desc·description] "파이프라인 검증용 합성 샘플" | — | 파이프라인 검증용 합성 샘플 | {"ocr":"파 이 프 라인 검 증 용 합성 샘플","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
+| 자막 문구(OCR) [c_desc·description] "파이프라인 검증용 합성 샘플" | — | 파이프라인 검증용 합성 샘플 | {"ocr":"파 이 프 라인 ASS 합성 샘플","similarity":0.75,"match":"ocr"} | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
 | 자막 문구(OCR) [c_spk·speaker] "창가 남성" | — | 창가 남성 | {"ocr":"창가 남성","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
 | 자막 문구(OCR) [c_sit1·situation] "창가 남성이 일어선다" | — | 창가 남성이 일어선다 | {"ocr":"창가 남 성 이 일 어 선다","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
 | 자막 문구(OCR) [c_sit2·situation] "다시 자리에 앉는다" | — | 다시 자리에 앉는다 | {"ocr":"다시 자 리 에 앉는다","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=4.34s [프레임](frames/cap_c_sit2_0004340.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
@@ -114,7 +115,7 @@
 |---|---|---|---|---|---|---|
 | 자막 색·외곽선·박스 [c_title·title] "움직임 테스트 영상" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
 | 자막 색·외곽선·박스 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"color":"#E6E6E6","outline_px":4.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#E5E5E5","outline_px":11,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
-| 자막 색·외곽선·박스 [c_spk·speaker] "창가 남성" | 못 잼 | {"color":"#FFFFFF","outline_px":0.0,"outline_color":"#000000","box":true,"box_alpha":0.65… | {"fill_color":"#FFFFFF","outline_px":0,"outline_color":"#52504E","box_alpha":0.622,"highl… | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) |
+| 자막 색·외곽선·박스 [c_spk·speaker] "창가 남성" | 못 잼 | {"color":"#FFFFFF","outline_px":0.0,"outline_color":"#000000","box":true,"box_alpha":0.65… | {"fill_color":"#FFFFFF","outline_px":0,"outline_color":"#504E4C","box_alpha":0.629,"highl… | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) |
 | 자막 색·외곽선·박스 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
 | 자막 색·외곽선·박스 [c_sit2·situation] "다시 자리에 앉는다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=4.34s [프레임](frames/cap_c_sit2_0004340.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
 | 자막 색·외곽선·박스 [c_sit3·situation] "뒷줄 남성이 손을 든다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=7.94s [프레임](frames/cap_c_sit3_0007940.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
@@ -132,20 +133,20 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 자막 글꼴 [c_title·title] "움직임 테스트 영상" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9883,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) |
-| 자막 글꼴 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | Noto Sans CJK KR Bold | {"best":"Noto Sans CJK KR Bold","iou_expected":0.4188,"scores":[{"font":"Noto Sans CJK KR… | 다르다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 기대 글꼴 IoU 0.4188 ≪ 같은 글꼴 천장 0.951 — 다른(대체) 글꼴로 그려진 것으로 보임, 후보 글꼴 중에도 … |
-| 자막 글꼴 [c_spk·speaker] "창가 남성" | 못 잼 | Noto Sans CJK KR Bold | {"best":"NanumGothic","iou_expected":0.3756,"scores":[{"font":"Noto Sans CJK KR Bold","io… | 다르다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 기대 글꼴 IoU 0.3756 ≪ 같은 글꼴 천장 0.951 — 다른(대체) 글꼴로 그려진 것으로 보임, 후보 글꼴 중에도 … |
-| 자막 글꼴 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9729,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) |
-| 자막 글꼴 [c_sit2·situation] "다시 자리에 앉는다" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9701,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=4.34s [프레임](frames/cap_c_sit2_0004340.png) |
-| 자막 글꼴 [c_sit3·situation] "뒷줄 남성이 손을 든다" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9634,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=7.94s [프레임](frames/cap_c_sit3_0007940.png) |
-| 자막 글꼴 [c_dlg·dialogue] ""저기 봐, 들어온다!"" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9622,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_dlg_0010219.png) |
-| 자막 글꼴 [c_rx·reaction] "갸우뚱?" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.9802,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=15.32s [프레임](frames/cap_c_rx_0015319.png) |
-| 자막 글꼴 [c_sit4·situation] "두 사람이 고개를 기울인다" | 못 잼 | Noto Sans CJK KR Black | {"best":"Noto Sans CJK KR Black","iou_expected":0.8462,"scores":[{"font":"Noto Sans CJK K… | 같다 | 아니오 | t=15.34s [프레임](frames/cap_c_sit4_0015339.png) |
+| 자막 글꼴 [c_title·title] "움직임 테스트 영상" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9883,"margin":0.0727,"top":"Not… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 판정: 동일(identical) — IoU 0.988 >= 천장 p10 0.973; 차순위 대비 차이 +0.073 > 잡음 … |
+| 자막 글꼴 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | Noto Sans CJK KR Bold | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9511,"margin":0.0573,"top":"Not… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 판정: 동일(identical) — IoU 0.951 >= 천장 p10 0.930; 차순위 대비 차이 +0.057 > 잡음 … |
+| 자막 글꼴 [c_spk·speaker] "창가 남성" | 못 잼 | Noto Sans CJK KR Bold | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9587,"margin":0.0532,"top":"Not… | 같다 | 아니오 | t=0.57s [프레임](frames/cap_c_spk_0000570.png) 판정: 동일(identical) — IoU 0.959 >= 천장 p10 0.945; 차순위 대비 차이 +0.053 > 잡음 … |
+| 자막 글꼴 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9729,"margin":0.0531,"top":"Not… | 같다 | 아니오 | t=1.54s [프레임](frames/cap_c_sit1_0001540.png) 판정: 동일(identical) — IoU 0.973 >= 천장 p10 0.966; 차순위 대비 차이 +0.053 > 잡음 … |
+| 자막 글꼴 [c_sit2·situation] "다시 자리에 앉는다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9701,"margin":0.0621,"top":"Not… | 같다 | 아니오 | t=4.34s [프레임](frames/cap_c_sit2_0004340.png) 판정: 동일(identical) — IoU 0.970 >= 천장 p10 0.966; 차순위 대비 차이 +0.062 > 잡음 … |
+| 자막 글꼴 [c_sit3·situation] "뒷줄 남성이 손을 든다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"similar","verdict_ko":"유사(동일 확정 불가)","iou_expected":0.9634,"margin":0.0513,"t… | 못 잼 | 아니오 | t=7.94s [프레임](frames/cap_c_sit3_0007940.png) 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.963 < 천장 p10 0.966; 차순위 … |
+| 자막 글꼴 [c_dlg·dialogue] ""저기 봐, 들어온다!"" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9622,"margin":0.1321,"top":"Not… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_dlg_0010219.png) 판정: 동일(identical) — IoU 0.962 >= 천장 p10 0.953; 차순위 대비 차이 +0.132 > 잡음 … |
+| 자막 글꼴 [c_rx·reaction] "갸우뚱?" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9802,"margin":0.0842,"top":"Not… | 같다 | 아니오 | t=15.32s [프레임](frames/cap_c_rx_0015319.png) 판정: 동일(identical) — IoU 0.980 >= 천장 p10 0.963; 차순위 대비 차이 +0.084 > 잡음 … |
+| 자막 글꼴 [c_sit4·situation] "두 사람이 고개를 기울인다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"different","verdict_ko":"다름","iou_expected":0.8462,"margin":0.0377,"top":"Not… | 다르다 | 아니오 | t=15.34s [프레임](frames/cap_c_sit4_0015339.png) 판정: 다름(different) — IoU 0.846 < 천장 p10 0.966 - 잡음 0.006; 글자별 하한(0.86)… |
 | 자막 글꼴 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.font_name":"Noto Sans CJK KR Bold","text.roles.description.bold"… | {"best":"Noto Sans CJK KR Bold"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.description.font_name, text.roles.desc… |
 | 자막 글꼴 [dialogue] (레퍼런스 대비) | 못 잼 | {"text.roles.dialogue.font_name":"Noto Sans CJK KR Black","text.roles.dialogue.bold":true} | {"best":"Noto Sans CJK KR Black"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.dialogue.font_name, text.roles.dialogu… |
 | 자막 글꼴 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.font_name":"Noto Sans CJK KR Black","text.roles.reaction.bold":true} | {"best":"Noto Sans CJK KR Black"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.font_name, text.roles.reactio… |
 | 자막 글꼴 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.font_name":"Noto Sans CJK KR Black","text.roles.situation.bold":tr… | {"best":"Noto Sans CJK KR Black"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.font_name, text.roles.situat… |
-| 자막 글꼴 [speaker] (레퍼런스 대비) | 못 잼 | {"text.roles.speaker.font_name":"Noto Sans CJK KR Bold","text.roles.speaker.bold":true} | {"best":"NanumGothic"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.speaker.font_name, text.roles.speaker.… |
+| 자막 글꼴 [speaker] (레퍼런스 대비) | 못 잼 | {"text.roles.speaker.font_name":"Noto Sans CJK KR Bold","text.roles.speaker.bold":true} | {"best":"Noto Sans CJK KR Bold"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.speaker.font_name, text.roles.speaker.… |
 | 자막 글꼴 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.font_name":"Noto Sans CJK KR Black","text.roles.title.bold":true} | {"best":"Noto Sans CJK KR Black"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.title.font_name, text.roles.title.bold… |
 
 ### 자막 타이밍
@@ -174,7 +175,7 @@
 |---|---|---|---|---|---|---|
 | 자막 등장 모션 [c_title·title] "움직임 테스트 영상" | 못 잼 | {"type":"none","dur_s":0.0,"scale_from":1.0} | {"type":"none","note":"첫 프레임부터 완전히 표시(등장 모션 없음)"} | 같다 | 아니오 | t=0.00s [프레임](frames/cap_c_title_0000120.png) |
 | 자막 등장 모션 [c_desc·description] "파이프라인 검증용 합성 샘플" | 못 잼 | {"type":"fade","dur_s":0.2,"scale_from":1.0} | {"type":"fade","scale_first":null,"presence_first":0.166,"dur_s":0.133,"scales":[null,nul… | 같다 | 아니오 | t=0.00s [프레임](frames/cap_c_desc_0000320.png) |
-| 자막 등장 모션 [c_spk·speaker] "창가 남성" | 못 잼 | {"type":"fade","dur_s":0.15,"scale_from":1.0} | {"type":"fade","scale_first":null,"presence_first":0.274,"dur_s":0.067,"scales":[null,nul… | 같다 | 아니오 | t=0.33s [프레임](frames/cap_c_spk_0000570.png) |
+| 자막 등장 모션 [c_spk·speaker] "창가 남성" | 못 잼 | {"type":"fade","dur_s":0.15,"scale_from":1.0} | {"type":"fade","scale_first":null,"presence_first":0.27,"dur_s":0.067,"scales":[null,null… | 같다 | 아니오 | t=0.33s [프레임](frames/cap_c_spk_0000570.png) |
 | 자막 등장 모션 [c_sit1·situation] "창가 남성이 일어선다" | 못 잼 | {"type":"pop","dur_s":0.12,"scale_from":0.85} | {"type":"pop","scale_first":0.853,"presence_first":0.512,"dur_s":0.133,"scales":[0.853,0.… | 같다 | 아니오 | t=1.27s [프레임](frames/cap_c_sit1_0001540.png) |
 | 자막 등장 모션 [c_sit2·situation] "다시 자리에 앉는다" | 못 잼 | {"type":"pop","dur_s":0.12,"scale_from":0.85} | {"type":"pop","scale_first":0.852,"presence_first":0.533,"dur_s":0.1,"scales":[0.852,0.89… | 같다 | 아니오 | t=4.07s [프레임](frames/cap_c_sit2_0004340.png) |
 | 자막 등장 모션 [c_sit3·situation] "뒷줄 남성이 손을 든다" | 못 잼 | {"type":"pop","dur_s":0.12,"scale_from":0.85} | {"type":"pop","scale_first":0.852,"presence_first":0.471,"dur_s":0.1,"scales":[0.852,0.89… | 같다 | 아니오 | t=7.67s [프레임](frames/cap_c_sit3_0007940.png) |
@@ -205,19 +206,19 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 전환 종류·길이 [s2] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":38.48} | 같다 | 아니오 | t=4.00s |
+| 전환 종류·길이 [s2] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":39.09} | 같다 | 아니오 | t=4.00s |
 | 전환 종류·길이 [s3] | 못 잼 | {"type":"flash","dur":0.12} | {"type":"flash","dur":0.1,"score":120.9} | 같다 | 아니오 | t=7.47s 플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF) |
 | 전환 종류·길이 [s4] | 못 잼 | {"type":"crossfade","dur":0.25} | {"type":"crossfade","dur":0.2519,"score":0.994} | 같다 | 아니오 | t=12.75s |
-| 확대(줌) [s1] | 못 잼 | {"final_ratio":1.25,"t50":1.374,"dur":0.35,"ease":"out","center_canvas":[731.4,971.3]} | {"measured_final_ratio":1.2499,"source_ratio":1.0001,"zoom_ratio_corrected":1.2497,"measu… | 같다 | 아니오 | t=1.40s ORB+RANSAC 유사변환 배율(출력 프레임끼리 비교, 소스 자체의 배율 변화로 나눔) |
-| 줌 없음 확인 [s2] | — | {"final_ratio":1.0} | {"max_dev":0.0011,"final_ratio":0.9994,"source_ratio":0.9994,"corrected":1.0,"median_inli… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
+| 확대(줌) [s1] | 못 잼 | {"final_ratio":1.25,"t50":1.374,"dur":0.35,"ease":"out","center_canvas":[731.4,971.3]} | {"measured_final_ratio":1.2506,"source_ratio":1.0001,"zoom_ratio_corrected":1.2504,"measu… | 같다 | 아니오 | t=1.40s ORB+RANSAC 유사변환 배율(출력 프레임끼리 비교, 소스 자체의 배율 변화로 나눔) |
+| 줌 없음 확인 [s2] | — | {"final_ratio":1.0} | {"max_dev":0.0005,"final_ratio":0.9996,"source_ratio":0.9994,"corrected":1.0002,"median_i… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 줌 없음 확인 [s3] | — | {"final_ratio":1.0} | {"max_dev":0.0009,"final_ratio":1.0002,"source_ratio":1.0002,"corrected":1.0,"median_inli… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 줌 없음 확인 [s4] | — | {"final_ratio":1.0} | {"max_dev":0.2638,"final_ratio":0.9519,"source_ratio":0.987,"corrected":0.9645,"median_in… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 연속 세그먼트 줌 횟수(같은 효과 쌓기 금지) | {"motion.zoom.max_consecutive":"해당 없음(rule)"} | {"max":1} | {"measured":1} | 같다 | 아니오 | — |
-| 줌 배율·길이 (레퍼런스 대비) | 못 잼 | {"motion.zoom.scale_to":1.25,"motion.zoom.dur_s":0.35,"motion.zoom.ease":"out"} | {"final_ratio":1.2499} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: motion.zoom.scale_to, motion.zoom.dur_s, motion.z… |
-| 정지(프리즈) [s2] | 못 잼 | {"start":6.8,"hold":0.7} | {"presence":"present","start":6.8,"hold":0.667,"mean_diff":0.0107} | 같다 | 아니오 | t=6.80s |
+| 줌 배율·길이 (레퍼런스 대비) | 못 잼 | {"motion.zoom.scale_to":1.25,"motion.zoom.dur_s":0.35,"motion.zoom.ease":"out"} | {"final_ratio":1.2506} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: motion.zoom.scale_to, motion.zoom.dur_s, motion.z… |
+| 정지(프리즈) [s2] | 못 잼 | {"start":6.8,"hold":0.7} | {"presence":"present","start":6.7667,"hold":0.7,"mean_diff":0.0132} | 같다 | 아니오 | t=6.80s |
 | 계획에 없는 정지 화면 | — | [] | [] | 같다 | 아니오 | 소스도 정지해 있으면 제외; 판단 불가(소스 없음)면 포함 |
 | 영상당 정지 횟수 | {"motion.freeze.max_per_video":"해당 없음(rule)"} | {"max":2} | {"count":1} | 같다 | 아니오 | — |
-| 정지 길이 (레퍼런스 대비) | 못 잼 | {"motion.freeze.hold_s":0.7} | {"hold_s":0.667} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.freeze.hold_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하… |
+| 정지 길이 (레퍼런스 대비) | 못 잼 | {"motion.freeze.hold_s":0.7} | {"hold_s":0.7} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.freeze.hold_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하… |
 | 전환 종류·길이 (레퍼런스 대비) | 못 잼 | {"motion.transitions.default":"cut","motion.transitions.flash.dur_s":0.12,"motion.transit… | {"mode":"cut","flash_dur":0.1,"crossfade_dur":0.2519} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.fl… |
 
 ### 움직이는 장식(위치/밝기 각각)
@@ -241,6 +242,8 @@
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
 | 모서리·하단 잔여 글자(출처 표기·워터마크·원어 자막) | — | [] | {"persistent":[],"single_hits":[{"zone":"video_top_left","clip_id":"s1","text":"pe","time… | 같다 | 아니오 | 한 번만 잡힌 글자는 장면 속 글자/OCR 잡음일 수 있어 참고로만 표시 |
+| 원본 오버레이 검출 기록 [v_class] | — | {"record":"warehouse/overlays/<sha256>.json","sha256":"7ca6f09cb32cf87c942cd9b56d5067a3ee… | — | 못 잼 (참고) | 아니오 | 출처 기록 없음(warehouse/overlays/7ca6f09cb32c….json) — `python -m shortkit… |
+| 원본 오버레이 검출 기록 [v_pair] | — | {"record":"warehouse/overlays/<sha256>.json","sha256":"650166430c4bf9ddc470ac17a86d1fcbd6… | — | 못 잼 (참고) | 아니오 | 출처 기록 없음(warehouse/overlays/650166430c4b….json) — `python -m shortkit… |
 
 ### 얼굴·손·물체 가림
 
@@ -268,22 +271,23 @@
 | 보호 영역 가림·잘림 [왼쪽 남성 얼굴·s3] | — | {"rect":[140.3,965.6,73.2,84.4],"resolution":[1080,1920],"t":[7.5,13.0],"covered":false,"… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=7.50s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [여성 얼굴·s4] | — | {"rect":[55.9,733.4,281.5,295.6],"resolution":[1080,1920],"t":[12.75,21.25],"covered":fal… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=12.75s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [남성 얼굴·s4] | — | {"rect":[625.9,719.3,281.5,281.5],"resolution":[1080,1920],"t":[12.75,21.25],"covered":fa… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=12.75s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
-| 얼굴 가림(얼굴 검출) | — | — | — | 못 잼 (참고) | 아니오 | 얼굴 검출기 없음: 이 OpenCV 빌드(cv2 5.0.0)에는 Haar cascade(CascadeClassifier/cv… |
+| 얼굴 가림(얼굴 검출) | — | {"covered":0} | {"detector":"shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))","fr… | 같다 | 아니오 | 얼굴: 출력 프레임 + 같은 순간의 소스 프레임(자막이 덮은 얼굴은 출력에서 안 보임)을 캔버스 좌표로 옮겨 검출; 자막 상… |
 
 ### 음악 구간
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| BGM 곡·버전 일치(파형 대조) | 못 잼 | {"path":"assets/test/generated/music_bed_a.wav","track_id":null} | {"presence":"present","waveform_ncc":0.7087,"local_match":{"n":84,"q95":0.9999,"q70":0.99… | 같다 | 아니오 | 출력 믹스에서 계획한 음악 파일의 파형을 찾음 |
-| BGM 속도(버전) | 못 잼 | 1.0 | 1.0 | 같다 | 아니오 | 후보 템포 상위: [[1.0, 0.6454], [1.005, 0.2163], [0.995, 0.1924], [1.015, 0… |
+| BGM 곡·버전 일치(파형 대조) | 못 잼 | {"path":"assets/test/generated/music_bed_a.wav","track_id":null} | {"presence":"present","waveform_ncc":0.9181,"local_match":{"n":84,"q95":0.9999,"q70":0.99… | 같다 | 아니오 | 출력 믹스에서 계획한 음악 파일의 파형을 찾음 ／ is_match 4요소: 곡=같다, 버전=같다, 속도=같다, 구간=같다 |
+| BGM 일치(곡 AND 버전 AND 속도 AND 구간, audio_bgm.is_match) | 못 잼 | {"track_id":"assets/test/generated/music_bed_a.wav","version":"file:assets/test/generated… | {"observed":{"track_id":"assets/test/generated/music_bed_a.wav","version":"file:assets/te… | 같다 | 아니오 | t=0.00s 곡=같다, 버전=같다, 속도=같다, 구간=같다 — 계획한 음원 파일의 파형이 출력에서 확인됨(같은 녹음 → 곡·버전 같음) |
+| BGM 속도(버전) | 못 잼 | 1.0 | 1.0 | 같다 | 아니오 | 후보 템포 상위: [[1.0, 0.8094], [1.005, 0.256], [0.995, 0.2381], [0.99, 0.1… |
 | BGM 사용 구간 | 못 잼 | {"section_start_s":12.0} | {"section_start_s":12.0,"used_section":[12.025,33.215],"runner_up":{"section_start_s":36.… | 같다 | 아니오 | t=0.00s 파형이 거의 똑같이 반복되는 곡이라 다른 위치도 같은 소리(상관 차 ≤ 0.005) — 구간 구별 한계 |
 | BGM 페이드 인/아웃 | 못 잼 | {"fade_in_s":0.0,"fade_out_s":0.8} | {"fade_in_s":0.0,"fade_out_s":0.689,"audible_span":[0.025,21.215]} | 같다 (참고) | 아니오 | 0.05초 창 LS 이득 곡선에서 측정 |
-| BGM 곡·버전·속도·구간 (레퍼런스 대비) | 못 잼 | {"audio.bgm.track_id":null,"audio.bgm.title":null,"audio.bgm.version":null,"audio.bgm.tem… | {"tempo":1.0,"section_start_s":12.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 9개: audio.bgm.track_id, audio.bgm.title, audio.bgm.ve… |
+| BGM 곡·버전·속도·구간 (레퍼런스 대비) | 못 잼 | {"audio.bgm.track_id":null,"audio.bgm.title":null,"audio.bgm.version":null,"audio.bgm.tem… | {"track_id":null,"title":null,"version":null,"tempo_ratio":1.0,"section_start_s":12.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 9개: audio.bgm.track_id, audio.bgm.title, audio.bgm.ve… |
 | 보존 대사 구간의 BGM 덕킹 | 못 잼 | {"duck_ranges":[[10.0,12.3]],"depth_db":10.0} | {"ducked_ranges":[[9.945,12.444],[20.791,21.24]],"coverage":[1.0]} | 같다 | 아니오 | t=10.00s |
 | 보존 대사 밖에서 BGM 낮춤 없음(효과음·컷 때문에 덕킹 금지) | {"audio.ducking.only_under_kept_dialogue":"해당 없음(… | {"ducking_only_in":[[10.0,12.3]]} | {"ducking_outside":[]} | 같다 | 아니오 | — |
 | 덕킹은 원음이 실제로 들리는 곳에서만 | — | 덕킹 구간 ⊆ 원음 존재 구간 | {"ducks_without_original":[],"original_present":[[9.999,11.999]]} | 같다 | 아니오 | — |
-| 덕킹 깊이 | 못 잼 | {"depth_db":-10.0} | {"depth_db":-10.03} | 같다 | 아니오 | — |
-| 덕킹 깊이·속도 (레퍼런스 대비) | 못 잼 | {"audio.ducking.depth_db":10.0,"audio.ducking.attack_s":0.08,"audio.ducking.release_s":0.… | {"depth_db":-10.03} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: audio.ducking.depth_db, audio.ducking.attack_s, a… |
+| 덕킹 깊이 | 못 잼 | {"depth_db":-10.0} | {"depth_db":-10.0} | 같다 | 아니오 | — |
+| 덕킹 깊이·속도 (레퍼런스 대비) | 못 잼 | {"audio.ducking.depth_db":10.0,"audio.ducking.attack_s":0.08,"audio.ducking.release_s":0.… | {"depth_db":-10.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: audio.ducking.depth_db, audio.ducking.attack_s, a… |
 | 의도적 정적 6.80–7.45s (BGM 없음) | 못 잼 | {"range":[6.8,7.45],"bgm_db_rel":"≤ -30.0"} | {"max_bgm_db_rel":-120.0} | 같다 | 아니오 | t=6.80s |
 | 계획에 없는 BGM 끊김 | — | [[6.8,7.45]] | [] | 같다 | 아니오 | — |
 
@@ -291,32 +295,32 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 보존 원음 [s3 10.00–12.30s] | 못 잼 | {"present":true,"gain_db":0.0,"stem":"raw","reason":"소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존… | {"presence":"present","present_fraction":1.0,"gain_db_mix_scale":-11.22} | 같다 | 아니오 | t=10.00s 원음 이득은 BGM 기준 믹스 척도 추정(BGM 없으면 없음) |
+| 보존 원음 [s3 10.00–12.30s] | 못 잼 | {"present":true,"gain_db":0.0,"stem":"raw","reason":"소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존… | {"presence":"present","present_fraction":1.0,"gain_db_mix_scale":-0.01} | 같다 | 아니오 | t=10.00s 원음 이득은 BGM 기준 믹스 척도 추정(BGM 없으면 없음) |
 | 보존 원음 속 음악 제거 [s3] | {"audio.original.remove_embedded_music":"해당 없음(ru… | {"embedded_music_removed":true} | {"has_embedded_music":false,"stem":"raw","path":"assets/test/generated/classroom_voice.mp… | 같다 (참고) | 아니오 | 소스에 음악 없음(plan 기록) |
 | 원음 OFF 구간에 원음 없음(기본 OFF) | {"audio.original.default":"해당 없음(rule)"} | {"kept_only":[[10.0,12.3]]} | {"presence_outside_kept":"absent","leak_windows":[],"sources_without_audio":[]} | 같다 | 아니오 | — |
-| 보존 원음 크기·경계 (레퍼런스 대비) | 못 잼 | {"audio.original.keep_gain_db":0.0,"audio.original.fade_s":0.04} | {"gain_db":-11.87} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_… |
+| 보존 원음 크기·경계 (레퍼런스 대비) | 못 잼 | {"audio.original.keep_gain_db":0.0,"audio.original.fade_s":0.04} | {"gain_db":-0.01} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_… |
 
 ### 효과음 종류별 개수
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 효과음 [fx1·whoosh] 위치 | — | {"t":1.25,"type":"whoosh"} | {"t":1.2522,"ncc":0.852} | 같다 | 아니오 | t=1.25s |
-| 효과음 [fx1·whoosh] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-27.8,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=1.25s |
-| 효과음 [fx2·click] 위치 | — | {"t":6.8,"type":"click"} | {"t":6.8,"ncc":0.99} | 같다 | 아니오 | t=6.80s |
-| 효과음 [fx2·click] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-23.83,"reference":"bgm_plateau (BGM 없음/정적 구간)"} | 다르다 (참고) | 아니오 | t=6.80s |
-| 효과음 [fx3·pop] 위치 | — | {"t":7.75,"type":"pop"} | {"t":7.75,"ncc":0.944} | 같다 | 아니오 | t=7.75s |
-| 효과음 [fx3·pop] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-20.21,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=7.75s |
-| 효과음 [fx4·ding] 위치 | — | {"t":10.9,"type":"ding"} | {"t":10.9357,"ncc":0.949} | 같다 | 아니오 | t=10.94s |
-| 효과음 [fx4·ding] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-18.8,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=10.94s |
-| 효과음 [fx5·boing] 위치 | — | {"t":15.0,"type":"boing"} | {"t":15.0,"ncc":0.866} | 같다 | 아니오 | t=15.00s |
-| 효과음 [fx5·boing] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-17.44,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=15.00s |
+| 효과음 [fx1·whoosh] 위치 | — | {"t":1.25,"type":"whoosh"} | {"t":1.2522,"ncc":0.915} | 같다 | 아니오 | t=1.25s |
+| 효과음 [fx1·whoosh] 크기 | 못 잼 | {"gain_db":-12.0} | {"gain_db_mix_scale":-15.97,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=1.25s |
+| 효과음 [fx2·click] 위치 | — | {"t":6.8,"type":"click"} | {"t":6.8,"ncc":0.994} | 같다 | 아니오 | t=6.80s |
+| 효과음 [fx2·click] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-11.05,"reference":"bgm_plateau (BGM 없음/정적 구간)"} | 다르다 (참고) | 아니오 | t=6.80s |
+| 효과음 [fx3·pop] 위치 | — | {"t":7.75,"type":"pop"} | {"t":7.7501,"ncc":0.991} | 같다 | 아니오 | t=7.75s |
+| 효과음 [fx3·pop] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-11.74,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=7.75s |
+| 효과음 [fx4·ding] 위치 | — | {"t":10.9,"type":"ding"} | {"t":10.9,"ncc":0.998} | 같다 | 아니오 | t=10.90s |
+| 효과음 [fx4·ding] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-11.91,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=10.90s |
+| 효과음 [fx5·boing] 위치 | — | {"t":15.0,"type":"boing"} | {"t":15.0,"ncc":0.992} | 같다 | 아니오 | t=15.00s |
+| 효과음 [fx5·boing] 크기 | 못 잼 | {"gain_db":-8.0} | {"gain_db_mix_scale":-11.19,"reference":"local_bgm"} | 다르다 (참고) | 아니오 | t=15.00s |
 | 효과음 개수 [boing] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=15.00s |
 | 효과음 개수 [click] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=6.80s |
-| 효과음 개수 [ding] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=10.94s |
+| 효과음 개수 [ding] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=10.90s |
 | 효과음 개수 [pop] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=7.75s |
 | 효과음 개수 [whoosh] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=1.25s |
 | 효과음 종류별 개수 (레퍼런스 포맷 범위 대비) | 못 잼 | 레퍼런스 카탈로그의 포맷별 p10–p90 | {"whoosh":1,"click":1,"pop":1,"ding":1,"boing":1} | 못 잼 (참고) | 아니오 | sfx_catalog.json 미측정: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), De… |
-| 효과음 크기 (레퍼런스 대비) | 못 잼 | {"audio.sfx.gain_db_default":-8.0} | {"gain_db":-20.21} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: audio.sfx.gain_db_default — 출력이 임시값과 같아도 레퍼런스와 같다… |
+| 효과음 크기 (레퍼런스 대비) | 못 잼 | {"audio.sfx.gain_db_default":-8.0} | {"gain_db":-11.74} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: audio.sfx.gain_db_default — 출력이 임시값과 같아도 레퍼런스와 같다… |
 
 ### 사건과의 시차
 
@@ -324,8 +328,8 @@
 |---|---|---|---|---|---|---|
 | 효과음 [fx1] 사건과의 시차 (창가 남성이 일어서기 시작함(확대 시) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":1.3,"max_abs_offset":0.3} | {"sfx_t":1.2522,"offset":-0.048} | 같다 | 아니오 | t=1.25s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
 | 효과음 [fx2] 사건과의 시차 (다시 앉은 순간 화면이 멈춤) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":6.8,"max_abs_offset":0.3} | {"sfx_t":6.8,"offset":0.0} | 같다 | 아니오 | t=6.80s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
-| 효과음 [fx3] 사건과의 시차 (뒷줄 남성이 손을 들어 올림) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":7.75,"max_abs_offset":0.3} | {"sfx_t":7.75,"offset":0.0} | 같다 | 아니오 | t=7.75s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
-| 효과음 [fx4] 사건과의 시차 (뒷줄 남성이 자리에서 일어섬) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":11.0,"max_abs_offset":0.3} | {"sfx_t":10.9357,"offset":-0.064} | 같다 | 아니오 | t=10.94s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
+| 효과음 [fx3] 사건과의 시차 (뒷줄 남성이 손을 들어 올림) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":7.75,"max_abs_offset":0.3} | {"sfx_t":7.7501,"offset":0.0} | 같다 | 아니오 | t=7.75s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
+| 효과음 [fx4] 사건과의 시차 (뒷줄 남성이 자리에서 일어섬) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":11.0,"max_abs_offset":0.3} | {"sfx_t":10.9,"offset":-0.1} | 같다 | 아니오 | t=10.90s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
 | 효과음 [fx5] 사건과의 시차 (두 사람이 동시에 고개를 옆으로 기울) | {"audio.sfx.max_event_offset_s":"해당 없음(rule)"} | {"event_t":15.05,"max_abs_offset":0.3} | {"sfx_t":15.0,"offset":-0.05} | 같다 | 아니오 | t=15.00s 사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정 |
 
 ### 사건 없는 효과음 0
@@ -339,8 +343,8 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 통합 음량(LUFS)·트루피크 | 못 잼 | {"integrated_lufs":-14.0,"true_peak_db":-1.5} | {"integrated_lufs":-14.4,"lra":4.4,"true_peak_db":-1.8} | 같다 | 아니오 | — |
-| 음량 (레퍼런스 대비) | 못 잼 | {"audio.loudness.integrated_lufs":-14.0,"audio.loudness.true_peak_db":-1.5} | {"integrated_lufs":-14.4} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: audio.loudness.integrated_lufs, audio.loudness.tr… |
+| 통합 음량(LUFS)·트루피크 | 못 잼 | {"integrated_lufs":-14.0,"true_peak_db":-1.5} | {"integrated_lufs":-14.9,"lra":2.0,"true_peak_db":-2.0} | 같다 | 아니오 | — |
+| 음량 (레퍼런스 대비) | 못 잼 | {"audio.loudness.integrated_lufs":-14.0,"audio.loudness.true_peak_db":-1.5} | {"integrated_lufs":-14.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: audio.loudness.integrated_lufs, audio.loudness.tr… |
 
 ### 구성·표지
 
@@ -349,7 +353,7 @@
 | 영상 길이 | — | 21.25 | 21.267 | 같다 | 아니오 | — |
 | 영상 길이 (레퍼런스 분포 대비) | 못 잼 | {"structure.duration_s.p10":null,"structure.duration_s.p50":null,"structure.duration_s.p9… | {"duration":21.27} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: structure.duration_s.p10, structure.duration_s.p5… |
 | 첫 자막 시각 (레퍼런스 대비) | 못 잼 | {"structure.first_caption_at_s":0.0} | {"first_caption_at_s":0.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와… |
-| 표지 프레임에 제목 문구 표시 | 못 잼 | {"t":0.0,"text":"교실과 벽 앞, 사람들의 움직임","role":"title"} | {"ocr":"움직임 테스트 영상","similarity":0.3,"role_caption_visible":true} | 다르다 (참고) | 아니오 | t=0.00s |
+| 표지 프레임에 제목 문구 표시 | 못 잼 | {"t":0.0,"text":"움직임 테스트 영상","role":"title"} | {"ocr":"움직임 테스트 영상","similarity":1.0,"role_caption_visible":true} | 같다 (참고) | 아니오 | t=0.00s |
 | 표지 구성 (레퍼런스 대비) | 못 잼 | {"cover.source":"first_frame","cover.text_role":"title"} | {"text_role_visible":true} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스… |
 
 ## 못 잼 항목과 이유
@@ -357,6 +361,7 @@
 - 화면 해상도·프레임레이트 (레퍼런스 대비) (`canvas.format:format_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.width, canvas.height, canvas.fps — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 영상 영역 (레퍼런스 대비) (`canvas.video_region:region_ref`): 레퍼런스 미측정(임시값) 키 5개: canvas.video_region.x, canvas.video_region.y, canvas.video_region.w, canvas.video_region.h, canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.background.type, canvas.background.color, canvas.background.blur_sigma — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+- **필수** 자막 글꼴 [c_sit3·situation] "뒷줄 남성이 손을 든다" (`caption.font:c_sit3`): 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.963 < 천장 p10 0.966; 차순위 대비 차이 +0.051 > 잡음 0.006; 글자별 검사 통과 — 제작 영향: 글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음
 - 자막 이모지 사용 (`caption.tone:emoji`): 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 제작 영향: 자막 문구·말투를 확인하지 못함
 - 자막 위치 [description] (레퍼런스 대비) (`caption.position:description_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.description.anchor.x, text.roles.description.anchor.y, text.roles.description.anchor.align, text.roles.description.anchor.valign, text.roles.description.max_width_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [description] (레퍼런스 대비) (`caption.size:description_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.description.size_px, text.roles.description.line_spacing, text.roles.description.max_lines, text.roles.description.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
@@ -401,8 +406,9 @@
 - 장식 스타일 [arrow] (레퍼런스 대비) (`decor.position:d_arrow_ref`): 레퍼런스 미측정(임시값) 키 5개: decorations.arrow.color, decorations.arrow.size_px, decorations.arrow.outline_px, decorations.arrow.outline_color, decorations.arrow.blink_hz — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화살표·원 등 장식 스타일 불일치
 - 레퍼런스 로고 템플릿 없음 (`identity.logo_templates:all`): 레퍼런스 로고 템플릿이 없어 로고 대조 못 함(레퍼런스 미확보) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
 - 레퍼런스와 같은 녹화(영상) 재사용 없음 (`identity.reference_footage:all`): 레퍼런스 영상 지문(exclusions.jsonl reference_footage) 없음 → 같은 녹화 여부 못 잼 (URL 규칙만 확인) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
-- 얼굴 가림(얼굴 검출) (`cover_up.faces:detector`): 얼굴 검출기 없음: 이 OpenCV 빌드(cv2 5.0.0)에는 Haar cascade(CascadeClassifier/cv2.data)가 없고, 얼굴 모델 파일(assets/models/face_detection_yunet*.onnx 또는 $SHORTKIT_FACE_MODEL)도 없음 — plan 보호 영역 검사로 대체 — 제작 영향: 얼굴·손·핵심 물체를 가리는지 확인하지 못함
-- BGM 곡·버전·속도·구간 (레퍼런스 대비) (`audio.bgm:bgm_ref`): 레퍼런스 미측정(임시값) 키 9개: audio.bgm.track_id, audio.bgm.title, audio.bgm.version, audio.bgm.tempo_ratio, audio.bgm.section_start_s, audio.bgm.gain_db … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 곡 식별(제목·버전·속도·구간)이 필요 — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+- 원본 오버레이 검출 기록 [v_class] (`clean.residual:prov:v_class`): 출처 기록 없음(warehouse/overlays/7ca6f09cb32c….json) — `python -m shortkit clean detect --source assets/test/generated/classroom_voice.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- 원본 오버레이 검출 기록 [v_pair] (`clean.residual:prov:v_pair`): 출처 기록 없음(warehouse/overlays/650166430c4b….json) — `python -m shortkit clean detect --source assets/test/generated/video/head-pose-face-detection-female-and-male.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- BGM 곡·버전·속도·구간 (레퍼런스 대비) (`audio.bgm:bgm_ref`): 레퍼런스 미측정(임시값) 키 9개: audio.bgm.track_id, audio.bgm.title, audio.bgm.version, audio.bgm.tempo_ratio, audio.bgm.section_start_s, audio.bgm.gain_db … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. audio_bgm.is_match: 곡(track_id/제목)·버전·속도·구간이 모두 레퍼런스와 같아야 같다; 계획이 파일 경로로 BGM 을 지정해 라이브러리 곡 id 가 없음 → 곡 일치는 못 잼 — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
 - 덕킹 깊이·속도 (레퍼런스 대비) (`audio.ducking:ducking_ref`): 레퍼런스 미측정(임시값) 키 3개: audio.ducking.depth_db, audio.ducking.attack_s, audio.ducking.release_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
 - 보존 원음 크기·경계 (레퍼런스 대비) (`audio.original:orig_ref`): 레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 보존 원음 크기 불일치
 - 효과음 종류별 개수 (레퍼런스 포맷 범위 대비) (`audio.sfx.count:catalog`): sfx_catalog.json 미측정: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
@@ -417,9 +423,7 @@
 - `episodes/test-pipeline-001/qa/compare_sheet_p02.png`
 
 ## 결함 기록 (defects.jsonl)
-- 열림 8 / 이번에 해결 확인 2 / 재발 0 / 새로 등록 0
-- 같은 검사 재확인: test-qa-bad: audio.sfx.count=problem, audio.sfx.no_event=problem, audio.sfx.placement=ok, caption.font=problem, cover.frame=ok
-- 같은 검사 재확인: test-qa-good: audio.sfx.count=ok, audio.sfx.no_event=ok, audio.sfx.placement=ok, caption.font=problem, cover.frame=ok
+- 열림 7 / 이번에 해결 확인 3 / 재발 0 / 새로 등록 2
 
 ---
 판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음). 레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.

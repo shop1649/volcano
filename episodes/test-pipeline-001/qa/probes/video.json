@@ -21,8 +21,8 @@
           "type": "cut",
           "t": 4.0,
           "dur": 0.0,
-          "score": 38.48,
-          "diff": 41.34
+          "score": 39.09,
+          "diff": 41.33
         },
         "type_ok": true,
         "timing_ok": true
@@ -77,8 +77,8 @@
       }
     ],
     "diff_stats": {
-      "p50": 0.251,
-      "p90": 0.933
+      "p50": 0.246,
+      "p90": 0.935
     }
   },
   "freezes": {
@@ -86,10 +86,10 @@
     "min_frames": 6,
     "runs": [
       {
-        "start": 6.8,
+        "start": 6.7667,
         "end": 7.4667,
-        "frames": 20,
-        "mean_diff": 0.0107
+        "frames": 21,
+        "mean_diff": 0.0132
       }
     ],
     "expected": [
@@ -99,10 +99,10 @@
         "end": 7.5,
         "hold": 0.7,
         "observed": {
-          "start": 6.8,
+          "start": 6.7667,
           "end": 7.4667,
-          "frames": 20,
-          "mean_diff": 0.0107
+          "frames": 21,
+          "mean_diff": 0.0132
         },
         "start_ok": true,
         "hold_ok": true,
@@ -118,7 +118,7 @@
         "clip_id": "s1",
         "n_samples": 119,
         "n_rejected_low_inliers": 0,
-        "median_inliers": 136.0,
+        "median_inliers": 143.0,
         "expected": {
           "scale_from": 1.0,
           "scale_to": 1.25,
@@ -157,11 +157,11 @@
           ],
           [
             0.4,
-            1.0
+            1.0001
           ],
           [
             0.467,
-            0.9998
+            0.9999
           ],
           [
             0.533,
@@ -169,11 +169,11 @@
           ],
           [
             0.6,
-            1.0
+            0.9999
           ],
           [
             0.667,
-            1.0001
+            1.0
           ],
           [
             0.733,
@@ -181,7 +181,7 @@
           ],
           [
             0.8,
-            0.9999
+            0.9998
           ],
           [
             0.867,
@@ -189,19 +189,19 @@
           ],
           [
             0.933,
-            0.9999
-          ],
-          [
-            1.0,
-            0.9999
-          ],
-          [
-            1.067,
             0.9998
           ],
           [
+            1.0,
+            0.9998
+          ],
+          [
+            1.067,
+            0.9997
+          ],
+          [
             1.133,
-            1.0
+            0.9999
           ],
           [
             1.2,
@@ -209,43 +209,43 @@
           ],
           [
             1.267,
-            1.0012
+            1.0004
           ],
           [
             1.333,
-            1.0664
+            1.0652
           ],
           [
             1.4,
-            1.1611
+            1.1563
           ],
           [
             1.467,
-            1.2166
+            1.219
           ],
           [
             1.533,
-            1.2423
+            1.241
           ],
           [
             1.6,
-            1.2469
+            1.2517
           ],
           [
             1.667,
-            1.2479
+            1.2482
           ],
           [
             1.733,
-            1.2508
+            1.2497
           ],
           [
             1.8,
-            1.2478
+            1.2489
           ],
           [
             1.867,
-            1.2487
+            1.25
           ],
           [
             1.933,
@@ -253,35 +253,35 @@
           ],
           [
             2.0,
-            1.2495
+            1.2508
           ],
           [
             2.067,
-            1.2495
+            1.2475
           ],
           [
             2.133,
-            1.2443
+            1.2452
           ],
           [
             2.2,
-            1.245
+            1.2474
           ],
           [
             2.267,
-            1.2523
+            1.2462
           ],
           [
             2.333,
-            1.2465
+            1.2484
           ],
           [
             2.4,
-            1.247
+            1.2442
           ],
           [
             2.467,
-            1.2467
+            1.2472
           ],
           [
             2.533,
@@ -289,27 +289,27 @@
           ],
           [
             2.6,
-            1.2513
+            1.2496
           ],
           [
             2.667,
-            1.249
+            1.2494
           ],
           [
             2.733,
-            1.2487
+            1.2484
           ],
           [
             2.8,
-            1.2478
+            1.251
           ],
           [
             2.867,
-            1.2477
+            1.252
           ],
           [
             2.933,
-            1.2488
+            1.2491
           ],
           [
             3.0,
@@ -317,78 +317,78 @@
           ],
           [
             3.067,
-            1.2486
+            1.2513
           ],
           [
             3.133,
-            1.2494
+            1.2483
           ],
           [
             3.2,
-            1.2525
+            1.2516
           ],
           [
             3.267,
-            1.2517
+            1.2514
           ],
           [
             3.333,
-            1.2499
-          ],
-          [
-            3.4,
-            1.2504
-          ],
-          [
-            3.467,
-            1.2553
-          ],
-          [
-            3.533,
-            1.2499
-          ],
-          [
-            3.6,
-            1.2505
-          ],
-          [
-            3.667,
-            1.2498
-          ],
-          [
-            3.733,
-            1.2493
-          ],
-          [
-            3.8,
             1.2492
           ],
           [
+            3.4,
+            1.2506
+          ],
+          [
+            3.467,
+            1.2523
+          ],
+          [
+            3.533,
+            1.2524
+          ],
+          [
+            3.6,
+            1.2507
+          ],
+          [
+            3.667,
+            1.2516
+          ],
+          [
+            3.733,
+            1.2514
+          ],
+          [
+            3.8,
+            1.2501
+          ],
+          [
             3.867,
-            1.2494
+            1.2484
           ],
           [
             3.933,
-            1.25
+            1.2495
           ]
         ],
-        "measured_final_ratio": 1.2499,
-        "measured_max_dev": 0.2531,
-        "measured_spread": 0.0017,
+        "measured_final_ratio": 1.2506,
+        "measured_max_dev": 0.2516,
+        "measured_spread": 0.0015,
         "expected_final_ratio": 1.25,
-        "max_abs_err": 0.0057,
+        "max_abs_err": 0.0058,
         "measured_t50": 1.4,
         "expected_t50": 1.374,
         "measured_dur": 0.357,
         "measured_zoom_start": 1.294,
         "measured_ease": "out",
-        "ease_fit_rmse": 0.0084,
+        "ease_fit_rmse": 0.0092,
         "measured_center_canvas": [
-          731.9,
-          971.3
+          731.0,
+          970.9
         ],
         "source_ratio": 1.0001,
-        "zoom_ratio_corrected": 1.2497,
+        "zoom_ratio_corrected": 1.2504,
         "status": "measured",
         "tolerance": {
           "ratio": 0.04,
@@ -399,7 +399,7 @@
         "clip_id": "s2",
         "n_samples": 99,
         "n_rejected_low_inliers": 0,
-        "median_inliers": 356.0,
+        "median_inliers": 354.0,
         "curve": [
           [
             4.067,
@@ -415,19 +415,19 @@
           ],
           [
             4.267,
-            0.9996
+            0.9995
           ],
           [
             4.333,
-            1.0001
+            0.9999
           ],
           [
             4.4,
-            1.0001
+            0.9992
           ],
           [
             4.467,
-            0.9997
+            0.9999
           ],
           [
             4.533,
@@ -435,35 +435,35 @@
           ],
           [
             4.6,
-            0.9997
+            0.9995
           ],
           [
             4.667,
-            0.9998
+            0.9993
           ],
           [
             4.733,
-            0.9992
+            0.9998
           ],
           [
             4.8,
-            0.9996
+            0.9993
           ],
           [
             4.867,
-            0.9997
+            0.9994
           ],
           [
             4.933,
-            0.9997
+            0.9999
           ],
           [
             5.0,
-            0.9999
+            1.0
           ],
           [
             5.067,
-            0.9999
+            0.9996
           ],
           [
             5.133,
@@ -471,23 +471,23 @@
           ],
           [
             5.2,
-            0.9999
+            1.0
           ],
           [
             5.267,
-            0.9998
+            1.0
           ],
           [
             5.333,
-            1.0
+            1.0002
           ],
           [
             5.4,
-            1.0
+            1.0002
           ],
           [
             5.467,
-            1.0001
+            1.0002
           ],
           [
             5.533,
@@ -495,15 +495,15 @@
           ],
           [
             5.6,
-            1.0003
+            1.0002
           ],
           [
             5.667,
-            1.0001
+            1.0002
           ],
           [
             5.733,
-            1.0001
+            1.0
           ],
           [
             5.8,
@@ -511,11 +511,11 @@
           ],
           [
             5.867,
-            1.0
+            0.9999
           ],
           [
             5.933,
-            0.9999
+            1.0
           ],
           [
             6.0,
@@ -523,11 +523,11 @@
           ],
           [
             6.067,
-            0.9995
+            0.9999
           ],
           [
             6.133,
-            0.9992
+            0.9998
           ],
           [
             6.2,
@@ -535,15 +535,15 @@
           ],
           [
             6.267,
-            0.9997
-          ],
-          [
-            6.333,
             0.9996
           ],
           [
+            6.333,
+            0.9997
+          ],
+          [
             6.4,
-            0.9998
+            0.999
           ],
           [
             6.467,
@@ -555,60 +555,60 @@
           ],
           [
             6.6,
-            0.9995
+            0.9997
           ],
           [
             6.667,
-            0.9996
+            0.9997
           ],
           [
             6.733,
-            0.9984
+            0.9997
           ],
           [
             6.8,
-            0.9994
+            0.9996
           ],
           [
             6.867,
-            0.9994
+            0.9996
           ],
           [
             6.933,
-            0.9994
+            0.9996
           ],
           [
             7.0,
-            0.9994
+            0.9996
           ],
           [
             7.067,
-            0.9994
+            0.9996
           ],
           [
             7.133,
-            0.9994
+            0.9996
           ],
           [
             7.2,
-            0.9994
+            0.9996
           ],
           [
             7.267,
-            0.9994
+            0.9996
           ],
           [
             7.333,
-            0.9989
+            0.9996
           ]
         ],
-        "measured_final_ratio": 0.9994,
-        "measured_max_dev": 0.0011,
-        "measured_spread": 0.0003,
+        "measured_final_ratio": 0.9996,
+        "measured_max_dev": 0.0005,
+        "measured_spread": 0.0002,
         "expected_final_ratio": 1.0,
-        "max_abs_err": 0.0016,
+        "max_abs_err": 0.001,
         "source_ratio": 0.9994,
-        "zoom_ratio_corrected": 1.0,
+        "zoom_ratio_corrected": 1.0002,
         "status": "measured",
         "tolerance": {
           "ratio": 0.04,
@@ -1671,7 +1671,7 @@
             "t": 0.84,
             "expected_src_t": 2.34,
             "matched_src_t": 2.3,
-            "ncc": 0.964,
+            "ncc": 0.966,
             "ncc_moving": 0.941,
             "offset": -0.04,
             "prominence": 0.0031,
@@ -1683,10 +1683,10 @@
             "t": 2.0,
             "expected_src_t": 3.5,
             "matched_src_t": 3.533,
-            "ncc": 0.969,
+            "ncc": 0.971,
             "ncc_moving": 0.962,
             "offset": 0.033,
-            "prominence": 0.1572,
+            "prominence": 0.1567,
             "moving_frac": 0.149,
             "at_window_edge": false,
             "decisive": true
@@ -1695,10 +1695,10 @@
             "t": 3.16,
             "expected_src_t": 4.66,
             "matched_src_t": 4.633,
-            "ncc": 0.969,
+            "ncc": 0.971,
             "ncc_moving": 0.979,
             "offset": -0.027,
-            "prominence": 0.1055,
+            "prominence": 0.1056,
             "moving_frac": 0.15,
             "at_window_edge": false,
             "decisive": true
@@ -1749,7 +1749,7 @@
             "ncc": 0.979,
             "ncc_moving": 0.963,
             "offset": 0.04,
-            "prominence": 0.0262,
+            "prominence": 0.0263,
             "moving_frac": 0.15,
             "at_window_edge": false,
             "decisive": false
@@ -1866,6 +1866,31 @@
   "residual": {
     "items": [],
     "clean_verify_available": true
+  },
+  "provenance": {
+    "status": "measured",
+    "sources": [
+      {
+        "source_id": "v_class",
+        "path": "assets/test/generated/classroom_voice.mp4",
+        "sha256": "7ca6f09cb32cf87c942cd9b56d5067a3ee48817629f4c576ef706515292a2533",
+        "sha256_from": "plan sources[].sha256",
+        "items": [],
+        "record": null,
+        "status": "no_record",
+        "reason": "출처 기록 없음(warehouse/overlays/7ca6f09cb32c….json) — `python -m shortkit clean detect --source assets/test/generated/classroom_voice.mp4`"
+      },
+      {
+        "source_id": "v_pair",
+        "path": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4",
+        "sha256": "650166430c4bf9ddc470ac17a86d1fcbd6d76c64e60ed73675fdc6b3e3d3af38",
+        "sha256_from": "plan sources[].sha256",
+        "items": [],
+        "record": null,
+        "status": "no_record",
+        "reason": "출처 기록 없음(warehouse/overlays/650166430c4b….json) — `python -m shortkit clean detect --source assets/test/generated/video/head-pose-face-detection-female-and-male.mp4`"
+      }
+    ]
   },
   "protected": [
     {
@@ -2263,8 +2288,124 @@
     "fps": 30.0
   },
   "faces": {
-    "detector": null,
-    "status": "unmeasured",
-    "reason": "얼굴 검출기 없음: 이 OpenCV 빌드(cv2 5.0.0)에는 Haar cascade(CascadeClassifier/cv2.data)가 없고, 얼굴 모델 파일(assets/models/face_detection_yunet*.onnx 또는 $SHORTKIT_FACE_MODEL)도 없음"
+    "detector": "shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))",
+    "status": "measured",
+    "frames": 6,
+    "sample_times": [
+      0.833,
+      1.833,
+      2.833,
+      3.833,
+      15.567,
+      16.567
+    ],
+    "sample_fps_max": 1.0,
+    "covered": [],
+    "unsampled_captions": [],
+    "faces": [
+      {
+        "t": 0.833,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              360.0,
+              795.5,
+              137.2,
+              137.2
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 1.833,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              2.2,
+              1000.2,
+              58.5,
+              58.5
+            ],
+            "from": "output"
+          },
+          {
+            "rect": [
+              260.8,
+              749.9,
+              175.6,
+              175.6
+            ],
+            "from": "source"
+          }
+        ]
+      },
+      {
+        "t": 2.833,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              258.8,
+              746.0,
+              180.0,
+              180.0
+            ],
+            "from": "output"
+          },
+          {
+            "rect": [
+              173.2,
+              932.8,
+              49.5,
+              49.5
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 3.833,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              168.8,
+              930.5,
+              54.0,
+              54.0
+            ],
+            "from": "output"
+          },
+          {
+            "rect": [
+              261.0,
+              746.0,
+              180.0,
+              180.0
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 15.567,
+        "clip_id": "s4",
+        "faces": []
+      },
+      {
+        "t": 16.567,
+        "clip_id": "s4",
+        "faces": []
+      }
+    ],
+    "resolution": [
+      1080,
+      1920
+    ],
+    "min_face_px_canvas": 45.0,
+    "method": "얼굴: 출력 프레임 + 같은 순간의 소스 프레임(자막이 덮은 얼굴은 출력에서 안 보임)을 캔버스 좌표로 옮겨 검출; 자막 상자: 출력에서 측정"
   }
 }
