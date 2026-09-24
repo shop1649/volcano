@@ -39,8 +39,8 @@ RESTORE_SNIPPET = r'''python3 - "PRESET_BUNDLE.md" "shortkit-preset" <<'PY'
 import base64, hashlib, io, re, sys, tarfile, pathlib
 md, dest = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
 text = md.read_text(encoding="utf-8")
-b = text.index("<!-- SHORTKIT-PAYLOAD-BEGIN"); b = text.index("\n", b) + 1
-e = text.index("<!-- SHORTKIT-PAYLOAD-END -->")
+b = text.rindex("<!-- SHORTKIT-PAYLOAD-" + "BEGIN"); b = text.index("\n", b) + 1   # last marker = the real one
+e = text.rindex("<!-- SHORTKIT-PAYLOAD-" + "END -->")
 raw = base64.b64decode("".join(text[b:e].split()))
 want = re.search(r"payload_sha256: ([0-9a-f]{64})", text).group(1)
 got = hashlib.sha256(raw).hexdigest()
@@ -126,9 +126,7 @@ def cmd_build(args) -> int:
 
 def extract(md_path: Path, dest: Path) -> int:
     text = md_path.read_text(encoding="utf-8")
-    b = text.index("\n", text.index(BEGIN)) + 1
-    e = text.index(END)
-    raw = base64.b64decode("".join(text[b:e].split()))
+    raw = _payload(text)
     want = _payload_sha(text)
     got = hashlib.sha256(raw).hexdigest()
     if got != want:
@@ -146,6 +144,15 @@ def extract(md_path: Path, dest: Path) -> int:
     return len(members)
 
 
+def _payload(text: str) -> bytes:
+    # the LAST marker pair is the real one (the restore snippet above quotes the marker names)
+    b = text.index("\n", text.rindex(BEGIN)) + 1
+    e = text.rindex(END)
+    if e < b:
+        raise ValueError("payload markers out of order")
+    return base64.b64decode("".join(text[b:e].split()))
+
+
 def _payload_sha(text: str) -> str:
     m = re.search(r"payload_sha256: ([0-9a-f]{64})", text)
     if not m:
@@ -161,9 +168,7 @@ def cmd_restore(args) -> int:
 
 def cmd_verify(args) -> int:
     text = Path(args.md).read_text(encoding="utf-8")
-    b = text.index("\n", text.index(BEGIN)) + 1
-    e = text.index(END)
-    raw = base64.b64decode("".join(text[b:e].split()))
+    raw = _payload(text)
     want = _payload_sha(text)
     ok = hashlib.sha256(raw).hexdigest() == want
     print("payload sha256", "OK" if ok else "MISMATCH")
