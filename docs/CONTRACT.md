@@ -1,0 +1,215 @@
+# shortkit — implementation contract (for every agent that writes code here)
+
+This file is the single source of truth for interfaces between modules. Read it fully before
+writing code. If you need a change to a shared interface, do NOT edit another module's files:
+describe the change under "REQUESTED SHARED CHANGES" in your final report.
+
+## 0. What the system is for
+
+A reusable production system (not a report) that makes YouTube Shorts with the *same editing
+structure* as a reference channel (https://youtube.com/@joshuamagazine) using *different
+footage*:
+
+    new-source discovery → selection → script & cut plan → edit/render → output QA
+
+Hard rules from the user (verbatim intent; they are acceptance criteria):
+- Never fill an unmeasured item with a guess or call it done. Everything that could not be
+  measured is status `unmeasured` (Korean label **못 잼**) with its production impact.
+- Numeric measurements: `{n, p10, p50, p90}` overall AND per format (`shortkit.util.stats`).
+- Screen/text coordinates are always stored with the resolution they refer to.
+- Presence items (motion, transitions, BGM, original audio…): `present/absent/unmeasured`
+  (있다/없다/못 잼).
+- Every setting links: evidence (video, time) → measured value → production-code setting →
+  output check. No setting may exist only in a report (enforced by `shortkit preset audit`).
+- Fixed style lives in the preset; per-episode coordinates/times live in the episode plan.
+- Footage must be different recordings from the reference's; never reproduce the reference
+  channel's name/logo/identity marks.
+- Captions: written only after actually watching/listening; short natural Korean; never invent
+  relations/motives/lines not in the footage; separate roles: title / description / situation /
+  speaker (person id) / dialogue (real line) / reaction; do not pre-announce the twist; never
+  cover faces/hands/key objects; trim meaningless tails but never cut an important action; do
+  not stack the same effect repeatedly or repeat to pad length.
+- Audio: BGM identified by title AND version AND speed AND used section; a different part of
+  the same song is NOT a match; use a clean music file (never the stem separated from the
+  reference). Original sound OFF by default; keep only important lines / a person speaking.
+  Remove music already embedded in the source (separate, then check quality). Duck BGM only
+  under kept dialogue; no ducking where original audio is off; SFX or cuts are never a reason to
+  duck. Never claim a listening check that was not done.
+- SFX: placed because of an on-screen *event*, never because of a cut. Per-episode counts and
+  type distribution must fall in the format's observed range; SFX without an event = 0;
+  |sfx.t − event.t| ≤ 0.3 s.
+- Source overlays: no original logo / source overlay / foreign-language burned subtitles in
+  the final frame (check top-left/top-right and inner cuts). Order: clean original → crop →
+  local restoration. Never crop away the important person/action. Keep provenance records.
+- First episode: proposal (source, segment sheet, cover text, 3 title candidates, SFX sheet)
+  must be approved before rendering; later episodes need no re-approval.
+- QA on the final MP4 only (never "the code/timeline is right so the output is right").
+  Same-absolute-time 1-second grid reference vs ours; caption strip; under it a 0.5-second SFX
+  strip. Table: 같다/다르다/못 잼, intended changes marked separately. Unmeasured never becomes
+  complete.
+
+### Environment facts (this build machine, 2026-09-24)
+- Network policy blocks youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com,
+  reddit.com, lens.google.com, namu.wiki, freesound.org, pixabay.com, dl.fbaipublicfiles.com
+  (Demucs weights), huggingface.co, archive.org. Allowed: github.com / raw.githubusercontent.com
+  (public repos), pypi, npm, ubuntu apt.
+- Therefore: code that talks to those platforms must be written against their documented
+  formats (yt-dlp info-dict fields, Reddit JSON, YouTube Data API v3) and unit-tested with
+  **clearly labelled synthetic fixtures**; mark such paths "not live-tested here". Never try to
+  route around the block (no mirrors/proxies/Invidious etc.).
+- Installed: Python 3.11, ffmpeg 6.1.1 (libass, libx264, xfade, delogo, zoompan, loudnorm,
+  rubberband, sidechaincompress), melt 7.22 (affine, freeze, volume, qtblend, avfilter.subtitles,
+  avfilter.ass, kdenlivetitle), tesseract 5 (kor, eng), fpcalc (chromaprint), espeak-ng (ko),
+  sox, Korean fonts (Noto Sans CJK KR all weights, Nanum*), numpy/scipy/opencv-headless/pillow/
+  pyyaml/jsonschema/yt-dlp/pytesseract/opentimelineio/imagehash/pytest. NOT installed: torch,
+  demucs (weights host blocked). 4 CPUs, no GPU.
+- Candidate OFL Korean fonts (sha256-pinned) are cached in `/home/user/fontcache` on this
+  machine only; code must fetch them via a manifest (see §7), never hard-code that path.
+
+## 1. Conventions
+- Package `shortkit` (Python ≥3.10). CLI `python -m shortkit <area> <cmd>`; each area
+  implements `register(parser)` in `shortkit/<area>/cli.py` (see `shortkit/cli.py`).
+- Paths: stored paths are root-relative POSIX (`shortkit.paths.relp/absp`). Never write
+  absolute paths, user names or machine-specific locations to any stored file.
+- JSON/YAML I/O via `shortkit.util.jsonio`; media via `shortkit.util.media` (probe, read_audio,
+  write_wav, read_frames, iter_frames, lufs, ffmpeg); hashing via `shortkit.util.hashing`.
+- Stats via `shortkit.util.stats` (`pstats`, `pstats_by_group`, `categorical`, `tri_state`,
+  labels `TRI_KO`, `QA_KO`).
+- Preset access: `shortkit.config.load_preset(name, format_id)` → `Preset`. **Read style values
+  only through `preset.get("a.b.c")` / `preset.section("a.b")`** — reads are traced to the
+  calling function and become the registry's `code` link. Do not read preset.yaml directly.
+- Status vocab (stored English, reported Korean):
+  measurement `measured|unmeasured`; presence `present|absent|unmeasured`;
+  QA `same|different|unmeasured`; sfx map `have|none|unmeasured` (있음/없음/못 잼).
+- Timestamps: UTC ISO-8601 (`jsonio.now_iso()`); times in media are float seconds.
+- Output text for humans (reports, tables, CLI summaries) is Korean. Code/comments English.
+- Tests: `tests/<area>/test_*.py` (pytest). Heavy ones marked `@pytest.mark.slow`. Tests must
+  create their own temporary project root when they write files (copy `shortkit.root` marker
+  into `tmp_path` and set `SHORTKIT_ROOT`), or write only under `assets/test/generated/` /
+  `episodes/_pytest_*`. Test media: run `python -m shortkit testassets synth`,
+  `... fetch-video --local-dir /home/user/intel-iot-devkit/sample-videos`, `... dirty-source`
+  (already done on this machine: `assets/test/generated/`).
+- Do not run `git commit/checkout/stash/reset`. Do not edit files outside your ownership list.
+
+## 2. Preset layers and registry (implemented: `shortkit/config.py`, `shortkit/preset_cli.py`)
+`presets/<name>/preset.yaml` (base, PROVISIONAL) ← `measured.yaml` (generated from
+`measurements/*.json`) ← `requested_changes.yaml` (user-requested changes, `changes:` subtree).
+`settings_registry.yaml` is generated by `shortkit preset sync`.
+
+### Measurement file format — `presets/<name>/measurements/<group>.json`
+```json
+{"schema": "shortkit.measurement/1", "group": "text_layout", "source_snapshot": "<latest100 captured_at>",
+ "items": [
+  {"key": "text.roles.title.size_px", "status": "measured|unmeasured", "value": 84,
+   "unit": "px", "resolution": [1080, 1920],
+   "overall": {"n": 37, "p10": 80, "p50": 84, "p90": 90},
+   "by_format": {"F1": {"n": 20, "p10": 80, "p50": 84, "p90": 88, "value": 84}},
+   "evidence": [{"video_id": "abc", "t": 1.0, "value": 84, "frame": "presets/.../frames/abc_0001.png"}],
+   "method": "OCR bbox cap-height → px", "measured_at": "…", "blocker": null}
+ ]}
+```
+`value` is what production uses (numeric: p50 unless the method says otherwise; categorical:
+mode). `shortkit preset apply-measurements` writes these into `measured.yaml`.
+
+### QA check declarations
+`shortkit/qa/checks.py` must expose `declarations() -> dict[check_id, list[preset-key glob]]`
+so the registry links each style key to the checks that verify it in the output MP4.
+
+## 3. Episode plan — `episodes/<episode_id>/plan.yaml`
+JSON Schema: `shortkit/schema/plan.schema.json` (authoritative). Key points:
+- `sources[]`: root-relative path + sha256 + warehouse_id; `clean` ops in SOURCE px/time;
+  `protected` rects (faces/hands/objects) in SOURCE px/time.
+- `timeline[]`: ordered segments (src_in/src_out/speed/zoom/freeze/transition_in/original_audio).
+  Output times are derived by the resolver. Crossfade overlaps the previous clip by `dur`.
+- `captions[]`: OUTPUT time; role ∈ title/description/situation/speaker/dialogue/reaction;
+  `pos` optional canvas-px override; `grounding` = what in the footage supports the line.
+- `decorations[]`: arrow/circle/box with keyframes (t relative to decoration start).
+- `sfx[]`: type (catalog id), t (OUTPUT), `event {t, desc, kind…}` (required; kind ≠ "cut").
+- `bgm`: overrides + `silences` (intentional silence ranges).
+- `reveal {t, keywords}`: captions starting before t must not contain the keywords.
+- `approval`: first episode (`episode_index: 1`, mode production) must be approved before
+  `shortkit episode render`; test mode never needs approval.
+
+## 4. ResolvedEdit IR — `shortkit/edit/ir.py` (authoritative)
+`resolve(plan, preset) -> ResolvedEdit`, saved to `episodes/<id>/build/resolved.json`.
+Renderer, exporters and QA consume only this IR (+ the output files). Captions and decorations
+are rendered by libass from ONE ASS file (`ass_path`) so ffmpeg and MLT draw identical text.
+
+## 5. Episode folder layout
+```
+episodes/<id>/plan.yaml
+episodes/<id>/proposal.md                 # first-episode approval sheet
+episodes/<id>/build/{resolved.json, captions.ass, preset_access.json, *.wav}
+episodes/<id>/output/<id>.mp4             # master render (ffmpeg)
+episodes/<id>/project/{<id>.mlt, <id>.fcpxml, <id>.otio, captions.ass, captions.srt, README.md}
+episodes/<id>/qa/{report.json, report.md, compare_sheet.png, defects.jsonl, probes/*.json}
+```
+
+## 6. Reference data — `presets/<name>/`
+```
+reference/latest100.json      snapshot (fixed at analysis time): rank, video_id, url, title,
+                              published_at/upload_date, duration, view_count,
+                              view_count_checked_at, kind(short|video); plus status/blocker
+reference/all_videos.json     whole channel listing (reference only; latest100 wins on conflict)
+reference/high_views.json     videos with view_count ≥ 800000 (+ checked_at)
+reference/videos/             downloads (git-ignored), reference/downloads.jsonl (sha256, format)
+analysis/<video_id>/…         per-video analysis outputs
+formats.yaml                  format table (structure vs intro-only variants, representative video)
+measurements/*.json           §2
+sfx_catalog.json              §8
+sfx_map.yaml                  §8
+fonts_report.json             font identification (IoU ceiling + candidates)
+unresolved.md                 unmeasured items, production impact, resolution state
+```
+
+## 7. Fonts
+`assets/fonts/manifest.yaml` lists candidate fonts `{name, file, url, sha256, license}`;
+`shortkit doctor --fetch-fonts` downloads into `assets/fonts/` (git-ignored) and verifies
+sha256. System fonts are found with fontconfig (`fc-match`/`fc-list`) when available.
+
+## 8. SFX catalog and map
+`sfx_catalog.json`:
+```json
+{"schema": "shortkit.sfx_catalog/1", "preset_id": "joshuamagazine-v1", "status": "measured|unmeasured",
+ "blocker": null, "basis": {"videos": ["..."], "n_videos": 50, "separator": "demucs htdemucs"},
+ "types": [{
+   "type_id": "whoosh_a", "label": "휙(스윕)", "class": "edit_sfx|onsite_sound|intentional_silence",
+   "fingerprint": {"method": "...", "centroid": "presets/.../sfx_fp/whoosh_a.npy"},
+   "per_video_count": {"overall": {"n":50,"p10":0,"p50":1,"p90":3}, "by_format": {"F1": {...}}},
+   "prev_caption_role": {"n":…, "counts": {...}, "mode": "reaction"},
+   "screen_event": {"n":…, "counts": {"text_pop": 5, "zoom_in": 3}, "mode": "text_pop"},
+   "emotion": {"n":…, "counts": {"surprise": 4}, "mode": "surprise"},
+   "placement_rule": "…",
+   "offset_to_event_s": {"n":…, "p10":…, "p50":…, "p90":…},
+   "gain_db_rel_mix": {"n":…, "p10":…, "p50":…, "p90":…},
+   "examples": [{"video_id": "…", "t": 12.5}, … at least 3 distinct videos]}]}
+```
+`sfx_map.yaml`: `types: {type_id: {status: have|none|unmeasured, file, similarity, method,
+alternatives, needed_asset}}` + `library_root` (user-provided SFX warehouse; overridable in
+`local.yaml`).
+
+## 9. Source warehouse — `warehouse/`
+`candidates.jsonl` one record per candidate:
+```
+{id, platform, url, title, original_author, original_url, reposter, keywords[],
+ views (int|null), views_checked_at, views_source ('platform_metadata'|'unavailable'),
+ likes (separate; NEVER converted to views), published_at, first_seen_at,
+ duration, width, height, download_path, sha256, reference_overlap {excluded, matched_video_id, method, distance},
+ scores {recency, intensity, reversal, quality, format_fit, total}, selection_reason, status
+ (candidate|selected|rejected|used|excluded), access {platform_status: ok|blocked|login_required|error, note}}
+```
+`exclusions.jsonl` (reference footage fingerprints / URLs), `search_log.jsonl` (every query,
+platform, time, result count, access status), `source_accounts.json` (repeatedly used source
+accounts/keywords traced from the reference).
+
+## 10. QA
+`shortkit qa run --episode <id> [--reference <mp4>]` measures the final MP4 and writes rows:
+```
+{check_id, item (Korean), category, reference, expected, observed, tolerance,
+ status: same|different|unmeasured, intended_change: bool, change_ref, evidence {t, frame}, note}
+```
+Gate passes only when no row is `different` without `intended_change`, required rows are not
+`unmeasured`, SFX-without-event = 0, every SFX within ±0.3 s of its event. Defects go to
+`defects.jsonl` with {id, check_id, found, fix, recheck_same_cases[], final_gate}.
+Compare sheet: 1-second grid at the same absolute times (reference row / ours row), each with a
+caption strip, and under it a 0.5-second SFX strip.

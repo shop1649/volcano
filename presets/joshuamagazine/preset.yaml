@@ -1,0 +1,265 @@
+# ---------------------------------------------------------------------------------------------
+# Preset: joshuamagazine-v1  (레퍼런스: https://youtube.com/@joshuamagazine)
+#
+# !!! 상태: 모든 스타일 값은 PROVISIONAL(임시 기본값) 이다. !!!
+#   2026-09-24 분석 시점에 이 작업 환경의 네트워크 정책이 youtube.com / googlevideo.com /
+#   i.ytimg.com 을 차단(HTTP 403)해서 레퍼런스 영상을 한 편도 받지 못했다. 따라서 아래 값 중
+#   어떤 것도 레퍼런스에서 측정된 값이 아니다. 각 키의 상태·근거·영향은
+#   settings_registry.yaml 에 기록되어 있고, `shortkit preset audit` 이 미측정 키가 남아 있는 한
+#   production 렌더와 QA 최종 관문을 통과시키지 않는다(테스트 모드만 허용).
+#   측정 후 `shortkit preset apply-measurements` 가 measurements/*.json 의 값으로 이 파일을 갱신한다.
+#
+# 규칙
+#   - 좌표·크기는 canvas 해상도(canvas.width x canvas.height) 기준 픽셀.
+#   - 경로는 프로젝트 루트 기준 상대 경로.
+#   - 여기 있는 값은 "고정 스타일". 새 소재마다 다시 판단하는 좌표·시각은 에피소드 plan.yaml 에 둔다
+#     (per_episode 섹션은 무엇을 매번 다시 판단하는지의 목록일 뿐 값이 아니다).
+#   - 원 채널의 채널명·로고·워터마크 등 고유 식별 요소는 복제하지 않는다(identity_exclusions).
+# ---------------------------------------------------------------------------------------------
+preset_id: joshuamagazine-v1
+schema: shortkit.preset/1
+reference:
+  platform: youtube
+  channel_handle: '@joshuamagazine'
+  channel_url: https://youtube.com/@joshuamagazine
+  channel_id_hint: UC_TL4XPdPb0WnAudbMMS2_g   # WebSearch 결과 링크에서 얻음. 직접 접속 확인 못 함(미검증)
+  snapshot_file: presets/joshuamagazine/reference/latest100.json
+  latest_n: 100
+  high_view_threshold: 800000
+  sfx_catalog_latest_n: 50
+identity_exclusions:
+  # 최종 화면·오디오에 나오면 안 되는 원 채널 식별 요소. QA 가 OCR 로 검사한다.
+  forbidden_text: ['조슈아매거진', '조슈아 매거진', 'joshuamagazine', 'joshua magazine', 'JOSHUA MAGAZINE']
+  logo_templates_dir: presets/joshuamagazine/reference/identity_templates   # 레퍼런스에서 추출(미측정)
+  own_branding: none      # 우리 채널 브랜딩은 이 프리셋에서 넣지 않는다(요청 시 requested_changes 로)
+
+canvas:
+  width: 1080
+  height: 1920
+  fps: 30
+  background:
+    type: color            # color | blur_source
+    color: '#000000'
+    blur_sigma: 30
+  video_region:            # 소스 영상이 놓이는 영역
+    x: 0
+    y: 656
+    w: 1080
+    h: 608
+    fit: cover             # cover(잘라서 채움) | contain(여백)
+  safe_margin: {left: 54, right: 54, top: 110, bottom: 250}
+
+text:
+  font_dirs: [assets/fonts]
+  roles:
+    title:                 # 제목(상단 고정 헤드라인)
+      font_name: Noto Sans CJK KR Black
+      font_file: null      # null 이면 시스템/assets/fonts 에서 font_name 으로 찾는다
+      bold: true
+      size_px: 84
+      color: '#FFFFFF'
+      highlight_color: '#FFE400'
+      outline_px: 6
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: false, color: '#000000', alpha: 0.0, pad_x: 18, pad_y: 10}
+      line_spacing: 1.18
+      max_width_px: 980
+      max_lines: 2
+      max_chars_per_line: 13
+      anchor: {x: 540, y: 330, align: center, valign: middle}
+      motion_in: {type: none, dur_s: 0.0, scale_from: 1.0, offset_px: 0}
+      motion_out: {type: none, dur_s: 0.0}
+      timing: {lead_s: 0.0, min_dur_s: 1.0}
+      persist: whole_video   # whole_video | timed
+    description:           # 제목 아래 설명
+      font_name: Noto Sans CJK KR Bold
+      font_file: null
+      bold: true
+      size_px: 46
+      color: '#E6E6E6'
+      highlight_color: '#FFE400'
+      outline_px: 4
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: false, color: '#000000', alpha: 0.0, pad_x: 14, pad_y: 8}
+      line_spacing: 1.15
+      max_width_px: 980
+      max_lines: 1
+      max_chars_per_line: 20
+      anchor: {x: 540, y: 500, align: center, valign: middle}
+      motion_in: {type: fade, dur_s: 0.2, scale_from: 1.0, offset_px: 0}
+      motion_out: {type: none, dur_s: 0.0}
+      timing: {lead_s: 0.0, min_dur_s: 1.0}
+      persist: timed
+    situation:             # 본문 자막: 상황 설명
+      font_name: Noto Sans CJK KR Black
+      font_file: null
+      bold: true
+      size_px: 66
+      color: '#FFFFFF'
+      highlight_color: '#FFE400'
+      outline_px: 6
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: false, color: '#000000', alpha: 0.0, pad_x: 16, pad_y: 8}
+      line_spacing: 1.15
+      max_width_px: 960
+      max_lines: 2
+      max_chars_per_line: 14
+      anchor: {x: 540, y: 1430, align: center, valign: middle}
+      motion_in: {type: pop, dur_s: 0.12, scale_from: 0.85, offset_px: 0}
+      motion_out: {type: none, dur_s: 0.0}
+      timing: {lead_s: 0.0, min_dur_s: 0.9}
+      persist: timed
+    speaker:               # 인물 식별 라벨
+      font_name: Noto Sans CJK KR Bold
+      font_file: null
+      bold: true
+      size_px: 40
+      color: '#FFFFFF'
+      highlight_color: '#FFE400'
+      outline_px: 0
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: true, color: '#000000', alpha: 0.65, pad_x: 14, pad_y: 6}
+      line_spacing: 1.1
+      max_width_px: 420
+      max_lines: 1
+      max_chars_per_line: 10
+      anchor: {x: 540, y: 700, align: center, valign: middle}   # 기본값; 실제 위치는 에피소드별(인물 옆)
+      motion_in: {type: fade, dur_s: 0.15, scale_from: 1.0, offset_px: 0}
+      motion_out: {type: fade, dur_s: 0.15}
+      timing: {lead_s: 0.0, min_dur_s: 1.0}
+      persist: timed
+    dialogue:              # 실제 대사(원음 인용)
+      font_name: Noto Sans CJK KR Black
+      font_file: null
+      bold: true
+      size_px: 62
+      color: '#FFE400'
+      highlight_color: '#FFFFFF'
+      outline_px: 6
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: false, color: '#000000', alpha: 0.0, pad_x: 16, pad_y: 8}
+      line_spacing: 1.15
+      max_width_px: 960
+      max_lines: 2
+      max_chars_per_line: 15
+      anchor: {x: 540, y: 1430, align: center, valign: middle}
+      motion_in: {type: none, dur_s: 0.0, scale_from: 1.0, offset_px: 0}
+      motion_out: {type: none, dur_s: 0.0}
+      timing: {lead_s: 0.0, min_dur_s: 0.8}
+      quote_marks: ['"', '"']
+      persist: timed
+    reaction:              # 반응·효과자막
+      font_name: Noto Sans CJK KR Black
+      font_file: null
+      bold: true
+      size_px: 76
+      color: '#FFE400'
+      highlight_color: '#FFFFFF'
+      outline_px: 7
+      outline_color: '#000000'
+      shadow_px: 0
+      shadow_color: '#000000'
+      box: {enabled: false, color: '#000000', alpha: 0.0, pad_x: 16, pad_y: 8}
+      line_spacing: 1.1
+      max_width_px: 900
+      max_lines: 1
+      max_chars_per_line: 10
+      anchor: {x: 540, y: 1140, align: center, valign: middle}
+      motion_in: {type: pop, dur_s: 0.1, scale_from: 1.35, offset_px: 0}
+      motion_out: {type: none, dur_s: 0.0}
+      timing: {lead_s: 0.0, min_dur_s: 0.6}
+      persist: timed
+  tone:                    # 자막 말투(측정 전 임시). 대본 작성 규칙에서 사용
+    register: 반말_구어체    # 반말_구어체 | 해요체 | 음슴체 | 혼합
+    sentence_end_examples: []
+    emoji: false
+    notes: 측정 전. 레퍼런스 자막 OCR 로 종결어미 분포를 측정해 채운다.
+
+motion:
+  zoom:
+    scale_to: 1.25
+    dur_s: 0.35
+    ease: out
+    max_consecutive: 1     # 같은 효과 연속 쌓기 금지: 연속 세그먼트에서 줌 최대 횟수
+  freeze:
+    hold_s: 0.7
+    max_per_video: 2
+  transitions:
+    default: cut           # cut | flash | crossfade
+    flash: {dur_s: 0.12, color: '#FFFFFF'}
+    crossfade: {dur_s: 0.25}
+  speed:
+    slowmo_factor: 0.5
+  trim:
+    tail_after_meaning_s: 0.25   # 의미가 끝난 뒤 남기는 꼬리 최대치
+
+decorations:
+  arrow: {color: '#FF2A2A', size_px: 120, outline_px: 6, outline_color: '#FFFFFF', blink_hz: 0.0}
+  circle: {color: '#FF2A2A', stroke_px: 10, blink_hz: 0.0}
+  box: {color: '#FF2A2A', stroke_px: 8, blink_hz: 0.0}
+
+audio:
+  sample_rate: 48000
+  loudness: {integrated_lufs: -14.0, true_peak_db: -1.5, tolerance_lu: 1.0}
+  bgm:
+    track_id: null         # 곡 식별 전(못 잼). assets/library/music 의 깨끗한 파일 id
+    title: null
+    version: null          # original | sped_up | slowed | remix | instrumental ...
+    tempo_ratio: 1.0       # 원곡 대비 속도
+    section_start_s: 0.0   # 원곡에서 실제 사용 시작 지점
+    gain_db: -20.0         # 믹스 안에서의 BGM 레벨(전체 LUFS 정규화 전)
+    fade_in_s: 0.0
+    fade_out_s: 0.8
+    loop: false
+  original:
+    default: off           # 원본 소리는 기본 OFF. 중요 대사/말하는 구간만 plan 에서 keep
+    keep_gain_db: 0.0
+    fade_s: 0.04
+    remove_embedded_music: true   # 원본에 붙은 음악은 분리(demucs vocals)해서 제거
+  ducking:
+    depth_db: 10.0         # 보존한 대사 구간에서만 BGM 을 낮춤
+    attack_s: 0.08
+    release_s: 0.3
+    only_under_kept_dialogue: true
+  sfx:
+    catalog: presets/joshuamagazine/sfx_catalog.json
+    map: presets/joshuamagazine/sfx_map.yaml
+    gain_db_default: -8.0
+    max_event_offset_s: 0.3
+    require_event: true
+  silence:
+    fade_s: 0.05
+
+structure:
+  formats_file: presets/joshuamagazine/formats.yaml
+  duration_s: {p10: null, p50: null, p90: null, n: 0}
+  first_caption_at_s: 0.0
+
+cover:
+  source: first_frame      # first_frame | chosen_frame
+  text_role: title
+
+per_episode:               # 새 소재마다 다시 판단하는 항목(값은 plan.yaml 에)
+  - timeline.segments(src_in/src_out, 순서)
+  - captions(text/start/end, speaker 라벨 위치)
+  - zoom.center, zoom.start
+  - decorations.keyframes
+  - sfx(t, type, event)
+  - original_audio.keep ranges
+  - bgm.section_start_s (곡이 고정이면 고정, 에피소드 길이에 맞춘 끝 처리)
+  - sources[].clean(crop/delogo/inpaint)
+  - sources[].protected(얼굴·손·핵심 물체)
+
+approval:
+  first_episode_requires_approval: true
+  later_episodes_require_approval: false

@@ -1,0 +1,3473 @@
+schema: shortkit.registry/1
+preset_id: joshuamagazine-v1
+synced_at: '2026-09-24T16:59:27+00:00'
+legend:
+  status:
+    measured: 레퍼런스에서 측정
+    unmeasured: 못 잼(임시값 사용 중)
+    requested_change: 사용자 요청 변경
+    fixed_by_rule: 사용자 제작 규칙으로 고정
+    not_applicable: 측정 대상 아님(메타/경로)
+  chain: evidence(영상·시각) → measurement(n,p10,p50,p90,해상도) → code(읽는 함수) → qa_checks(출력 검사)
+entries:
+  preset_id:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: joshuamagazine-v1
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  schema:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: shortkit.preset/1
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.platform:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: youtube
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.channel_handle:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: '@joshuamagazine'
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.channel_url:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: https://youtube.com/@joshuamagazine
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.channel_id_hint:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: UC_TL4XPdPb0WnAudbMMS2_g
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.snapshot_file:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: presets/joshuamagazine/reference/latest100.json
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.latest_n:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: 100
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.high_view_threshold:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: 800000
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  reference.sfx_catalog_latest_n:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value: 50
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  identity_exclusions.forbidden_text:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value:
+    - 조슈아매거진
+    - 조슈아 매거진
+    - joshuamagazine
+    - joshua magazine
+    - JOSHUA MAGAZINE
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  identity_exclusions.logo_templates_dir:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: presets/joshuamagazine/reference/identity_templates
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  identity_exclusions.own_branding:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: none
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  canvas.width:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1080
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.height:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1920
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.fps:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 30
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.background.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: color
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.background.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.background.blur_sigma:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 30
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.video_region.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.video_region.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 656
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.video_region.w:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1080
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.video_region.h:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 608
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.video_region.fit:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: cover
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.safe_margin.left:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 54
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.safe_margin.right:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 54
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.safe_margin.top:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 110
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  canvas.safe_margin.bottom:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 250
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+    resolution_state: blocked_network
+  text.font_dirs:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value:
+    - assets/fonts
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.title.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Black
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.title.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.title.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 84
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.title.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.title.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.title.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.title.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.title.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.title.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.title.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.title.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 18
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.title.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 10
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.title.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.18
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 980
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 2
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 13
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.title.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.title.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 330
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.title.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.title.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.title.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.title.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.title.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: whole_video
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Bold
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.description.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.description.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 46
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.description.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#E6E6E6'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.description.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.description.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 4
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.description.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.description.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.description.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.description.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.description.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 14
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.description.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.description.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 980
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 20
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.description.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.description.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 500
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.description.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.description.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: fade
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.2
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.description.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.description.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.description.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: timed
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Black
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.situation.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.situation.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 66
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.situation.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.situation.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.situation.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.situation.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.situation.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.situation.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.situation.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.situation.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 16
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.situation.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.situation.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 960
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 2
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 14
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.situation.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.situation.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1430
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.situation.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.situation.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: pop
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.12
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.85
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.situation.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.situation.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.9
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.situation.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: timed
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Bold
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.speaker.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 40
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.speaker.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.65
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 14
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 420
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 10
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.speaker.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 700
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: fade
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: fade
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.speaker.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: timed
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Black
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.dialogue.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 62
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.dialogue.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 16
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 960
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 2
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 15
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1430
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.dialogue.quote_marks:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value:
+    - '"'
+    - '"'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.dialogue.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: timed
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.font_name:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: Noto Sans CJK KR Black
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.font_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: null
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  text.roles.reaction.bold:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: true
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 76
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 크기 불일치 → 줄 수·가림 영역 변화
+    resolution_state: blocked_network
+  text.roles.reaction.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFE400'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 글자 색 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.highlight_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 강조 색 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 7
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 외곽선 두께·색 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.shadow_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.shadow_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.box.enabled:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#000000'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.box.alpha:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.box.pad_x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 16
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.box.pad_y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.line_spacing:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.max_width_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 900
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.max_lines:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.max_chars_per_line:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 10
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.roles.reaction.anchor.x:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 540
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.anchor.y:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1140
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.anchor.align:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: center
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.anchor.valign:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: middle
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 제목/자막 위치 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_in.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: pop
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_in.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.1
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_in.scale_from:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.35
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_in.offset_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_out.type:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: none
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.motion_out.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.timing.lead_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.timing.min_dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 등장 타이밍 불일치
+    resolution_state: blocked_network
+  text.roles.reaction.persist:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: timed
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
+    resolution_state: blocked_network
+  text.tone.register:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 반말_구어체
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    resolution_state: blocked_network
+  text.tone.sentence_end_examples:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: []
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    resolution_state: blocked_network
+  text.tone.emoji:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    resolution_state: blocked_network
+  text.tone.notes:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 측정 전. 레퍼런스 자막 OCR 로 종결어미 분포를 측정해 채운다.
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    resolution_state: blocked_network
+  motion.zoom.scale_to:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.25
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.zoom.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.35
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.zoom.ease:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: out
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.zoom.max_consecutive:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: 1
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  motion.freeze.hold_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.7
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.freeze.max_per_video:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: 2
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  motion.transitions.default:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: cut
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.transitions.flash.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.12
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.transitions.flash.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.transitions.crossfade.dur_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.25
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.speed.slowmo_factor:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.5
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
+    resolution_state: blocked_network
+  motion.trim.tail_after_meaning_s:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: 0.25
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  decorations.arrow.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FF2A2A'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.arrow.size_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 120
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.arrow.outline_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 6
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.arrow.outline_color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FFFFFF'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.arrow.blink_hz:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.circle.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FF2A2A'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.circle.stroke_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 10
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.circle.blink_hz:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.box.color:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: '#FF2A2A'
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.box.stroke_px:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  decorations.box.blink_hz:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
+    resolution_state: blocked_network
+  audio.sample_rate:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: 48000
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.loudness.integrated_lufs:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: -14.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 최종 음량 불일치
+    resolution_state: blocked_network
+  audio.loudness.true_peak_db:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: -1.5
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 최종 음량 불일치
+    resolution_state: blocked_network
+  audio.loudness.tolerance_lu:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: 1.0
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.bgm.track_id:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.title:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.version:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.tempo_ratio:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 1.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.section_start_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.gain_db:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: -20.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.fade_in_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.fade_out_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.8
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.bgm.loop:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: false
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    resolution_state: blocked_network
+  audio.original.default:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: false
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.original.keep_gain_db:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 보존 원음 크기 불일치
+    resolution_state: blocked_network
+  audio.original.fade_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.04
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 원음 켜고 끄는 경계 처리 불일치
+    resolution_state: blocked_network
+  audio.original.remove_embedded_music:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: true
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.ducking.depth_db:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 10.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
+    resolution_state: blocked_network
+  audio.ducking.attack_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.08
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
+    resolution_state: blocked_network
+  audio.ducking.release_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.3
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
+    resolution_state: blocked_network
+  audio.ducking.only_under_kept_dialogue:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: true
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.sfx.catalog:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: presets/joshuamagazine/sfx_catalog.json
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.sfx.map:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: presets/joshuamagazine/sfx_map.yaml
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.sfx.gain_db_default:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: -8.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 효과음 크기 불일치
+    resolution_state: blocked_network
+  audio.sfx.max_event_offset_s:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: 0.3
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.sfx.require_event:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: true
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  audio.silence.fade_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.05
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 의도적 정적 처리 불일치
+    resolution_state: blocked_network
+  structure.formats_file:
+    scope: fixed
+    category: infra
+    status: not_applicable
+    value: presets/joshuamagazine/formats.yaml
+    value_origin: infra
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  structure.duration_s.p10:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    resolution_state: blocked_network
+  structure.duration_s.p50:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    resolution_state: blocked_network
+  structure.duration_s.p90:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: null
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    resolution_state: blocked_network
+  structure.duration_s.n:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    resolution_state: blocked_network
+  structure.first_caption_at_s:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: 0.0
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    resolution_state: blocked_network
+  cover.source:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: first_frame
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 표지 구성 불일치
+    resolution_state: blocked_network
+  cover.text_role:
+    scope: fixed
+    category: style
+    status: unmeasured
+    value: title
+    value_origin: provisional
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: 표지 구성 불일치
+    resolution_state: blocked_network
+  per_episode:
+    scope: fixed
+    category: meta
+    status: not_applicable
+    value:
+    - timeline.segments(src_in/src_out, 순서)
+    - captions(text/start/end, speaker 라벨 위치)
+    - zoom.center, zoom.start
+    - decorations.keyframes
+    - sfx(t, type, event)
+    - original_audio.keep ranges
+    - bgm.section_start_s (곡이 고정이면 고정, 에피소드 길이에 맞춘 끝 처리)
+    - sources[].clean(crop/delogo/inpaint)
+    - sources[].protected(얼굴·손·핵심 물체)
+    value_origin: meta
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  approval.first_episode_requires_approval:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: true
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved
+  approval.later_episodes_require_approval:
+    scope: fixed
+    category: rule
+    status: fixed_by_rule
+    value: false
+    value_origin: rule
+    evidence: []
+    measurement: null
+    code: []
+    qa_checks: []
+    impact_if_unmeasured: null
+    resolution_state: resolved

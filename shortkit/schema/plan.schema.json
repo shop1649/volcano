@@ -1,0 +1,854 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shortkit.plan/1",
+  "title": "Episode plan (episodes/<episode_id>/plan.yaml)",
+  "type": "object",
+  "required": [
+    "schema",
+    "episode_id",
+    "preset_id",
+    "format_id",
+    "mode",
+    "sources",
+    "timeline",
+    "captions",
+    "sfx"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "shortkit.plan/1"
+    },
+    "episode_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "preset_id": {
+      "type": "string"
+    },
+    "format_id": {
+      "type": "string",
+      "description": "id from presets/<p>/formats.yaml; 'UNCLASSIFIED' only allowed in mode=test"
+    },
+    "mode": {
+      "enum": [
+        "production",
+        "test"
+      ],
+      "description": "test = pipeline validation only; never published"
+    },
+    "episode_index": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1 = first episode of this preset (needs approval)"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "approved_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_plan_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "표지 문구"
+        },
+        "frame_t": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "output time of the cover frame"
+        }
+      }
+    },
+    "title_candidates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "path"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "root-relative path of the downloaded source"
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "warehouse_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "record id in warehouse/candidates.jsonl"
+          },
+          "vocals_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "separated voice stem (demucs) for kept original audio"
+          },
+          "has_embedded_music": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "clean": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "crop": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/rect"
+                  }
+                ]
+              },
+              "delogo": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/timed_rect"
+                }
+              },
+              "inpaint": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/timed_rect"
+                }
+              },
+              "blur": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/timed_rect"
+                }
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          },
+          "protected": {
+            "type": "array",
+            "description": "faces/hands/key objects in SOURCE px/time; overlays must not cover them",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "x",
+                "y",
+                "w",
+                "h"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "w": {
+                  "type": "number"
+                },
+                "h": {
+                  "type": "number"
+                },
+                "start": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "end": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "minItems": 1,
+      "description": "ordered video segments; output times are derived",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "src_in",
+          "src_out"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "src_in": {
+            "type": "number",
+            "minimum": 0
+          },
+          "src_out": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "speed": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "default": 1.0
+          },
+          "purpose": {
+            "type": "string",
+            "description": "role in the structure (hook/context/build/reveal/reaction/outro)"
+          },
+          "zoom": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "center"
+                ],
+                "properties": {
+                  "scale_from": {
+                    "type": "number",
+                    "default": 1.0
+                  },
+                  "scale_to": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "null = preset motion.zoom.scale_to"
+                  },
+                  "center": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "description": "zoom center in SOURCE px"
+                  },
+                  "start": {
+                    "type": "number",
+                    "default": 0.0,
+                    "description": "seconds from segment start (output time)"
+                  },
+                  "dur": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "null = preset motion.zoom.dur_s"
+                  },
+                  "ease": {
+                    "enum": [
+                      "linear",
+                      "in",
+                      "out",
+                      "inout",
+                      null
+                    ]
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "freeze": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "at": {
+                    "type": "string",
+                    "enum": [
+                      "end",
+                      "src_t"
+                    ],
+                    "default": "end"
+                  },
+                  "src_t": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "hold": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "null = preset motion.freeze.hold_s"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "transition_in": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "enum": [
+                  "cut",
+                  "flash",
+                  "crossfade"
+                ]
+              },
+              "dur": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "original_audio": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "keep": {
+                "type": "boolean",
+                "default": false
+              },
+              "ranges": {
+                "type": "array",
+                "description": "SOURCE-time subranges to keep; empty with keep=true = whole segment",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "gain_db": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "stem": {
+                "enum": [
+                  "raw",
+                  "vocals"
+                ],
+                "default": "raw"
+              },
+              "reason": {
+                "type": "string",
+                "description": "why this original sound is kept (important line / person speaking)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "captions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "text",
+          "start",
+          "end"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "title",
+              "description",
+              "situation",
+              "speaker",
+              "dialogue",
+              "reaction"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "use \\n for forced line breaks"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number"
+          },
+          "pos": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            ],
+            "description": "canvas px override of the role anchor (e.g. speaker label next to the person)"
+          },
+          "highlight": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "grounding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "description": "what in the footage supports this line; invented relations/motives/lines are forbidden",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "seen",
+                  "heard",
+                  "on_screen_text",
+                  "source_metadata",
+                  "framing"
+                ]
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "src_t": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "decorations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "start",
+          "end",
+          "keyframes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "arrow",
+              "circle",
+              "box"
+            ]
+          },
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "keyframes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "t",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "t": {
+                  "type": "number",
+                  "description": "seconds from decoration start"
+                },
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "w": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "h": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "rotation": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "blink_hz": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sfx": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "t",
+          "event"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "sfx type id from sfx_catalog.json"
+          },
+          "t": {
+            "type": "number",
+            "minimum": 0,
+            "description": "output time where the sound starts"
+          },
+          "event": {
+            "type": "object",
+            "required": [
+              "t",
+              "desc"
+            ],
+            "additionalProperties": false,
+            "description": "the on-screen event that motivates this sound (never a bare cut)",
+            "properties": {
+              "t": {
+                "type": "number"
+              },
+              "desc": {
+                "type": "string",
+                "minLength": 2
+              },
+              "kind": {
+                "type": "string"
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "src_t": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "prev_caption_role": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "emotion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "gain_db": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "file": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "explicit file; null = resolve via sfx_map"
+          }
+        }
+      }
+    },
+    "bgm": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null = preset audio.bgm.track_id via music library"
+        },
+        "section_start_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "tempo_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "gain_db": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "silences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "start",
+              "end"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "start": {
+                "type": "number"
+              },
+              "end": {
+                "type": "number"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "crf": {
+          "type": "integer"
+        },
+        "audio_bitrate": {
+          "type": "string"
+        }
+      }
+    },
+    "reveal": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "information-order guard: captions that start before t must not contain these keywords (반전을 미리 설명하지 않는다)",
+      "properties": {
+        "t": {
+          "type": "number"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
+        }
+      }
+    },
+    "timed_rect": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
+        },
+        "start": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "end": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

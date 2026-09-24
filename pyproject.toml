@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shortkit"
+version = "0.1.0"
+description = "Reference-driven short-form video production preset system (source discovery -> selection -> script/cut plan -> edit -> output QA)"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "opencv-python-headless>=4.8",
+  "pillow>=10.0",
+  "pyyaml>=6.0",
+  "jsonschema>=4.0",
+  "yt-dlp>=2024.1.1",
+  "imagehash>=4.3",
+]
+
+[project.optional-dependencies]
+ocr = ["pytesseract>=0.3.10"]
+separation = ["demucs>=4.0.1", "torch>=2.0", "torchaudio>=2.0"]
+otio = ["opentimelineio>=0.16"]
+test = ["pytest>=7"]
+
+[project.scripts]
+shortkit = "shortkit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["shortkit*"]
+
+[tool.setuptools.package-data]
+shortkit = ["schema/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "slow: renders video or runs heavy analysis",
+  "network: needs internet access to external platforms",
+]
