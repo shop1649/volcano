@@ -90,15 +90,15 @@ mode: {MODE}
 episode_index: {IDX}
 notes: ''
 cover:
-  text: ''
-  frame_t: null
+  text: ''                               # 표지 문구 = 표지 프레임(frame_t)에 실제로 보이는 자막 글자와 같아야 함
+  frame_t: 0.0
 title_candidates: []
 sources:
 - id: src1
   path: warehouse/sources/TODO.mp4      # 창고에 받은 소재(루트 기준 상대 경로)
   sha256: null
   warehouse_id: null                     # warehouse/candidates.jsonl 의 id
-  has_embedded_music: null               # 원본에 음악이 섞였는지(확인 전 null = 못 잼)
+  has_embedded_music: null               # 원본에 음악이 섞였는지 true/false (원음을 살리면 필수; null = 못 잼)
   clean: {{crop: null, delogo: [], inpaint: [], blur: []}}
   protected: []                          # 얼굴/손/핵심 물체 {{label, x, y, w, h, start, end}} (원본 px/시각)
 timeline:
@@ -247,11 +247,35 @@ def _render(args) -> int:
     rep = json.loads((paths.episode_dir(args.episode_id) / "build" / "render_report.json").read_text())
     for w in (rep.get("audio") or {}).get("warnings") or []:
         print(f"  [렌더 경고] {w}")
+    if plan["mode"] == "production":
+        for row in mark_sources_used(plan):
+            _log(args.episode_id, {"event": "warehouse_used", **row})
+            print(f"  [창고] {row['warehouse_id']}: " + ("사용함(used) 기록" if row["ok"] else f"기록 실패 — {row['error']}"))
     ml = rep.get("mp4_loudness") or {}
     print(f"렌더 완료: {paths.relp(out)}  {rep['probe']['width']}x{rep['probe']['height']} "
           f"{rep['probe']['fps']}fps {rep['probe']['duration']:.2f}s, 음량 {ml.get('integrated_lufs')} LUFS "
           f"/ 최대 {ml.get('true_peak_db')} dBTP (기계 측정; 사람 청취 확인 아님)")
     return 0
+
+
+def mark_sources_used(plan: dict) -> list[dict]:
+    """After a successful PRODUCTION render: record usage of every linked warehouse source
+    (``shortkit.sourcing.warehouse.mark_used``).  Returns one row per source with a warehouse_id."""
+    rows = []
+    wids = list(dict.fromkeys(s["warehouse_id"] for s in plan.get("sources", []) if s.get("warehouse_id")))
+    if not wids:
+        return rows
+    try:
+        from ..sourcing import warehouse as wh
+    except ImportError as e:
+        return [{"warehouse_id": w, "ok": False, "error": f"shortkit.sourcing.warehouse 없음: {e}"} for w in wids]
+    for w in wids:
+        try:
+            wh.mark_used(w, plan["episode_id"], by="shortkit episode render")
+            rows.append({"warehouse_id": w, "ok": True, "error": None})
+        except Exception as e:  # never hide a failed provenance update
+            rows.append({"warehouse_id": w, "ok": False, "error": f"{type(e).__name__}: {e}"})
+    return rows
 
 
 def cmd_render(args) -> int:

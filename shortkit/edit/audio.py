@@ -7,6 +7,13 @@ Rules enforced here (user's audio rules):
 - Intentional silences mute the BGM with ``audio.silence.fade_s`` ramps.
 - BGM must be a clean music file: plan.bgm.path or preset ``audio.bgm.track_id`` looked up in
   ``assets/library/music/index.yaml`` (or ``music_library_root`` from local.yaml).
+
+Gain semantics (shared with the renderer): audio.bgm.gain_db, audio.sfx.gain_db_default / plan
+sfx gain_db and audio.original.keep_gain_db are levels AT THE FINAL PROGRAM LOUDNESS (gain applied
+to the clean file / SFX file / source audio as recorded).  ``ref audio-measure`` measures
+audio.bgm.gain_db that way (clean-file LS gain + target_lufs - reference mix LUFS), so the master's
+loudness normalisation is a small trim; the foreground safety limiter may reduce SFX / kept
+originals by at most audio.loudness.max_limiter_db (``shortkit.edit.render``).
 """
 from __future__ import annotations
 
@@ -36,25 +43,52 @@ def music_library_roots() -> list[str]:
     return roots
 
 
+def library_path(stored: str) -> Path:
+    """Root-relative path or ``$music_library_root/...`` / ``$sfx_library_root/...`` token path
+    (``shortkit.reference.separation.resolve_stored``) -> absolute path."""
+    if stored.startswith("$"):
+        from ..reference.separation import resolve_stored
+
+        return Path(resolve_stored(stored))
+    return paths.absp(stored)
+
+
+def _index_entry(tracks, track_id: str) -> dict | None:
+    """index.yaml ``tracks`` as a mapping {track_id: entry} or a list of entries keyed ``track_id``
+    (assets/library/music/README.md) or ``id``."""
+    if isinstance(tracks, dict):
+        ent = tracks.get(track_id)
+        return ent if isinstance(ent, dict) else None
+    if isinstance(tracks, list):
+        return next((t for t in tracks if isinstance(t, dict)
+                     and (t.get("track_id") == track_id or t.get("id") == track_id)), None)
+    return None
+
+
 def lookup_track(track_id: str) -> tuple[str | None, dict]:
-    """track id -> (root-relative path | None, index entry)."""
+    """track id -> (root-relative path | None, index entry).
+
+    Library roots and entry files may be ``$music_library_root/...`` tokens.  A file outside the
+    project cannot be stored in the IR (``_outside_root``: copy it into assets/library/music)."""
     for root in music_library_roots():
-        idx = read_yaml(paths.absp(root) / "index.yaml", None)
+        try:
+            idx = read_yaml(library_path(root) / "index.yaml", None)
+        except FileNotFoundError:
+            continue
         if not idx:
             continue
-        tracks = idx.get("tracks", idx)
-        ent = None
-        if isinstance(tracks, dict):
-            ent = tracks.get(track_id)
-        elif isinstance(tracks, list):
-            ent = next((t for t in tracks if isinstance(t, dict) and t.get("id") == track_id), None)
+        ent = _index_entry(idx.get("tracks", idx) if isinstance(idx, dict) else idx, track_id)
         if not ent:
             continue
         f = ent.get("path") or ent.get("file")
         if not f:
             return None, ent
-        for cand in (f, str(Path(root) / f)):
-            p = paths.absp(cand)
+        cands = [f] if str(f).startswith("$") else [f, f"{root.rstrip('/')}/{f}"]
+        for cand in cands:
+            try:
+                p = library_path(cand)
+            except FileNotFoundError:
+                continue
             if p.is_file():
                 try:
                     return paths.relp(p), ent
@@ -173,6 +207,11 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
     sr = int(a["sample_rate"])
     loud = a["loudness"]
     target_lufs, tp = float(loud["integrated_lufs"]), float(loud["true_peak_db"])
+    max_lim, tol_lu = float(loud["max_limiter_db"]), float(loud["tolerance_lu"])
+    if max_lim < 0:
+        issues.append(_issue("error", "rule_max_limiter", f"audio.loudness.max_limiter_db={max_lim}: 0 이상이어야 합니다",
+                             "audio.loudness.max_limiter_db"))
+        max_lim = 0.0
     orig_cfg = a["original"]
     if orig_cfg["default"] not in ("off", False):
         issues.append(_issue("error", "rule_original_default",
@@ -267,7 +306,7 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
         env = build_envelope(duration, duck_ranges, depth, attack, release, silences, sil_fade)
         bgm = Bgm(path=path, track_id=track_id if not pb.get("path") else None, section_start_s=section,
                   tempo_ratio=tempo, gain_db=gain, fade_in_s=fi, fade_out_s=fo, envelope=env, silences=silences,
-                  duck_ranges=duck_ranges)
+                  duck_ranges=duck_ranges, loop=loop)
 
     # --- SFX
     sfx_cfg = a["sfx"]
@@ -296,4 +335,4 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
             gain_db=float(s["gain_db"]) if s.get("gain_db") is not None else gain_default,
             event_t=float(ev["t"]), event_desc=ev["desc"], emotion=s.get("emotion"), map_status=look["status"]))
     return AudioPlan(sample_rate=sr, target_lufs=target_lufs, true_peak_db=tp, bgm=bgm, originals=originals,
-                     sfx=placements)
+                     sfx=placements, max_limiter_db=max_lim, loudness_tolerance_lu=tol_lu)

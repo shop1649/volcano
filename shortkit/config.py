@@ -58,6 +58,7 @@ NON_MEASURED: dict[str, str] = {
     "motion.trim.tail_after_meaning_s": "rule",
     "structure.formats_file": "infra",
     "audio.loudness.tolerance_lu": "rule",
+    "audio.loudness.max_limiter_db": "rule",
 }
 
 # What it costs production when a key stays unmeasured (못 잼). Pattern -> impact text.
@@ -78,6 +79,7 @@ IMPACT: dict[str, str] = {
     "audio.bgm.*": "BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가",
     "audio.ducking.*": "보존 대사 구간의 BGM 덕킹 깊이·속도 불일치",
     "audio.loudness.*": "최종 음량 불일치",
+    "render.clean.*": "원본 정리(흐림) 강도가 달라 가린 영역이 더/덜 보일 수 있음",
     "audio.original.keep_gain_db": "보존 원음 크기 불일치",
     "audio.original.fade_s": "원음 켜고 끄는 경계 처리 불일치",
     "audio.sfx.gain_db_default": "효과음 크기 불일치",

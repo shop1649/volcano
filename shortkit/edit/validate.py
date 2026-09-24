@@ -109,11 +109,21 @@ def _norm_url(u: str | None) -> str | None:
 
 
 def warehouse_records() -> dict[str, dict]:
+    """Source warehouse records by id (``shortkit.sourcing.warehouse.load``)."""
+    try:
+        from ..sourcing import warehouse as wh
+
+        rows = wh.load()
+    except ImportError:          # sourcing area unavailable: read the agreed file format directly
+        rows = read_jsonl(paths.absp("warehouse/candidates.jsonl"))
     recs: dict[str, dict] = {}
-    for r in read_jsonl(paths.absp("warehouse/candidates.jsonl")):
+    for r in rows:
         if r.get("id"):
             recs[r["id"]] = {**recs.get(r["id"], {}), **r}
     return recs
+
+
+WAREHOUSE_USABLE = ("selected", "used")
 
 
 def excluded_urls() -> dict[str, str]:
@@ -155,13 +165,23 @@ def check_sources(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
             out.append(issue("error", "source_excluded_reference",
                              f"레퍼런스와 같은 원본으로 판정된 소재입니다(matched={ro.get('matched_video_id')}, "
                              f"method={ro.get('method')})", where))
-        if rec.get("status") in ("excluded", "rejected"):
-            out.append(issue("error", "source_excluded_status", f"창고 레코드 상태가 {rec.get('status')} 입니다", where))
+        st = rec.get("status")
+        if st in ("excluded", "rejected"):
+            out.append(issue("error", "source_excluded_status", f"창고 레코드 상태가 {st} 입니다", where))
+        elif st not in WAREHOUSE_USABLE:
+            out.append(issue("error" if prod else "warn", "source_not_selected",
+                             f"창고 레코드 상태가 {st!r} 입니다: 선택(selected) 또는 사용(used)된 소재만 쓸 수 있습니다 "
+                             f"(`shortkit source select {wid}`)", where))
         for u in (rec.get("url"), rec.get("original_url")):
             if _norm_url(u) in excl:
                 out.append(issue("error", "source_excluded_url", f"제외 목록 URL 과 일치: {u} ({excl[_norm_url(u)]})", where))
-        if rec.get("sha256") and s.get("sha256") and rec["sha256"] != s["sha256"]:
-            out.append(issue("error", "provenance_sha_mismatch", "창고 레코드 sha256 과 plan sha256 이 다릅니다", where))
+        if not rec.get("sha256"):
+            out.append(issue("error" if prod else "warn", "provenance_sha_missing",
+                             f"창고 레코드 '{wid}' 에 sha256 이 없어 같은 파일인지 확인할 수 없습니다(못 잼)", where))
+        elif not s.get("sha256") or rec["sha256"] != s["sha256"]:
+            out.append(issue("error", "provenance_sha_mismatch",
+                             f"창고 레코드 sha256({str(rec['sha256'])[:12]}…) 과 plan sha256"
+                             f"({str(s.get('sha256'))[:12]}…) 이 다릅니다", where))
 
 
 # ----------------------------------------------------------------------------- timeline / motion
@@ -536,13 +556,14 @@ def check_audio(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasur
             out.append(issue("error", "original_keep_reason", "원음을 살리려면 이유(중요 대사/말하는 사람)가 필요합니다", where))
         stem = oa.get("stem") or "raw"
         hem = srcs.get(seg["source"], {}).get("has_embedded_music")
-        if remove_music and stem == "raw":
-            if hem is True:
-                out.append(issue("error", "embedded_music_raw",
-                                 "소스에 음악이 섞여 있는데 원음(raw)을 그대로 씁니다: 분리한 vocals stem 을 쓰세요", where))
-            elif hem is None:
-                out.append(issue("error" if prod else "warn", "embedded_music_unknown",
-                                 "소스에 음악이 섞였는지 확인하지 않았습니다(has_embedded_music 못 잼)", where))
+        if hem is None:
+            # whoever keeps original sound must have checked the source for embedded music (true/false)
+            out.append(issue("error" if prod else "warn", "embedded_music_unknown",
+                             f"원음을 살리는 소스 {seg['source']} 에 음악이 섞였는지 기록되지 않았습니다"
+                             "(sources[].has_embedded_music = true/false 필요, 지금은 못 잼)", where))
+        elif remove_music and stem == "raw" and hem is True:
+            out.append(issue("error", "embedded_music_raw",
+                             "소스에 음악이 섞여 있는데 원음(raw)을 그대로 씁니다: 분리한 vocals stem 을 쓰세요", where))
         if stem == "vocals":
             out.append(issue("warn", "vocals_quality_unchecked",
                              "분리한 목소리(vocals) 품질은 사람이 들어서 확인해야 합니다(자동 확인 안 함, 못 잼)", where))
@@ -557,6 +578,53 @@ def check_audio(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasur
         if not title or not version:
             out.append(issue("warn" if allow_unmeasured else "error", "bgm_identity_unmeasured",
                              "BGM 제목·버전 미식별(못 잼): 곡 일치 판정 불가", "audio.bgm"))
+
+
+# ----------------------------------------------------------------------------- cover
+def _ws(s: str) -> str:
+    return " ".join(str(s).split())
+
+
+def caption_at_rest(c, t: float) -> bool:
+    """Caption fully shown at output time t: after its motion_in, before its motion_out."""
+    mi, mo = c.motion_in or {}, c.motion_out or {}
+    d_in = float(mi.get("dur_s") or 0.0) if mi.get("type") not in (None, "none") else 0.0
+    d_out = float(mo.get("dur_s") or 0.0) if mo.get("type") not in (None, "none") else 0.0
+    return c.start + d_in - EPS <= t < c.end - d_out - 1e-9
+
+
+def check_cover(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
+    """plan.cover.text is the 표지 문구 and must be the text actually visible on the cover frame
+    (cover.frame_t, default 0.0): some caption at rest at frame_t shows exactly that text (line
+    breaks / repeated spaces aside).  Error in production, warning in test mode."""
+    prod = plan["mode"] == "production"
+    sev = "error" if prod else "warn"
+    cov = plan.get("cover") or {}
+    text = _ws(cov.get("text") or "")
+    r = ctx.resolved
+    t = float(cov["frame_t"]) if cov.get("frame_t") is not None else 0.0
+    src_mode = ctx.preset.get("cover.source")
+    role = ctx.preset.get("cover.text_role")
+    if src_mode == "first_frame" and abs(t) > EPS:
+        out.append(issue(sev, "cover_frame_not_first", f"프리셋 cover.source=first_frame 인데 cover.frame_t={t}s 입니다",
+                         "cover.frame_t"))
+    if not text:
+        return                       # empty cover text: proposal_incomplete (first episode) reports it
+    if not (0.0 <= t < r.duration):
+        out.append(issue(sev, "cover_frame_t", f"cover.frame_t={t}s 가 영상 길이 0..{r.duration:.2f}s 밖입니다",
+                         "cover.frame_t"))
+        return
+    plan_text = {c["id"]: c["text"] for c in plan.get("captions", [])}
+    shown = [c for c in r.captions if caption_at_rest(c, t)]
+    match = [c for c in shown if text in (_ws(c.text.replace("\n", " ")), _ws(plan_text.get(c.id, "")))]
+    if not match:
+        vis = " / ".join(f"{c.id}({c.role}): {_ws(c.text.replace(chr(10), ' '))}" for c in shown) or "없음"
+        out.append(issue(sev, "cover_text_not_visible",
+                         f"표지 문구 '{text}' 가 표지 프레임 {t:.2f}s 에 보이는 자막에 없습니다(보이는 자막: {vis}). "
+                         "표지 문구는 표지 프레임에 실제로 보이는 글자여야 합니다", "cover.text"))
+    elif role and all(c.role != role for c in match):
+        out.append(issue("warn", "cover_text_role",
+                         f"표지 문구가 {match[0].role} 자막으로 보입니다(프리셋 cover.text_role={role})", "cover.text"))
 
 
 # ----------------------------------------------------------------------------- approval / audit
@@ -625,6 +693,7 @@ def validate(plan: dict, preset: config.Preset | None = None, *, preset_name: st
     check_structure(plan, ctx, out)
     check_protected_framing(plan, ctx, out)
     check_captions(plan, ctx, out)
+    check_cover(plan, ctx, out)
     check_sfx(plan, ctx, out, allow_unmeasured)
     check_audio(plan, ctx, out, allow_unmeasured)
     check_approval(plan, preset, out, for_render)

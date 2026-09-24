@@ -26,9 +26,20 @@ MISSING = "못 잼"
 
 
 def _peek(pr: config.Preset, key: str):
-    """Display-only preset value for the report.  Deliberately NOT a traced read: showing a value
-    in a proposal is not production code using it, so it must not create a registry code link."""
-    return config.get_path(pr.data, key, None)
+    """Display-only preset value for the report.  Deliberately NOT a traced read (``Preset.peek``):
+    showing a value in a proposal is not production code using it, so it must not create a registry
+    code link."""
+    return pr.peek(key)
+
+
+def overlap_accepted_unmeasured(rec: dict) -> dict | None:
+    """The accepted-unmeasured entry for ``reference_overlap`` in a warehouse record's selection
+    (the source was selected although the 'same recording as the reference' check was not done)."""
+    for a in ((rec.get("selection") or {}).get("accepted_unmeasured") or []):
+        key = a.get("key") if isinstance(a, dict) else a
+        if key == "reference_overlap":
+            return a if isinstance(a, dict) else {"key": key}
+    return None
 
 
 def _v(x, unit: str = "") -> str:
@@ -99,8 +110,17 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
             vtxt, _v(rec.get("published_at")), _v(rec.get("selection_reason"))]) + " |")
     L.append("")
     for s in plan["sources"]:
-        if not s.get("warehouse_id") or not recs.get(s.get("warehouse_id") or ""):
+        rec = recs.get(s.get("warehouse_id") or "")
+        if not s.get("warehouse_id") or not rec:
             L.append(f"- {s['id']}: 창고 레코드 없음(warehouse_id={s.get('warehouse_id')!r}) → 출처 정보 {MISSING}")
+            continue
+        ov = overlap_accepted_unmeasured(rec)
+        if ov is not None:
+            L.append(f"- **주의 {s['id']}**: 레퍼런스와 같은 녹화인지 검사하지 못한 채(못 잼) 선택됨 — "
+                     f"사유: {ov.get('reason') or MISSING}, 선택: {ov.get('by') or MISSING} {ov.get('at') or ''} "
+                     f"/ 영향: {ov.get('impact') or '레퍼런스와 같은 녹화를 다시 쓸 위험(사용자 규칙 위반)'}")
+        L.append(f"- {s['id']}: 창고 상태 {rec.get('status') or MISSING}, 음악 섞임 "
+                 f"{ {True: '있다', False: '없다'}.get(s.get('has_embedded_music'), MISSING) }")
     L.append("")
 
     # 구간 시트
@@ -207,7 +227,7 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
         L.append("| 키 | 현재(임시)값 | 영향 |")
         L.append("|---|---|---|")
         for k in prov:
-            val = config.get_path(pr.data, k, None)
+            val = pr.peek(k)
             L.append(f"| `{k}` | {_cell(val)} | {_cell(config.impact_of(k))} |")
     unm = [i for i in issues if "unmeasured" in i["code"]]
     if unm:

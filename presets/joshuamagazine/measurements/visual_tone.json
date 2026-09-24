@@ -1,0 +1,55 @@
+{
+  "schema": "shortkit.measurement/1",
+  "group": "visual_tone",
+  "preset_id": "joshuamagazine-v1",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "source_snapshot_status": "blocked",
+  "generated_at": "2026-09-24T19:14:31+00:00",
+  "generated_by": "shortkit ref aggregate",
+  "basis": {
+    "n_videos_analyzed": 0,
+    "video_ids": [],
+    "excluded_long_form": [],
+    "formats_assigned": 0,
+    "canvas_resolution": [
+      1080,
+      1920
+    ]
+  },
+  "items": [
+    {
+      "key": "text.tone.register",
+      "unit": null,
+      "resolution": null,
+      "method": "주 자막(제목·설명·상황·반응) 마지막 어절의 종결 어미 분류(합쇼체/해요체/음슴체/반말/명사형) → 영상별 최빈 종결(60% 이상이면 그 말투, 아니면 혼합) → 영상 간 최빈값. OCR 오인식 영향 있음",
+      "value_rule": "mode",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "counts": {},
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "ending_counts": {}
+    },
+    {
+      "key": "text.tone.sentence_end_examples",
+      "unit": null,
+      "resolution": null,
+      "method": "종결 어미(마지막 두 글자) 빈도 상위 8개",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    }
+  ]
+}

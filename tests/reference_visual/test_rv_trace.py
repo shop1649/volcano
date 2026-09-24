@@ -78,18 +78,20 @@ def test_trace_writes_exclusions_and_accounts(ref_video):
     urls = {x["url"] for x in rows if x["kind"] == "url"}
     assert f"https://www.youtube.com/watch?v={vid}" in urls
     assert all({"url", "reason", "added_at", "added_by"} <= set(x) for x in rows if x["kind"] == "url")
-    # the hashes identify the same footage: re-hash a few frames of the raw clip and compare
-    import imagehash
-    from PIL import Image
-
-    from shortkit.util.media import read_frames
-    fr = read_frames(proj / P / f"reference/videos/{vid}.mp4", [r["frame_times"][3]])[0]
-    h = imagehash.phash(Image.fromarray(fr))
-    assert h - imagehash.hex_to_hash(r["phash"][3]) <= 10
+    # the fingerprint is the sourcing module's own keyframe hashing (identical to candidate hashing)
+    from shortkit.sourcing import exclusions as X
+    reg = r["region"]
+    kf = X.keyframe_hashes(proj / P / f"reference/videos/{vid}.mp4", n=T.N_KEYFRAMES, variants=False,
+                           region=reg and {k: reg[k] for k in ("x", "y", "w", "h")})
+    assert [k["phash"] for k in kf] == r["phash"] and [k["t"] for k in kf] == r["frame_times"]
+    assert "grayscale" in r["method"] and r["added_by"] == T.ADDED_BY
     sa = json.loads((proj / "warehouse/source_accounts.json").read_text("utf-8"))
-    top = {(a["platform"], a["account"]): a for a in sa["accounts"]}
-    assert top[("tiktok", "@real_uploader_1")]["frequency"] == 1
-    assert top[("tiktok", "@real_uploader_1")]["evidence"][0]["video_id"] == vid
+    assert sa["status"] == "measured" and sa["blocker"] is None
+    top = {(a["platform"], a["handle"]): a for a in sa["accounts"]}
+    assert top[("tiktok", "@real_uploader_1")]["count"] == 1
+    assert top[("tiktok", "@real_uploader_1")]["url"] == "https://www.tiktok.com/@real_uploader_1"
+    assert top[("tiktok", "@real_uploader_1")]["evidence"][0]["ref_video_id"] == vid
+    assert top[("reddit", "r/SyntheticVideos")]["url"] == "https://www.reddit.com/r/SyntheticVideos"
     assert {k["keyword"] for k in sa["keywords"]} >= {"교실", "반전"}
     lens = proj / P / f"analysis/{vid}/lens"
     assert (lens / "lens_queries.md").is_file() and len(list(lens.glob("*.jpg"))) >= 2
@@ -141,15 +143,67 @@ def test_subset_trace_keeps_earlier_accounts(ref_video):
     write_json(proj / P / "reference/meta/other000001.json", {"video_id": "other000001",
                                                                "description": "출처: instagram @second_source"})
     out = T.trace("joshuamagazine", ["other000001"], do_ocr=False, lens=False)
-    accs = {a["account"] for a in out["accounts"]}
+    accs = {a["handle"] for a in out["accounts"]}
     assert {"@real_uploader_1", "@second_source"} <= accs and out["videos_traced"] == 2
-    ig = next(a for a in out["accounts"] if a["account"] == "@second_source")
-    assert ig["platform"] == "instagram" and ig["verified_by_text"] is True
+    ig = next(a for a in out["accounts"] if a["handle"] == "@second_source")
+    assert ig["platform"] == "instagram" and ig["verified_by_text"] is True and ig["url"] is None
 
 
-def test_no_videos_writes_nothing(proj):
+BLOCKED_SNAPSHOT = {"status": "blocked", "captured_at": "2026-09-24T00:00:00+00:00", "method": "yt-dlp SYNTHETIC",
+                    "blocker": "SYNTHETIC: Tunnel connection failed: 403 Forbidden", "videos": [], "n": 0}
+
+
+def test_no_videos_writes_unmeasured_with_collect_blocker(proj):
+    """Blocked `ref collect` -> nothing to trace -> an explicit 못 잼 file carrying the collect blocker
+    (nothing invented), which the sourcing side reads as 미확보(못 잼)."""
+    write_json(proj / P / "reference/latest100.json", BLOCKED_SNAPSHOT)
     out = T.trace("joshuamagazine", [], do_ocr=False)
-    assert out["status"] == "unmeasured" and not (proj / "warehouse/source_accounts.json").exists()
+    sa = json.loads((proj / "warehouse/source_accounts.json").read_text("utf-8"))
+    assert out["status"] == sa["status"] == "unmeasured" and out["traced_now"] == 0
+    assert "Tunnel connection failed: 403 Forbidden" in sa["blocker"] and "2026-09-24" in sa["blocker"]
+    assert sa["accounts"] == [] and sa["keywords"] == [] and sa["traced_at"]
+    from shortkit.sourcing import keywords
+    ref = keywords.reference_derived()
+    assert ref["status"] == "unmeasured" and ref["queries"] == [] and ref["accounts"] == []
+    assert "403 Forbidden" in ref["note"]
+    assert not (proj / "warehouse/exclusions.jsonl").exists() or \
+        (proj / "warehouse/exclusions.jsonl").read_text("utf-8").strip() == ""
+
+
+def test_source_accounts_shape_is_read_by_sourcing(ref_video):
+    """The written file follows the agreed shape exactly and sourcing.keywords.reference_derived()
+    turns it into reference-derived queries/accounts."""
+    proj, vid = ref_video
+    T.trace("joshuamagazine", [vid], do_ocr=False, lens=False)
+    sa = json.loads((proj / "warehouse/source_accounts.json").read_text("utf-8"))
+    assert {"status", "blocker", "traced_at", "accounts", "keywords"} <= set(sa)
+    for a in sa["accounts"]:
+        assert {"platform", "handle", "url", "count", "evidence", "verified_by_text"} <= set(a)
+        assert isinstance(a["count"], int) and a["count"] >= 1
+        assert all({"ref_video_id", "t"} <= set(e) for e in a["evidence"])
+    for k in sa["keywords"]:
+        assert {"keyword", "platforms", "count", "evidence"} <= set(k) and isinstance(k["platforms"], list)
+        assert all({"ref_video_id", "t"} <= set(e) for e in k["evidence"])
+    kw = next(k for k in sa["keywords"] if k["keyword"] == "교실")
+    assert kw["platforms"] == ["reddit", "tiktok"]            # source platforms credited in the same video
+    from shortkit.sourcing import keywords
+    ref = keywords.reference_derived()
+    assert ref["status"] == "measured"
+    assert {q["query"] for q in ref["queries"]} >= {"교실", "반전"}
+    qs = {q["query"]: q for q in ref["accounts"]}
+    assert qs["https://www.tiktok.com/@real_uploader_1"]["platforms"] == ["tiktok"]
+    assert qs["https://www.reddit.com/r/SyntheticVideos"]["platforms"] == ["reddit"]
+    assert qs["@another.source"]["evidence"][0]["ref_video_id"] == vid
+    assert all(q["origin"] == "reference_derived_account" for q in ref["accounts"])
+
+
+def test_measured_file_not_downgraded(ref_video):
+    proj, vid = ref_video
+    T.trace("joshuamagazine", [vid], do_ocr=False, lens=False)
+    shutil.rmtree(proj / P / "analysis")
+    out = T.trace("joshuamagazine", [], do_ocr=False)
+    sa = json.loads((proj / "warehouse/source_accounts.json").read_text("utf-8"))
+    assert sa["status"] == "measured" and out.get("kept_existing") is True
 
 
 def test_transcript_keywords_when_file_exists(proj):
@@ -160,3 +214,19 @@ def test_transcript_keywords_when_file_exists(proj):
     k = T.transcript_keywords("joshuamagazine", vid)
     assert k["status"] == "measured" and k["keywords"][:2] == ["고양이", "냉장고"]
     assert T.transcript_keywords("joshuamagazine", "nofile00001")["status"] == "unmeasured"
+
+
+@pytest.mark.slow
+def test_trace_with_ocr_records_watermark_account_with_time(ref_video):
+    """Full trace (OCR on): the burned-in @fake_repost watermark of the SYNTHETIC dirty source becomes an
+    unverified account whose evidence carries the reference video time."""
+    proj, vid = ref_video
+    T.trace("joshuamagazine", [vid], do_ocr=True, lens=False)
+    sa = json.loads((proj / "warehouse/source_accounts.json").read_text("utf-8"))
+    wm = [a for a in sa["accounts"] if any(e["kind"] == "watermark_ocr" for e in a["evidence"])]
+    hits = [a for a in wm if "fakerepost".startswith(T._norm(a["handle"])) and len(T._norm(a["handle"])) >= 7]
+    assert hits, sa["accounts"]
+    a = hits[0]
+    assert a["verified_by_text"] is False and a["url"] is None
+    assert all(isinstance(e["t"], (int, float)) and e["ref_video_id"] == vid for e in a["evidence"])
+    assert sa["coverage"].get("watermark_ocr") == 1 and sa["coverage"].get("description") == 1

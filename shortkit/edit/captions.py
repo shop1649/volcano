@@ -537,11 +537,9 @@ def caption_events(cap, layout: Layout, style_name: str) -> list[AssEvent]:
 
 
 # ----------------------------------------------------------------------------- decorations
-# Arrow geometry defaults, used only when the preset has no decorations.arrow.*_ratio keys.
-# NOT measured from the reference (못 잼) -- see requested shared change to add them to the preset.
-ARROW_HEAD_LEN = 0.45     # head length / total length
-ARROW_HEAD_W = 0.62       # head width / total length
-ARROW_SHAFT_W = 0.24      # shaft width / total length
+# Arrow geometry comes from the preset (decorations.arrow.head_len_ratio / head_width_ratio /
+# shaft_width_ratio, copied into Decoration.style by the resolver); there is no code default.
+ARROW_RATIO_KEYS = ("head_len_ratio", "head_width_ratio", "shaft_width_ratio")
 RING_SEGMENTS = 72
 
 
@@ -554,16 +552,18 @@ def _rot(pts, deg):
 def deco_shape(kind: str, kf: dict, style: dict) -> tuple[list[list[tuple[float, float]]], tuple[float, float]]:
     """Polygons in canvas px for one keyframe; returns (polygons, reference point).
 
-    arrow : tip at (x, y); length = h or style size_px; width = w or size*ARROW_HEAD_W;
-            rotation degrees clockwise, 0 = pointing DOWN (arrow above its target).
+    arrow : tip at (x, y); length = h or style size_px; head width = w or length * head_width_ratio;
+            head length = length * head_len_ratio; shaft width = length * shaft_width_ratio (scaled
+            with w); rotation degrees clockwise, 0 = pointing DOWN (arrow above its target).
     circle: ellipse ring centred at (x, y) with size w x h, stroke = style stroke_px.
     box   : rectangle ring centred at (x, y) with size w x h, stroke = style stroke_px.
     """
     x, y = float(kf["x"]), float(kf["y"])
     if kind == "arrow":
-        r_len = float(style.get("head_len_ratio") or ARROW_HEAD_LEN)
-        r_w = float(style.get("head_width_ratio") or ARROW_HEAD_W)
-        r_sh = float(style.get("shaft_width_ratio") or ARROW_SHAFT_W)
+        missing = [k for k in ARROW_RATIO_KEYS if style.get(k) is None]
+        if missing:
+            raise ValueError(f"decorations.arrow.{missing[0]} 가 장식 스타일에 없습니다(현재 프리셋으로 다시 resolve)")
+        r_len, r_w, r_sh = (float(style[k]) for k in ARROW_RATIO_KEYS)
         L = float(kf.get("h") or style["size_px"])
         W = float(kf.get("w") or L * r_w)
         hl, sw = L * r_len, max(2.0, L * r_sh * (W / (L * r_w)))

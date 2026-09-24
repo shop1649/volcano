@@ -1,0 +1,177 @@
+{
+  "schema": "shortkit.measurement/1",
+  "group": "visual_motion",
+  "preset_id": "joshuamagazine-v1",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "source_snapshot_status": "blocked",
+  "generated_at": "2026-09-24T19:14:31+00:00",
+  "generated_by": "shortkit ref aggregate",
+  "basis": {
+    "n_videos_analyzed": 0,
+    "video_ids": [],
+    "excluded_long_form": [],
+    "formats_assigned": 0,
+    "canvas_resolution": [
+      1080,
+      1920
+    ]
+  },
+  "items": [
+    {
+      "key": "motion.zoom.scale_to",
+      "unit": "ratio",
+      "resolution": null,
+      "method": "영상별 확대(zoom_in) 배율 중앙값(ORB 유사변환 누적; 원본 카메라 줌과 구분 못 함)",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "presence": {
+        "zoom": {},
+        "freeze": {},
+        "speed": {},
+        "flash": {}
+      }
+    },
+    {
+      "key": "motion.zoom.dur_s",
+      "unit": "s",
+      "resolution": null,
+      "method": "영상별 확대 길이 중앙값",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.freeze.hold_s",
+      "unit": "s",
+      "resolution": null,
+      "method": "영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.speed.slowmo_factor",
+      "unit": "ratio",
+      "resolution": null,
+      "method": "프레임 복제율 변화로 본 재생 속도 비(프레임 보간 슬로모션은 검출 못 함)",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.transitions.default",
+      "unit": null,
+      "resolution": null,
+      "method": "영상별 가장 많은 전환 종류(cut/flash/crossfade)",
+      "value_rule": "mode",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "counts": {},
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.transitions.flash.dur_s",
+      "unit": "s",
+      "resolution": null,
+      "method": "플래시(밝기 급등) 길이 중앙값",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.transitions.flash.color",
+      "unit": "rgb_hex",
+      "resolution": null,
+      "method": "플래시 최고 밝기 프레임의 평균 색",
+      "value_rule": "mode of color clusters (RGB distance <= 28)",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "clusters": [],
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    },
+    {
+      "key": "motion.transitions.crossfade.dur_s",
+      "unit": "s",
+      "resolution": null,
+      "method": "섞임 구간(블렌드 가중치 0→1) 길이 중앙값",
+      "value_rule": "p50",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+    }
+  ]
+}

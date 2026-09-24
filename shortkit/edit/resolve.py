@@ -14,7 +14,6 @@ screen; see ``src_to_region``.
 """
 from __future__ import annotations
 
-import hashlib
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -27,11 +26,12 @@ from ..util.media import MediaError, probe
 from . import captions as cap_mod
 from .ir import (SCHEMA, CaptionBox, Clip, Decoration, Freeze, Rect, ResolvedEdit, TimedRect, Transition,
                  Zoom)
-from .plan import TEST_FORMAT_ID, build_dir, canonical_json, load_plan
+from .plan import TEST_FORMAT_ID, build_dir, load_plan
 
 MOTION_IN_TYPES = ("none", "fade", "pop", "slide_up")
 MOTION_OUT_TYPES = ("none", "fade")
 EASES = ("linear", "in", "out", "inout")
+FLASH_SCOPES = ("region", "canvas")
 ROLES = ("title", "description", "situation", "speaker", "dialogue", "reaction")
 EPS = 1e-6
 
@@ -186,16 +186,41 @@ def zoom_scale(clip: Clip, u: float) -> float:
     return z.scale_from + (z.scale_to - z.scale_from) * ease((u - z.start) / z.dur, z.ease)
 
 
+def zoom_progress(clip: Clip, u: float) -> float:
+    """Eased zoom progress in [0, 1] at local output time u (0 before start, 1 after start + dur)."""
+    z = clip.zoom
+    if not z:
+        return 0.0
+    if z.dur <= 0:
+        return 1.0 if u >= z.start else 0.0
+    return ease((u - z.start) / z.dur, z.ease)
+
+
 def src_to_region(clip: Clip, u: float) -> tuple[float, float, float]:
-    """Affine (s, tx, ty) with region-local q = s * (p_src - crop_xy) + t at local output time u."""
+    """Affine (s, tx, ty) with region-local q = s * (p_src - crop_xy) + t at local output time u.
+
+    Fixed point (``Zoom.recenter`` false): the un-zoomed region position of ``zoom.center_src``,
+    clamped into the region, stays where it is while the scale changes.  With recenter true that
+    point moves (same eased progress) to the region centre; for ``fit = cover`` the translation is
+    clamped so the scaled picture keeps covering the region."""
     b, ox, oy = base_fit(clip)
     z = zoom_scale(clip, u)
     if clip.zoom and z != 1.0:
-        ex, ey, _, _ = effective_src_rect(clip)
+        ex, ey, ew, eh = effective_src_rect(clip)
         cx, cy = clip.zoom.center_src
-        px = min(max(ox + b * (cx - ex), 0.0), clip.region.w)
-        py = min(max(oy + b * (cy - ey), 0.0), clip.region.h)
-        return z * b, px * (1 - z) + z * ox, py * (1 - z) + z * oy
+        R = clip.region
+        px = min(max(ox + b * (cx - ex), 0.0), R.w)
+        py = min(max(oy + b * (cy - ey), 0.0), R.h)
+        if not getattr(clip.zoom, "recenter", False):
+            return z * b, px * (1 - z) + z * ox, py * (1 - z) + z * oy
+        w = zoom_progress(clip, u)
+        qx, qy = px + (R.w / 2.0 - px) * w, py + (R.h / 2.0 - py) * w
+        s = z * b
+        tx, ty = qx - s * (cx - ex), qy - s * (cy - ey)
+        if clip.fit == "cover":
+            tx = min(0.0, max(R.w - s * ew, tx)) if s * ew >= R.w else tx
+            ty = min(0.0, max(R.h - s * eh, ty)) if s * eh >= R.h else ty
+        return s, tx, ty
     return b, ox, oy
 
 
@@ -280,30 +305,39 @@ def _timed_rects(lst) -> list[TimedRect]:
                       end=r.get("end"), reason=r.get("reason", "")) for r in (lst or [])]
 
 
-def inpaint_cache_path(src: SourceInfo, rects: list[dict]) -> str:
-    key = canonical_json({"src": src.plan.get("sha256") or src.path, "rects": rects})
-    h = hashlib.sha256(key.encode()).hexdigest()[:16]
-    return f"warehouse/cache/clean/{src.id}_{h}.mp4"
-
-
 def run_inpaint(src: SourceInfo, rects: list[dict], issues: list[dict], execute: bool) -> str | None:
-    """Clean intermediate via shortkit.clean.apply.inpaint_video (lazy import)."""
+    """Clean intermediate via ``shortkit.clean.apply`` (lazy import): the cache location is
+    ``clean.apply.cache_path`` (warehouse/cache/clean/<source sha256>_<ops hash>.mp4, shared with
+    every other user of the cleaner) and ``inpaint_cached`` builds / re-validates it."""
+    where = f"sources[{src.id}].clean.inpaint"
     try:
-        from ..clean.apply import inpaint_video  # type: ignore
+        from ..clean.apply import cache_path, inpaint_cached  # type: ignore
     except Exception as e:  # module owned by another area; report instead of skipping silently
         issues.append(issue("error", "inpaint_unavailable",
-                            f"소스 {src.id} 에 clean.inpaint 가 있지만 shortkit.clean.apply.inpaint_video 를 불러오지 못함: "
-                            f"{type(e).__name__}", f"sources[{src.id}].clean.inpaint"))
+                            f"소스 {src.id} 에 clean.inpaint 가 있지만 shortkit.clean.apply 를 불러오지 못함: "
+                            f"{type(e).__name__}", where))
         return None
-    rel = inpaint_cache_path(src, rects)
-    out = paths.absp(rel)
-    if execute and not out.is_file():
+    if not src.exists:
+        return None
+    rs = [dict(r) for r in rects]
+    try:
+        out = Path(cache_path(src.abs, rs, src_sha=src.plan.get("sha256") or None))
+        rel = paths.relp(out)
+    except Exception as e:
+        issues.append(issue("error", "inpaint_failed", f"inpaint 캐시 경로 계산 실패({src.id}): {type(e).__name__}: {e}",
+                            where))
+        return None
+    if execute:
         out.parent.mkdir(parents=True, exist_ok=True)
         try:
-            inpaint_video(src.abs, [dict(r) for r in rects], out)
+            res = inpaint_cached(src.abs, rs)
         except Exception as e:
-            issues.append(issue("error", "inpaint_failed", f"inpaint 실패({src.id}): {type(e).__name__}: {e}",
-                                f"sources[{src.id}].clean.inpaint"))
+            issues.append(issue("error", "inpaint_failed", f"inpaint 실패({src.id}): {type(e).__name__}: {e}", where))
+            return None
+        got = res.get("out") if isinstance(res, dict) else None
+        if got and Path(paths.absp(got)).resolve() != out.resolve():
+            issues.append(issue("error", "inpaint_cache_mismatch",
+                                f"inpaint 결과 경로 {got} 가 캐시 경로 {rel} 와 다릅니다", where))
             return None
     return rel
 
@@ -314,10 +348,24 @@ def resolve_clips(plan: dict, preset: config.Preset, canvas: dict, sources: dict
     # read the fixed motion style once (every key used below, traced to this function)
     z_sec, f_sec, t_sec = preset.section("motion.zoom"), preset.section("motion.freeze"), \
         preset.section("motion.transitions")
-    mz = {"scale_to": z_sec["scale_to"], "dur_s": z_sec["dur_s"], "ease": z_sec["ease"]}
+    mz = {"scale_to": z_sec["scale_to"], "dur_s": z_sec["dur_s"], "ease": z_sec["ease"],
+          "recenter": z_sec["recenter"]}
     mf = {"hold_s": f_sec["hold_s"]}
-    mt = {"default": t_sec["default"], "flash": {"dur_s": t_sec["flash"]["dur_s"], "color": t_sec["flash"]["color"]},
+    mt = {"default": t_sec["default"], "flash": {"dur_s": t_sec["flash"]["dur_s"], "color": t_sec["flash"]["color"],
+                                                 "scope": t_sec["flash"]["scope"]},
           "crossfade": {"dur_s": t_sec["crossfade"]["dur_s"]}}
+    if not isinstance(mz["recenter"], bool):
+        issues.append(issue("error", "zoom_recenter", f"motion.zoom.recenter={mz['recenter']!r}: true/false 만 허용",
+                            "motion.zoom.recenter"))
+        mz["recenter"] = False
+    if mt["flash"]["scope"] not in FLASH_SCOPES:
+        issues.append(issue("error", "flash_scope", f"motion.transitions.flash.scope={mt['flash']['scope']!r} 미지원 "
+                            f"{FLASH_SCOPES}", "motion.transitions.flash.scope"))
+        mt["flash"]["scope"] = "region"
+    blur_ratio = float(preset.get("render.clean.blur_sigma_ratio"))
+    if not blur_ratio > 0:
+        issues.append(issue("error", "blur_sigma_ratio", f"render.clean.blur_sigma_ratio={blur_ratio}: 0보다 커야 합니다",
+                            "render.clean.blur_sigma_ratio"))
     vr = canvas["video_region"]
     region = Rect(vr["x"], vr["y"], vr["w"], vr["h"])
     clips: list[Clip] = []
@@ -382,7 +430,7 @@ def resolve_clips(plan: dict, preset: config.Preset, canvas: dict, sources: dict
                       center_src=(float(z["center"][0]), float(z["center"][1])),
                       start=float(z.get("start") or 0.0),
                       dur=float(z["dur"] if z.get("dur") is not None else mz["dur_s"]),
-                      ease=z.get("ease") or mz["ease"])
+                      ease=z.get("ease") or mz["ease"], recenter=bool(mz["recenter"]))
             if zm.ease not in EASES:
                 issues.append(issue("error", "zoom_ease", f"지원하지 않는 zoom ease: {zm.ease}", where))
             if src.width and not (0 <= zm.center_src[0] <= src.width and 0 <= zm.center_src[1] <= src.height):
@@ -407,7 +455,8 @@ def resolve_clips(plan: dict, preset: config.Preset, canvas: dict, sources: dict
                     fit=canvas["video_region"]["fit"], src_size=(int(src.width or 0), int(src.height or 0)),
                     crop=crop_r, delogo=_timed_rects(cl.get("delogo")), inpaint=_timed_rects(cl.get("inpaint")),
                     blur=_timed_rects(cl.get("blur")), zoom=zm, freeze=fr,
-                    transition_in=Transition(ttype, tdur, tcolor), purpose=seg.get("purpose", ""))
+                    transition_in=Transition(ttype, tdur, tcolor, mt["flash"]["scope"] if ttype == "flash" else "region"),
+                    purpose=seg.get("purpose", ""), blur_sigma_ratio=blur_ratio)
         if ttype == "crossfade" and clips:
             prev = clips[-1]
             if tdur <= 0 or tdur >= (prev.out_end - prev.out_start) - EPS or tdur >= (out_end - out_start) - EPS:
@@ -496,13 +545,14 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
             color=st["color"], highlight=list(c.get("highlight") or []), highlight_color=st["highlight_color"],
             outline_px=float(st["outline_px"]), outline_color=st["outline_color"], shadow_px=float(st["shadow_px"]),
             box=box, motion_in=dict(st["motion_in"]), motion_out=dict(st["motion_out"]),
-            grounding=c.get("grounding")))
+            grounding=c.get("grounding"), line_spacing=float(st["line_spacing"]), shadow_color=st["shadow_color"],
+            weight=int(font.face.weight), lines_pos=[(round(lb.center[0], 3), round(lb.center[1], 3))
+                                                     for lb in lay.lines]))
     return caps
 
 
-DECO_KEYS = {"arrow": ("color", "size_px", "outline_px", "outline_color", "blink_hz"),
-             # optional geometry keys (read when the preset has them; see captions.ARROW_*)
-             "arrow_optional": ("head_len_ratio", "head_width_ratio", "shaft_width_ratio"),
+DECO_KEYS = {"arrow": ("color", "size_px", "outline_px", "outline_color", "blink_hz",
+                       "head_len_ratio", "head_width_ratio", "shaft_width_ratio"),
              "circle": ("color", "stroke_px", "blink_hz"),
              "box": ("color", "stroke_px", "blink_hz")}
 

@@ -191,12 +191,14 @@ motion:
     dur_s: 0.35
     ease: out
     max_consecutive: 1     # 같은 효과 연속 쌓기 금지: 연속 세그먼트에서 줌 최대 횟수
+    recenter: false        # 임시값(못 잼): false = 확대 중심(zoom.center)이 화면에서 제자리(현재 렌더러 동작),
+                           #   true = 확대하면서 중심을 영상 영역 가운데로 옮김(cover 면 빈 곳이 안 보이게 제한)
   freeze:
     hold_s: 0.7
     max_per_video: 2
   transitions:
     default: cut           # cut | flash | crossfade
-    flash: {dur_s: 0.12, color: '#FFFFFF'}
+    flash: {dur_s: 0.12, color: '#FFFFFF', scope: region}   # scope 임시값(못 잼): region = 영상 영역만(현재 동작) | canvas = 화면 전체
     crossfade: {dur_s: 0.25}
   speed:
     slowmo_factor: 0.5
@@ -204,26 +206,39 @@ motion:
     tail_after_meaning_s: 0.25   # 의미가 끝난 뒤 남기는 꼬리 최대치
 
 decorations:
-  arrow: {color: '#FF2A2A', size_px: 120, outline_px: 6, outline_color: '#FFFFFF', blink_hz: 0.0}
+  # arrow 모양 비율(임시값, 못 잼 — 지금까지 렌더러에 박혀 있던 값): 머리 길이/전체 길이, 머리 폭/전체 길이, 몸통 폭/전체 길이
+  arrow: {color: '#FF2A2A', size_px: 120, outline_px: 6, outline_color: '#FFFFFF', blink_hz: 0.0,
+          head_len_ratio: 0.45, head_width_ratio: 0.62, shaft_width_ratio: 0.24}
   circle: {color: '#FF2A2A', stroke_px: 10, blink_hz: 0.0}
   box: {color: '#FF2A2A', stroke_px: 8, blink_hz: 0.0}
 
+render:
+  clean:
+    blur_sigma_ratio: 0.166667   # 임시값(못 잼, 지금까지의 렌더러 동작 1/6): sources[].clean.blur 가우시안 sigma = max(w, h) × 이 값 (원본 px)
+
 audio:
   sample_rate: 48000
-  loudness: {integrated_lufs: -14.0, true_peak_db: -1.5, tolerance_lu: 1.0}
+  # 레벨 규칙: 아래 gain_db 값(bgm.gain_db, sfx.gain_db_default, plan 의 sfx gain_db, original.keep_gain_db)은 모두
+  # "최종 프로그램 음량(integrated_lufs)에서의 레벨"이다(깨끗한 음원/효과음 파일/원본 소리 대비 dB). `ref audio-measure` 가
+  # audio.bgm.gain_db 를 그렇게 잰다(깨끗한 음원 LS 이득 + 목표 LUFS - 레퍼런스 믹스 LUFS). 그래서 마지막 음량 정규화는 작은
+  # 보정이어야 한다. BGM 에는 어떤 리미터도 걸지 않는다. 전경(효과음+살린 원음)만 max_limiter_db 까지 줄일 수 있고, 그보다
+  # 더 필요하면 전체 이득을 낮추고 목표 음량 부족분을 render_report.json 에 적는다(test 경고 / production 오류).
+  loudness: {integrated_lufs: -14.0, true_peak_db: -1.5, tolerance_lu: 1.0,
+             max_limiter_db: 3.0}   # max_limiter_db: 규칙(측정값 아님) — QA 효과음 레벨 허용(±3 dB) 안에 머물도록
   bgm:
     track_id: null         # 곡 식별 전(못 잼). assets/library/music 의 깨끗한 파일 id
     title: null
     version: null          # original | sped_up | slowed | remix | instrumental ...
     tempo_ratio: 1.0       # 원곡 대비 속도
     section_start_s: 0.0   # 원곡에서 실제 사용 시작 지점
-    gain_db: -20.0         # 믹스 안에서의 BGM 레벨(전체 LUFS 정규화 전)
+    gain_db: 0.0           # 임시값(못 잼). 최종 프로그램 음량에서의 BGM 레벨(깨끗한 음원 대비 dB). 0 = 받은 파일 그대로:
+                           #   테스트 음원 music_bed_a.wav(-14.4 LUFS, -1.9 dBTP)가 BGM 만 나올 때 목표 -14 LUFS 근처에 놓임
     fade_in_s: 0.0
     fade_out_s: 0.8
     loop: false
   original:
     default: off           # 원본 소리는 기본 OFF. 중요 대사/말하는 구간만 plan 에서 keep
-    keep_gain_db: 0.0
+    keep_gain_db: 0.0      # 임시값(못 잼). 최종 프로그램 음량에서 살린 원음 레벨(녹음된 원본 소리 대비 dB)
     fade_s: 0.04
     remove_embedded_music: true   # 원본에 붙은 음악은 분리(demucs vocals)해서 제거
   ducking:
@@ -234,7 +249,8 @@ audio:
   sfx:
     catalog: presets/joshuamagazine/sfx_catalog.json
     map: presets/joshuamagazine/sfx_map.yaml
-    gain_db_default: -8.0
+    gain_db_default: -8.0  # 임시값(못 잼). 최종 프로그램 음량에서 효과음 레벨(효과음 파일 대비 dB): 0 dBFS 근처로 만든
+                           #   파일(테스트 효과음 최대 +3.3 dBTP)도 봉우리가 true-peak 한도(-1.5 dBTP) 아래
     max_event_offset_s: 0.3
     require_event: true
   silence:

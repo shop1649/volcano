@@ -1,0 +1,160 @@
+{
+  "schema": "shortkit.measurement/1",
+  "group": "audio",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "videos": [],
+  "generated_at": "2026-09-24T19:14:31+00:00",
+  "items": [
+    {
+      "key": "audio.bgm.track_id",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "깨끗한 음원 라이브러리 대조(bgm.json)",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.title",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "라이브러리 index.yaml 제목",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.version",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "라이브러리 index.yaml 버전 + 속도 1.0 일치 규칙",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.tempo_ratio",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "ratio",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "특징 NCC 속도 격자 + 파형 정렬",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.section_start_s",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "s",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "깨끗한 음원 안 사용 시작 지점",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.gain_db",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "dB",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "깨끗한 음원 대비 LS 이득(대사 없는 구간 중앙값)을 믹스 통합 음량이 목표 -14.0 LUFS 일 때로 환산: gain + (목표 LUFS - 레퍼런스 믹스 LUFS)",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.fade_in_s",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "s",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "선형 진폭 페이드 모델",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.bgm.fade_out_s",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "s",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "선형 진폭 페이드 모델",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+    },
+    {
+      "key": "audio.ducking.depth_db",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "dB",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "대사 전/중 BGM 이득 중앙값 차",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+    },
+    {
+      "key": "audio.ducking.attack_s",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "s",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "10→90 % 하강 시간/0.8 (선형 dB 경사)",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+    },
+    {
+      "key": "audio.ducking.release_s",
+      "status": "unmeasured",
+      "value": null,
+      "unit": "s",
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "10→90 % 복귀 시간/0.8 (선형 dB 경사)",
+      "measured_at": "2026-09-24T19:14:31+00:00",
+      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+    }
+  ]
+}

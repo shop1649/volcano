@@ -47,14 +47,28 @@ def library_root(smap: dict) -> str | None:
     return local_settings().get("sfx_library_root") or smap.get("library_root")
 
 
+def _abs(stored: str) -> Path | None:
+    """Root-relative path or ``$sfx_library_root/...`` / ``$music_library_root/...`` token path
+    (``shortkit.reference.separation.resolve_stored``) -> absolute path (None: token root not set)."""
+    if stored.startswith("$"):
+        from ..reference.separation import resolve_stored
+
+        try:
+            return Path(resolve_stored(stored))
+        except FileNotFoundError:
+            return None
+    return paths.absp(stored)
+
+
 def _resolve_file(file: str, lib_root: str | None) -> str | None:
-    """Map file -> root-relative path if it exists (as root-relative, or relative to library_root)."""
+    """Map file -> root-relative path if it exists (as root-relative / token path, or relative to
+    library_root, which may itself be a token).  Files outside the project cannot be stored."""
     cands = [file]
-    if lib_root:
-        cands.append(str(Path(lib_root) / file))
+    if lib_root and not file.startswith("$"):
+        cands.append(f"{str(lib_root).rstrip('/')}/{file}")
     for c in cands:
-        p = paths.absp(c)
-        if p.is_file():
+        p = _abs(c)
+        if p is not None and p.is_file():
             try:
                 return paths.relp(p)
             except ValueError:

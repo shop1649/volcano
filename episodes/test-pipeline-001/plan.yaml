@@ -13,8 +13,8 @@ format_id: UNCLASSIFIED
 mode: test
 episode_index: 1
 notes: 테스트 모드. 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음.
-cover:
-  text: 교실과 벽 앞, 사람들의 움직임
+cover:                           # 표지 문구 = 표지 프레임(0.0s)에 실제로 보이는 제목 자막(c_title)과 같은 글자
+  text: 움직임 테스트 영상
   frame_t: 0.0
 title_candidates:
 - 창가 남성이 일어섰다 앉기까지
@@ -26,7 +26,7 @@ sources:
   sha256: 7ca6f09cb32cf87c942cd9b56d5067a3ee48817629f4c576ef706515292a2533
   warehouse_id: null
   vocals_path: null
-  has_embedded_music: false      # 오디오는 합성 TTS 한 줄뿐(음악 없음, 만든 과정으로 확인)
+  has_embedded_music: false      # 음악 없음(만든 과정으로 확인): 무음 영상 + TTS 한 줄뿐 — assets/test/generated/classroom_voice.truth.json
   clean: {crop: null, delogo: [], inpaint: [], blur: []}
   protected:                     # 원본 1920x1080 px / 원본 시각
   - {label: 창가 남성 얼굴(앉음), x: 1200, y: 540, w: 140, h: 160, start: 0.0, end: 2.8}
@@ -147,6 +147,8 @@ sfx:
   event: {t: 1.3, desc: 창가 남성이 일어서기 시작함(확대 시작), kind: action, source: v_class, src_t: 2.8}
   emotion: anticipation
   file: assets/test/generated/sfx/whoosh.wav
+  gain_db: -12.0     # 이 합성 whoosh.wav 는 파일 자체가 +2.5 dBTP / -9.5 LUFS 로 뜨거움: 프리셋 기본(-8)이면 BGM 피크 위에서
+                     # 전경 리미터 3 dB 한도를 넘어 전체 음량이 목표보다 1.1 LU 모자람(측정) → 이 효과만 최종 레벨 -12 dB
 - id: fx2
   type: click
   t: 6.8

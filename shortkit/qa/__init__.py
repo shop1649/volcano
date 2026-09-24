@@ -23,11 +23,33 @@ This package ``__init__`` stays import-light: ``shortkit.config`` imports
 """
 from __future__ import annotations
 
+import contextlib
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 QA_SCHEMA = "shortkit.qa_report/1"
+
+# Tesseract's OpenMP threads busy-wait; on the shared 4-core build machine one OCR call went from
+# ~0.2 s to minutes.  Every tesseract process QA starts (pytesseract here, shortkit.clean's OCR
+# through clean.verify.residual_score) inherits os.environ, so the limit is set at import AND
+# forced to 1 around every call (``tesseract_env``) even when the caller's shell set another value.
+os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+
+
+@contextlib.contextmanager
+def tesseract_env():
+    """Run the enclosed tesseract call(s) with ``OMP_THREAD_LIMIT=1`` (restored afterwards)."""
+    old = os.environ.get("OMP_THREAD_LIMIT")
+    os.environ["OMP_THREAD_LIMIT"] = "1"
+    try:
+        yield
+    finally:
+        if old is None:
+            os.environ.pop("OMP_THREAD_LIMIT", None)
+        else:
+            os.environ["OMP_THREAD_LIMIT"] = old
 
 
 class QAError(RuntimeError):

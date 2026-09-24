@@ -23,14 +23,14 @@ from collections import Counter
 
 import numpy as np
 
-from . import QAContext, hex_rgb, rect_intersection, rgb_hex, rnd
+from . import QAContext, hex_rgb, rect_intersection, rgb_hex, rnd, tesseract_env
 from .probes_video import color_mask, grab, grab_window, text_similarity
 
 OCR_LANG = "kor+eng"
 OCR_TIMEOUT_S = 20
 # tesseract's OpenMP threads thrash badly on a loaded machine (one call took minutes with the
-# default thread count); one thread per call is 100x faster here.  Only affects the tesseract
-# subprocess environment.
+# default thread count); one thread per call is 100x faster here.  Every pytesseract call below
+# runs inside ``tesseract_env()`` (OMP_THREAD_LIMIT forced to 1 for the tesseract subprocess).
 os.environ.setdefault("OMP_THREAD_LIMIT", "1")
 _OCR_STATS = {"calls": 0, "timeouts": 0}
 
@@ -46,11 +46,13 @@ def tesseract_ok() -> tuple[bool, str]:
     try:
         import pytesseract
 
-        langs = set(pytesseract.get_languages(config=""))
+        with tesseract_env():
+            langs = set(pytesseract.get_languages(config=""))
+            ver = pytesseract.get_tesseract_version()
         miss = [l for l in ("kor", "eng") if l not in langs]
         if miss:
             return False, f"tesseract 언어 데이터 없음: {miss}"
-        return True, str(pytesseract.get_tesseract_version())
+        return True, str(ver)
     except Exception as e:
         return False, f"tesseract 사용 불가: {type(e).__name__}: {e}"
 
@@ -65,8 +67,9 @@ def ocr_words(img: np.ndarray, psm: int = 6, lang: str = OCR_LANG, upscale: int 
         im = cv2.resize(im, (im.shape[1] * upscale, im.shape[0] * upscale), interpolation=cv2.INTER_CUBIC)
     _OCR_STATS["calls"] += 1
     try:
-        d = pytesseract.image_to_data(Image.fromarray(im), lang=lang, config=f"--psm {psm}",
-                                      output_type=pytesseract.Output.DICT, timeout=OCR_TIMEOUT_S)
+        with tesseract_env():
+            d = pytesseract.image_to_data(Image.fromarray(im), lang=lang, config=f"--psm {psm}",
+                                          output_type=pytesseract.Output.DICT, timeout=OCR_TIMEOUT_S)
     except RuntimeError:           # pytesseract raises RuntimeError on timeout
         _OCR_STATS["timeouts"] += 1
         return []
@@ -606,11 +609,14 @@ def recolor_blend(img: np.ndarray, src_rgb, dst_rgb, base_rgb) -> np.ndarray:
     return np.clip(out + 0.5, 0, 255).astype(np.uint8)
 
 
-def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None) -> dict:
-    try:
-        from ..reference.typography import font_iou  # type: ignore
-    except Exception as e:
-        return {"status": "unmeasured", "reason": f"shortkit.reference.typography.font_iou 사용 불가 ({type(e).__name__})"}
+def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None, ctx: QAContext | None = None) -> dict:
+    """Font of one caption in the output frame.
+
+    Primary: ``shortkit.qa.font_id.identify_caption_font`` (typography.identify_many with the
+    expected font's IoU ceiling measured under THIS output's encode settings) -> verdict
+    identical / similar / different / unmeasured.  Fallback (identification impossible, e.g. no
+    x264 SEI): raw ``font_iou`` scores, judged later against the fonts_report ceiling -- that
+    fallback can never produce 'same'."""
     from .. import paths
 
     try:
@@ -634,6 +640,32 @@ def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None) -> dict:
     around = hex_rgb(cap.outline_color) if cap.outline_px else None
     if boxed and loc and loc.get("box_region_color"):
         around = hex_rgb(loc["box_region_color"])
+    fill = hex_rgb(cap.color, (255, 255, 255))
+    ident = None
+    if ctx is not None:
+        try:
+            from .font_id import identify_caption_font
+
+            ident = identify_caption_font(ctx, cap, crop, text, fill, around, boxed)
+        except Exception as e:
+            ident = {"status": "unmeasured", "verdict": "unmeasured",
+                     "reason": f"글꼴 판별(identify) 실패: {type(e).__name__}: {e}"[:300]}
+    if ident is not None and ident.get("status") == "measured":
+        scores = [{"font": r["font"], "iou": r["iou"], "verdict": r.get("verdict")} for r in ident.get("ranked") or []]
+        return {"status": "measured", "method": "identify", "expected": cap.font_name, "best": ident.get("top"),
+                "iou_expected": ident.get("iou_expected"), "scores": scores, "identify": ident}
+    legacy = _font_iou_scores(crop, text, cap, exp_path, around, find_font)
+    if ident is not None:
+        legacy["identify"] = ident
+    return legacy
+
+
+def _font_iou_scores(crop: np.ndarray, text: str, cap, exp_path, around, find_font) -> dict:
+    """Fallback: raw font_iou of the expected font and a few alternatives (no verdict)."""
+    try:
+        from ..reference.typography import font_iou  # type: ignore
+    except Exception as e:
+        return {"status": "unmeasured", "reason": f"shortkit.reference.typography.font_iou 사용 불가 ({type(e).__name__})"}
     # fonts are passed by exact NAME so .ttc collections resolve to the right face
     cands = [cap.font_name]
     if find_font is not None:
@@ -665,8 +697,8 @@ def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None) -> dict:
     if not ok or scores[0].get("iou") is None:
         return {"status": "unmeasured", "reason": "font_iou 계산 실패", "scores": scores}
     best = max(ok, key=lambda s: s["iou"])
-    return {"status": "measured", "expected": cap.font_name, "best": best["font"], "iou_expected": scores[0]["iou"],
-            "scores": scores}
+    return {"status": "measured", "method": "font_iou", "expected": cap.font_name, "best": best["font"],
+            "iou_expected": scores[0]["iou"], "scores": scores}
 
 
 # ----------------------------------------------------------------------------- tone
@@ -850,7 +882,7 @@ def probe_captions(ctx: QAContext) -> list[dict]:
                     item.update(measure_timing(ctx, cap, loc, frame))
                 except Exception as e:
                     item["timing_error"] = f"{type(e).__name__}: {e}"[:300]
-                item["font"] = measure_font(frame, cap, loc["bbox"], loc)
+                item["font"] = measure_font(frame, cap, loc["bbox"], loc, ctx)
         except Exception as e:
             item["found"] = False
             item["error"] = f"{type(e).__name__}: {e}"[:300]
