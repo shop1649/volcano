@@ -12,6 +12,8 @@
 새 소재 탐색 → 선별 → 대본·컷 구성(plan.yaml) → 편집(렌더 + 편집 프로젝트) → 출력 검수(최종 MP4 기준 QA)
 ```
 
+원 요청문: `docs/REQUEST.md` (모든 검수 기준의 근거).
+
 구성: 파이썬 패키지 `shortkit`(명령: `python -m shortkit <영역> <명령>`), 채널 프리셋 `presets/joshuamagazine/`,
 소재 창고 `warehouse/`, 에피소드 `episodes/<id>/`, 인터페이스 계약 `docs/CONTRACT.md`.
 
