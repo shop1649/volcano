@@ -8,7 +8,7 @@ import json
 
 import pytest
 
-from conftest import codes, load_preset, write_plan
+from .conftest import codes, load_preset, write_plan
 
 
 def run(root, plan, **kw):
@@ -55,7 +55,7 @@ def test_cover_text_ignores_line_breaks_only(root, plan):
 # ----------------------------------------------------------------------------- embedded music
 @pytest.mark.parametrize("stem", ["raw", "vocals"])
 def test_kept_original_needs_embedded_music_record(root, plan, stem):
-    from conftest import M
+    from .conftest import M
 
     plan["sources"][0]["has_embedded_music"] = None
     plan["sources"][0]["vocals_path"] = f"{M}/vocals.wav"

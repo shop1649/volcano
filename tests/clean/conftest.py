@@ -5,6 +5,11 @@ test media, so nothing is written into the real warehouse.  Expensive steps (det
 detection, the synthetic overlay clip) are computed once per session.
 """
 from __future__ import annotations
+import sys as _sys_for_helpers
+from pathlib import Path as _Path_for_helpers
+_HERE_FOR_HELPERS = str(_Path_for_helpers(__file__).resolve().parent)  # bare-name helper modules of this test dir
+if _HERE_FOR_HELPERS not in _sys_for_helpers.path:
+    _sys_for_helpers.path.insert(0, _HERE_FOR_HELPERS)
 
 import shutil
 from pathlib import Path

@@ -1,6 +1,6 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-24T20:33:15+00:00'
+synced_at: '2026-09-24T20:42:10+00:00'
 access_logs:
 - episodes/test-coverage-001/build/preset_access.json
 - episodes/test-coverage-001/build/preset_access_all.json

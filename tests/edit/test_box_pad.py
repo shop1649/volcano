@@ -10,7 +10,7 @@ import subprocess
 import numpy as np
 import pytest
 
-from conftest import load_preset, set_preset, write_plan
+from .conftest import load_preset, set_preset, write_plan
 
 BG = (0, 255, 0)
 BOX = (0, 0, 255)

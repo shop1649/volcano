@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import yaml
 
-from conftest import M, load_preset, write_plan
+from .conftest import M, load_preset, write_plan
 
 
 def _frame(path, t):

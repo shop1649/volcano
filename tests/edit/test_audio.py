@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from conftest import load_preset, write_plan
+from .conftest import load_preset, write_plan
 
 
 def test_envelope_ducks_only_kept_ranges():
@@ -109,7 +109,7 @@ def test_bgm_track_id_lookup_in_music_library(root, plan):
     """preset audio.bgm.track_id -> assets/library/music/index.yaml (synthetic index for the test)."""
     import shutil
 
-    from conftest import set_preset
+    from .conftest import set_preset
     from shortkit.edit.resolve import resolve_context
 
     lib = root / "assets/library/music"

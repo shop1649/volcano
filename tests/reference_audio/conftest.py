@@ -5,6 +5,11 @@ assets/test/generated.  The ORACLE separator is a test double (demucs is not ins
 Every test that writes files does so inside a temporary project root (SHORTKIT_ROOT).
 """
 from __future__ import annotations
+import sys as _sys_for_helpers
+from pathlib import Path as _Path_for_helpers
+_HERE_FOR_HELPERS = str(_Path_for_helpers(__file__).resolve().parent)  # bare-name helper modules of this test dir
+if _HERE_FOR_HELPERS not in _sys_for_helpers.path:
+    _sys_for_helpers.path.insert(0, _HERE_FOR_HELPERS)
 
 import os
 import sys

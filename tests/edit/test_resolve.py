@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import load_preset, write_plan
+from .conftest import load_preset, write_plan
 
 
 def ctx_for(root, plan):

@@ -6,7 +6,7 @@ import json
 import pytest
 
 import synthref as S
-from conftest import PRESET, no_abs_paths
+from .conftest import PRESET, no_abs_paths
 from shortkit.reference import audio_bgm as B
 
 VERSION_OF = {"bed_a.wav": ("bed_a_original", "bed_a", "original"),

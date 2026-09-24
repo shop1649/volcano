@@ -9,7 +9,7 @@ import math
 import numpy as np
 import pytest
 
-from conftest import load_preset, set_preset, write_plan
+from .conftest import load_preset, set_preset, write_plan
 
 SR = 48000
 

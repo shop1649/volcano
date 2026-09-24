@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 import synthref as S
-from conftest import PRESET, no_abs_paths
+from .conftest import PRESET, no_abs_paths
 from shortkit.reference import sfx_catalog as C, sfx_map as M
 
 REPO = S.REPO

@@ -9,7 +9,7 @@ import shutil
 import pytest
 import yaml
 
-from conftest import M, codes, load_preset, set_preset, write_plan
+from .conftest import M, codes, load_preset, set_preset, write_plan
 
 
 def run(root, plan, **kw):

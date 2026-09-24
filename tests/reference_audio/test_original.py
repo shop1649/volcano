@@ -6,7 +6,7 @@ import shutil
 import pytest
 
 import synthref as S
-from conftest import PRESET, no_abs_paths
+from .conftest import PRESET, no_abs_paths
 from shortkit.reference import audio_bgm, audio_original as O, separation
 
 

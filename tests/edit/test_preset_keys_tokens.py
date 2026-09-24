@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 import yaml
 
-from conftest import codes, load_preset, set_preset, write_plan
+from .conftest import codes, load_preset, set_preset, write_plan
 
 
 def _resolve(root, plan):

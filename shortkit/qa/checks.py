@@ -170,15 +170,9 @@ class RowBuilder:
         if self._meas is None:
             from ..util.jsonio import read_json
 
-            self._meas = {}
-            d = self.ctx.preset.dir / "measurements"
-            if d.is_dir():
-                for f in sorted(d.glob("*.json")):
-                    m = read_json(f) or {}
-                    items = m.get("items", []) if isinstance(m, dict) else m
-                    for it in items or []:
-                        if isinstance(it, dict) and it.get("key"):
-                            self._meas[it["key"]] = it
+            from ..config import load_measurement_items
+
+            self._meas = load_measurement_items(self.ctx.preset.dir, strict=False)
         return self._meas
 
     def reference_of(self, keys: list[str]) -> tuple[Any, list[str], list[str]]:

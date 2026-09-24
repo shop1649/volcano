@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from conftest import PRESET, no_abs_paths
+from .conftest import PRESET, no_abs_paths
 from shortkit.reference import sfx_catalog as C
 from shortkit.reference.sfx_events import sfx_events_path
 

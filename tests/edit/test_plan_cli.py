@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import yaml
 
-from conftest import base_plan, write_plan
+from .conftest import base_plan, write_plan
 
 
 def test_sha_excludes_approval(root):

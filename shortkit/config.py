@@ -314,6 +314,52 @@ def preset_name_for_id(preset_id: str) -> str:
     raise KeyError(f"no preset with preset_id={preset_id}")
 
 
+# ----------------------------------------------------------------------------- measurement items (single loader)
+class MeasurementConflict(RuntimeError):
+    pass
+
+
+def load_measurement_items(preset_dir: Path, strict: bool = True) -> dict[str, dict]:
+    """All measurement items of a preset keyed by preset key (each item gets ``file``).
+
+    A key may appear in several files (e.g. a watched observation and an automatic emitter): a
+    ``measured`` item always wins over an ``unmeasured`` one; two MEASURED items for the same key are a
+    conflict (raised when ``strict``, else the first file wins and ``conflicts`` is recorded on the item).
+    """
+    out: dict[str, dict] = {}
+    d = Path(preset_dir) / "measurements"
+    if not d.is_dir():
+        return out
+    for f in sorted(d.glob("*.json")):
+        m = read_json(f)
+        items = m if isinstance(m, list) else m.get("items", [m]) if isinstance(m, dict) else []
+        for it in items or []:
+            if not (isinstance(it, dict) and it.get("key")):
+                continue
+            it = dict(it)
+            try:
+                it["file"] = paths.relp(f)
+            except ValueError:
+                it["file"] = f.name
+            k = it["key"]
+            prev = out.get(k)
+            if prev is None:
+                out[k] = it
+                continue
+            pm, im = prev.get("status") == "measured", it.get("status") == "measured"
+            if im and not pm:
+                it.setdefault("also_in", []).append(prev["file"])
+                out[k] = it
+            elif im and pm:
+                msg = f"measurement conflict for {k}: {prev['file']} and {it['file']} are both 'measured'"
+                if strict:
+                    raise MeasurementConflict(msg)
+                prev.setdefault("conflicts", []).append(it["file"])
+            else:
+                prev.setdefault("also_in", []).append(it["file"])
+    return out
+
+
 # ----------------------------------------------------------------------------- registry
 def registry_path(name: str) -> Path:
     return paths.preset_dir(name) / "settings_registry.yaml"
@@ -371,17 +417,7 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
     pr = load_preset(name)
     reg_file = registry_path(name)
     old = (read_yaml(reg_file, {}) or {}).get("entries", {})
-    meas_dir = pr.dir / "measurements"
-    meas: dict[str, dict] = {}
-    if meas_dir.is_dir():
-        for f in sorted(meas_dir.glob("*.json")):
-            m = read_json(f)
-            items = m if isinstance(m, list) else m.get("items", [m]) if isinstance(m, dict) else []
-            for it in items:
-                if isinstance(it, dict) and it.get("key"):
-                    it = dict(it)
-                    it["file"] = paths.relp(f)
-                    meas[it["key"]] = it
+    meas = load_measurement_items(pr.dir)
     code: dict[str, set[str]] = defaultdict(set)
     seen: set[str] = set()
     used: list[str] = []

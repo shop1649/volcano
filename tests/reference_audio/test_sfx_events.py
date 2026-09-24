@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 import synthref as S
-from conftest import PRESET, no_abs_paths
+from .conftest import PRESET, no_abs_paths
 from shortkit import paths
 from shortkit.reference import audio_bgm, separation, sfx_events as E
 
