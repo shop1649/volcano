@@ -85,7 +85,8 @@ def read_yaml(path: str | os.PathLike, default: Any = None) -> Any:
     p = Path(path)
     if not p.exists():
         return default
-    return yaml.safe_load(p.read_text(encoding="utf-8"))
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    return yaml.load(p.read_text(encoding="utf-8"), Loader=loader)
 
 
 def write_yaml(path: str | os.PathLike, data: Any) -> None:

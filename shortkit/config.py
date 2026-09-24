@@ -194,6 +194,9 @@ class TrackedMapping(Mapping):
             return self._wrap(k, self._d[k])
         return default
 
+    def __contains__(self, k: object) -> bool:  # membership test is not a value read
+        return k in self._d
+
     def __iter__(self) -> Iterator[str]:
         return iter(self._d)
 
@@ -229,6 +232,11 @@ class Preset:
             return TrackedMapping(v, key, self.log)
         self.log.record(key, _caller())
         return v
+
+    def peek(self, key: str, default: Any = None) -> Any:
+        """Untraced read for display only (reports, proposals). Never use it to drive production."""
+        v = get_path(self.data, key, _ABSENT)
+        return default if v is _ABSENT else copy.deepcopy(v)
 
     def section(self, key: str) -> TrackedMapping:
         v = get_path(self.data, key)
