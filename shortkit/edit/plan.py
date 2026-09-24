@@ -101,20 +101,51 @@ def plan_sha256(plan: dict) -> str:
     return hashlib.sha256(canonical_json(body).encode("utf-8")).hexdigest()
 
 
-def approval_state(plan: dict, preset_requires_first: bool) -> dict:
+APPROVAL_FIRST_KEY = "approval.first_episode_requires_approval"
+APPROVAL_LATER_KEY = "approval.later_episodes_require_approval"
+
+
+def is_first_episode(plan: dict) -> bool:
+    """episode_index 1 = first episode.  A plan WITHOUT an index is treated as a first episode
+    (the approval gate must not be skipped just because the index was left out)."""
+    idx = plan.get("episode_index")
+    return idx is None or int(idx) <= 1
+
+
+def approval_rule_key(plan: dict) -> str:
+    """The preset key that decides whether THIS episode needs approval (first vs later episodes)."""
+    return APPROVAL_FIRST_KEY if is_first_episode(plan) else APPROVAL_LATER_KEY
+
+
+def approval_state_for(plan: dict, preset) -> dict:
+    """The approval gate: reads the preset rule for this episode's index (traced ``Preset.get``:
+    ``approval.first_episode_requires_approval`` for episode 1, ``approval.later_episodes_require_approval``
+    for episode_index > 1) and returns ``approval_state``."""
+    key = approval_rule_key(plan)
+    rule = preset.get(key)
+    if not isinstance(rule, bool):
+        raise PlanError(f"프리셋 {key}={rule!r}: true/false 만 허용")
+    st = approval_state(plan, rule)
+    st["rule_key"] = key
+    return st
+
+
+def approval_state(plan: dict, preset_requires: bool) -> dict:
     """Approval facts for gates/reports.
 
-    required: production & episode_index == 1 & preset approval.first_episode_requires_approval
-    (a plan may also set approval.required: true explicitly; it can never switch the rule off).
+    ``preset_requires`` is the preset rule for THIS episode's index (``approval_state_for`` reads it:
+    first_episode_requires_approval for episode 1 / no index, later_episodes_require_approval for
+    episode_index > 1).  required: production & that rule (a plan may also set approval.required: true
+    explicitly; it can never switch the rule off).  Test mode never needs approval.
     """
     ap = plan.get("approval") or {}
-    required = (plan.get("mode") == "production" and int(plan.get("episode_index") or 0) == 1
-                and bool(preset_requires_first)) or (plan.get("mode") == "production" and ap.get("required") is True)
+    prod = plan.get("mode") == "production"
+    required = (prod and bool(preset_requires)) or (prod and ap.get("required") is True)
     approved = bool(ap.get("approved"))
     cur = plan_sha256(plan)
     return {"required": required, "approved": approved, "approved_by": ap.get("approved_by"),
             "approved_at": ap.get("approved_at"), "approved_plan_sha256": ap.get("approved_plan_sha256"),
-            "plan_sha256": cur,
+            "plan_sha256": cur, "first_episode": is_first_episode(plan),
             "changed_since_approval": bool(approved and ap.get("approved_plan_sha256")
                                            and ap.get("approved_plan_sha256") != cur)}
 

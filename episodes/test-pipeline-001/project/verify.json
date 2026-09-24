@@ -1,7 +1,7 @@
 {
   "schema": "shortkit.project_verify/1",
   "episode_id": "test-pipeline-001",
-  "checked_at": "2026-09-24T19:37:26+00:00",
+  "checked_at": "2026-09-24T20:29:35+00:00",
   "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.mlt",
   "master": "episodes/test-pipeline-001/output/test-pipeline-001.mp4",
   "thresholds": {
@@ -15,13 +15,14 @@
   },
   "method": {
     "video": "gray SSIM(11x11 gaussian, σ=1.5) + 평균 절대차, 1초 격자; 두 파일 모두 폭 540px 이하로 area 축소 후 비교",
-    "audio": "mono 16 kHz RMS envelope(50 ms) 상관 + 초별 RMS 레벨 차(dB)",
+    "audio": "mono 16 kHz((L+R)/2, util.media.read_audio) RMS envelope(50 ms) 상관 + 초별 RMS 레벨 차(dB)",
     "render": "melt avformat consumer, 프로필 해상도(축소 렌더 아님)"
   },
   "not_verified": [
     "Shotcut/Kdenlive GUI 에서 실제로 열어 보기(이 기계에 GUI 없음)",
     "사람이 직접 보고 들은 확인(청취·시청 확인 안 함)"
   ],
+  "master_sha256": "61acb4f9e44ff1232ef1d9bea51e69e662d83844d7661ef1bc993df405fa26b9",
   "melt": {
     "cmd": [
       "xvfb-run",
@@ -29,7 +30,7 @@
       "melt",
       "test-pipeline-001.mlt",
       "-consumer",
-      "avformat:../build/verify/test-pipeline-001.melt.15468.tmp.render.mkv",
+      "avformat:../build/verify/test-pipeline-001.melt.16633.tmp.render.mkv",
       "progressive=1",
       "vcodec=libx264",
       "preset=veryfast",
@@ -52,7 +53,7 @@
     "ssim_overall": 0.9973,
     "ssim_worst_second": 0.9939,
     "mad_overall": 0.418,
-    "audio_env_corr": 0.998,
+    "audio_env_corr": 0.9961,
     "duration_master_s": 21.2667,
     "duration_project_s": 21.266,
     "duration_diff_frames": 0.02,
@@ -76,7 +77,7 @@
       "level_diff_db": {
         "n": 22,
         "p10": 0.01,
-        "p50": 0.025,
+        "p50": 0.02,
         "p90": 0.094
       }
     }
@@ -99,8 +100,8 @@
       "ssim_min": 0.998,
       "mad": 0.251,
       "video": "pass",
-      "level_master_dbfs": -15.84,
-      "level_project_dbfs": -15.8,
+      "level_master_dbfs": -18.85,
+      "level_project_dbfs": -18.81,
       "level_diff_db": 0.04,
       "audio": "pass"
     },
@@ -113,9 +114,9 @@
       "ssim_min": 0.9979,
       "mad": 0.273,
       "video": "pass",
-      "level_master_dbfs": -15.48,
-      "level_project_dbfs": -15.46,
-      "level_diff_db": 0.02,
+      "level_master_dbfs": -18.45,
+      "level_project_dbfs": -18.42,
+      "level_diff_db": 0.03,
       "audio": "pass"
     },
     {
@@ -127,8 +128,8 @@
       "ssim_min": 0.9981,
       "mad": 0.27,
       "video": "pass",
-      "level_master_dbfs": -15.85,
-      "level_project_dbfs": -15.84,
+      "level_master_dbfs": -18.86,
+      "level_project_dbfs": -18.85,
       "level_diff_db": 0.02,
       "audio": "pass"
     },
@@ -141,8 +142,8 @@
       "ssim_min": 0.998,
       "mad": 0.268,
       "video": "pass",
-      "level_master_dbfs": -16.0,
-      "level_project_dbfs": -15.97,
+      "level_master_dbfs": -19.01,
+      "level_project_dbfs": -18.98,
       "level_diff_db": 0.03,
       "audio": "pass"
     },
@@ -155,8 +156,8 @@
       "ssim_min": 0.998,
       "mad": 0.26,
       "video": "pass",
-      "level_master_dbfs": -17.48,
-      "level_project_dbfs": -17.47,
+      "level_master_dbfs": -20.49,
+      "level_project_dbfs": -20.48,
       "level_diff_db": 0.01,
       "audio": "pass"
     },
@@ -169,8 +170,8 @@
       "ssim_min": 0.998,
       "mad": 0.262,
       "video": "pass",
-      "level_master_dbfs": -17.48,
-      "level_project_dbfs": -17.46,
+      "level_master_dbfs": -20.49,
+      "level_project_dbfs": -20.47,
       "level_diff_db": 0.01,
       "audio": "pass"
     },
@@ -183,9 +184,9 @@
       "ssim_min": 0.9979,
       "mad": 0.288,
       "video": "pass",
-      "level_master_dbfs": -17.1,
-      "level_project_dbfs": -17.11,
-      "level_diff_db": -0.01,
+      "level_master_dbfs": -20.07,
+      "level_project_dbfs": -20.09,
+      "level_diff_db": -0.02,
       "audio": "pass"
     },
     {
@@ -197,9 +198,9 @@
       "ssim_min": 0.9978,
       "mad": 0.317,
       "video": "pass",
-      "level_master_dbfs": -19.11,
-      "level_project_dbfs": -19.0,
-      "level_diff_db": 0.11,
+      "level_master_dbfs": -21.83,
+      "level_project_dbfs": -21.72,
+      "level_diff_db": 0.12,
       "audio": "pass"
     },
     {
@@ -211,9 +212,9 @@
       "ssim_min": 0.998,
       "mad": 0.261,
       "video": "pass",
-      "level_master_dbfs": -15.82,
-      "level_project_dbfs": -15.8,
-      "level_diff_db": 0.02,
+      "level_master_dbfs": -18.83,
+      "level_project_dbfs": -18.81,
+      "level_diff_db": 0.03,
       "audio": "pass"
     },
     {
@@ -225,8 +226,8 @@
       "ssim_min": 0.998,
       "mad": 0.264,
       "video": "pass",
-      "level_master_dbfs": -15.74,
-      "level_project_dbfs": -15.73,
+      "level_master_dbfs": -18.75,
+      "level_project_dbfs": -18.74,
       "level_diff_db": 0.02,
       "audio": "pass"
     },
@@ -239,9 +240,9 @@
       "ssim_min": 0.998,
       "mad": 0.309,
       "video": "pass",
-      "level_master_dbfs": -17.79,
-      "level_project_dbfs": -17.77,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -20.38,
+      "level_project_dbfs": -20.35,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -253,8 +254,8 @@
       "ssim_min": 0.9979,
       "mad": 0.319,
       "video": "pass",
-      "level_master_dbfs": -18.6,
-      "level_project_dbfs": -18.6,
+      "level_master_dbfs": -20.96,
+      "level_project_dbfs": -20.95,
       "level_diff_db": 0.01,
       "audio": "pass"
     },
@@ -267,8 +268,8 @@
       "ssim_min": 0.9666,
       "mad": 1.88,
       "video": "pass",
-      "level_master_dbfs": -20.61,
-      "level_project_dbfs": -20.59,
+      "level_master_dbfs": -23.62,
+      "level_project_dbfs": -23.6,
       "level_diff_db": 0.02,
       "audio": "pass"
     },
@@ -281,9 +282,9 @@
       "ssim_min": 0.996,
       "mad": 0.392,
       "video": "pass",
-      "level_master_dbfs": -17.47,
-      "level_project_dbfs": -17.47,
-      "level_diff_db": 0.01,
+      "level_master_dbfs": -20.49,
+      "level_project_dbfs": -20.48,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -295,9 +296,9 @@
       "ssim_min": 0.981,
       "mad": 0.429,
       "video": "pass",
-      "level_master_dbfs": -16.37,
-      "level_project_dbfs": -16.34,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -19.37,
+      "level_project_dbfs": -19.35,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -309,9 +310,9 @@
       "ssim_min": 0.9789,
       "mad": 0.518,
       "video": "pass",
-      "level_master_dbfs": -15.9,
-      "level_project_dbfs": -15.87,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -18.41,
+      "level_project_dbfs": -18.39,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -323,8 +324,8 @@
       "ssim_min": 0.9965,
       "mad": 0.455,
       "video": "pass",
-      "level_master_dbfs": -15.83,
-      "level_project_dbfs": -15.79,
+      "level_master_dbfs": -18.84,
+      "level_project_dbfs": -18.8,
       "level_diff_db": 0.03,
       "audio": "pass"
     },
@@ -337,9 +338,9 @@
       "ssim_min": 0.9964,
       "mad": 0.435,
       "video": "pass",
-      "level_master_dbfs": -15.57,
-      "level_project_dbfs": -15.54,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -18.57,
+      "level_project_dbfs": -18.55,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -351,8 +352,8 @@
       "ssim_min": 0.9967,
       "mad": 0.415,
       "video": "pass",
-      "level_master_dbfs": -15.85,
-      "level_project_dbfs": -15.83,
+      "level_master_dbfs": -18.86,
+      "level_project_dbfs": -18.84,
       "level_diff_db": 0.02,
       "audio": "pass"
     },
@@ -365,9 +366,9 @@
       "ssim_min": 0.9943,
       "mad": 0.386,
       "video": "pass",
-      "level_master_dbfs": -15.99,
-      "level_project_dbfs": -15.97,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -19.0,
+      "level_project_dbfs": -18.98,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -379,8 +380,8 @@
       "ssim_min": 0.9793,
       "mad": 0.496,
       "video": "pass",
-      "level_master_dbfs": -18.54,
-      "level_project_dbfs": -18.44,
+      "level_master_dbfs": -21.55,
+      "level_project_dbfs": -21.45,
       "level_diff_db": 0.1,
       "audio": "pass"
     },
@@ -393,8 +394,8 @@
       "ssim_min": 0.9839,
       "mad": 0.516,
       "video": "pass",
-      "level_master_dbfs": -29.24,
-      "level_project_dbfs": -28.51,
+      "level_master_dbfs": -32.26,
+      "level_project_dbfs": -31.52,
       "level_diff_db": 0.74,
       "audio": "pass"
     }
@@ -404,7 +405,7 @@
   "other_formats": {
     "fcpxml": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.fcpxml",
-      "checked_at": "2026-09-24T19:38:43+00:00",
+      "checked_at": "2026-09-24T20:31:20+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
@@ -412,7 +413,7 @@
     },
     "otio": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.otio",
-      "checked_at": "2026-09-24T19:38:43+00:00",
+      "checked_at": "2026-09-24T20:31:20+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",

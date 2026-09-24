@@ -30,6 +30,15 @@ def _no_abs_paths(obj, root):
 
 
 def test_fonts_cli_without_crops_is_unmeasured(tmp_root, capsys):
+    """No reference captions: fonts_report says 못 잼 and measurements/font_identity.json STILL exists with
+    every role's font_name and bold unmeasured, carrying the reference-collection blocker."""
+    import shutil
+    from pathlib import Path
+
+    snap = Path(__file__).resolve().parents[2] / "presets" / "joshuamagazine" / "reference" / "latest100.json"
+    (tmp_root / "presets" / "joshuamagazine" / "reference").mkdir(parents=True, exist_ok=True)
+    shutil.copy(snap, tmp_root / "presets" / "joshuamagazine" / "reference" / "latest100.json")
+    real = read_json(snap)
     a = _parser().parse_args(["fonts", "--preset", "joshuamagazine"])
     assert a.func(a) == 0
     out = capsys.readouterr().out
@@ -40,8 +49,36 @@ def test_fonts_cli_without_crops_is_unmeasured(tmp_root, capsys):
     assert ident["roles"]["title"]["current_preset_font"] == "Noto Sans CJK KR Black"
     assert ident["roles"]["title"]["status"] == "unmeasured"
     assert rep["status"].startswith("unmeasured")
-    assert not (tmp_root / "presets" / "joshuamagazine" / "measurements" / "font_identity.json").exists()
+    meas = read_json(tmp_root / "presets" / "joshuamagazine" / "measurements" / "font_identity.json")
+    assert meas["schema"] == "shortkit.measurement/1" and meas["group"] == "font_identity"
+    assert meas["source_snapshot"] == real.get("captured_at")
+    items = {i["key"]: i for i in meas["items"]}
+    roles = list(ident["roles"])
+    assert set(items) == {f"text.roles.{r}.{k}" for r in roles for k in ("font_name", "bold")}
+    for it in items.values():
+        assert it["status"] == "unmeasured" and it["value"] is None and it["blocker"]
+        if real.get("status") == "blocked":
+            assert "레퍼런스 목록 수집 차단" in it["blocker"] and str(real["blocker"])[:60] in it["blocker"]
     _no_abs_paths(rep, tmp_root)
+    _no_abs_paths(meas, tmp_root)
+
+
+def test_face_weight_and_font_identity_merge(tmp_root):
+    """bold rule reads OS/2 usWeightClass with the renderer's parser; a --roles run keeps other roles."""
+    from shortkit.config import load_preset
+
+    assert T.face_weight("Gothic A1 Black") == (900, None)
+    assert T.face_weight("Pretendard Bold")[0] == 700
+    assert T.face_weight("Do Hyeon")[0] == 400 and T.face_weight("Do Hyeon")[0] < T.BOLD_MIN_WEIGHT
+    w, blk = T.face_weight("No Such Font Anywhere")
+    assert w is None and blk
+    pr = load_preset("joshuamagazine")
+    T.write_font_identity(pr, T._font_identity_unmeasured("title", "x") + T._font_identity_unmeasured("dialogue", "x"))
+    T.write_font_identity(pr, T._font_identity_unmeasured("title", "y"))
+    meas = read_json(tmp_root / "presets" / "joshuamagazine" / "measurements" / "font_identity.json")
+    items = {i["key"]: i for i in meas["items"]}
+    assert items["text.roles.title.font_name"]["blocker"] == "y" and items["text.roles.title.bold"]["blocker"] == "y"
+    assert items["text.roles.dialogue.bold"]["blocker"] == "x" and len(items) == 4
 
 
 def test_font_candidates_cli_lists(tmp_root, capsys):
@@ -150,7 +187,13 @@ def test_ref_fonts_end_to_end_on_synthetic_reference(tmp_root, capsys):
     assert items["text.roles.title.font_name"]["resolution"] == [720, 1280]
     assert items["text.roles.title.font_name"]["by_format"]["F1"]["value"] == "Gothic A1 Black"
     assert items["text.roles.title.font_name"]["overall"]["n"] == 2
-    assert "text.roles.situation.font_name" not in items   # nothing measured -> nothing written for it
+    bold = items["text.roles.title.bold"]                 # identical face Gothic A1 Black: OS/2 weight 900
+    assert bold["status"] == "measured" and bold["value"] is True and bold["overall"]["weight_class"] == 900
+    assert bold["by_format"]["F1"]["value"] is True and bold["resolution"] == [720, 1280]
+    assert all(e["value"] is True and e["t"] is not None for e in bold["evidence"])
+    for k in ("font_name", "bold"):                       # no crops for that role -> unmeasured item, not missing
+        it = items[f"text.roles.situation.{k}"]
+        assert it["status"] == "unmeasured" and it["value"] is None and "crop" in it["blocker"]
     for c in title["crops"]:
         assert c["resolution"] == [720, 1280] and len(c["bbox"]) == 4
     _no_abs_paths(rep, tmp_root)

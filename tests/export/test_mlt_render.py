@@ -87,7 +87,7 @@ def test_tempo_bgm_and_blur_are_prerendered_and_declared(root, fresh_project, mo
     from shortkit.edit.ir import TimedRect
 
     monkeypatch.setattr(export_mlt, "load_render_report", lambda r: None)
-    r = ef.build_resolved(bgm_tempo=1.1)
+    r = ef.build_resolved(bgm_tempo=1.1, blur_sigma_ratio=1 / 6.0)
     r.clips[2].blur = [TimedRect(1300, 300, 200, 200, 10.5, 11.5, "synthetic blur test")]
     ef.write_ass(root, r)
     out, dec = export_mlt.export_with_decisions(r, fresh_project, compute_loudness=False)
@@ -95,6 +95,7 @@ def test_tempo_bgm_and_blur_are_prerendered_and_declared(root, fresh_project, mo
     assert "bgm_tempo" in kinds and kinds["bgm_tempo"]["tempo_ratio"] == 1.1
     assert kinds["bgm_tempo"]["method"] in ("rubberband", "atempo", "cached")
     assert "blur_intermediate" in kinds and (fresh_project / kinds["blur_intermediate"]["file"]).is_file()
+    assert kinds["blur_intermediate"]["sigmas_src_px"] == [pytest.approx(200 / 6.0, abs=1e-3)]   # render.blur_sigma_src
     x = ET.parse(out).getroot()
     res = [q.text for q in x.iter("property") if q.get("name") == "resource"]
     assert any("media/bgm_tempo_" in t for t in res)

@@ -294,6 +294,7 @@
       <property name="transition.distort">1</property>
       <property name="transition.rect">0 656 1080 608 1</property>
     </filter>
+    <property name="shortkit:flash_scope">region</property>
   </producer>
   <playlist id="playlist2">
     <property name="shotcut:video">1</property>
@@ -343,6 +344,18 @@
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-12</property>
     </filter>
+    <filter id="filter20" in="0" out="12">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
+    </filter>
+    <filter id="filter21" in="0" out="12">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">0=0;3=0;4=-0.071;5=-0.932;6=-2.128;7=-1.449;8=-0.264;9=0;12=0</property>
+      <property name="shortkit:role">master foreground safety limiter</property>
+    </filter>
     <property name="shortkit:event">1.300s 창가 남성이 일어서기 시작함(확대 시작)</property>
   </producer>
   <producer id="audio2" in="0" out="1">
@@ -352,10 +365,16 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 click (fx2)</property>
-    <filter id="filter20" in="0" out="1">
+    <filter id="filter22" in="0" out="1">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
+    </filter>
+    <filter id="filter23" in="0" out="1">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
     </filter>
     <property name="shortkit:event">6.800s 다시 앉은 순간 화면이 멈춤</property>
   </producer>
@@ -366,10 +385,16 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 pop (fx3)</property>
-    <filter id="filter21" in="0" out="2">
+    <filter id="filter24" in="0" out="2">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
+    </filter>
+    <filter id="filter25" in="0" out="2">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
     </filter>
     <property name="shortkit:event">7.750s 뒷줄 남성이 손을 들어 올림</property>
   </producer>
@@ -380,10 +405,16 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 ding (fx4)</property>
-    <filter id="filter22" in="0" out="35">
+    <filter id="filter26" in="0" out="35">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
+    </filter>
+    <filter id="filter27" in="0" out="35">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
     </filter>
     <property name="shortkit:event">11.000s 뒷줄 남성이 자리에서 일어섬</property>
   </producer>
@@ -394,10 +425,16 @@
     <property name="mlt_service">avformat</property>
     <property name="seekable">1</property>
     <property name="shotcut:caption">효과음 boing (fx5)</property>
-    <filter id="filter23" in="0" out="17">
+    <filter id="filter28" in="0" out="17">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">-8</property>
+    </filter>
+    <filter id="filter29" in="0" out="17">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
     </filter>
     <property name="shortkit:event">15.050s 두 사람이 동시에 고개를 옆으로 기울임</property>
   </producer>
@@ -423,18 +460,18 @@
     <property name="seekable">1</property>
     <property name="shotcut:caption">원본 소리 s3 (raw)</property>
     <property name="video_index">-1</property>
-    <filter id="filter24" in="585" out="653">
+    <filter id="filter30" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
       <property name="level">0</property>
     </filter>
-    <filter id="filter25" in="585" out="653">
+    <filter id="filter31" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">fadeInVolume</property>
       <property name="level">0=-1.584;1=0;2=0</property>
       <property name="shotcut:animIn">1</property>
     </filter>
-    <filter id="filter26" in="585" out="653">
+    <filter id="filter32" in="585" out="653">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">fadeOutVolume</property>
       <property name="level">0=0;66=0;67=-1.584;68=-120</property>
@@ -527,13 +564,13 @@
       <property name="threads">0</property>
       <property name="always_active">1</property>
     </transition>
-    <filter id="filter28">
+    <filter id="filter34">
       <property name="mlt_service">avfilter.subtitles</property>
       <property name="av.filename">captions.ass</property>
       <property name="av.fontsdir">../build/fonts</property>
       <property name="shortkit:role">captions+decorations (one ASS layer, same file as the master)</property>
     </filter>
-    <filter id="filter29">
+    <filter id="filter35">
       <property name="mlt_service">volume</property>
       <property name="level">-0.067</property>
       <property name="shotcut:filter">audioGain</property>

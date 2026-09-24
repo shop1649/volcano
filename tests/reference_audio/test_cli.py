@@ -10,7 +10,8 @@ import synthref as S
 from shortkit.reference import audio_cli
 
 REPO = S.REPO
-CMDS = {"separate", "bgm-identify", "bgm-align", "original", "sfx-events", "sfx-catalog", "sfx-map", "audio-analyze"}
+CMDS = {"separate", "bgm-identify", "bgm-align", "original", "sfx-events", "sfx-catalog", "sfx-map", "audio-analyze",
+        "audio-measure"}
 
 
 def test_register_adds_all_commands():
@@ -30,6 +31,12 @@ def test_real_state_commands(tmp_project, capsys):
     assert audio_cli.main(["separate", "--video", "notdownloaded"]) == 3
     out = capsys.readouterr().out
     assert "못 잼" in out and "미제공" in out
+    assert audio_cli.main(["audio-measure"]) == 0                # no reference video: every item 못 잼 + blocker
+    out = capsys.readouterr().out
+    for key in ("audio.loudness.integrated_lufs", "audio.bgm.loop", "audio.original.keep_gain_db",
+                "audio.original.fade_s", "audio.silence.fade_s", "audio.sfx.gain_db_default"):
+        assert key in out
+    assert "측정됨" not in out
 
 
 @pytest.mark.slow

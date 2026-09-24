@@ -190,6 +190,17 @@ def test_motion(analyzed):
     assert len(s) == 1 and s[0]["t"] == pytest.approx(8.0, abs=0.1) and s[0]["factor"] == pytest.approx(0.5, abs=0.1)
     assert out["motion"]["presence"] == {"zoom": "present", "freeze": "present", "speed": "present",
                                          "flash": "present"}
+    # the mock zoom is zoompan's linear ramp about the frame centre: ease = linear; a zoom about the
+    # centre looks the same with and without recenter -> no recenter observation
+    fit = z[0]["ease_fit"]
+    assert fit["ease"] == "linear" and fit["dur_s"] == pytest.approx(0.5, abs=0.07), fit
+    assert z[0]["recenter_fit"]["class"] == "centre" and z[0]["recenter_fit"]["recenter"] is None
+    # the mock's white flash (ffmpeg fade inside the footage band) covers the video region only
+    fl = [e for e in ev if e["type"] == "flash"]
+    assert len(fl) == 1 and fl[0]["scope"] == "region"
+    assert out["shots"]["cuts"][1]["scope"]["value"] == "region"
+    # no arrow / circle / box in the mock (yellow dialogue and cyan reaction captions are masked)
+    assert out["motion"]["decorations"]["items"] == [], out["motion"]["decorations"]
 
 
 def test_aggregate_single_mock_video_scaled_to_canvas(analyzed, monkeypatch):
@@ -220,6 +231,20 @@ def test_aggregate_single_mock_video_scaled_to_canvas(analyzed, monkeypatch):
     assert items["text.roles.situation.size_px"]["by_format"] == {}
     assert items["canvas.video_region.fit"]["status"] == "unmeasured" and items["canvas.video_region.fit"]["blocker"]
     assert items["text.roles.situation.timing.lead_s"]["status"] == "unmeasured"
+    # emitters added for keys that had no measurement path
+    assert items["motion.zoom.ease"]["value"] == "linear"
+    assert items["motion.zoom.recenter"]["status"] == "unmeasured"          # centre zoom: no observation
+    assert items["motion.transitions.flash.scope"]["value"] == "region"
+    assert items["text.roles.dialogue.quote_marks"]["value"] == ["“", "”"]
+    sm = items["canvas.safe_margin.left"]
+    assert sm["status"] == "measured" and sm["resolution"] == [1080, 1920]
+    # leftmost caption ink in the mock: the situation line (x=175 at 540 wide) -> 350 at 1080
+    left_truth = min(e["bbox"][0] for e in truth["events"])
+    assert sm["value"] == pytest.approx(2 * left_truth, abs=8)
+    top_truth = min(e["bbox"][1] for e in truth["events"])
+    assert items["canvas.safe_margin.top"]["value"] == pytest.approx(2 * top_truth, abs=8)
+    # no snapshot / downloads in this fixture: the canvas size cannot be measured
+    assert items["canvas.width"]["status"] == "unmeasured" and items["canvas.width"]["blocker"]
     ev = items["text.roles.title.size_px"]["evidence"][0]
     assert ev["video_id"] == "mockref_a" and ev["frame"].startswith("presets/joshuamagazine/analysis/mockref_a/frames/")
 

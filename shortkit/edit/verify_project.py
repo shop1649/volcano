@@ -13,8 +13,10 @@ Comparison (same absolute time, 1-second grid):
          files are then decoded to gray, area-downscaled to <= 540 px wide; per frame SSIM (Gaussian 11x11,
          sigma 1.5, K1=0.01, K2=0.03, same as Wang et al. 2004) and mean |diff|; per second:
          mean/min SSIM and mean abs diff.
-  audio  mono 16 kHz; RMS envelope (50 ms windows) Pearson correlation over the whole file;
-         per second RMS level difference in dB (only where the master is above -45 dBFS).
+  audio  mono 16 kHz (shortkit.util.media.read_audio downmix (L+R)/2 for both files, so the
+         convention cancels in every comparison); RMS envelope (50 ms windows) Pearson correlation
+         over the whole file; per second RMS level difference in dB (only where the master is above
+         -45 dBFS of that downmix).
 Thresholds (defaults below, recorded in verify.json):
   ssim_sec_mean >= 0.90  per second    (identical geometry through two different scalers +
                                         x264 of both files measured ~0.95-0.99 on test clips;
@@ -294,11 +296,20 @@ def verify(resolved: ResolvedEdit, master_mp4: Path, project_file: Path, *, thre
                  "project_file": _rel(project_file), "master": _rel(master_mp4), "thresholds": th,
                  "method": {"video": "gray SSIM(11x11 gaussian, σ=1.5) + 평균 절대차, 1초 격자; 두 파일 모두 "
                                      f"폭 {COMPARE_MAX_WIDTH}px 이하로 area 축소 후 비교",
-                            "audio": "mono 16 kHz RMS envelope(50 ms) 상관 + 초별 RMS 레벨 차(dB)",
+                            "audio": "mono 16 kHz((L+R)/2, util.media.read_audio) RMS envelope(50 ms) 상관 + "
+                                     "초별 RMS 레벨 차(dB)",
                             "render": "melt avformat consumer, 프로필 해상도(축소 렌더 아님)"},
                  "not_verified": ["Shotcut/Kdenlive GUI 에서 실제로 열어 보기(이 기계에 GUI 없음)",
                                   "사람이 직접 보고 들은 확인(청취·시청 확인 안 함)"]}
     status, why = None, None
+    ir_file = paths.absp(f"episodes/{r.episode_id}/build/resolved.json")
+    if master_mp4.is_file():
+        from ..util.hashing import sha256_file
+
+        res["master_sha256"] = sha256_file(master_mp4)
+        if ir_file.is_file() and master_mp4.stat().st_mtime < ir_file.stat().st_mtime:
+            res["warnings"] = [f"마스터 MP4 가 {_rel(ir_file)} 보다 오래됨(IR 을 다시 만든 뒤 다시 렌더하지 않음) → "
+                               "차이가 나면 프로젝트가 아니라 마스터가 옛 IR 일 수 있음"]
     if not master_mp4.is_file():
         status, why = "unmeasured", f"마스터 MP4 없음: {_rel(master_mp4)}"
     elif not project_file.is_file():

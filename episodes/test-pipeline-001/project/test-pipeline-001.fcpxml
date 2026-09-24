@@ -43,13 +43,96 @@
             <asset-clip ref="r3" offset="0s" name="s1" start="3/2s" duration="4s" tcFormat="NDF" srcEnable="video">
               <adjust-conform type="none" />
               <adjust-crop mode="trim">
-                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000">
+                  <param name="left">
+                    <keyframeAnimation>
+                      <keyframe time="3/2s" value="0.0411" interp="linear" />
+                      <keyframe time="14/5s" value="0.0411" interp="linear" />
+                      <keyframe time="17/6s" value="4.1616" interp="linear" />
+                      <keyframe time="43/15s" value="7.1492" interp="linear" />
+                      <keyframe time="29/10s" value="9.3188" interp="linear" />
+                      <keyframe time="44/15s" value="10.8782" interp="linear" />
+                      <keyframe time="89/30s" value="11.9725" interp="linear" />
+                      <keyframe time="3s" value="12.7087" interp="linear" />
+                      <keyframe time="91/30s" value="13.1706" interp="linear" />
+                      <keyframe time="46/15s" value="13.4280" interp="linear" />
+                      <keyframe time="31/10s" value="13.5430" interp="linear" />
+                      <keyframe time="47/15s" value="13.5734" interp="linear" />
+                      <keyframe time="19/6s" value="13.5746" interp="linear" />
+                      <keyframe time="82/15s" value="13.5746" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="top">
+                    <keyframeAnimation>
+                      <keyframe time="3/2s" value="0.0000" interp="linear" />
+                      <keyframe time="14/5s" value="0.0000" interp="linear" />
+                      <keyframe time="17/6s" value="3.1574" interp="linear" />
+                      <keyframe time="43/15s" value="5.4467" interp="linear" />
+                      <keyframe time="29/10s" value="7.1092" interp="linear" />
+                      <keyframe time="44/15s" value="8.3042" interp="linear" />
+                      <keyframe time="89/30s" value="9.1427" interp="linear" />
+                      <keyframe time="3s" value="9.7069" interp="linear" />
+                      <keyframe time="91/30s" value="10.0608" interp="linear" />
+                      <keyframe time="46/15s" value="10.2581" interp="linear" />
+                      <keyframe time="31/10s" value="10.3462" interp="linear" />
+                      <keyframe time="47/15s" value="10.3695" interp="linear" />
+                      <keyframe time="19/6s" value="10.3704" interp="linear" />
+                      <keyframe time="82/15s" value="10.3704" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="right">
+                    <keyframeAnimation>
+                      <keyframe time="3/2s" value="0.0411" interp="linear" />
+                      <keyframe time="14/5s" value="0.0411" interp="linear" />
+                      <keyframe time="17/6s" value="2.0050" interp="linear" />
+                      <keyframe time="43/15s" value="3.4289" interp="linear" />
+                      <keyframe time="29/10s" value="4.4629" interp="linear" />
+                      <keyframe time="44/15s" value="5.2061" interp="linear" />
+                      <keyframe time="89/30s" value="5.7277" interp="linear" />
+                      <keyframe time="3s" value="6.0785" interp="linear" />
+                      <keyframe time="91/30s" value="6.2987" interp="linear" />
+                      <keyframe time="46/15s" value="6.4214" interp="linear" />
+                      <keyframe time="31/10s" value="6.4762" interp="linear" />
+                      <keyframe time="47/15s" value="6.4907" interp="linear" />
+                      <keyframe time="19/6s" value="6.4912" interp="linear" />
+                      <keyframe time="82/15s" value="6.4912" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="bottom">
+                    <keyframeAnimation>
+                      <keyframe time="3/2s" value="0.0000" interp="linear" />
+                      <keyframe time="14/5s" value="0.0000" interp="linear" />
+                      <keyframe time="17/6s" value="2.9319" interp="linear" />
+                      <keyframe time="43/15s" value="5.0577" interp="linear" />
+                      <keyframe time="29/10s" value="6.6014" interp="linear" />
+                      <keyframe time="44/15s" value="7.7110" interp="linear" />
+                      <keyframe time="89/30s" value="8.4897" interp="linear" />
+                      <keyframe time="3s" value="9.0135" interp="linear" />
+                      <keyframe time="91/30s" value="9.3422" interp="linear" />
+                      <keyframe time="46/15s" value="9.5254" interp="linear" />
+                      <keyframe time="31/10s" value="9.6072" interp="linear" />
+                      <keyframe time="47/15s" value="9.6288" interp="linear" />
+                      <keyframe time="19/6s" value="9.6296" interp="linear" />
+                      <keyframe time="82/15s" value="9.6296" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </trim-rect>
               </adjust-crop>
               <adjust-transform position="0.0000 -0.0000" scale="0.562963 0.562963" anchor="0 0">
                 <param name="position">
                   <keyframeAnimation>
                     <keyframe time="3/2s" value="0.0000 -0.0000" interp="linear" />
-                    <keyframe time="14/5s" value="0.0000 -0.0000" interp="easeOut" />
+                    <keyframe time="14/5s" value="0.0000 -0.0000" interp="linear" />
+                    <keyframe time="17/6s" value="-0.6464 0.0380" interp="linear" />
+                    <keyframe time="43/15s" value="-1.1701 0.0688" interp="linear" />
+                    <keyframe time="29/10s" value="-1.5840 0.0932" interp="linear" />
+                    <keyframe time="44/15s" value="-1.9010 0.1118" interp="linear" />
+                    <keyframe time="89/30s" value="-2.1341 0.1255" interp="linear" />
+                    <keyframe time="3s" value="-2.2961 0.1351" interp="linear" />
+                    <keyframe time="91/30s" value="-2.4000 0.1412" interp="linear" />
+                    <keyframe time="46/15s" value="-2.4586 0.1446" interp="linear" />
+                    <keyframe time="31/10s" value="-2.4850 0.1462" interp="linear" />
+                    <keyframe time="47/15s" value="-2.4920 0.1466" interp="linear" />
                     <keyframe time="19/6s" value="-2.4923 0.1466" interp="linear" />
                     <keyframe time="82/15s" value="-2.4923 0.1466" interp="linear" />
                   </keyframeAnimation>
@@ -57,7 +140,17 @@
                 <param name="scale">
                   <keyframeAnimation>
                     <keyframe time="3/2s" value="0.562963 0.562963" interp="linear" />
-                    <keyframe time="14/5s" value="0.562963 0.562963" interp="easeOut" />
+                    <keyframe time="14/5s" value="0.562963 0.562963" interp="linear" />
+                    <keyframe time="17/6s" value="0.599467 0.599467" interp="linear" />
+                    <keyframe time="43/15s" value="0.629040 0.629040" interp="linear" />
+                    <keyframe time="29/10s" value="0.652413 0.652413" interp="linear" />
+                    <keyframe time="44/15s" value="0.670316 0.670316" interp="linear" />
+                    <keyframe time="89/30s" value="0.683476 0.683476" interp="linear" />
+                    <keyframe time="3s" value="0.692625 0.692625" interp="linear" />
+                    <keyframe time="91/30s" value="0.698491 0.698491" interp="linear" />
+                    <keyframe time="46/15s" value="0.701804 0.701804" interp="linear" />
+                    <keyframe time="31/10s" value="0.703293 0.703293" interp="linear" />
+                    <keyframe time="47/15s" value="0.703689 0.703689" interp="linear" />
                     <keyframe time="19/6s" value="0.703704 0.703704" interp="linear" />
                     <keyframe time="82/15s" value="0.703704 0.703704" interp="linear" />
                   </keyframeAnimation>
@@ -98,7 +191,21 @@
                 </adjust-volume>
               </asset-clip>
               <asset-clip ref="r8" lane="-2" offset="83/30s" name="SFX whoosh" start="0s" duration="7/15s" audioRole="effects">
-                <adjust-volume amount="-12.07dB" />
+                <adjust-volume amount="-12.07dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-12.07dB" interp="linear" />
+                      <keyframe time="2/15s" value="-12.07dB" interp="linear" />
+                      <keyframe time="1/6s" value="-12.14dB" interp="linear" />
+                      <keyframe time="1/5s" value="-13.00dB" interp="linear" />
+                      <keyframe time="7/30s" value="-14.20dB" interp="linear" />
+                      <keyframe time="4/15s" value="-13.52dB" interp="linear" />
+                      <keyframe time="3/10s" value="-12.33dB" interp="linear" />
+                      <keyframe time="1/3s" value="-12.07dB" interp="linear" />
+                      <keyframe time="13/30s" value="-12.07dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
                 <note>event 1.30s: 창가 남성이 일어서기 시작함(확대 시작)</note>
               </asset-clip>
               <caption lane="10" offset="3/2s" name="제목" start="3600s" duration="319/15s" role="iTT?captionFormat=ITT.ko">

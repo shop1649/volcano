@@ -7,8 +7,10 @@
     ref sfx-events     효과음 이벤트 추출(BGM·보컬 제거 잔여 + 믹스 대조) -> audio/sfx_events.json
     ref sfx-catalog    최신 N편 효과음 카탈로그 -> sfx_catalog.json
     ref sfx-map        카탈로그 종류 ↔ 사용자 효과음 창고 매칭 -> sfx_map.yaml
-    ref audio-analyze  위 영상별 단계를 순서대로(separate → bgm → original → sfx-events)
-    ref audio-measure  영상별 결과를 measurements/audio.json 으로 집계(audio.bgm.*, audio.ducking.*)
+    ref audio-analyze  위 영상별 단계를 순서대로(separate → bgm → original → sfx-events → loudness)
+    ref audio-measure  영상별 결과를 measurements/audio.json 으로 집계(audio.loudness.*, audio.bgm.* 반복 포함,
+                       audio.ducking.*, audio.original.keep_gain_db/fade_s, audio.silence.fade_s,
+                       audio.sfx.gain_db_default)
 
 `register(subparsers)` is called by ``shortkit/reference/cli.py``; this module can also run on its
 own: ``python -m shortkit.reference.audio_cli <command> ...``.
@@ -76,12 +78,12 @@ def register(sub) -> None:
     p.add_argument("--threshold", type=float, default=None, help="유사도 기준(기본 0.80)")
     p.set_defaults(func=cmd_sfx_map)
 
-    p = sub.add_parser("audio-measure", help="영상별 bgm/original 결과 -> measurements/audio.json (프리셋 audio.* 측정값)")
+    p = sub.add_parser("audio-measure", help="영상별 음량/bgm/original/효과음 결과 -> measurements/audio.json (프리셋 audio.* 측정값)")
     p.add_argument("--preset", default=DEFAULT_PRESET)
     p.add_argument("--videos", help="쉼표로 구분한 video_id 목록(생략 시 분석된 모든 영상)")
     p.set_defaults(func=cmd_audio_measure)
 
-    p = sub.add_parser("audio-analyze", help="영상별 오디오 분석 일괄: separate → bgm-identify → original → sfx-events")
+    p = sub.add_parser("audio-analyze", help="영상별 오디오 분석 일괄: separate → bgm-identify → original → sfx-events → 음량")
     _video_args(p, allow_all=True)
     p.add_argument("--no-separate", action="store_true", help="분리 시도 생략(캐시만 사용)")
     p.set_defaults(func=cmd_audio_analyze)
@@ -143,6 +145,10 @@ def _print_bgm(r: dict) -> None:
               f"  사용 범위(레퍼런스) {f('used_range_ref_s')}  게인 {f('gain_db')} dB")
         print(f"  페이드 in {f('fade_in_s')} s / out {f('fade_out_s')} s, 끊김 {len(f('cuts'))}회, "
               f"정렬 {m['alignment']['mode']} (일치도 {m['alignment']['coherence']})")
+        lp = m.get("loop") or {}
+        jumps = ", ".join(f"{j['t']:.2f}s {'되감김' if j['kind'] == 'restart' else '건너뜀'} {j['jump_s']:+.1f}s"
+                          for j in lp.get("jumps") or [])
+        print(f"  BGM 되감김(반복) {_ko(lp.get('presence', 'unmeasured'))}" + (f": {jumps}" if jumps else ""))
 
 
 def cmd_bgm_align(a) -> int:
@@ -179,7 +185,16 @@ def _print_original(r: dict) -> None:
                                                 f"release p50 {(dk.get('release_s') or {}).get('p50')} s"
                                                 if d.get("n") else f" — {dk.get('blocker') or r.get('blocker')}"))
     sil = (r.get("silences") or {}).get("items") or []
-    print(f"  정적 {len(sil)}개 (BGM 끊김 확인 {sum(1 for s in sil if s.get('bgm_cut'))}개)")
+    ramps = [f"{side} {x['fade_s']:.3f}s" for s in sil for side, x in (s.get("ramps") or {}).items()
+             if isinstance(x, dict) and x.get("status") == "measured"]
+    print(f"  정적 {len(sil)}개 (BGM 끊김 확인 {sum(1 for s in sil if s.get('bgm_cut'))}개)"
+          + (f", 경사(렌더러 fade_s) {', '.join(ramps)}" if ramps else ""))
+    oe = r.get("original_edges") or {}
+    fades = [f"{e['edge']} {e['t']:.2f}s {e['fade_s']:.3f}s" for e in oe.get("edges") or [] if e.get("status") == "measured"]
+    print("  원음 켜짐/꺼짐 경사: " + (", ".join(fades) if fades else f"못 잼 — {oe.get('blocker')}"))
+    kl = r.get("kept_speech_level") or {}
+    print("  살린 대사 음량(프로그램 대비): " + (f"{kl['rel_program_lu']:+.1f} LU" if kl.get("status") == "measured"
+                                              else f"못 잼 — {kl.get('blocker')}"))
 
 
 def cmd_sfx_events(a) -> int:
@@ -243,15 +258,16 @@ def cmd_audio_measure(a) -> int:
     print(f"[측정 집계] 영상 {len(r['videos'])}편 -> measurements/audio.json")
     for it in r["items"]:
         n = (it.get("overall") or {}).get("n", 0)
-        print(f"  {it['key']:<28} {_ko(it['status']):<4} 값 {it['value']}  n={n}"
-              + (f"  ({it['blocker']})" if it.get("blocker") else ""))
+        blk = str(it.get("blocker") or "")
+        print(f"  {it['key']:<32} {_ko(it['status']):<4} 값 {it['value']}  n={n}"
+              + (f"  ({blk[:160]}{'…' if len(blk) > 160 else ''})" if blk else ""))
     print("  → `shortkit preset apply-measurements` 로 프리셋에 반영")
     return 0
 
 
 def cmd_audio_analyze(a) -> int:
     from .audio_bgm import analyze_bgm
-    from .audio_original import analyze_original, load_context
+    from .audio_original import analyze_original, load_context, measure_loudness
     from .separation import DemucsSeparator, stems_or_none
     from .sfx_catalog import newest_video_ids
     from .sfx_events import analyze_sfx_events
@@ -278,6 +294,9 @@ def cmd_audio_analyze(a) -> int:
         ctx = load_context(a.preset, vid, audio, st)
         _print_original(analyze_original(a.preset, vid, ctx=ctx))
         _print_sfx(analyze_sfx_events(a.preset, vid, ctx=ctx))
+        ld = measure_loudness(a.preset, vid, audio_path=audio)
+        print(f"[음량] {vid}: " + (f"{ld['integrated_lufs']} LUFS, 최대 {ld['true_peak_db']} dBTP (ebur128)"
+                                   if ld.get("status") == "measured" else f"못 잼 — {ld.get('blocker')}"))
     return 0
 
 

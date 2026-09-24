@@ -7,9 +7,15 @@ cannot drift):
   frame n shows time t = n / fps; a clip is active for out_start - 1e-6 <= t < out_end - 1e-6
   source time at local time u = t - out_start: resolve.src_time_at (speed, freeze hold)
   placement: resolve.src_to_region (cover/contain fit + eased zoom about zoom.center, clipped to
-             the video region)
-  crossfade: linear blend over [b.out_start, a.out_end); flash: colour over the video region with
+             the video region; Zoom.recenter moves that point to the region centre)
+  crossfade: linear blend over [b.out_start, a.out_end); flash: colour over Transition.scope
+             ('region' = canvas.video_region, 'canvas' = whole frame) with
              alpha = 1 - |t - cut| / (dur / 2)
+  blur ops: gaussian sigma = render.blur_sigma_src(clip, rect) (render.clean.blur_sigma_ratio)
+  foreground limiter: per-frame gain from the master's build/fg_gain.json (render.mix_audio);
+             fallback: build/stems vs render.pre_norm_stems(r)
+  mono audio files: melt 7.22 upmixes mono to stereo at -3.01 dB per channel (measured), the master
+             (shortkit.util.media.read_audio) at unity -> +3.01 dB compensation filter on mono files
   captions + decorations: the ONE ASS file drawn over everything by libass
 
 Track layout (tractor, bottom -> top)::
@@ -46,13 +52,18 @@ from ..util.hashing import sha256_text
 from ..util.jsonio import now_iso, read_json, write_json
 from ..util.media import MediaError, ffmpeg, probe
 from .ir import Clip, ResolvedEdit
-from .resolve import base_fit, effective_src_rect, ease as r_ease, src_time_at, src_to_region
+from .resolve import FLASH_SCOPES, base_fit, effective_src_rect, ease as r_ease, src_time_at, src_to_region
 
 MLT_VERSION = "7.22.0"
 EPS_ACTIVE = 1e-6          # render.Compositor.frame activity margin
 EPS_PICK = 1e-3            # render.EPS_T: a source frame is shown when pts <= s + 1 ms
 SILENCE_DB_FLOOR = -120.0  # audio.SILENCE_DB; MLT volume level at this value is inaudible
 DECISIONS_FILE = "export_decisions.json"
+# melt 7.22 (swresample default matrix) puts a mono file on a stereo profile at 1/sqrt(2) per channel
+# (measured on the build machine: ratio 0.70704, L == R); shortkit.util.media.read_audio (the master's
+# mix) duplicates mono at unity -> a +20*log10(sqrt(2)) dB volume filter on every mono audio producer.
+MONO_UPMIX_COMP_DB = 20.0 * math.log10(math.sqrt(2.0))
+NATIVE_EASE_TOL_PX = 1e-3               # native keyframe easing only when it reproduces every frame
 
 # render.py easing is cubic; these are melt 7.22's cubic easing keyframe operators
 _MLT_EASE = {"linear": "", "in": "g", "out": "h", "inout": "i"}
@@ -264,8 +275,20 @@ def build_segments(r: ResolvedEdit, warnings: list[str]) -> list[Segment]:
     return segs
 
 
+def flash_rect(r: ResolvedEdit, c: Clip) -> tuple[str, tuple[int, int, int, int]]:
+    """(scope, canvas px rect) the master's flash covers (render.Compositor.frame): 'canvas' = the
+    whole frame, 'region' = the clip's video region.  Any other scope is refused like the renderer."""
+    scope = getattr(c.transition_in, "scope", "region") or "region"
+    if scope not in FLASH_SCOPES:
+        raise ValueError(f"클립 {c.id}: flash scope {scope!r} 미지원 {FLASH_SCOPES}")
+    if scope == "canvas":
+        return scope, (0, 0, int(r.canvas["width"]), int(r.canvas["height"]))
+    return scope, region_int(c)
+
+
 def flash_runs(r: ResolvedEdit) -> list[dict]:
-    """Frames where render draws a flash: [{clip_index, n0, n1, alphas[], color}]."""
+    """Frames where render draws a flash: [{clip_index, n0, n1, alphas[], color, scope, rect}]
+    (rect = canvas px [x, y, w, h] of the flashed area, see ``flash_rect``)."""
     fps = fps_of(r)
     N = n_frames(r)
     runs = []
@@ -273,6 +296,7 @@ def flash_runs(r: ResolvedEdit) -> list[dict]:
         tr = c.transition_in
         if tr.type != "flash" or tr.dur <= 0:
             continue
+        scope, rect = flash_rect(r, c)
         half = tr.dur / 2.0
         lo = max(0, int(math.floor((c.out_start - half) * fps)) - 1)
         hi = min(N, int(math.ceil((c.out_start + half) * fps)) + 2)
@@ -284,8 +308,26 @@ def flash_runs(r: ResolvedEdit) -> list[dict]:
         if not frames:
             continue
         runs.append({"clip_index": i, "n0": frames[0][0], "n1": frames[-1][0] + 1,
-                     "alphas": [a for _, a in frames], "color": tr.color or "#FFFFFF"})
+                     "alphas": [a for _, a in frames], "color": tr.color or "#FFFFFF", "scope": scope,
+                     "rect": list(rect)})
     return runs
+
+
+def zoom_animates(c: Clip) -> bool:
+    """True when resolve.src_to_region changes over the clip because of its zoom: the scale moves, or
+    Zoom.recenter moves the (zoomed, scale != 1) fixed point to the region centre."""
+    z = c.zoom
+    if z is None:
+        return False
+    if abs(z.scale_to - z.scale_from) > 1e-9:
+        return True
+    return bool(getattr(z, "recenter", False)) and abs(z.scale_from - 1.0) > 1e-9
+
+
+def zoom_motion_frames(c: Clip, fps: float) -> tuple[float, float]:
+    """Fractional output frames where the zoom motion starts / ends (outside: constant placement)."""
+    z = c.zoom
+    return (c.out_start + z.start) * fps, (c.out_start + z.start + z.dur) * fps
 
 
 def region_int(c: Clip) -> tuple[int, int, int, int]:
@@ -380,26 +422,30 @@ class Media:
         """(root-relative file, time offset) the pieces of clip c read from.
 
         Blur ops have no region-limited MLT equivalent without masks, so a blurred intermediate
-        covering the clip's source range is pre-rendered (render.BLUR_SIGMA_FRAC).  Inpaint is
+        covering the clip's source range is pre-rendered with the master's sigma
+        (render.blur_sigma_src: max(w, h) * render.clean.blur_sigma_ratio, SOURCE px).  Inpaint is
         already baked into c.source_path by resolve (warehouse/cache/clean/...)."""
         if not c.blur:
             return c.source_path, 0.0
         if c.id in self._blur:
             return self._blur[c.id]
-        from .render import BLUR_SIGMA_FRAC
+        from .render import blur_ratio, blur_sigma_src
 
+        ratio = blur_ratio(c)          # RenderError for an old IR without the preset value (no default)
+        sigmas = [blur_sigma_src(c, bl) for bl in c.blur]
         info = self.info(c.source_path)
         sfps = (info.fps if info else None) or 30.0
         a = max(0.0, math.floor((c.src_in - 1.0) * sfps) / sfps)
         b = c.src_out + 1.0
-        key = sha256_text(repr((c.source_path, a, b, [(x.x, x.y, x.w, x.h, x.start, x.end) for x in c.blur])))[:12]
+        key = sha256_text(repr((c.source_path, a, b, [(x.x, x.y, x.w, x.h, x.start, x.end) for x in c.blur],
+                                [round(s, 6) for s in sigmas])))[:12]
         self.media_dir.mkdir(parents=True, exist_ok=True)
         out = self.media_dir / f"{c.id}_blur_{key}.mp4"
         chain, last = [], "[0:v]"
         for j, bl in enumerate(c.blur):
             x, y = int(round(bl.x)), int(round(bl.y))
             w, h = max(2, int(round(bl.w))), max(2, int(round(bl.h)))
-            sig = max(1.0, max(bl.w, bl.h) * BLUR_SIGMA_FRAC)
+            sig = sigmas[j]
             s0 = (bl.start if bl.start is not None else 0.0) - a
             s1 = (bl.end if bl.end is not None else 1e9) - a
             chain.append(f"{last}split[m{j}][c{j}];[c{j}]crop={w}:{h}:{x}:{y},gblur=sigma={sig:.3f}[b{j}];"
@@ -415,7 +461,9 @@ class Media:
             "kind": "blur_intermediate", "clip": c.id, "file": Path(os.path.relpath(out, self.out_dir)).as_posix(),
             "why": "영역 흐림(blur)은 MLT 필터만으로 같은 영역·시간에 적용할 수 없어 미리 렌더한 중간 파일을 사용",
             "source_range_s": [round(a, 4), round(b, 4)],
-            "sigma_rule": "gaussian sigma = max(w, h) / 6 (SOURCE px, render.BLUR_SIGMA_FRAC)"})
+            "sigma_rule": f"gaussian sigma = max(w, h) × render.clean.blur_sigma_ratio({ratio:g}) "
+                          "(SOURCE px, render.blur_sigma_src)",
+            "sigmas_src_px": [round(s, 3) for s in sigmas]})
         return self._blur[c.id]
 
     def hold_still(self, c: Clip, src_rel: str, offset: float, s: float) -> str:
@@ -460,17 +508,27 @@ class Media:
         return paths.relp(out)
 
     def tempo_original(self, o, sr: int) -> str:
+        """Speed-changed kept original, made with the master's exact steps (render.pre_norm_stems):
+        read_audio(stereo, the util.media channel convention) -> 16-bit wav -> ffmpeg atempo chain."""
+        import tempfile
+
+        from ..util.media import read_audio, write_wav
         from .render import _atempo_chain
 
-        key = sha256_text(repr((o.path, o.src_start, o.src_end, o.speed)))[:12]
+        key = sha256_text(repr((o.path, o.src_start, o.src_end, o.speed, sr, "read_audio-stereo/2")))[:12]
         self.media_dir.mkdir(parents=True, exist_ok=True)
         out = self.media_dir / f"orig_{o.clip_id}_{key}.wav"
         if not out.is_file():
-            ffmpeg(["-ss", f"{o.src_start:.6f}", "-i", paths.absp(o.path), "-t", f"{o.src_end - o.src_start:.6f}",
-                    "-vn", "-af", _atempo_chain(o.speed), "-ar", str(sr), "-ac", "2", "-c:a", "pcm_s16le", out])
+            with tempfile.TemporaryDirectory(prefix="shortkit_orig_") as td:
+                t_in, t_out = Path(td) / "orig_in.wav", Path(td) / "orig_out.wav"
+                x = read_audio(paths.absp(o.path), sr=sr, mono=False, start=o.src_start,
+                               duration=o.src_end - o.src_start)
+                write_wav(t_in, x, sr)
+                ffmpeg(["-i", t_in, "-af", _atempo_chain(o.speed), "-ar", str(sr), "-ac", "2", t_out])
+                shutil.copyfile(t_out, out)
         self._record({
             "kind": "original_tempo", "clip": o.clip_id, "file": Path(os.path.relpath(out, self.out_dir)).as_posix(),
-            "why": f"원본 소리 {o.speed:g}배속: 마스터와 같은 atempo(음높이 유지)로 미리 렌더"})
+            "why": f"원본 소리 {o.speed:g}배속: 마스터와 같은 순서(read_audio 스테레오 → atempo, 음높이 유지)로 미리 렌더"})
         return paths.relp(out)
 
 
@@ -675,8 +733,10 @@ class MltBuilder:
         return e_in + inside[0], e_in + inside[-1]
 
     def _rect_keyframes(self, c: Clip, p: Piece) -> str:
-        """transition.rect animation: exact per-frame values while the zoom moves, native cubic
-        easing (2 keyframes) when the zoom lies on the frame grid inside this piece."""
+        """transition.rect animation: exact per-frame values while the zoom moves; native cubic
+        easing (2 keyframes) only when the zoom lies on the frame grid inside this piece AND melt's
+        eased interpolation between the two rects reproduces resolve.src_to_region on every frame
+        (not the case e.g. for Zoom.recenter when the cover clamp engages mid-zoom)."""
         fps = self.fps
 
         def val(n: int) -> str:
@@ -684,32 +744,47 @@ class MltBuilder:
             return f"{fmt(x)} {fmt(y)} {fmt(w)} {fmt(h)} 1"
 
         z = c.zoom
-        if z is None or abs(z.scale_to - z.scale_from) < 1e-9:
+        if not zoom_animates(c):
             return val(p.n0)
-        zf0 = (c.out_start + z.start) * fps
-        zf1 = (c.out_start + z.start + z.dur) * fps
+        recenter = bool(getattr(z, "recenter", False))
+        zf0, zf1 = zoom_motion_frames(c, fps)
         a0, a1 = p.n0, p.n1 - 1
         if zf1 <= a0 or zf0 >= a1 + 1:     # zoom does not move inside this piece
             return f"0={val(a0)};{a1 - a0}={val(a1)}" if a1 > a0 else val(a0)
         on_grid = abs(zf0 - round(zf0)) < 1e-6 and abs(zf1 - round(zf1)) < 1e-6
+        why = "줌 시작/끝이 프레임 경계에 있지 않거나 조각이 줌 중간에서 나뉨"
         if on_grid and a0 <= round(zf0) and round(zf1) <= a1 and native_ease_ok(z.ease) and z.dur > 0:
             k0, k1 = int(round(zf0)), int(round(zf1))
-            parts = []
-            if a0 < k0:
-                parts.append(f"0={val(a0)}")
-            parts.append(f"{k0 - a0}{_MLT_EASE[z.ease]}={val(k0)}")
-            parts.append(f"{k1 - a0}={val(k1)}")
-            if k1 < a1:
-                parts.append(f"{a1 - a0}={val(a1)}")
-            self.dec.setdefault("zoom_keyframes", []).append({"clip": c.id, "mode": "native_cubic_easing",
-                                                              "ease": z.ease})
-            return ";".join(parts)
+            if self._native_ease_exact(c, k0, k1, z.ease):
+                parts = []
+                if a0 < k0:
+                    parts.append(f"0={val(a0)}")
+                parts.append(f"{k0 - a0}{_MLT_EASE[z.ease]}={val(k0)}")
+                parts.append(f"{k1 - a0}={val(k1)}")
+                if k1 < a1:
+                    parts.append(f"{a1 - a0}={val(a1)}")
+                self.dec.setdefault("zoom_keyframes", []).append({"clip": c.id, "mode": "native_cubic_easing",
+                                                                  "ease": z.ease, "recenter": recenter})
+                return ";".join(parts)
+            why = ("두 키프레임 사이 3차 보간이 resolve.src_to_region 과 어긋남(recenter 중 cover 경계 고정 등) "
+                   "→ 프레임마다 키프레임")
         lo = max(a0, int(math.floor(zf0)))
         hi = min(a1, int(math.ceil(zf1)))
         ks = sorted({a0, a1, *range(lo, hi + 1)})
         self.dec.setdefault("zoom_keyframes", []).append({"clip": c.id, "mode": "per_frame", "ease": z.ease,
-                                                          "why": "줌 시작/끝이 프레임 경계에 있지 않거나 조각이 줌 중간에서 나뉨"})
+                                                          "recenter": recenter, "why": why})
         return ";".join(f"{k - a0}={val(k)}" for k in ks)
+
+    def _native_ease_exact(self, c: Clip, k0: int, k1: int, ease: str) -> bool:
+        """melt interpolates x, y, w, h between keyframes k0 and k1 with the cubic ease of the frame
+        progress; True when that equals canvas_rect (src_to_region) on every frame in between."""
+        v0, v1 = canvas_rect(c, k0, self.fps), canvas_rect(c, k1, self.fps)
+        for k in range(k0, k1 + 1):
+            e = _cubic((k - k0) / (k1 - k0), ease)
+            want = canvas_rect(c, k, self.fps)
+            if any(abs(a + (b - a) * e - w) > NATIVE_EASE_TOL_PX for a, b, w in zip(v0, v1, want)):
+                return False
+        return True
 
     def _entry(self, pl: ET.Element, pid: str, e_in: int, e_out: int) -> None:
         ET.SubElement(pl, "entry", {"producer": pid, "in": str(e_in), "out": str(e_out)})
@@ -801,13 +876,18 @@ class MltBuilder:
                 self.prop(p, k, v)
             kf = ";".join(f"{k}={fmt(a, 5)}" for k, a in enumerate(fr["alphas"]))
             self._filter(p, "brightness", 0, n - 1, [("level", 1), ("alpha", kf)], "brightnessOpacity")
-            rx, ry, rw, rh = region_int(c)
+            rx, ry, rw, rh = fr["rect"]
             self._filter(p, "affine", 0, n - 1, [("background", "color:#00000000"), ("transition.fill", 1),
                                                  ("transition.distort", 1),
                                                  ("transition.rect", f"{rx} {ry} {rw} {rh} 1")], "affineSizePosition")
+            self.prop(p, "shortkit:flash_scope", fr["scope"])
             entries.append((fr["n0"], fr["n1"], pid))
             self.dec["flashes"].append({"clip": c.id, "frames": [fr["n0"], fr["n1"]], "color": fr["color"],
-                                        "shape": "alpha = 1 - |t - cut| / (dur/2), 영상 영역에만"})
+                                        "scope": fr["scope"], "rect": fr["rect"],
+                                        "resolution": [self.W, self.H],
+                                        "shape": "alpha = 1 - |t - cut| / (dur/2), "
+                                                 + ("화면 전체(canvas)" if fr["scope"] == "canvas"
+                                                    else "영상 영역에만(region)")})
         pl = self.playlist("V3 플래시", "video")
         cur = 0
         for n0, n1, pid in entries:
@@ -830,8 +910,21 @@ class MltBuilder:
             self.prop(p, "video_index", -1)
         return pid
 
+    def _is_mono(self, rel: str) -> bool:
+        info = self.media.info(rel)
+        return bool(info is not None and info.has_audio and int(info.audio_channels or 0) == 1)
+
+    def _mono_note(self, rel: str) -> None:
+        m = self.dec["audio"].setdefault("mono_upmix_compensation", {
+            "comp_db": round(MONO_UPMIX_COMP_DB, 4), "files": [],
+            "why": "melt 7.22 는 모노 파일을 스테레오 프로젝트에 채널마다 -3.01 dB 로 올림(이 기계에서 측정: 비 0.70704, "
+                   "L=R); 마스터(shortkit.util.media.read_audio)는 모노를 양쪽 채널에 같은 크기(0 dB)로 넣음 "
+                   "→ 모노 파일 클립마다 +3.01 dB volume 필터(역할: mono->stereo upmix compensation)"})
+        if rel not in m["files"]:
+            m["files"].append(rel)
+
     def _gain_filters(self, el: ET.Element, e_in: int, e_out: int, gain_db: float, fade_in: float, fade_out: float,
-                      env_fn=None, fg_gain: list[float] | None = None, out_n0: int = 0) -> None:
+                      env_fn=None, fg_gain: list[float] | None = None, out_n0: int = 0, mono_comp: bool = False) -> None:
         """volume filters: constant gain, optional envelope (dB of relative time), linear-amplitude fades.
 
         melt's volume filter ramps linearly from the previous frame's gain to this frame's gain over
@@ -840,18 +933,18 @@ class MltBuilder:
         T = n / self.fps
         end = [(k + 1) / self.fps for k in range(n)]
         self._filter(el, "volume", e_in, e_out, [("level", fmt(gain_db, 3))], "audioGain")
+        if mono_comp:
+            self._filter(el, "volume", e_in, e_out, [("level", fmt(MONO_UPMIX_COMP_DB, 4)),
+                                                     ("shortkit:role", "mono->stereo upmix compensation "
+                                                                       "(melt -3.01 dB per channel, master unity)")],
+                         "audioGain")
         if env_fn is not None:
             vals = [max(SILENCE_DB_FLOOR, float(env_fn(t))) for t in end]
             self._filter(el, "volume", e_in, e_out, [("level", self._compact(vals)),
                                                      ("shortkit:role", "envelope(ducking/silence)")], "audioGain")
         if fg_gain is not None:
-            K = len(fg_gain)
-
-            def kv(i):
-                a = fg_gain[min(K - 1, max(0, out_n0 + i))]
-                b = fg_gain[min(K - 1, max(0, out_n0 + i + 1))]
-                return db((a + b) / 2)
-            vals = [kv(i) for i in range(n)]
+            # value at the END of clip frame i = boundary between output frames out_n0+i and out_n0+i+1
+            vals = [fg_gain_db_at_frame_start(fg_gain, out_n0 + i + 1) for i in range(n)]
             if min(vals) < -0.05:
                 self._filter(el, "volume", e_in, e_out, [("level", self._compact(vals)),
                                                          ("shortkit:role", "master foreground safety limiter")],
@@ -912,7 +1005,11 @@ class MltBuilder:
         from .audio import envelope_db_at
 
         env_fn = (lambda t, _e=b.envelope: envelope_db_at(_e, t)) if b.envelope else None
-        self._gain_filters(p, e_in, e_out, b.gain_db, b.fade_in_s, min(b.fade_out_s, self.r.duration), env_fn)
+        mono = self._is_mono(src)
+        if mono:
+            self._mono_note(src)
+        self._gain_filters(p, e_in, e_out, b.gain_db, b.fade_in_s, min(b.fade_out_s, self.r.duration), env_fn,
+                           mono_comp=mono)
         pl = self.playlist("A1 BGM", "audio")
         self._entry(pl, pid, e_in, e_out)
         self.track_names.append({"track": "A1 BGM", "kind": "audio", "items": 1})
@@ -954,7 +1051,11 @@ class MltBuilder:
             for n0, n1, (s, length) in lane:
                 pid = self._audio_producer(s.path, f"효과음 {s.type} ({s.id})", max(length, n1 - n0), False)
                 p = self.root.find(f"producer[@id='{pid}']")
-                self._gain_filters(p, 0, n1 - n0 - 1, s.gain_db, 0.0, 0.0, fg_gain=self.fg_gain, out_n0=n0)
+                mono = self._is_mono(s.path)
+                if mono:
+                    self._mono_note(s.path)
+                self._gain_filters(p, 0, n1 - n0 - 1, s.gain_db, 0.0, 0.0, fg_gain=self.fg_gain, out_n0=n0,
+                                   mono_comp=mono)
                 self.prop(p, "shortkit:event", f"{s.event_t:.3f}s {s.event_desc}")
                 prods.append((n0, n1, pid))
             name = "A2 효과음" if li == 0 else f"A2 효과음 {li + 1}"
@@ -991,7 +1092,11 @@ class MltBuilder:
                 e_out = e_in + (n1 - n0) - 1
                 pid = self._audio_producer(src, f"원본 소리 {o.clip_id} ({o.stem})", max(length, e_out + 1), video_file)
                 p = self.root.find(f"producer[@id='{pid}']")
-                self._gain_filters(p, e_in, e_out, o.gain_db, o.fade_s, o.fade_s, fg_gain=self.fg_gain, out_n0=n0)
+                mono = self._is_mono(src)
+                if mono:
+                    self._mono_note(src)
+                self._gain_filters(p, e_in, e_out, o.gain_db, o.fade_s, o.fade_s, fg_gain=self.fg_gain, out_n0=n0,
+                                   mono_comp=mono)
                 self.prop(p, "shortkit:reason", o.reason or "kept original")
                 prods.append((n0, n1, pid, e_in, e_out))
             name = "A3 원본 소리" if li == 0 else f"A3 원본 소리 {li + 1}"
@@ -1058,70 +1163,87 @@ class MltBuilder:
 
 
 # ============================================================================ loudness
-def master_foreground_gain(r: ResolvedEdit, decisions: dict) -> list[float] | None:
-    """Per-output-frame gain the master's stem-aware safety limiter applied to the foreground
-    (kept originals + SFX), READ from the master's own build stems:
+FG_GAIN_SCHEMA = "shortkit.fg_gain/1"
+FG_MIN_REDUCTION_DB = 0.05      # below this the master's foreground limiter is treated as not acting
 
-        k[f] = <fg_out, fg_pre> / <fg_pre, fg_pre> / (norm_gain * final_trim)   over frame f
 
-    fg_out = build/stems/{originals,sfx}.wav written by render.py (after gain + limiter + trim),
-    fg_pre = the same stems rebuilt from the IR before normalization (gain_db, fades, placement).
-    Returns None when the master used no foreground limiting or its stems are missing."""
+def fg_gain_path(r: ResolvedEdit) -> str:
+    return f"episodes/{r.episode_id}/build/fg_gain.json"
+
+
+def _fg_gain_file(r: ResolvedEdit, rep_audio: dict) -> tuple[dict | None, list[str]]:
+    """build/fg_gain.json and the reasons it cannot be used for THIS IR / master render."""
+    fg = read_json(paths.absp(fg_gain_path(r)))
+    if fg is None:
+        return None, []
+    fps, N = fps_of(r), n_frames(r)
+    bad = []
+    if fg.get("schema") != FG_GAIN_SCHEMA:
+        bad.append(f"schema {fg.get('schema')!r} ≠ {FG_GAIN_SCHEMA}")
+    if fg.get("episode_id") != r.episode_id:
+        bad.append(f"episode_id {fg.get('episode_id')!r} ≠ {r.episode_id}")
+    try:
+        if abs(float(fg.get("fps")) - fps) > 1e-6:
+            bad.append(f"fps {fg.get('fps')} ≠ {fps:g}")
+    except (TypeError, ValueError):
+        bad.append("fps 없음")
+    gm = fg.get("gain_mean")
+    if not isinstance(gm, list) or len(gm) != N or fg.get("frames") != N:
+        bad.append(f"프레임 수 {fg.get('frames')}/{len(gm) if isinstance(gm, list) else None} ≠ IR {N}")
+    if rep_audio.get("norm_gain_db") is not None and fg.get("norm_gain_db") is not None and \
+            abs(float(rep_audio["norm_gain_db"]) - float(fg["norm_gain_db"])) > 1e-3:
+        bad.append(f"render_report.json 정규화 이득 {rep_audio['norm_gain_db']} ≠ fg_gain.json "
+                   f"{fg['norm_gain_db']} (다른 렌더의 파일)")
+    return fg, bad
+
+
+def _fg_gain_from_stems(r: ResolvedEdit, rep_audio: dict, decisions: dict) -> list[float] | None:
+    """Fallback for masters without build/fg_gain.json: k per frame = <fg_out, fg_pre> / <fg_pre, fg_pre> / g.
+    fg_out = build/stems/{originals,sfx}.wav (final levels, written by render.mix_audio), fg_pre =
+    render.pre_norm_stems(r).foreground (the master's own stem builder: speed-changed originals,
+    fades, placement), g = 10^((norm_gain_db + final_trim_db) / 20) from render_report.json."""
     import numpy as np
 
     from ..util.media import read_audio
+    from .render import pre_norm_stems
 
-    a = ((load_render_report(r) or {}).get("audio") or {})
-    red = a.get("fg_limiter_max_reduction_db")
-    if red is None or float(red) <= 0.05:
+    red = rep_audio.get("fg_limiter_max_reduction_db")
+    if red is None:
+        decisions["foreground_limiter"] = {
+            "status": "못 잼", "source": None,
+            "why": f"{fg_gain_path(r)} 도 render_report.json 의 전경 리미터 기록(fg_limiter_max_reduction_db)도 없음 "
+                   "→ 마스터가 효과음/원본 소리를 줄였는지 모름(MLT 에서는 줄이지 않음)"}
+        return None
+    if float(red) <= FG_MIN_REDUCTION_DB:
+        decisions["foreground_limiter"] = {"status": "없음", "source": f"episodes/{r.episode_id}/build/render_report.json",
+                                           "master_max_reduction_db": float(red),
+                                           "note": f"마스터 전경 리미터 감쇠 ≤ {FG_MIN_REDUCTION_DB} dB → 키프레임 불필요"}
         return None
     build = paths.absp(f"episodes/{r.episode_id}/build/stems")
     files = [build / "originals.wav", build / "sfx.wav"]
-    if not all(f.is_file() for f in files):
+    if not all(f.is_file() for f in files) or rep_audio.get("norm_gain_db") is None:
         decisions["foreground_limiter"] = {"status": "못 잼", "master_max_reduction_db": red,
-                                           "why": "마스터가 효과음/원본 소리에 안전 리미터를 걸었지만 build/stems 가 없어 "
-                                                  "프레임별 감쇠를 읽지 못함 → MLT 에서는 그 구간이 더 크게 들림"}
+                                           "why": f"마스터가 효과음/원본 소리를 최대 {red} dB 줄였지만 {fg_gain_path(r)} 와 "
+                                                  "build/stems(또는 정규화 이득)가 없어 프레임별 감쇠를 읽지 못함 "
+                                                  "→ MLT 에서는 그 구간이 더 크게 들림"}
         return None
-    sr = r.audio.sample_rate
-    n = int(round(r.duration * sr))
-    fps = fps_of(r)
-    N = n_frames(r)
+    st = pre_norm_stems(r)
+    sr = st.sample_rate
+    n = len(st.bgm)
+    fps, N = fps_of(r), n_frames(r)
 
     def fit(x):
         x = x[:n]
         return np.pad(x, ((0, n - len(x)), (0, 0))) if len(x) < n else x
 
     fo = fit(read_audio(files[0], sr=sr, mono=False)) + fit(read_audio(files[1], sr=sr, mono=False))
-    fp = np.zeros((n, 2), np.float32)
-    for o in r.audio.originals:
-        if abs(o.speed - 1.0) > 1e-9:
-            decisions["foreground_limiter"] = {"status": "못 잼", "why": "배속 원본 소리의 사전 스템 재구성 미구현"}
-            return None
-        x = read_audio(paths.absp(o.path), sr=sr, mono=False, start=o.src_start, duration=o.src_end - o.src_start)
-        m = int(round((o.out_end - o.out_start) * sr))
-        x = np.pad(x, ((0, max(0, m - len(x))), (0, 0)))[:m]
-        g = np.ones(m, np.float32) * 10 ** (o.gain_db / 20)
-        fl = int(round(o.fade_s * sr))
-        if fl > 0:
-            g[:fl] *= np.linspace(0.0, 1.0, fl, endpoint=False, dtype=np.float32)
-            g[max(0, m - fl):] *= np.linspace(1.0, 0.0, min(fl, m), dtype=np.float32)
-        s0 = int(round(o.out_start * sr))
-        e0 = min(n, s0 + m)
-        fp[s0:e0] += (x * g[:, None])[: e0 - s0]
-    for sp in r.audio.sfx:
-        if not sp.path:
-            continue
-        x = read_audio(paths.absp(sp.path), sr=sr, mono=False) * 10 ** (sp.gain_db / 20)
-        s0 = int(round(sp.t * sr))
-        e0 = min(n, s0 + len(x))
-        if e0 > s0:
-            fp[s0:e0] += x[: e0 - s0]
-    g0 = 10 ** ((float(a.get("norm_gain_db") or 0.0) + float(a.get("final_trim_db") or 0.0)) / 20)
-    k = []
+    fp = st.foreground
+    g0 = 10 ** ((float(rep_audio.get("norm_gain_db") or 0.0) + float(rep_audio.get("final_trim_db") or 0.0)) / 20)
+    k: list[float | None] = []
     for f in range(N):
         s0, s1 = int(round(f * sr / fps)), min(n, int(round((f + 1) * sr / fps)))
-        pp = float((fp[s0:s1] ** 2).sum())
-        if s1 <= s0 or pp < 1e-10:
+        pp = float((fp[s0:s1].astype(np.float64) ** 2).sum()) if s1 > s0 else 0.0
+        if pp < 1e-10:
             k.append(None)
             continue
         k.append(float(min(1.0, max(1e-6, float((fo[s0:s1] * fp[s0:s1]).sum()) / pp / g0))))
@@ -1133,11 +1255,57 @@ def master_foreground_gain(r: ResolvedEdit, decisions: dict) -> list[float] | No
             last = v
     decisions["foreground_limiter"] = {
         "status": "있음", "master_max_reduction_db": red,
-        "measured_max_reduction_db": round(-20 * math.log10(min(k)), 2),
-        "source": f"episodes/{r.episode_id}/build/stems/{{originals,sfx}}.wav",
-        "how": "마스터 스템과 IR 로 다시 만든 정규화 전 스템의 프레임별 비율 → 효과음/원본 소리 클립의 volume 키프레임",
-        "note": "마스터 리미터는 5 ms 블록 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"}
+        "measured_max_reduction_db": round(-20 * math.log10(min(k)), 2) if k else 0.0,
+        "source": f"episodes/{r.episode_id}/build/stems/{{originals,sfx}}.wav + render.pre_norm_stems",
+        "how": f"{fg_gain_path(r)} 가 없어(이전 렌더) 마스터 스템과 render.pre_norm_stems 로 만든 정규화 전 전경의 "
+               "프레임별 비율 → 효과음/원본 소리 클립의 volume 키프레임",
+        "note": "마스터 리미터는 샘플 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"}
     return k
+
+
+def master_foreground_gain(r: ResolvedEdit, decisions: dict) -> list[float] | None:
+    """Per-output-frame gain k (linear, <= 1) the master's stem-aware safety limiter applied to the
+    foreground (kept originals + SFX; the BGM is never limited), for the exporters' volume keyframes.
+
+    Read from ``build/fg_gain.json`` (render.mix_audio writes it in the same run as the stems and
+    render_report.json): ``gain_mean[f]`` = mean k over the samples of output frame f.  Only when that
+    file does not exist (older renders) is it derived from the master's stems and
+    ``render.pre_norm_stems`` (``_fg_gain_from_stems``; works for speed-changed originals too).
+    Returns None when the master reduced nothing (<= 0.05 dB) or the gain cannot be read; the reason
+    is in decisions['foreground_limiter'] (status 있음 / 없음 / 못 잼) -- never a guess."""
+    rep_audio = ((load_render_report(r) or {}).get("audio") or {})
+    fg, bad = _fg_gain_file(r, rep_audio)
+    if fg is None:
+        return _fg_gain_from_stems(r, rep_audio, decisions)
+    src = fg_gain_path(r)
+    if bad:
+        decisions["foreground_limiter"] = {"status": "못 잼", "source": src,
+                                           "why": "; ".join(bad) + " → 프레임별 감쇠를 쓰지 않음(MLT 에서는 효과음/원본 "
+                                                  "소리가 마스터보다 크게 들릴 수 있음)"}
+        return None
+    red = float(fg.get("max_reduction_db") or 0.0)
+    if red <= FG_MIN_REDUCTION_DB:
+        decisions["foreground_limiter"] = {"status": "없음", "source": src, "master_max_reduction_db": round(red, 3),
+                                           "note": f"마스터 전경 리미터 감쇠 ≤ {FG_MIN_REDUCTION_DB} dB → 키프레임 불필요"}
+        return None
+    k = [min(1.0, max(1e-6, float(v))) for v in fg["gain_mean"]]
+    decisions["foreground_limiter"] = {
+        "status": "있음", "source": src, "master_max_reduction_db": red,
+        "measured_max_reduction_db": round(-20 * math.log10(min(k)), 2),
+        "frames_limited": sum(1 for v in k if v < 1.0 - 1e-6),
+        "how": "fg_gain.json 의 gain_mean(프레임 평균 k) → 프레임 경계 값(이웃 두 프레임 평균) → 효과음/원본 소리 클립의 "
+               "volume 키프레임",
+        "note": "마스터 리미터는 샘플 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"}
+    return k
+
+
+def fg_gain_db_at_frame_start(k: list[float] | None, n: int) -> float:
+    """dB of the foreground gain at the boundary between output frames n-1 and n (0 dB without k)."""
+    if not k:
+        return 0.0
+    K = len(k)
+    a, b = k[min(K - 1, max(0, n - 1))], k[min(K - 1, max(0, n))]
+    return db((a + b) / 2)
 
 
 def loudness_gain(r: ResolvedEdit, project_file: Path, decisions: dict, compute: bool = True) -> float | None:

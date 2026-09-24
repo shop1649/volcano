@@ -3,8 +3,36 @@
   "group": "audio",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "videos": [],
-  "generated_at": "2026-09-24T19:14:31+00:00",
+  "generated_at": "2026-09-24T20:28:32+00:00",
   "items": [
+    {
+      "key": "audio.loudness.integrated_lufs",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "ffmpeg ebur128 통합 음량(EBU R128, 레퍼런스 파일 전체) — 근거 t=0 은 파일 전체 구간",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "LUFS"
+    },
+    {
+      "key": "audio.loudness.true_peak_db",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "ffmpeg ebur128 참 최대 레벨(4배 오버샘플, 레퍼런스 파일 전체); 값 = p50(영상별 최대치의 중앙값); 근거 t = 샘플 최대값 위치(참고)",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "dBTP"
+    },
     {
       "key": "audio.bgm.track_id",
       "status": "unmeasured",
@@ -15,8 +43,8 @@
       "by_format": {},
       "evidence": [],
       "method": "깨끗한 음원 라이브러리 대조(bgm.json)",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
     },
     {
       "key": "audio.bgm.title",
@@ -28,8 +56,8 @@
       "by_format": {},
       "evidence": [],
       "method": "라이브러리 index.yaml 제목",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
     },
     {
       "key": "audio.bgm.version",
@@ -41,120 +69,192 @@
       "by_format": {},
       "evidence": [],
       "method": "라이브러리 index.yaml 버전 + 속도 1.0 일치 규칙",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
     },
     {
       "key": "audio.bgm.tempo_ratio",
       "status": "unmeasured",
       "value": null,
-      "unit": "ratio",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "특징 NCC 속도 격자 + 파형 정렬",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "ratio"
     },
     {
       "key": "audio.bgm.section_start_s",
       "status": "unmeasured",
       "value": null,
-      "unit": "s",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "깨끗한 음원 안 사용 시작 지점",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
     },
     {
       "key": "audio.bgm.gain_db",
       "status": "unmeasured",
       "value": null,
-      "unit": "dB",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
-      "method": "깨끗한 음원 대비 LS 이득(대사 없는 구간 중앙값)을 믹스 통합 음량이 목표 -14.0 LUFS 일 때로 환산: gain + (목표 LUFS - 레퍼런스 믹스 LUFS)",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "method": "깨끗한 음원 대비 LS 이득(대사 없는 구간 중앙값)을 최종 음량 T 일 때로 환산: gain + (T - 레퍼런스 믹스 LUFS) [T: 전체 -14 LUFS (프리셋 현재값(provisional))]",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "dB"
     },
     {
       "key": "audio.bgm.fade_in_s",
       "status": "unmeasured",
       "value": null,
-      "unit": "s",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "선형 진폭 페이드 모델",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
     },
     {
       "key": "audio.bgm.fade_out_s",
       "status": "unmeasured",
       "value": null,
-      "unit": "s",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "선형 진폭 페이드 모델",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
+    },
+    {
+      "key": "audio.bgm.loop",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "영상별 BGM 되감김(같은 음원의 앞 지점으로 되돌아감) 있다/없다: bgm.json match.loop (창별 같은 음원 정렬 → 정렬선 사이 시작점 변화 < -1 s). 값 = 측정 영상의 과반(>50 %)이 '있다'일 때만 true(동률은 false)",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
     },
     {
       "key": "audio.ducking.depth_db",
       "status": "unmeasured",
       "value": null,
-      "unit": "dB",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "대사 전/중 BGM 이득 중앙값 차",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "dB"
     },
     {
       "key": "audio.ducking.attack_s",
       "status": "unmeasured",
       "value": null,
-      "unit": "s",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "10→90 % 하강 시간/0.8 (선형 dB 경사)",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
     },
     {
       "key": "audio.ducking.release_s",
       "status": "unmeasured",
       "value": null,
-      "unit": "s",
       "overall": {
         "n": 0
       },
       "by_format": {},
       "evidence": [],
       "method": "10→90 % 복귀 시간/0.8 (선형 dB 경사)",
-      "measured_at": "2026-09-24T19:14:31+00:00",
-      "blocker": "덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)"
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
+    },
+    {
+      "key": "audio.original.keep_gain_db",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "살린 대사의 음량 - 프로그램 음량 (LU): 보컬 stem 의 대사 구간 EBU R128 통합 음량 - 믹스 통합 음량(같은 모노 다운믹스). 최종 음량 T 에서 살린 대사는 T + 값 LUFS 에 놓인다. 렌더러는 이 dB 를 '녹음된 그대로의 원본 소리'에 곱하므로 소스 대사 음량이 L_src 이면 필요한 이득은 T + 값 - L_src (소스별 음량 맞춤은 렌더러 쪽 과제)",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "dB",
+      "value_semantics": "LU re programme loudness (kept speech integrated loudness - mix integrated loudness)"
+    },
+    {
+      "key": "audio.original.fade_s",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "원음(믹스 - 정렬된 BGM) RMS 10 ms 포락선의 켜짐/꺼짐 경사: 경계 뒤 일정 레벨 대비 -25 → -2 dB 시간을 렌더러의 선형 진폭 페이드에 같은 측정을 한 표로 환산; 경사 뒤 0.3 s 가 일정한(p90-p10 <= 4 dB) 경계만, 효과음 구간(시작~끝) ±0.3 s 경계 제외",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
+    },
+    {
+      "key": "audio.silence.fade_s",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "의도적 정적(BGM 끊김) 앞뒤 BGM 파형 LS 이득(3 ms 창)이 기준 레벨 대비 -2 → -30 dB 를 지나는 시간을 렌더러 모양(dB 선형 0→-120 dB, edit.audio.build_envelope)에 같은 측정을 한 표로 fade_s 환산 (들어갈 때·나올 때 모두 표본)",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "s"
+    },
+    {
+      "key": "audio.sfx.gain_db_default",
+      "status": "unmeasured",
+      "value": null,
+      "overall": {
+        "n": 0
+      },
+      "by_format": {},
+      "evidence": [],
+      "method": "카탈로그 효과음(edit_sfx) 이벤트마다 gain = gain_db_rel_mix(이벤트 RMS[최대 0.5 s] - 믹스 전체 RMS) + 믹스 RMS dBFS - 믹스 LUFS + T - 매핑된 창고 파일 RMS dBFS(시작점부터 같은 길이) → 렌더러 의미(최종 음량 T 에서 효과음 파일에 곱하는 dB); 값 = 이벤트 p50",
+      "measured_at": "2026-09-24T20:28:32+00:00",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "unit": "dB",
+      "catalog_status": "unmeasured",
+      "catalog_gain_db_rel_mix_p50_by_type": {}
     }
   ]
 }

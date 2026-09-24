@@ -1,6 +1,18 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-24T19:48:45+00:00'
+synced_at: '2026-09-24T20:33:15+00:00'
+access_logs:
+- episodes/test-coverage-001/build/preset_access.json
+- episodes/test-coverage-001/build/preset_access_all.json
+- episodes/test-coverage-001/build/preset_access_export.json
+- episodes/test-coverage-001/build/preset_access_proposal.json
+- episodes/test-coverage-001/build/preset_access_render.json
+- episodes/test-coverage-001/build/preset_access_validate.json
+- episodes/test-pipeline-001/build/preset_access.json
+- episodes/test-pipeline-001/build/preset_access_all.json
+- episodes/test-pipeline-001/build/preset_access_export.json
+- episodes/test-pipeline-001/build/preset_access_render.json
+- episodes/test-pipeline-001/build/preset_access_validate.json
 legend:
   status:
     measured: 레퍼런스에서 측정
@@ -170,7 +182,8 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_own_branding
     qa_checks:
     - identity.forbidden_text
     impact_if_unmeasured: null
@@ -182,13 +195,32 @@ entries:
     value: 1080
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 너비 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode;
+        n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080
+        은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
+        너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
+        y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.format
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.height:
     scope: fixed
     category: style
@@ -196,13 +228,32 @@ entries:
     value: 1920
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 높이 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode;
+        n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080
+        은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
+        너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
+        y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.format
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.fps:
     scope: fixed
     category: style
@@ -210,13 +261,32 @@ entries:
     value: 30
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 프레임률 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode;
+        n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080
+        은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
+        너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
+        y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: fps
     code:
     - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.format
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.background.type:
     scope: fixed
     category: style
@@ -233,7 +303,7 @@ entries:
       by_format: {}
       resolution: null
       method: '영상 밖 영역: 정지+단색 → color, 변하지만 흐림 → blur_source'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -261,7 +331,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 밖 정지 영역의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -290,7 +360,7 @@ entries:
       by_format: {}
       resolution: null
       method: null
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -321,7 +391,7 @@ entries:
       - 1080
       - 1920
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -352,7 +422,7 @@ entries:
       - 1080
       - 1920
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -383,7 +453,7 @@ entries:
       - 1080
       - 1920
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -414,7 +484,7 @@ entries:
       - 1080
       - 1920
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -443,7 +513,7 @@ entries:
       by_format: {}
       resolution: null
       method: null
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -462,13 +532,32 @@ entries:
     value: 54
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
+        와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
+        안쪽에 자막을 둠)'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.safe_margin
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.safe_margin.right:
     scope: fixed
     category: style
@@ -476,13 +565,32 @@ entries:
     value: 54
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
+        와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
+        안쪽에 자막을 둠)'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.safe_margin
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.safe_margin.top:
     scope: fixed
     category: style
@@ -490,13 +598,32 @@ entries:
     value: 110
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
+        와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
+        안쪽에 자막을 둠)'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.safe_margin
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   canvas.safe_margin.bottom:
     scope: fixed
     category: style
@@ -504,13 +631,32 @@ entries:
     value: 250
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_canvas.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
+        와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
+        안쪽에 자막을 둠)'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:read_canvas
     qa_checks:
     - canvas.safe_margin
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   text.font_dirs:
     scope: fixed
     category: infra
@@ -532,13 +678,25 @@ entries:
     value: Noto Sans CJK KR Black
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.title.font_file:
     scope: fixed
     category: infra
@@ -560,13 +718,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.title.size_px:
     scope: fixed
     category: style
@@ -586,7 +757,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -614,7 +785,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -642,7 +813,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -673,7 +844,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -701,7 +872,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -732,7 +903,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -760,7 +931,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -788,7 +959,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -816,7 +987,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -845,7 +1016,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -876,7 +1047,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -907,7 +1078,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -936,7 +1107,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -967,7 +1138,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -996,7 +1167,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1025,7 +1196,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1056,7 +1227,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1087,7 +1258,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1115,7 +1286,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1143,7 +1314,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1171,7 +1342,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1200,7 +1371,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1229,7 +1400,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1260,7 +1431,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1288,7 +1459,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1317,7 +1488,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1346,7 +1517,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1375,7 +1546,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1403,7 +1574,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1422,13 +1593,25 @@ entries:
     value: Noto Sans CJK KR Bold
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.description.font_file:
     scope: fixed
     category: infra
@@ -1450,13 +1633,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.description.size_px:
     scope: fixed
     category: style
@@ -1476,7 +1672,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1504,7 +1700,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1532,7 +1728,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1563,7 +1759,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1591,7 +1787,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1622,7 +1818,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1650,7 +1846,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1678,7 +1874,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1706,7 +1902,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1735,7 +1931,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1766,7 +1962,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1797,7 +1993,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1826,7 +2022,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1857,7 +2053,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1886,7 +2082,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1915,7 +2111,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1946,7 +2142,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1977,7 +2173,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2005,7 +2201,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2033,7 +2229,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2061,7 +2257,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2090,7 +2286,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2119,7 +2315,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2150,7 +2346,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2178,7 +2374,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2207,7 +2403,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2236,7 +2432,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2265,7 +2461,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2293,7 +2489,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2312,13 +2508,25 @@ entries:
     value: Noto Sans CJK KR Black
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.situation.font_file:
     scope: fixed
     category: infra
@@ -2340,13 +2548,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.situation.size_px:
     scope: fixed
     category: style
@@ -2366,7 +2587,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2394,7 +2615,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2422,7 +2643,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2453,7 +2674,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2481,7 +2702,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2512,7 +2733,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2540,7 +2761,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2568,7 +2789,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2596,7 +2817,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2625,7 +2846,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2656,7 +2877,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2687,7 +2908,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2716,7 +2937,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2747,7 +2968,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2776,7 +2997,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2805,7 +3026,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2836,7 +3057,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2867,7 +3088,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2895,7 +3116,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2923,7 +3144,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2951,7 +3172,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2980,7 +3201,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3009,7 +3230,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3040,7 +3261,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3068,7 +3289,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3097,7 +3318,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3126,7 +3347,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3155,7 +3376,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3183,7 +3404,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3202,13 +3423,25 @@ entries:
     value: Noto Sans CJK KR Bold
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.speaker.font_file:
     scope: fixed
     category: infra
@@ -3230,13 +3463,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.speaker.size_px:
     scope: fixed
     category: style
@@ -3256,7 +3502,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3284,7 +3530,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3312,7 +3558,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3343,7 +3589,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3371,7 +3617,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3402,7 +3648,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3430,7 +3676,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3458,7 +3704,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3486,7 +3732,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3515,7 +3761,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3546,7 +3792,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3577,7 +3823,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3606,7 +3852,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3637,7 +3883,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3666,7 +3912,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3695,7 +3941,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3726,7 +3972,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3757,7 +4003,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3785,7 +4031,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3813,7 +4059,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3841,7 +4087,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3870,7 +4116,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3899,7 +4145,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3930,7 +4176,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3958,7 +4204,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3987,7 +4233,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4016,7 +4262,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4045,7 +4291,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4073,7 +4319,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4092,13 +4338,25 @@ entries:
     value: Noto Sans CJK KR Black
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.dialogue.font_file:
     scope: fixed
     category: infra
@@ -4120,13 +4378,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.dialogue.size_px:
     scope: fixed
     category: style
@@ -4146,7 +4417,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4174,7 +4445,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4202,7 +4473,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4233,7 +4504,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4261,7 +4532,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4292,7 +4563,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4320,7 +4591,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4348,7 +4619,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4376,7 +4647,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4405,7 +4676,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4436,7 +4707,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4467,7 +4738,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4496,7 +4767,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4527,7 +4798,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4556,7 +4827,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4585,7 +4856,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4616,7 +4887,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4647,7 +4918,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4675,7 +4946,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4703,7 +4974,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4731,7 +5002,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4760,7 +5031,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4789,7 +5060,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4820,7 +5091,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4848,7 +5119,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4877,7 +5148,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4906,7 +5177,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4935,7 +5206,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4956,13 +5227,29 @@ entries:
     - '"'
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_text.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: '대사(dialogue) 자막 OCR 텍스트의 첫 글자·마지막 글자가 따옴표인지(textboxes.quote_pair): 양쪽 다 → 그 쌍, 양쪽 다 없음 → 없음([]),
+        한쪽만 → OCR 누락으로 보고 제외 → 영상별 최빈 쌍 → 영상 간 최빈(value = [여는 문자, 닫는 문자] 또는 []). 한계: 대사 역할 판정 자체가 따옴표를 근거로 쓰므로 따옴표
+        없는 대사는 말소리 겹침(audio/original.json)이나 글자색으로 대사로 잡힌 경우에만 관측됨; OCR 은 “ 와 " 를 혼동할 수 있음(글자 모양 확인은 사람 관찰로)'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.text
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   text.roles.dialogue.persist:
     scope: fixed
     category: style
@@ -4979,7 +5266,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4998,13 +5285,25 @@ entries:
     value: Noto Sans CJK KR Black
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.reaction.font_file:
     scope: fixed
     category: infra
@@ -5026,13 +5325,26 @@ entries:
     value: true
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/font_identity.json
+      overall:
+        n: 0
+      by_format: {}
+      resolution: null
+      method: 동일 판정된 글꼴 면의 OS/2 usWeightClass >= 600 → true (렌더러 굵기 검사와 같은 파서 shortkit.edit.captions.read_faces);
+        동일 판정이 없으면 못 잼
+      measured_at: '2026-09-24T20:28:37+00:00'
+      unit: bool
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     qa_checks:
     - caption.font
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
+    blocker: '레퍼런스 자막 crop 없음 (analysis/<id>/captions.json + 레퍼런스 영상 파일 필요) — 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00,
+      yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts:
+      Unable to download API page: (''Unable to connect to proxy'', OSError(''Tunnel connection failed: 403 Forbidden''))
+      (caused by ProxyError("(''Unable to connect to proxy'', OSError(''Tunnel connection fai'
   text.roles.reaction.size_px:
     scope: fixed
     category: style
@@ -5052,7 +5364,7 @@ entries:
       - 1080
       - 1920
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5080,7 +5392,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5108,7 +5420,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5139,7 +5451,7 @@ entries:
       - 1080
       - 1920
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5167,7 +5479,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5198,7 +5510,7 @@ entries:
       - 1080
       - 1920
       method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5226,7 +5538,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5254,7 +5566,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5282,7 +5594,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5311,7 +5623,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5342,7 +5654,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5373,7 +5685,7 @@ entries:
       - 1080
       - 1920
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5402,7 +5714,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5433,7 +5745,7 @@ entries:
       - 1080
       - 1920
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5462,7 +5774,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5491,7 +5803,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5522,7 +5834,7 @@ entries:
       - 1080
       - 1920
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5553,7 +5865,7 @@ entries:
       - 1080
       - 1920
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5581,7 +5893,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5609,7 +5921,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5637,7 +5949,7 @@ entries:
       by_format: {}
       resolution: null
       method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5666,7 +5978,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5695,7 +6007,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5726,7 +6038,7 @@ entries:
       - 1080
       - 1920
       method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5754,7 +6066,7 @@ entries:
       by_format: {}
       resolution: null
       method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5783,7 +6095,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5812,7 +6124,7 @@ entries:
       by_format: {}
       resolution: null
       method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5841,7 +6153,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5869,7 +6181,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5898,12 +6210,14 @@ entries:
       resolution: null
       method: 주 자막(제목·설명·상황·반응) 마지막 어절의 종결 어미 분류(합쇼체/해요체/음슴체/반말/명사형) → 영상별 최빈 종결(60% 이상이면 그 말투, 아니면 혼합) → 영상 간 최빈값.
         OCR 오인식 영향 있음
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
-    code: []
+    code:
+    - shortkit/edit/proposal.py:tone_style_guide
+    - shortkit/edit/validate.py:check_tone
     qa_checks:
     - caption.tone
-    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    impact_if_unmeasured: 자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -5923,12 +6237,13 @@ entries:
       by_format: {}
       resolution: null
       method: 종결 어미(마지막 두 글자) 빈도 상위 8개
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
-    code: []
+    code:
+    - shortkit/edit/proposal.py:tone_style_guide
     qa_checks:
     - caption.tone
-    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    impact_if_unmeasured: 제안서의 말투 안내(종결 어미 예시)가 비어 있음 → 대본 말투가 레퍼런스와 다를 수 있음
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -5941,25 +6256,42 @@ entries:
     value: false
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값)'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: null
+    code:
+    - shortkit/edit/proposal.py:tone_style_guide
+    - shortkit/edit/validate.py:check_tone
     qa_checks:
     - caption.tone
-    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
+    impact_if_unmeasured: 자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   text.tone.notes:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: meta
+    status: not_applicable
     value: 측정 전. 레퍼런스 자막 OCR 로 종결어미 분포를 측정해 채운다.
-    value_origin: provisional
+    value_origin: meta
     evidence: []
     measurement: null
     code: []
     qa_checks:
     - caption.tone
-    impact_if_unmeasured: 자막 말투가 레퍼런스와 다를 수 있음
-    resolution_state: blocked_network
+    impact_if_unmeasured: null
+    resolution_state: resolved
   motion.zoom.scale_to:
     scope: fixed
     category: style
@@ -5977,7 +6309,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 확대(zoom_in) 배율 중앙값(ORB 유사변환 누적; 원본 카메라 줌과 구분 못 함)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6005,8 +6337,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 영상별 확대 길이 중앙값
-      measured_at: '2026-09-24T19:14:31+00:00'
+      method: 영상별 확대 길이 중앙값(ease 곡선 맞춤이 판정된 사건은 맞춘 곡선의 전체 길이 — 느린 시작·끝 포함, 아니면 프레임당 0.3% 이상 변하는 구간 길이)
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6025,13 +6357,29 @@ entries:
     value: out
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_motion.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 확대 사건마다 누적 배율 곡선(사건 ±0.5초, 같은 샷)을 렌더러 ease(linear=u, in=u^3, out=1-(1-u)^3, inout) 곡선 c0+A*ease((t-t0)/dur)
+        에 맞춤(t0·dur 1/4프레임 격자, c0·A 최소제곱) → 두 번째로 좋은 곡선보다 SSE 1.5배 이상 좋고 잔차 ≤ 진폭 8% 일 때만 그 ease → 영상별 최빈 → 영상 간
+        최빈
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - video.zoom
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   motion.zoom.max_consecutive:
     scope: fixed
     category: rule
@@ -6053,13 +6401,29 @@ entries:
     value: false
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_motion.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: '확대 사건의 누적 유사변환 T_k 와 (1-z_k) 로 겉보기 고정점 맞춤: 순수 확대이고 고정점이 영상 영역 안(중심 근처 제외) → false(고정점 제자리 = 렌더러 recenter=false
+        로 그대로 재현), 고정점이 영역 밖이거나 확대 중 화면 중심 쪽으로 이동 → true(렌더러 recenter=true: 목표점이 같은 ease 로 중심으로 이동). 중심 근처 확대는 두
+        방식 결과가 같아 제외. 한계: 목표점이 중심 가까이 있던 recenter=true 확대도 ''영역 안 고정점''으로 보임'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - video.zoom
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   motion.freeze.hold_s:
     scope: fixed
     category: style
@@ -6077,7 +6441,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6119,7 +6483,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 많은 전환 종류(cut/flash/crossfade)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6148,7 +6512,7 @@ entries:
       by_format: {}
       resolution: null
       method: 플래시(밝기 급등) 길이 중앙값
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6176,7 +6540,7 @@ entries:
       by_format: {}
       resolution: null
       method: 플래시 최고 밝기 프레임의 평균 색
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6195,13 +6559,28 @@ entries:
     value: region
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/visual_motion.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: '플래시 최고 밝기 프레임 vs 앞뒤 0.1~0.25초 프레임 중앙값: 영상 영역 밖(가장자리 2% 제외, 밝아질 여유 있는 픽셀) 중 영역 안 평균 상승의 40%(최소 15)
+        이상 밝아진 비율 ≥ 0.6 → canvas(화면 전체), ≤ 0.15 → region(영상 영역만), 그 사이·영상이 화면 전체 → 판정 안 함 → 영상별 최빈 → 영상 간 최빈'
+      measured_at: '2026-09-24T20:28:30+00:00'
+      unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - video.transitions
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   motion.transitions.crossfade.dur_s:
     scope: fixed
     category: style
@@ -6219,7 +6598,7 @@ entries:
       by_format: {}
       resolution: null
       method: 섞임 구간(블렌드 가중치 0→1) 길이 중앙값
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -6248,7 +6627,7 @@ entries:
       by_format: {}
       resolution: null
       method: 프레임 복제율 변화로 본 재생 속도 비(프레임 보간 슬로모션은 검출 못 함)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: ratio
     code:
     - shortkit/edit/validate.py:check_motion
@@ -6268,7 +6647,8 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_trim_tail
     qa_checks: []
     impact_if_unmeasured: null
     resolution_state: resolved
@@ -6279,14 +6659,30 @@ entries:
     value: '#FF2A2A'
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        clusters: []
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: rgb_hex
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.size_px:
     scope: fixed
     category: style
@@ -6294,13 +6690,33 @@ entries:
     value: 120
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
+        없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
+        표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.outline_px:
     scope: fixed
     category: style
@@ -6308,13 +6724,33 @@ entries:
     value: 6
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
+        없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
+        표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: px
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.outline_color:
     scope: fixed
     category: style
@@ -6322,13 +6758,29 @@ entries:
     value: '#FFFFFF'
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        clusters: []
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: rgb_hex
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.blink_hz:
     scope: fixed
     category: style
@@ -6336,14 +6788,31 @@ entries:
     value: 0.0
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: Hz
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.head_len_ratio:
     scope: fixed
     category: style
@@ -6351,13 +6820,30 @@ entries:
     value: 0.45
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: ratio
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.head_width_ratio:
     scope: fixed
     category: style
@@ -6365,13 +6851,30 @@ entries:
     value: 0.62
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: ratio
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.arrow.shaft_width_ratio:
     scope: fixed
     category: style
@@ -6379,13 +6882,30 @@ entries:
     value: 0.24
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: ratio
     code:
-    - shortkit/edit/resolve.py:<dictcomp>
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.circle.color:
     scope: fixed
     category: style
@@ -6393,13 +6913,30 @@ entries:
     value: '#FF2A2A'
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        clusters: []
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: rgb_hex
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.circle.stroke_px:
     scope: fixed
     category: style
@@ -6407,12 +6944,33 @@ entries:
     value: 10
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
+        없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
+        표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: px
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.circle.blink_hz:
     scope: fixed
     category: style
@@ -6420,13 +6978,31 @@ entries:
     value: 0.0
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: Hz
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.box.color:
     scope: fixed
     category: style
@@ -6434,13 +7010,30 @@ entries:
     value: '#FF2A2A'
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        clusters: []
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: rgb_hex
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.box.stroke_px:
     scope: fixed
     category: style
@@ -6448,12 +7041,33 @@ entries:
     value: 8
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution:
+      - 1080
+      - 1920
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
+        없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
+        표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: px
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   decorations.box.blink_hz:
     scope: fixed
     category: style
@@ -6461,27 +7075,45 @@ entries:
     value: 0.0
     value_origin: provisional
     evidence: []
-    measurement: null
-    code: []
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        p10: null
+        p50: null
+        p90: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
+        그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: Hz
+    code:
+    - shortkit/edit/resolve.py:resolve_decorations
     qa_checks:
     - decor.brightness
     - decor.position
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   render.clean.blur_sigma_ratio:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: rule
+    status: fixed_by_rule
     value: 0.166667
-    value_origin: provisional
+    value_origin: rule
     evidence: []
     measurement: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
     qa_checks:
     - clean.residual
-    impact_if_unmeasured: 원본 정리(흐림) 강도가 달라 가린 영역이 더/덜 보일 수 있음
-    resolution_state: blocked_network
+    impact_if_unmeasured: null
+    resolution_state: resolved
   audio.sample_rate:
     scope: fixed
     category: infra
@@ -6503,13 +7135,24 @@ entries:
     value: -14.0
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: ffmpeg ebur128 통합 음량(EBU R128, 레퍼런스 파일 전체) — 근거 t=0 은 파일 전체 구간
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: LUFS
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.loudness
     impact_if_unmeasured: 최종 음량 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.loudness.true_peak_db:
     scope: fixed
     category: style
@@ -6517,13 +7160,24 @@ entries:
     value: -1.5
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: ffmpeg ebur128 참 최대 레벨(4배 오버샘플, 레퍼런스 파일 전체); 값 = p50(영상별 최대치의 중앙값); 근거 t = 샘플 최대값 위치(참고)
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: dBTP
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.loudness
     impact_if_unmeasured: 최종 음량 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.loudness.tolerance_lu:
     scope: fixed
     category: rule
@@ -6565,14 +7219,17 @@ entries:
         n: 0
       by_format: {}
       method: 깨끗한 음원 라이브러리 대조(bgm.json)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.title:
     scope: fixed
     category: style
@@ -6586,13 +7243,18 @@ entries:
         n: 0
       by_format: {}
       method: 라이브러리 index.yaml 제목
-      measured_at: '2026-09-24T19:14:31+00:00'
-    code: []
+      measured_at: '2026-09-24T20:28:32+00:00'
+    code:
+    - shortkit/edit/audio.py:check_bgm_identity
+    - shortkit/edit/validate.py:check_audio
     qa_checks:
     - audio.bgm
-    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    impact_if_unmeasured: BGM 곡 제목 미식별 → 음악 라이브러리 파일이 그 곡인지 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.version:
     scope: fixed
     category: style
@@ -6606,13 +7268,18 @@ entries:
         n: 0
       by_format: {}
       method: 라이브러리 index.yaml 버전 + 속도 1.0 일치 규칙
-      measured_at: '2026-09-24T19:14:31+00:00'
-    code: []
+      measured_at: '2026-09-24T20:28:32+00:00'
+    code:
+    - shortkit/edit/audio.py:check_bgm_identity
+    - shortkit/edit/validate.py:check_audio
     qa_checks:
     - audio.bgm
-    impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+    impact_if_unmeasured: BGM 버전 미식별 → 같은 곡의 다른 버전(다른 트랙)을 쓸 위험
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.tempo_ratio:
     scope: fixed
     category: style
@@ -6626,7 +7293,7 @@ entries:
         n: 0
       by_format: {}
       method: 특징 NCC 속도 격자 + 파형 정렬
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: ratio
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6634,7 +7301,10 @@ entries:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.section_start_s:
     scope: fixed
     category: style
@@ -6648,14 +7318,18 @@ entries:
         n: 0
       by_format: {}
       method: 깨끗한 음원 안 사용 시작 지점
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: s
-    code: []
+    code:
+    - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.gain_db:
     scope: fixed
     category: style
@@ -6668,8 +7342,8 @@ entries:
       overall:
         n: 0
       by_format: {}
-      method: '깨끗한 음원 대비 LS 이득(대사 없는 구간 중앙값)을 믹스 통합 음량이 목표 -14.0 LUFS 일 때로 환산: gain + (목표 LUFS - 레퍼런스 믹스 LUFS)'
-      measured_at: '2026-09-24T19:14:31+00:00'
+      method: '깨끗한 음원 대비 LS 이득(대사 없는 구간 중앙값)을 최종 음량 T 일 때로 환산: gain + (T - 레퍼런스 믹스 LUFS) [T: 전체 -14 LUFS (프리셋 현재값(provisional))]'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: dB
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6677,7 +7351,10 @@ entries:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.fade_in_s:
     scope: fixed
     category: style
@@ -6691,7 +7368,7 @@ entries:
         n: 0
       by_format: {}
       method: 선형 진폭 페이드 모델
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6699,7 +7376,10 @@ entries:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.fade_out_s:
     scope: fixed
     category: style
@@ -6713,7 +7393,7 @@ entries:
         n: 0
       by_format: {}
       method: 선형 진폭 페이드 모델
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6721,7 +7401,10 @@ entries:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
-    blocker: BGM 이 식별된 레퍼런스 영상 없음(다운로드 차단/라이브러리 미일치)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.bgm.loop:
     scope: fixed
     category: style
@@ -6729,13 +7412,24 @@ entries:
     value: false
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: '영상별 BGM 되감김(같은 음원의 앞 지점으로 되돌아감) 있다/없다: bgm.json match.loop (창별 같은 음원 정렬 → 정렬선 사이 시작점 변화 < -1 s).
+        값 = 측정 영상의 과반(>50 %)이 ''있다''일 때만 true(동률은 false)'
+      measured_at: '2026-09-24T20:28:32+00:00'
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.original.default:
     scope: fixed
     category: rule
@@ -6757,13 +7451,26 @@ entries:
     value: 0.0
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: '살린 대사의 음량 - 프로그램 음량 (LU): 보컬 stem 의 대사 구간 EBU R128 통합 음량 - 믹스 통합 음량(같은 모노 다운믹스). 최종 음량 T 에서 살린 대사는
+        T + 값 LUFS 에 놓인다. 렌더러는 이 dB 를 ''녹음된 그대로의 원본 소리''에 곱하므로 소스 대사 음량이 L_src 이면 필요한 이득은 T + 값 - L_src (소스별 음량
+        맞춤은 렌더러 쪽 과제)'
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: dB
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.original
     impact_if_unmeasured: 보존 원음 크기 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.original.fade_s:
     scope: fixed
     category: style
@@ -6771,13 +7478,25 @@ entries:
     value: 0.04
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: '원음(믹스 - 정렬된 BGM) RMS 10 ms 포락선의 켜짐/꺼짐 경사: 경계 뒤 일정 레벨 대비 -25 → -2 dB 시간을 렌더러의 선형 진폭 페이드에 같은 측정을 한
+        표로 환산; 경사 뒤 0.3 s 가 일정한(p90-p10 <= 4 dB) 경계만, 효과음 구간(시작~끝) ±0.3 s 경계 제외'
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.original
     impact_if_unmeasured: 원음 켜고 끄는 경계 처리 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.original.remove_embedded_music:
     scope: fixed
     category: rule
@@ -6805,7 +7524,7 @@ entries:
         n: 0
       by_format: {}
       method: 대사 전/중 BGM 이득 중앙값 차
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: dB
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6813,7 +7532,10 @@ entries:
     - audio.ducking
     impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
     resolution_state: blocked_network
-    blocker: 덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.ducking.attack_s:
     scope: fixed
     category: style
@@ -6827,7 +7549,7 @@ entries:
         n: 0
       by_format: {}
       method: 10→90 % 하강 시간/0.8 (선형 dB 경사)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6835,7 +7557,10 @@ entries:
     - audio.ducking
     impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
     resolution_state: blocked_network
-    blocker: 덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.ducking.release_s:
     scope: fixed
     category: style
@@ -6849,7 +7574,7 @@ entries:
         n: 0
       by_format: {}
       method: 10→90 % 복귀 시간/0.8 (선형 dB 경사)
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:32+00:00'
       unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
@@ -6857,7 +7582,10 @@ entries:
     - audio.ducking
     impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
     resolution_state: blocked_network
-    blocker: 덕킹을 잴 수 있는 영상 없음(BGM 미식별 또는 대사 구간 없음)
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.ducking.only_under_kept_dialogue:
     scope: fixed
     category: rule
@@ -6909,13 +7637,25 @@ entries:
     value: -8.0
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: 카탈로그 효과음(edit_sfx) 이벤트마다 gain = gain_db_rel_mix(이벤트 RMS[최대 0.5 s] - 믹스 전체 RMS) + 믹스 RMS dBFS - 믹스
+        LUFS + T - 매핑된 창고 파일 RMS dBFS(시작점부터 같은 길이) → 렌더러 의미(최종 음량 T 에서 효과음 파일에 곱하는 dB); 값 = 이벤트 p50
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: dB
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.sfx.placement
     impact_if_unmeasured: 효과음 크기 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   audio.sfx.max_event_offset_s:
     scope: fixed
     category: rule
@@ -6952,13 +7692,25 @@ entries:
     value: 0.05
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/audio.json
+      overall:
+        n: 0
+      by_format: {}
+      method: 의도적 정적(BGM 끊김) 앞뒤 BGM 파형 LS 이득(3 ms 창)이 기준 레벨 대비 -2 → -30 dB 를 지나는 시간을 렌더러 모양(dB 선형 0→-120 dB, edit.audio.build_envelope)에
+        같은 측정을 한 표로 fade_s 환산 (들어갈 때·나올 때 모두 표본)
+      measured_at: '2026-09-24T20:28:32+00:00'
+      unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
     qa_checks:
     - audio.silence
     impact_if_unmeasured: 의도적 정적 처리 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai'
   structure.formats_file:
     scope: fixed
     category: infra
@@ -6991,12 +7743,13 @@ entries:
       by_format: {}
       resolution: null
       method: 분석한 영상 파일의 길이 → p10
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_structure
     qa_checks:
     - structure.duration
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -7019,12 +7772,13 @@ entries:
       by_format: {}
       resolution: null
       method: 분석한 영상 파일의 길이 → p50
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_structure
     qa_checks:
     - structure.duration
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -7047,12 +7801,13 @@ entries:
       by_format: {}
       resolution: null
       method: 분석한 영상 파일의 길이 → p90
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
-    code: []
+    code:
+    - shortkit/edit/validate.py:check_structure
     qa_checks:
     - structure.duration
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -7075,13 +7830,13 @@ entries:
       by_format: {}
       resolution: null
       method: 분석한 영상 파일의 길이 → 표본 수
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: videos
     code:
     - shortkit/edit/validate.py:check_structure
     qa_checks:
     - structure.duration
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
+    impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
     resolution_state: blocked_network
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
@@ -7104,7 +7859,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 첫 시간제 자막(제목·설명 제외) 시작 시각
-      measured_at: '2026-09-24T19:14:31+00:00'
+      measured_at: '2026-09-24T20:28:30+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
@@ -7123,13 +7878,28 @@ entries:
     value: first_frame
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값)'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: null
     code:
     - shortkit/edit/validate.py:check_cover
     qa_checks:
     - cover.frame
     impact_if_unmeasured: 표지 구성 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   cover.text_role:
     scope: fixed
     category: style
@@ -7137,13 +7907,28 @@ entries:
     value: title
     value_origin: provisional
     evidence: []
-    measurement: null
+    measurement:
+      file: presets/joshuamagazine/measurements/manual.json
+      overall:
+        n: 0
+        counts: {}
+        mode: null
+      by_format: {}
+      resolution: null
+      method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
+        → 영상 간 분포(수치 p50, 색·범주 최빈값)'
+      measured_at: '2026-09-24T20:28:31+00:00'
+      unit: null
     code:
     - shortkit/edit/validate.py:check_cover
     qa_checks:
     - cover.frame
     impact_if_unmeasured: 표지 구성 불일치
     resolution_state: blocked_network
+    blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
+      DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
+      to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
+      to proxy'', OSError(''Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음'
   per_episode:
     scope: fixed
     category: meta
@@ -7174,6 +7959,7 @@ entries:
     evidence: []
     measurement: null
     code:
+    - shortkit/edit/plan.py:approval_state_for
     - shortkit/edit/validate.py:check_approval
     qa_checks: []
     impact_if_unmeasured: null
@@ -7186,7 +7972,8 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/plan.py:approval_state_for
     qa_checks: []
     impact_if_unmeasured: null
     resolution_state: resolved

@@ -23,12 +23,17 @@ from ..util.media import probe
 from .collect import Blocked, classify_error
 from .common import reference_dir, safe_id, say, scrub, videos_dir, warn
 
-FORMAT = ("bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]/"
-          "bv*[height<=1080]+ba/b[height<=1080]")
+# Cap the SHORT side, not the height: a vertical Short is 1080x1920, and a height cap of 1080 would
+# fetch a 608x1080 rendition.  yt-dlp's sort field "res" is the smaller dimension of the video.
+FORMAT = "bv*+ba/b"
 
 
-def _format_for(max_height: int) -> str:
-    return FORMAT.replace("1080", str(int(max_height)))
+def _format_for(max_short_side: int) -> str:
+    return FORMAT
+
+
+def _format_sort(max_short_side: int) -> list[str]:
+    return [f"res:{int(max_short_side)}", "ext:mp4:m4a", "fps"]
 
 
 def ydl_download(url: str, out_dir: Path, max_height: int = 1080, cookies: str | None = None) -> dict:
@@ -36,6 +41,7 @@ def ydl_download(url: str, out_dir: Path, max_height: int = 1080, cookies: str |
     import yt_dlp
 
     opts = {"quiet": True, "no_warnings": True, "noprogress": True, "format": _format_for(max_height),
+            "format_sort": _format_sort(max_height),
             "merge_output_format": "mp4", "outtmpl": str(out_dir / "%(id)s.%(ext)s"), "retries": 2,
             "socket_timeout": 30, "overwrites": False}
     if cookies:
@@ -54,7 +60,7 @@ def _record(vid: str, f: Path, info: dict | None, source: str) -> dict:
             "vcodec": pi.vcodec, "acodec": pi.acodec, "bitrate": pi.bit_rate, "duration": round(pi.duration, 3),
             "has_audio": pi.has_audio, "downloaded_at": now_iso(), "source": source,
             "source_url": info.get("webpage_url") or info.get("original_url"),
-            "requested_format": _format_for(1080) if fmt else None}
+            "requested_format": (f"{_format_for(1080)} sort={','.join(_format_sort(1080))}") if fmt else None}
 
 
 def download(preset: str, ids: list[str], max_height: int = 1080, cookies: str | None = None,

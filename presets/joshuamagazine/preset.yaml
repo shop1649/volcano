@@ -31,7 +31,9 @@ identity_exclusions:
   # 최종 화면·오디오에 나오면 안 되는 원 채널 식별 요소. QA 가 OCR 로 검사한다.
   forbidden_text: ['조슈아매거진', '조슈아 매거진', 'joshuamagazine', 'joshua magazine', 'JOSHUA MAGAZINE']
   logo_templates_dir: presets/joshuamagazine/reference/identity_templates   # 레퍼런스에서 추출(미측정)
-  own_branding: none      # 우리 채널 브랜딩은 이 프리셋에서 넣지 않는다(요청 시 requested_changes 로)
+  own_branding: none      # 규칙(측정 대상 아님): 우리 채널 브랜딩은 이 프리셋에서 넣지 않는다(요청 시 requested_changes 로).
+                          #   none 이면 episode validate(check_own_branding)가 제목·설명·상황·반응 자막의 @핸들/주소 형태 문구를
+                          #   오류로 막는다(화면 속 글자를 옮긴 자막 grounding.kind=on_screen_text 는 예외)
 
 canvas:
   width: 1080
@@ -179,11 +181,12 @@ text:
       motion_out: {type: none, dur_s: 0.0}
       timing: {lead_s: 0.0, min_dur_s: 0.6}
       persist: timed
-  tone:                    # 자막 말투(측정 전 임시). 대본 작성 규칙에서 사용
-    register: 반말_구어체    # 반말_구어체 | 해요체 | 음슴체 | 혼합
-    sentence_end_examples: []
-    emoji: false
-    notes: 측정 전. 레퍼런스 자막 OCR 로 종결어미 분포를 측정해 채운다.
+  tone:                    # 자막 말투(측정 전 임시). ref aggregate 가 레퍼런스 자막 OCR 종결 어미로 측정
+    register: 반말_구어체    # 반말_구어체 | 해요체 | 음슴체 | 합쇼체 | 혼합 — episode validate(check_tone)가 제목·설명·상황·반응
+                           #   자막의 문장 끝을 같은 분류기로 검사(대사 dialogue 예외; production 오류 / test 경고)
+    sentence_end_examples: []   # 레퍼런스 종결 어미 빈도 상위 — 첫 편 제안서(proposal.md)의 '말투 안내'로 대본 작성자에게 제시
+    emoji: false           # false 면 위 역할 자막의 이모지를 validate 가 막음
+    notes: 측정 전. 레퍼런스 자막 OCR 로 종결어미 분포를 측정해 채운다.   # 분류: meta(기록용 메모, 제작 값 아님)
 
 motion:
   zoom:
@@ -203,18 +206,22 @@ motion:
   speed:
     slowmo_factor: 0.5
   trim:
-    tail_after_meaning_s: 0.25   # 의미가 끝난 뒤 남기는 꼬리 최대치
+    tail_after_meaning_s: 0.25   # 규칙: 의미가 끝난 뒤 남기는 꼬리 최대치 — episode validate(check_trim_tail)가 세그먼트의 마지막
+                                 #   의미 표지(근거 있는 자막·효과음 사건·살린 원음·정지·확대·장식) 뒤 꼬리를 경고(reaction/outro 예외)
 
 decorations:
   # arrow 모양 비율(임시값, 못 잼 — 지금까지 렌더러에 박혀 있던 값): 머리 길이/전체 길이, 머리 폭/전체 길이, 몸통 폭/전체 길이
   arrow: {color: '#FF2A2A', size_px: 120, outline_px: 6, outline_color: '#FFFFFF', blink_hz: 0.0,
           head_len_ratio: 0.45, head_width_ratio: 0.62, shaft_width_ratio: 0.24}
+  # circle/box: 원·네모 테두리(안쪽이 비어 있음 — 보호 영역을 둘러싸는 것은 가림이 아님). resolve 가 plan 에서 쓸 때 읽는다
+  # (episodes/test-coverage-001 이 둘 다 씀)
   circle: {color: '#FF2A2A', stroke_px: 10, blink_hz: 0.0}
   box: {color: '#FF2A2A', stroke_px: 8, blink_hz: 0.0}
 
 render:
   clean:
-    blur_sigma_ratio: 0.166667   # 임시값(못 잼, 지금까지의 렌더러 동작 1/6): sources[].clean.blur 가우시안 sigma = max(w, h) × 이 값 (원본 px)
+    blur_sigma_ratio: 0.166667   # 분류: 규칙(우리 원본 정리 단계의 렌더 파라미터, 레퍼런스 스타일 아님 — 지금까지의 렌더러 동작 1/6):
+                                 #   sources[].clean.blur 가우시안 sigma = max(w, h) × 이 값 (원본 px)
 
 audio:
   sample_rate: 48000
@@ -227,10 +234,10 @@ audio:
              max_limiter_db: 3.0}   # max_limiter_db: 규칙(측정값 아님) — QA 효과음 레벨 허용(±3 dB) 안에 머물도록
   bgm:
     track_id: null         # 곡 식별 전(못 잼). assets/library/music 의 깨끗한 파일 id
-    title: null
-    version: null          # original | sped_up | slowed | remix | instrumental ...
+    title: null            # 곡 식별 = 제목 AND 버전: resolve(audio.check_bgm_identity)가 음악 라이브러리 항목의 title/version 과
+    version: null          #   비교(다른 버전 = 다른 트랙 → 오류). original | sped_up | slowed | remix | instrumental ...
     tempo_ratio: 1.0       # 원곡 대비 속도
-    section_start_s: 0.0   # 원곡에서 실제 사용 시작 지점
+    section_start_s: 0.0   # 원곡에서 실제 사용 시작 지점(plan.bgm.section_start_s 가 없으면 이 값; 덮어쓰면 경고 — 다른 구간은 불일치)
     gain_db: 0.0           # 임시값(못 잼). 최종 프로그램 음량에서의 BGM 레벨(깨끗한 음원 대비 dB). 0 = 받은 파일 그대로:
                            #   테스트 음원 music_bed_a.wav(-14.4 LUFS, -1.9 dBTP)가 BGM 만 나올 때 목표 -14 LUFS 근처에 놓임
     fade_in_s: 0.0
@@ -258,7 +265,8 @@ audio:
 
 structure:
   formats_file: presets/joshuamagazine/formats.yaml
-  duration_s: {p10: null, p50: null, p90: null, n: 0}
+  duration_s: {p10: null, p50: null, p90: null, n: 0}   # episode validate(check_structure): 계획 길이가 p10..p90 밖이면
+                                                        #   production 오류 / test 경고, 미측정이면 경고
   first_caption_at_s: 0.0
 
 cover:
@@ -276,6 +284,6 @@ per_episode:               # 새 소재마다 다시 판단하는 항목(값은 
   - sources[].clean(crop/delogo/inpaint)
   - sources[].protected(얼굴·손·핵심 물체)
 
-approval:
-  first_episode_requires_approval: true
-  later_episodes_require_approval: false
+approval:                  # 규칙: 승인 관문(plan.approval_state_for)이 회차에 맞는 키 하나를 읽는다
+  first_episode_requires_approval: true    # episode_index 1(또는 회차 없음)
+  later_episodes_require_approval: false   # episode_index > 1

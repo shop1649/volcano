@@ -1,0 +1,1809 @@
+{
+    "OTIO_SCHEMA": "Timeline.1",
+    "metadata": {
+        "shortkit": {
+            "canvas": {
+                "background": {
+                    "blur_sigma": 30.0,
+                    "color": "#000000",
+                    "type": "color"
+                },
+                "fps": 30.0,
+                "height": 1920,
+                "safe_margin": {
+                    "bottom": 250.0,
+                    "left": 54.0,
+                    "right": 54.0,
+                    "top": 110.0
+                },
+                "video_region": {
+                    "fit": "cover",
+                    "h": 608.0,
+                    "w": 1080.0,
+                    "x": 0.0,
+                    "y": 656.0
+                },
+                "width": 1080
+            },
+            "captions_file": "captions.ass",
+            "captions_srt": "captions.srt",
+            "duration_s": 22.5,
+            "episode_id": "test-coverage-001",
+            "frames": 675,
+            "mode": "test",
+            "note": "자막·장식은 captions.ass 한 파일(libass)로 그려짐; OTIO 마커는 위치 표시용",
+            "preset_id": "joshuamagazine-v1",
+            "schema": "shortkit.otio/1"
+        }
+    },
+    "name": "test-coverage-001",
+    "global_start_time": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "rate": 30.0,
+        "value": 0.0
+    },
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "metadata": {},
+        "name": "tracks",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "enabled": true,
+        "color": null,
+        "children": [
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V1 배경",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "background": {
+                                    "blur_sigma": 30.0,
+                                    "color": "#000000",
+                                    "type": "color"
+                                },
+                                "note": "blur_source 면 흐린 소스를 배경으로(마스터 기준)"
+                            }
+                        },
+                        "name": "배경",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 675.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "배경",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 675.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#000000"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V2 영상",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    330.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": null,
+                                "id": "c_title",
+                                "kind": "caption",
+                                "lines": [
+                                    "빈 방에 들어온 사람들"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "title",
+                                "size_px": 84.0
+                            }
+                        },
+                        "name": "빈 방에 들어온 사람들",
+                        "color": "RED",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 675.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    500.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Bold",
+                                "grounding": null,
+                                "id": "c_desc",
+                                "kind": "caption",
+                                "lines": [
+                                    "설정 연결 검증 테스트 2편"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "description",
+                                "size_px": 46.0
+                            }
+                        },
+                        "name": "설정 연결 검증 테스트 2편",
+                        "color": "ORANGE",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "아래쪽에서 들어와 오른쪽 벽 쪽으로 걸어가 6.8s 에 화면 밖",
+                                    "source": "v_room",
+                                    "src_t": 4.0
+                                },
+                                "id": "c_sit1",
+                                "kind": "caption",
+                                "lines": [
+                                    "한 사람이 빈 방을 가로질러 나간다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "한 사람이 빈 방을 가로질러 나간다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 135.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 9.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_face",
+                                    "src_t": 7.0
+                                },
+                                "id": "c_sit2",
+                                "kind": "caption",
+                                "lines": [
+                                    "한 남성이 카메라 앞까지 걸어온다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "한 남성이 카메라 앞까지 걸어온다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 144.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 150.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1140.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "카메라 정면을 보고 서 있음",
+                                    "source": "v_face",
+                                    "src_t": 11.0
+                                },
+                                "id": "c_rx",
+                                "kind": "caption",
+                                "lines": [
+                                    "빤히"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "reaction",
+                                "size_px": 76.0
+                            }
+                        },
+                        "name": "빤히",
+                        "color": "MAGENTA",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 78.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 300.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_face",
+                                    "src_t": 34.8
+                                },
+                                "id": "c_sit3",
+                                "kind": "caption",
+                                "lines": [
+                                    "두 사람이 나란히 와서 선다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "두 사람이 나란히 와서 선다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 144.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 411.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_face",
+                                    "src_t": 43.0
+                                },
+                                "id": "c_sit4",
+                                "kind": "caption",
+                                "lines": [
+                                    "그리고 둘 다 떠난다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "그리고 둘 다 떠난다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 108.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 561.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s1",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 4.8,
+                                "out_start": 0.0,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        0,
+                                        144
+                                    ],
+                                    "source_time_at_start": 2.0
+                                },
+                                "purpose": "context",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_room",
+                                "speed": 1.0,
+                                "src_in": 2.0,
+                                "src_out": 6.8,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s1",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 144.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 60.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/people-detection.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1490.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/people-detection.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s2",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 9.8,
+                                "out_start": 4.8,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        144,
+                                        294
+                                    ],
+                                    "source_time_at_start": 5.0
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 1.0,
+                                "src_in": 5.0,
+                                "src_out": 10.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s2",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 150.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 150.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 10.8,
+                                    "src_t": 11.0
+                                },
+                                "out_end": 13.5,
+                                "out_start": 9.8,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        294,
+                                        324
+                                    ],
+                                    "source_time_at_start": 10.0
+                                },
+                                "purpose": "reaction",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 1.0,
+                                "src_in": 10.0,
+                                "src_out": 13.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 30.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 300.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 10.8,
+                                    "src_t": 11.0
+                                },
+                                "out_end": 13.5,
+                                "out_start": 9.8,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "hold",
+                                    "out_frames": [
+                                        324,
+                                        346
+                                    ],
+                                    "source_time_at_start": 11.0
+                                },
+                                "purpose": "reaction",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 1.0,
+                                "src_in": 10.0,
+                                "src_out": 13.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3 정지",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 22.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 330.0
+                            }
+                        },
+                        "effects": [
+                            {
+                                "OTIO_SCHEMA": "FreezeFrame.1",
+                                "metadata": {},
+                                "name": "freeze",
+                                "effect_name": "FreezeFrame",
+                                "enabled": true,
+                                "time_scalar": 0.0
+                            }
+                        ],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 10.8,
+                                    "src_t": 11.0
+                                },
+                                "out_end": 13.5,
+                                "out_start": 9.8,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        346,
+                                        405
+                                    ],
+                                    "source_time_at_start": 11.033333
+                                },
+                                "purpose": "reaction",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 1.0,
+                                "src_in": 10.0,
+                                "src_out": 13.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 59.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 331.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s4",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 18.5,
+                                "out_start": 13.5,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        405,
+                                        555
+                                    ],
+                                    "source_time_at_start": 32.0
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 1.0,
+                                "src_in": 32.0,
+                                "src_out": 37.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "scope": "region",
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s4",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 150.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 960.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s5",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 22.5,
+                                "out_start": 18.5,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        555,
+                                        675
+                                    ],
+                                    "source_time_at_start": 42.0
+                                },
+                                "purpose": "outro",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_face",
+                                "speed": 0.5,
+                                "src_in": 42.0,
+                                "src_out": 44.0,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s5",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1260.0
+                            }
+                        },
+                        "effects": [
+                            {
+                                "OTIO_SCHEMA": "LinearTimeWarp.1",
+                                "metadata": {},
+                                "name": "speed",
+                                "effect_name": "LinearTimeWarp",
+                                "enabled": true,
+                                "time_scalar": 0.5
+                            }
+                        ],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/face-demographics-walking-and-pause.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2727.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V3 플래시",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 404.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "opacity_by_frame": [
+                                    0.4444,
+                                    1.0,
+                                    0.4444
+                                ],
+                                "rect": {
+                                    "h": 608,
+                                    "w": 1080,
+                                    "x": 0,
+                                    "y": 656
+                                },
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "scope": "region"
+                            }
+                        },
+                        "name": "플래시 s4",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "플래시 s4",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 3.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#FFFFFF"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A1 BGM",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "duck_ranges": [],
+                                "envelope_db": [
+                                    [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        22.5,
+                                        0.0
+                                    ]
+                                ],
+                                "fade_in_s": 0.0,
+                                "fade_out_s": 0.8,
+                                "gain_db": 0.0,
+                                "loudness_gain_db": -0.067,
+                                "section_start_s": 0.0,
+                                "silences": [],
+                                "tempo_ratio": 1.0,
+                                "track_id": null
+                            }
+                        },
+                        "name": "BGM",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 675.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/music_bed_b.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1800.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/music_bed_b.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A2 효과음",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 4.6,
+                                "kind": "sfx_event",
+                                "offset_s": -0.05,
+                                "sfx_id": "fx1",
+                                "sfx_t": 4.55
+                            }
+                        },
+                        "name": "whoosh: 걷던 사람이 오른쪽 화면 밖으로 나감",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 138.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 10.8,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx2",
+                                "sfx_t": 10.8
+                            }
+                        },
+                        "name": "click: 정면을 보고 선 순간 화면이 멈춤",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 324.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 16.3,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx3",
+                                "sfx_t": 16.3
+                            }
+                        },
+                        "name": "ding: 걸어 들어온 두 사람이 나란히 멈춰 섬",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 489.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 136.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "걷던 사람이 오른쪽 화면 밖으로 나감",
+                                "event_t": 4.6,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx1",
+                                "loudness_gain_db": -0.067,
+                                "map_status": "unmeasured",
+                                "type": "whoosh"
+                            }
+                        },
+                        "name": "효과음 whoosh",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 14.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/whoosh.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 13.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/whoosh.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 174.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "정면을 보고 선 순간 화면이 멈춤",
+                                "event_t": 10.8,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx2",
+                                "loudness_gain_db": -0.067,
+                                "map_status": "unmeasured",
+                                "type": "click"
+                            }
+                        },
+                        "name": "효과음 click",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/click.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/click.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 162.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "걸어 들어온 두 사람이 나란히 멈춰 섬",
+                                "event_t": 16.3,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx3",
+                                "loudness_gain_db": -0.067,
+                                "map_status": "unmeasured",
+                                "type": "ding"
+                            }
+                        },
+                        "name": "효과음 ding",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 36.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/ding.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 36.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/ding.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            }
+        ]
+    }
+}

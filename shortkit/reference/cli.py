@@ -122,6 +122,12 @@ def cmd_aggregate(args) -> int:
     return 0 if r["videos"] else 3
 
 
+def cmd_manual_aggregate(args) -> int:
+    from .manual import aggregate_manual
+    r = aggregate_manual(args.preset, include_long=args.include_long)
+    return 0 if r["measured"] else 3
+
+
 def cmd_trace(args) -> int:
     from .trace_sources import trace
     ids = _ids(args)
@@ -151,7 +157,7 @@ def register(p) -> None:
 
     d = sub.add_parser("download", help="레퍼런스 영상 받기(mp4 1080p 이하, 소리 포함) → reference/videos + downloads.jsonl")
     _sel(d)
-    d.add_argument("--max-height", type=int, default=1080)
+    d.add_argument("--max-height", type=int, default=1080, help="짧은 변 기준 최대 해상도(세로 쇼츠 1080x1920 이면 1080)")
     d.add_argument("--cookies", default=None)
     d.set_defaults(func=cmd_download)
 
@@ -177,6 +183,14 @@ def register(p) -> None:
     _sel(g, default_set=None)
     g.add_argument("--include-long", action="store_true", help="긴 영상(kind=video)도 포함(기본: 쇼츠만)")
     g.set_defaults(func=cmd_aggregate)
+
+    mg = sub.add_parser("manual-aggregate",
+                        help="영상을 본 사람의 관찰(manual_observations.csv: video_id,t,key,value,observed_by,watched,note; "
+                             "watched=yes + observed_by 인 행만) + 자동 장식 검출 → measurements/manual.json "
+                             "(장식·이모지·표지 키; px 는 레퍼런스 영상 자체 픽셀)")
+    mg.add_argument("--preset", default=DEFAULT_PRESET)
+    mg.add_argument("--include-long", action="store_true", help="긴 영상(kind=video) 관찰도 포함")
+    mg.set_defaults(func=cmd_manual_aggregate)
 
     t = sub.add_parser("trace", help="레퍼런스 소재 출처 추적(설명란·워터마크 OCR·렌즈용 키프레임) → warehouse/")
     _sel(t)

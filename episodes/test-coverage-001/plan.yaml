@@ -1,0 +1,154 @@
+# 설정 연결(coverage) 검증용 테스트 에피소드 (mode: test — 게시용 아님, 승인 불필요)
+# 목적: test-pipeline-001 이 쓰지 않는 프리셋 경로를 실제 렌더로 읽게 한다
+#   - circle / box 장식(decorations.circle.*, decorations.box.* — 장식 blink_hz 는 plan 에서 지정하지 않아 프리셋 값 사용)
+#   - BGM 사용 구간 시작(section_start_s)·속도(tempo_ratio)·레벨을 plan 에서 덮어쓰지 않음 → 프리셋 audio.bgm.* 사용
+#   - episode_index 2 → 승인 관문이 approval.later_episodes_require_approval 을 읽음
+#   - 다른 전개 구조: context → build → reaction(src_t 정지) → build(flash) → outro(느린 재생)
+# 소재: Intel sample-videos (CC BY 4.0) 두 개. 두 파일의 오디오 트랙은 무음(volumedetect max -91.0 dB).
+# 자막·효과음·장식·보호 영역은 프레임을 직접 보고(0.5s/0.67s 간격 격자 접촉 시트) 빈 방 배경과의 차이로
+# 사람 영역을 재서 정했다(배경: people-detection 10.0s, face-demographics 24.0s — 사람 없음):
+#   people-detection   2.0s 아래쪽에서 한 사람이 들어옴 → 3.0~6.0s 오른쪽으로 걸어감 → 6.8s 화면 밖(없음)
+#   face-demographics  5.0~8.4s 남성이 카메라 쪽으로 걸어옴 → 8.5~18.2s 정면을 보고 서 있음 → 19.5s 없음
+#                      32.0~34.7s 두 사람이 걸어 들어옴 → 34.8~42.1s 나란히 서 있음 → 42.2~44.0s 걸어 나감
+schema: shortkit.plan/1
+episode_id: test-coverage-001
+preset_id: joshuamagazine-v1
+format_id: UNCLASSIFIED
+mode: test
+episode_index: 2
+notes: 테스트 모드(설정 연결 검증). 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음.
+cover:                           # 표지 문구 = 표지 프레임(0.0s)에 실제로 보이는 제목 자막(c_title)과 같은 글자
+  text: 빈 방에 들어온 사람들
+  frame_t: 0.0
+title_candidates:
+- 빈 방에 들어온 사람들
+- 카메라 앞에 멈춰 선 남성
+- 나란히 섰다가 떠난 두 사람
+sources:
+- id: v_room
+  path: assets/test/generated/video/people-detection.mp4
+  sha256: 18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693
+  warehouse_id: null
+  vocals_path: null
+  has_embedded_music: false      # 오디오 트랙이 무음(volumedetect mean/max -91.0 dB)
+  clean: {crop: null, delogo: [], inpaint: [], blur: []}
+  protected:                     # 원본 768x432 px / 원본 시각 — 걸어가는 사람 전신(위에서 찍은 뒷모습), 구간별 합집합
+  - {label: 걸어가는 사람(들어옴), x: 240, y: 138, w: 158, h: 294, start: 2.0, end: 2.6}
+  - {label: 걸어가는 사람(가운데), x: 290, y: 84, w: 184, h: 278, start: 2.5, end: 3.6}
+  - {label: 걸어가는 사람(오른쪽으로), x: 400, y: 75, w: 204, h: 214, start: 3.5, end: 4.6}
+  - {label: 걸어가는 사람(오른쪽 벽 앞), x: 516, y: 76, w: 194, h: 178, start: 4.5, end: 5.6}
+  - {label: 걸어가는 사람(나가는 중), x: 612, y: 88, w: 156, h: 156, start: 5.5, end: 6.8}
+- id: v_face
+  path: assets/test/generated/video/face-demographics-walking-and-pause.mp4
+  sha256: d88ab9aa03634f66f8815db3dc940e1cdd80b098440effb20882e814fd206bf5
+  warehouse_id: null
+  vocals_path: null
+  has_embedded_music: false      # 오디오 트랙이 무음(volumedetect mean/max -91.0 dB)
+  clean: {crop: null, delogo: [], inpaint: [], blur: []}
+  protected:                     # 원본 768x432 px / 원본 시각 — 얼굴(머리 포함), 걸어오는 동안은 구간별 합집합
+  - {label: 남성 얼굴(걸어옴), x: 330, y: 140, w: 110, h: 90, start: 5.0, end: 6.4}
+  - {label: 남성 얼굴(가까이 옴), x: 318, y: 118, w: 108, h: 122, start: 6.3, end: 7.7}
+  - {label: 남성 얼굴(정면으로 섬), x: 318, y: 95, w: 122, h: 150, start: 7.6, end: 18.3}
+  - {label: 왼쪽 여성 얼굴(걸어 들어옴), x: 112, y: 150, w: 156, h: 120, start: 32.0, end: 33.1}
+  - {label: 왼쪽 여성 얼굴(다가옴), x: 64, y: 138, w: 150, h: 152, start: 33.0, end: 34.8}
+  - {label: 왼쪽 여성 얼굴(섬), x: 55, y: 130, w: 150, h: 170, start: 34.7, end: 42.2}
+  - {label: 오른쪽 남성 얼굴(걸어 들어옴), x: 410, y: 80, w: 118, h: 130, start: 32.0, end: 33.1}
+  - {label: 오른쪽 남성 얼굴(다가옴), x: 430, y: 38, w: 140, h: 172, start: 33.0, end: 34.8}
+  - {label: 오른쪽 남성 얼굴(섬), x: 440, y: 40, w: 120, h: 165, start: 34.7, end: 42.2}
+timeline:
+- id: s1
+  source: v_room
+  src_in: 2.0
+  src_out: 6.8
+  purpose: context
+- id: s2
+  source: v_face
+  src_in: 5.0
+  src_out: 10.0
+  purpose: build
+- id: s3
+  source: v_face
+  src_in: 10.0
+  src_out: 13.0
+  purpose: reaction
+  freeze: {at: src_t, src_t: 11.0, reason: 정면을 보고 선 순간을 잠깐 멈춤}
+- id: s4
+  source: v_face
+  src_in: 32.0
+  src_out: 37.0
+  purpose: build
+  transition_in: {type: flash}
+- id: s5
+  source: v_face
+  src_in: 42.0
+  src_out: 44.0
+  speed: 0.5
+  purpose: outro
+captions:
+- {id: c_title, role: title, text: 빈 방에 들어온 사람들, start: 0.0, end: 22.5}
+- {id: c_desc, role: description, text: 설정 연결 검증 테스트 2편, start: 0.0, end: 4.0}
+- id: c_sit1
+  role: situation
+  text: 한 사람이 빈 방을 가로질러 나간다
+  start: 0.3
+  end: 4.8
+  grounding: {kind: seen, source: v_room, src_t: 4.0, note: 아래쪽에서 들어와 오른쪽 벽 쪽으로 걸어가 6.8s 에 화면 밖}
+- id: c_sit2
+  role: situation
+  text: 한 남성이 카메라 앞까지 걸어온다
+  start: 5.0
+  end: 9.8
+  grounding: {kind: seen, source: v_face, src_t: 7.0}
+- id: c_rx
+  role: reaction
+  text: 빤히
+  start: 10.0
+  end: 12.6
+  grounding: {kind: seen, source: v_face, src_t: 11.0, note: 카메라 정면을 보고 서 있음}
+- id: c_sit3
+  role: situation
+  text: 두 사람이 나란히 와서 선다
+  start: 13.7
+  end: 18.5
+  grounding: {kind: seen, source: v_face, src_t: 34.8}
+- id: c_sit4
+  role: situation
+  text: 그리고 둘 다 떠난다
+  start: 18.7
+  end: 22.3
+  grounding: {kind: seen, source: v_face, src_t: 43.0}
+decorations:
+- id: d_circle
+  kind: circle
+  start: 8.5                     # s2 원본 8.7s(정면으로 멈춘 뒤) ~ s3 정지 끝(출력 11.5s)
+  end: 11.5
+  reason: 카메라 앞에 멈춰 선 남성의 얼굴을 둘러 표시(원 안쪽에 얼굴 전체 — 가리지 않음)
+  keyframes:
+  - {t: 0.0, x: 533, y: 895, w: 290, h: 340}
+- id: d_box
+  kind: box
+  start: 16.5                    # s4 원본 35.0s(두 사람이 멈춘 뒤) ~ 세그먼트 끝
+  end: 18.5
+  reason: 나란히 선 두 사람 중 왼쪽 사람의 얼굴을 네모로 둘러 표시(상자 안쪽에 얼굴 전체)
+  keyframes:
+  - {t: 0.0, x: 183, y: 959, w: 252, h: 280}
+sfx:
+- id: fx1
+  type: whoosh
+  t: 4.55
+  event: {t: 4.6, desc: 걷던 사람이 오른쪽 화면 밖으로 나감, kind: action, source: v_room, src_t: 6.6}
+  file: assets/test/generated/sfx/whoosh.wav
+- id: fx2
+  type: click
+  t: 10.8
+  event: {t: 10.8, desc: 정면을 보고 선 순간 화면이 멈춤, kind: freeze, source: v_face, src_t: 11.0}
+  file: assets/test/generated/sfx/click.wav
+- id: fx3
+  type: ding
+  t: 16.3
+  event: {t: 16.3, desc: 걸어 들어온 두 사람이 나란히 멈춰 섬, kind: action, source: v_face, src_t: 34.8}
+  file: assets/test/generated/sfx/ding.wav
+bgm:                             # section_start_s / tempo_ratio / gain_db 를 쓰지 않음 → 프리셋 audio.bgm.* 값 사용
+  enabled: true
+  path: assets/test/generated/music_bed_b.wav
+  silences: []

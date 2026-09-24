@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mlt LC_NUMERIC="C" version="7.22.0" title="shortkit test-coverage-001" producer="main_bin">
+  <profile description="shortkit 1080x1920 30fps" width="1080" height="1920" progressive="1" sample_aspect_num="1" sample_aspect_den="1" display_aspect_num="9" display_aspect_den="16" frame_rate_num="30" frame_rate_den="1" colorspace="709" />
+  <playlist id="main_bin">
+    <property name="xml_retain">1</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">1</property>
+  </playlist>
+  <producer id="black" in="0" out="674">
+    <property name="length">675</property>
+    <property name="eof">pause</property>
+    <property name="resource">0</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgba</property>
+    <property name="set.test_audio">0</property>
+  </producer>
+  <playlist id="background">
+    <entry producer="black" in="0" out="674" />
+  </playlist>
+  <producer id="bgcolor0" in="0" out="674">
+    <property name="length">675</property>
+    <property name="eof">pause</property>
+    <property name="resource">#FF000000</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgba</property>
+    <property name="shotcut:caption">배경색</property>
+  </producer>
+  <playlist id="playlist0">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V1 배경</property>
+    <entry producer="bgcolor0" in="0" out="674" />
+  </playlist>
+  <producer id="s1_video_0" in="0" out="1489">
+    <property name="length">1490</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/video/people-detection.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s1</property>
+    <property name="shortkit:clip_id">s1</property>
+    <property name="shortkit:piece">play:0-144</property>
+    <filter id="filter0" in="60" out="203">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter1" in="60" out="203">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s2_video_0" in="0" out="2726">
+    <property name="length">2727</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s2</property>
+    <property name="shortkit:clip_id">s2</property>
+    <property name="shortkit:piece">play:144-294</property>
+    <filter id="filter2" in="150" out="299">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter3" in="150" out="299">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s3_video_0" in="0" out="2726">
+    <property name="length">2727</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s3</property>
+    <property name="shortkit:clip_id">s3</property>
+    <property name="shortkit:piece">play:294-324</property>
+    <filter id="filter4" in="300" out="329">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter5" in="300" out="329">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s3_video_1" in="0" out="21">
+    <property name="length">22</property>
+    <property name="eof">pause</property>
+    <property name="resource">media/s3_hold_b88f1cbb0d8e.png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="shotcut:caption">s3 정지</property>
+    <property name="shortkit:clip_id">s3</property>
+    <property name="shortkit:piece">hold:324-346</property>
+    <filter id="filter6" in="0" out="21">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter7" in="0" out="21">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s3_video_2" in="0" out="2726">
+    <property name="length">2727</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s3</property>
+    <property name="shortkit:clip_id">s3</property>
+    <property name="shortkit:piece">play:346-405</property>
+    <filter id="filter8" in="331" out="389">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter9" in="331" out="389">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s4_video_0" in="0" out="2726">
+    <property name="length">2727</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s4</property>
+    <property name="shortkit:clip_id">s4</property>
+    <property name="shortkit:piece">play:405-555</property>
+    <filter id="filter10" in="960" out="1109">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter11" in="960" out="1109">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <producer id="s5_video_0" in="0" out="5453">
+    <property name="length">5454</property>
+    <property name="eof">pause</property>
+    <property name="resource">0.5:../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="audio_index">-1</property>
+    <property name="mlt_service">timewarp</property>
+    <property name="shotcut:producer">avformat</property>
+    <property name="warp_speed">0.5</property>
+    <property name="warp_resource">../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4</property>
+    <property name="warp_pitch">0</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">s5</property>
+    <property name="shortkit:clip_id">s5</property>
+    <property name="shortkit:piece">play:555-675</property>
+    <filter id="filter12" in="2520" out="2639">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">-0.4444 656 1080.8889 608 1</property>
+      <property name="transition.valign">top</property>
+      <property name="transition.halign">left</property>
+      <property name="transition.threads">0</property>
+    </filter>
+    <filter id="filter13" in="2520" out="2639">
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="rect">0 656 1080 608 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0</property>
+    </filter>
+  </producer>
+  <playlist id="playlist1">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V2 영상</property>
+    <entry producer="s1_video_0" in="60" out="203" />
+    <entry producer="s2_video_0" in="150" out="299" />
+    <entry producer="s3_video_0" in="300" out="329" />
+    <entry producer="s3_video_1" in="0" out="21" />
+    <entry producer="s3_video_2" in="331" out="389" />
+    <entry producer="s4_video_0" in="960" out="1109" />
+    <entry producer="s5_video_0" in="2520" out="2639" />
+  </playlist>
+  <producer id="flash0" in="0" out="2">
+    <property name="length">3</property>
+    <property name="eof">pause</property>
+    <property name="resource">#FFFFFFFF</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgba</property>
+    <property name="shotcut:caption">플래시 s4</property>
+    <filter id="filter14" in="0" out="2">
+      <property name="mlt_service">brightness</property>
+      <property name="shotcut:filter">brightnessOpacity</property>
+      <property name="level">1</property>
+      <property name="alpha">0=0.44444;1=1;2=0.44444</property>
+    </filter>
+    <filter id="filter15" in="0" out="2">
+      <property name="mlt_service">affine</property>
+      <property name="shotcut:filter">affineSizePosition</property>
+      <property name="background">color:#00000000</property>
+      <property name="transition.fill">1</property>
+      <property name="transition.distort">1</property>
+      <property name="transition.rect">0 656 1080 608 1</property>
+    </filter>
+    <property name="shortkit:flash_scope">region</property>
+  </producer>
+  <playlist id="playlist2">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V3 플래시</property>
+    <blank length="404" />
+    <entry producer="flash0" in="0" out="2" />
+  </playlist>
+  <producer id="audio0" in="0" out="1799">
+    <property name="length">1800</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/music_bed_b.wav</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">BGM music_bed_b.wav</property>
+    <filter id="filter16" in="0" out="674">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">0</property>
+    </filter>
+    <filter id="filter17" in="0" out="674">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">0=0;674=0</property>
+      <property name="shortkit:role">envelope(ducking/silence)</property>
+    </filter>
+    <filter id="filter18" in="0" out="674">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">fadeOutVolume</property>
+      <property name="level">0=0;650=0;651=-0.37;652=-0.756;653=-1.16;654=-1.584;655=-2.029;656=-2.499;657=-2.995;658=-3.522;659=-4.082;660=-4.682;661=-5.325;662=-6.021;663=-6.776;664=-7.604;665=-8.519;666=-9.542;667=-10.702;668=-12.041;669=-13.625;670=-15.563;671=-18.062;672=-21.584;673=-27.604;674=-120</property>
+      <property name="shotcut:animOut">24</property>
+    </filter>
+  </producer>
+  <playlist id="playlist3">
+    <property name="shotcut:audio">1</property>
+    <property name="shotcut:name">A1 BGM</property>
+    <entry producer="audio0" in="0" out="674" />
+  </playlist>
+  <producer id="audio1" in="0" out="12">
+    <property name="length">13</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/sfx/whoosh.wav</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">효과음 whoosh (fx1)</property>
+    <filter id="filter19" in="0" out="12">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">-8</property>
+    </filter>
+    <filter id="filter20" in="0" out="12">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
+    </filter>
+    <property name="shortkit:event">4.600s 걷던 사람이 오른쪽 화면 밖으로 나감</property>
+  </producer>
+  <producer id="audio2" in="0" out="1">
+    <property name="length">2</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/sfx/click.wav</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">효과음 click (fx2)</property>
+    <filter id="filter21" in="0" out="1">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">-8</property>
+    </filter>
+    <filter id="filter22" in="0" out="1">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
+    </filter>
+    <property name="shortkit:event">10.800s 정면을 보고 선 순간 화면이 멈춤</property>
+  </producer>
+  <producer id="audio3" in="0" out="35">
+    <property name="length">36</property>
+    <property name="eof">pause</property>
+    <property name="resource">../../../assets/test/generated/sfx/ding.wav</property>
+    <property name="mlt_service">avformat</property>
+    <property name="seekable">1</property>
+    <property name="shotcut:caption">효과음 ding (fx3)</property>
+    <filter id="filter23" in="0" out="35">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">-8</property>
+    </filter>
+    <filter id="filter24" in="0" out="35">
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="level">3.0103</property>
+      <property name="shortkit:role">mono-&gt;stereo upmix compensation (melt -3.01 dB per channel, master unity)</property>
+    </filter>
+    <property name="shortkit:event">16.300s 걸어 들어온 두 사람이 나란히 멈춰 섬</property>
+  </producer>
+  <playlist id="playlist4">
+    <property name="shotcut:audio">1</property>
+    <property name="shotcut:name">A2 효과음</property>
+    <blank length="136" />
+    <entry producer="audio1" in="0" out="12" />
+    <blank length="175" />
+    <entry producer="audio2" in="0" out="1" />
+    <blank length="163" />
+    <entry producer="audio3" in="0" out="35" />
+  </playlist>
+  <tractor id="tractor0" title="shortkit test-coverage-001" in="0" out="674">
+    <property name="shotcut">1</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">1</property>
+    <property name="shortkit:episode_id">test-coverage-001</property>
+    <property name="shortkit:preset_id">joshuamagazine-v1</property>
+    <track producer="background" />
+    <track producer="playlist0" hide="audio" />
+    <track producer="playlist1" hide="audio" />
+    <track producer="playlist2" hide="audio" />
+    <track producer="playlist3" hide="video" />
+    <track producer="playlist4" hide="video" />
+    <transition id="transition8">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition9">
+      <property name="a_track">0</property>
+      <property name="b_track">2</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition10">
+      <property name="a_track">0</property>
+      <property name="b_track">3</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition11">
+      <property name="a_track">0</property>
+      <property name="b_track">4</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition12">
+      <property name="a_track">0</property>
+      <property name="b_track">5</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition13">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="version">0.1</property>
+      <property name="mlt_service">qtblend</property>
+      <property name="threads">0</property>
+      <property name="always_active">1</property>
+    </transition>
+    <transition id="transition14">
+      <property name="a_track">0</property>
+      <property name="b_track">2</property>
+      <property name="version">0.1</property>
+      <property name="mlt_service">qtblend</property>
+      <property name="threads">0</property>
+      <property name="always_active">1</property>
+    </transition>
+    <transition id="transition15">
+      <property name="a_track">0</property>
+      <property name="b_track">3</property>
+      <property name="version">0.1</property>
+      <property name="mlt_service">qtblend</property>
+      <property name="threads">0</property>
+      <property name="always_active">1</property>
+    </transition>
+    <filter id="filter26">
+      <property name="mlt_service">avfilter.subtitles</property>
+      <property name="av.filename">captions.ass</property>
+      <property name="av.fontsdir">../build/fonts</property>
+      <property name="shortkit:role">captions+decorations (one ASS layer, same file as the master)</property>
+    </filter>
+    <filter id="filter27">
+      <property name="mlt_service">volume</property>
+      <property name="level">-0.067</property>
+      <property name="shotcut:filter">audioGain</property>
+      <property name="shortkit:role">loudness normalization gain (master render)</property>
+    </filter>
+  </tractor>
+</mlt>

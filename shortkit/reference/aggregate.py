@@ -12,6 +12,7 @@ method says), so long videos do not dominate; ``n`` = number of videos contribut
 """
 from __future__ import annotations
 
+import math
 import re
 from collections import Counter
 from pathlib import Path
@@ -35,7 +36,10 @@ REGISTER_MAP = {"반말": "반말_구어체", "해요체": "해요체", "음슴�
 def _stats_with_value(vals: list[float], rule: str, digits: int, as_int: bool) -> dict:
     st = pstats(vals, digits)
     if st["n"]:
-        v = st[rule] if rule in ("p10", "p50", "p90") else (max(vals) if rule == "max" else min(vals))
+        if rule == "mode":
+            v = Counter(round(float(x), digits) for x in vals).most_common(1)[0][0]
+        else:
+            v = st[rule] if rule in ("p10", "p50", "p90") else (max(vals) if rule == "max" else min(vals))
         st["value"] = int(round(v)) if as_int else round(float(v), digits)
     else:
         st["value"] = None
@@ -117,10 +121,229 @@ def _evidence(rows: list[dict], k: int = 5) -> list[dict]:
         if r.get("value") is None or r["video_id"] in seen:
             continue
         seen.add(r["video_id"])
-        out.append({"video_id": r["video_id"], "t": r.get("t"), "value": r["value"], "frame": r.get("frame")})
+        e = {"video_id": r["video_id"], "t": r.get("t"), "value": r["value"], "frame": r.get("frame")}
+        if r.get("note"):
+            e["note"] = r["note"]
+        out.append(e)
         if len(out) >= k:
             break
     return out
+
+
+def _video_mode(vals: list) -> Any:
+    """Per-video categorical value: the most common observation (ties -> the first observed)."""
+    vals = [v for v in vals if v is not None]
+    if not vals:
+        return None
+    c = Counter(vals)
+    top = max(c.values())
+    return next(v for v in vals if c[v] == top)
+
+
+# ============================================================================= canvas size (downloads + probe)
+_CAP_RE = re.compile(r"\b(height|width)\s*<=\s*(\d+)")
+FULL_HD_SHORT_SIDE = 1080     # a rendition whose short side is >= this is accepted even when a cap binds
+RUNG = 1.45                   # YouTube rendition ladder: the next rendition is ~1.5x taller (854 -> 1280 -> 1920)
+
+
+def download_cap_issue(row: dict) -> str | None:
+    """Why a downloaded file's size / frame rate may be a LOWER rendition than the reference serves
+    (None = usable).
+
+    ``shortkit ref download`` records the yt-dlp format string it requested.  A ``height<=N`` /
+    ``width<=N`` filter binds when the next rendition up (~1.45x) would exceed N; on a portrait Short a
+    ``height<=1080`` filter binds on the LONG side and yields a 608x1080 / 480x854 file instead of
+    1080x1920 (and YouTube's 60 fps renditions exist only at >= 720p).  Such a file is excluded when
+    its short side is below full HD; a binding cap on a >= 1080-short-side rendition is accepted and
+    noted (the upload may be larger, the value is the largest rendition up to the cap)."""
+    fmt = str(row.get("requested_format") or "")
+    caps = [(m.group(1), int(m.group(2))) for m in _CAP_RE.finditer(fmt)]
+    if not caps:
+        return None
+    w, h = row.get("width"), row.get("height")
+    if not w or not h:
+        return "다운로드 기록에 해상도 없음"
+    binding = [(d, n) for d, n in caps if RUNG * (h if d == "height" else w) > n]
+    if not binding or min(w, h) >= FULL_HD_SHORT_SIDE:
+        return None
+    d, n = binding[0]
+    return (f"형식 제한({d}<={n})이 걸린 {w}x{h} 파일(짧은 변 {min(w, h)} < {FULL_HD_SHORT_SIDE}) → 레퍼런스가 더 큰 "
+            "렌디션을 제공했을 수 있어 해상도·fps 의 하한값일 뿐(세로 영상의 height<=N 은 긴 변을 자름)")
+
+
+def download_cap_note(row: dict) -> str | None:
+    fmt = str(row.get("requested_format") or "")
+    w, h = row.get("width"), row.get("height")
+    if not (w and h):
+        return None
+    binding = [(m.group(1), int(m.group(2))) for m in _CAP_RE.finditer(fmt)
+               if RUNG * (h if m.group(1) == "height" else w) > int(m.group(2))]
+    return f"형식 제한 {binding[0][0]}<={binding[0][1]} 에 닿은 렌디션(원본 업로드는 더 클 수 있음)" if binding else None
+
+
+def canvas_resolution_rows(preset: str, snap: dict, include_long: bool,
+                           membership: dict[str, str]) -> tuple[dict[str, list[dict]], list[dict], dict]:
+    """Per-video (width, height, fps) of the snapshot's downloaded Shorts: the latest
+    reference/downloads.jsonl record, re-probed from the file when it is present."""
+    from ..util.jsonio import read_jsonl
+    from ..util.media import probe
+    from .common import reference_dir, video_path
+
+    recs: dict[str, dict] = {}
+    for r in read_jsonl(reference_dir(preset) / "downloads.jsonl"):
+        if r.get("video_id"):
+            recs[r["video_id"]] = r
+    rows: dict[str, list[dict]] = {"width": [], "height": [], "fps": []}
+    excluded: list[dict] = []
+    aspects: Counter = Counter()
+    snap_videos = (snap.get("videos") or []) if snap.get("status") in ("ok", "partial") else []
+    for v in snap_videos:
+        vid = v.get("video_id")
+        if not vid or (v.get("kind") == "video" and not include_long) or vid not in recs:
+            continue
+        rec = dict(recs[vid])
+        src = "reference/downloads.jsonl"
+        try:
+            f = video_path(preset, vid)
+        except ValueError:
+            f = None
+        if f is not None:
+            pi = probe(f)
+            if pi.width and pi.height:
+                rec.update(width=int(pi.width), height=int(pi.height), fps=round(float(pi.fps), 3) if pi.fps else None)
+                src = "ffprobe " + paths.relp(f)
+        issue = download_cap_issue(rec)
+        if issue:
+            excluded.append({"video_id": vid, "reason": issue, "width": rec.get("width"), "height": rec.get("height"),
+                             "fps": rec.get("fps"), "requested_format": rec.get("requested_format")})
+            continue
+        note = f"스트림 속성(파일 전체), {src}; 형식 {rec.get('format_id')}"
+        if download_cap_note(rec):
+            note += "; " + download_cap_note(rec)
+        base = {"video_id": vid, "format_id": membership.get(vid), "t": 0.0, "frame": None, "note": note}
+        if rec.get("width") and rec.get("height"):
+            rows["width"].append({**base, "value": int(rec["width"])})
+            rows["height"].append({**base, "value": int(rec["height"])})
+            aspects[_aspect(int(rec["width"]), int(rec["height"]))] += 1
+        if rec.get("fps"):
+            rows["fps"].append({**base, "value": float(rec["fps"])})
+    return rows, excluded, {"counts": dict(aspects.most_common()),
+                            "mode": aspects.most_common(1)[0][0] if aspects else None}
+
+
+def _aspect(w: int, h: int) -> str:
+    for a, b in ((9, 16), (16, 9), (1, 1), (4, 5), (3, 4), (4, 3), (2, 3)):
+        if abs(w / h - a / b) <= 0.01:
+            return f"{a}:{b}"
+    g = math.gcd(w, h)
+    return f"{w // g}:{h // g}"
+
+
+CANVAS_SIZE_METHOD = (
+    "reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 {what} → 스냅샷 쇼츠 영상 간 최빈값"
+    "(value_rule=mode; n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 "
+    "렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080 은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 "
+    "x·폭 ×(canvas.width/영상 너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. "
+    "캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]), y·높이 ×(canvas.height/"
+    "resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).")
+
+
+# ============================================================================= safe margins
+SAFE_MARGIN_METHOD = (
+    "영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스"
+    "(episode validate 의 caption_outside_safe 와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → "
+    "캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다 안쪽에 자막을 둠)")
+
+
+def safe_margin_rows(videos: dict[str, dict], scale: Callable) -> dict[str, list[dict]]:
+    rows: dict[str, list[dict]] = {k: [] for k in ("left", "right", "top", "bottom")}
+    for vid, d in videos.items():
+        cap = d.get("captions") or {}
+        sc = scale(d)
+        res = cap.get("resolution") or d.get("resolution")
+        if not sc or not res:
+            continue
+        W, H = res
+        ext = []
+        for it in cap.get("items") or []:
+            if it.get("role") not in ROLES or not it.get("bbox"):
+                continue
+            x, y, w, h = it["bbox"]
+            x0, y0, x1, y1 = x, y, x + w, y + h
+            bx = ((it.get("style") or {}).get("box") or {})
+            if bx.get("present") == "present" and bx.get("bbox"):
+                X, Y, BW, BH = bx["bbox"]
+                x0, y0, x1, y1 = min(x0, X), min(y0, Y), max(x1, X + BW), max(y1, Y + BH)
+            ext.append((x0, y0, x1, y1, it))
+        if not ext:
+            continue
+        for side, val, s_ in (("left", lambda e: e[0], sc[0]), ("right", lambda e: W - e[2], sc[0]),
+                              ("top", lambda e: e[1], sc[1]), ("bottom", lambda e: H - e[3], sc[1])):
+            e = min(ext, key=val)
+            it = e[4]
+            rows[side].append({"video_id": vid, "format_id": d["format_id"], "value": round(val(e) * s_, 1),
+                               "t": it.get("t_rep", it.get("start")), "frame": it.get("frame"),
+                               "note": f"{it.get('role')} 자막 '{str(it.get('text') or '')[:20]}'"})
+    return rows
+
+
+def _zoom_dur(e: dict) -> float:
+    """Full eased zoom duration when the ease fit is decisive (the threshold run misses the slow
+    start / end of an eased curve), else the threshold run length."""
+    fit = e.get("ease_fit") or {}
+    return float(fit["dur_s"]) if fit.get("ease") and fit.get("dur_s") else float(e["dur_s"])
+
+
+# ============================================================================= dialogue quote marks
+QUOTE_METHOD = (
+    "대사(dialogue) 자막 OCR 텍스트의 첫 글자·마지막 글자가 따옴표인지(textboxes.quote_pair): 양쪽 다 → 그 쌍, 양쪽 다 없음 → "
+    "없음([]), 한쪽만 → OCR 누락으로 보고 제외 → 영상별 최빈 쌍 → 영상 간 최빈(value = [여는 문자, 닫는 문자] 또는 []). "
+    "한계: 대사 역할 판정 자체가 따옴표를 근거로 쓰므로 따옴표 없는 대사는 말소리 겹침(audio/original.json)이나 글자색으로 "
+    "대사로 잡힌 경우에만 관측됨; OCR 은 “ 와 \" 를 혼동할 수 있음(글자 모양 확인은 사람 관찰로)")
+
+
+def _pair_key(q: dict) -> str:
+    return "none" if q["kind"] == "none" else f"{q['open']}…{q['close']}"
+
+
+def _pair_value(key: str | None) -> list[str] | None:
+    if key is None:
+        return None
+    if key == "none":
+        return []
+    o, c = key.split("…", 1)
+    return [o, c]
+
+
+def quote_marks_item(videos: dict[str, dict], blocker: str) -> dict:
+    from .textboxes import quote_pair
+
+    rows, partial, reasons = [], 0, Counter()
+    for vid, d in videos.items():
+        keys, first = [], None
+        for it in (d.get("captions") or {}).get("items") or []:
+            if it.get("role") != "dialogue":
+                continue
+            q = quote_pair(it.get("text") or "")
+            reasons["따옴표" if "따옴표" in str(it.get("role_reason") or "") else "말소리/글자색"] += 1
+            if q["kind"] == "partial":
+                partial += 1
+                continue
+            keys.append(_pair_key(q))
+            if first is None:
+                first = it
+        if keys:
+            rows.append({"video_id": vid, "format_id": d["format_id"], "value": _video_mode(keys),
+                         "t": first.get("t_rep", first.get("start")), "frame": first.get("frame")})
+    it = cat_item("text.roles.dialogue.quote_marks", rows, QUOTE_METHOD, blocker,
+                  extra={"value_encoding": "counts 의 키 '<여는>…<닫는>' 또는 'none' → value [여는, 닫는] 또는 []",
+                         "partial_items_excluded": partial, "dialogue_basis": dict(reasons)})
+    it["value"] = _pair_value(it["value"])
+    for st in it["by_format"].values():
+        st["value"] = _pair_value(st.get("value"))
+    for e in it["evidence"]:
+        e["value"] = _pair_value(e["value"])
+    return it
 
 
 # ============================================================================= tone
@@ -263,6 +486,27 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         "결과 화면만으로는 원본 비율을 알 수 없어 cover/contain 판정 불가(원본 추적 후 비교 필요)")))
     groups["visual_canvas"].append(unmeasured("canvas.background.blur_sigma", blk(
         "흐림 배경의 흐림 정도를 원본 없이 역산하는 방법 없음")))
+    # ---------------------------------------------------------------- canvas size / fps (downloads + probe)
+    crow, cexcl, aspect = canvas_resolution_rows(preset, snap, include_long, membership)
+    if snap.get("status") not in ("ok", "partial"):
+        cblk = snapshot_blocker(preset)
+    elif cexcl and not crow["width"]:
+        cblk = ("받은 파일이 모두 낮은 렌디션일 수 있음: " + cexcl[0]["reason"] + " → `shortkit ref download` 형식을 짧은 변 "
+                "기준으로 바꿔 다시 받아야 함")
+    else:
+        cblk = "스냅샷 쇼츠 중 받은 영상 없음(`shortkit ref download --set latest100` 필요)"
+    cextra = {"aspect": aspect, "excluded": cexcl}
+    for key, rk, unit, what, digits in (("canvas.width", "width", "px", "너비", 0),
+                                        ("canvas.height", "height", "px", "높이", 0),
+                                        ("canvas.fps", "fps", "fps", "프레임률", 3)):
+        groups["visual_canvas"].append(num_item(key, crow[rk], unit, CANVAS_SIZE_METHOD.format(what=what), cblk,
+                                                rule="mode", digits=digits, as_int=(digits == 0), extra=cextra))
+    # ---------------------------------------------------------------- safe margins
+    smr = safe_margin_rows(videos, scale)
+    for side in ("left", "right", "top", "bottom"):
+        groups["visual_canvas"].append(num_item(f"canvas.safe_margin.{side}", smr[side], "px", SAFE_MARGIN_METHOD,
+                                                blk("자막(역할 판정됨)이 검출된, 캔버스와 종횡비가 같은 영상 없음"),
+                                                canvas_res, rule="p10", digits=1))
     # ---------------------------------------------------------------- text roles
     for role in roles:
         R: dict[str, list[dict]] = {}
@@ -410,6 +654,8 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                           blk(f"'{role}': 기준 사건(말소리 시작)과 짝지을 수 있는 사례 없음 — 대사 외 역할은 기준 사건 정의 없음"),
                           digits=3))
         G.append(cat_item(pre + "persist", R.get("persist", []), "영상 길이의 90% 이상 표시되면 whole_video", rb))
+    # ---------------------------------------------------------------- dialogue quote marks
+    groups["visual_text"].append(quote_marks_item(videos, blk("'dialogue' 역할 자막이 검출된 영상 없음")))
     # ---------------------------------------------------------------- tone
     groups["visual_tone"] += tone_items(videos, blk("나레이션 자막 OCR 텍스트 없음"))
     # ---------------------------------------------------------------- motion
@@ -430,7 +676,16 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
 
         if zi:
             addm("motion.zoom.scale_to", round(float(np.median([e["scale_to"] for e in zi])), 4), zi[0]["t"])
-            addm("motion.zoom.dur_s", round(float(np.median([e["dur_s"] for e in zi])), 3), zi[0]["t"])
+            addm("motion.zoom.dur_s", round(float(np.median([_zoom_dur(e) for e in zi])), 3), zi[0]["t"])
+        zz = [e for e in ev if e["type"] in ("zoom_in", "zoom_out")]
+        eases = [(e["ease_fit"] or {}).get("ease") for e in zz if e.get("ease_fit")]
+        if any(eases):
+            first = next(e for e in zz if (e.get("ease_fit") or {}).get("ease"))
+            addm("motion.zoom.ease", _video_mode(eases), first["t"])
+        rcs = [(e.get("recenter_fit") or {}).get("recenter") for e in zz]
+        if any(r is not None for r in rcs):
+            first = next(e for e in zz if (e.get("recenter_fit") or {}).get("recenter") is not None)
+            addm("motion.zoom.recenter", _video_mode(rcs), first["t"])
         fz = [e for e in ev if e["type"] == "freeze"]
         if fz:
             addm("motion.freeze.hold_s", round(float(np.median([e["hold_s"] for e in fz])), 3), fz[0]["t"])
@@ -446,6 +701,10 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
             if fl:
                 addm("motion.transitions.flash.dur_s", round(float(np.median([x["dur"] for x in fl])), 3), fl[0]["t"])
                 addm("motion.transitions.flash.color", color_mode([x.get("color") for x in fl])["mode"], fl[0]["t"])
+                scopes = [(x.get("scope") or {}).get("value") for x in fl]
+                if any(scopes):
+                    first = next(x for x in fl if (x.get("scope") or {}).get("value"))
+                    addm("motion.transitions.flash.scope", _video_mode(scopes), first["t"])
             cf = [x for x in cuts if x["type"] == "crossfade"]
             if cf:
                 addm("motion.transitions.crossfade.dur_s", round(float(np.median([x["dur"] for x in cf])), 3), cf[0]["t"])
@@ -454,8 +713,25 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
     G.append(num_item("motion.zoom.scale_to", M.get("motion.zoom.scale_to", []), "ratio",
                       "영상별 확대(zoom_in) 배율 중앙값(ORB 유사변환 누적; 원본 카메라 줌과 구분 못 함)",
                       blk("확대가 검출된 영상 없음"), digits=4, extra=pz))
-    G.append(num_item("motion.zoom.dur_s", M.get("motion.zoom.dur_s", []), "s", "영상별 확대 길이 중앙값",
-                      blk("확대가 검출된 영상 없음"), digits=3))
+    G.append(num_item("motion.zoom.dur_s", M.get("motion.zoom.dur_s", []), "s",
+                      "영상별 확대 길이 중앙값(ease 곡선 맞춤이 판정된 사건은 맞춘 곡선의 전체 길이 — 느린 시작·끝 포함, "
+                      "아니면 프레임당 0.3% 이상 변하는 구간 길이)", blk("확대가 검출된 영상 없음"), digits=3))
+    zev = [e for d in videos.values() for e in ((d.get("motion") or {}).get("events") or [])
+           if e.get("type") in ("zoom_in", "zoom_out")]
+    zst = {"zoom_events": len(zev), "ramps_fitted": sum(1 for e in zev if e.get("ease_fit")),
+           "ease_decided": sum(1 for e in zev if (e.get("ease_fit") or {}).get("ease")),
+           "recenter_decided": sum(1 for e in zev if (e.get("recenter_fit") or {}).get("recenter") is not None)}
+    G.append(cat_item("motion.zoom.ease", M.get("motion.zoom.ease", []),
+                      "확대 사건마다 누적 배율 곡선(사건 ±0.5초, 같은 샷)을 렌더러 ease(linear=u, in=u^3, "
+                      "out=1-(1-u)^3, inout) 곡선 c0+A*ease((t-t0)/dur) 에 맞춤(t0·dur 1/4프레임 격자, c0·A 최소제곱) → "
+                      "두 번째로 좋은 곡선보다 SSE 1.5배 이상 좋고 잔차 ≤ 진폭 8% 일 때만 그 ease → 영상별 최빈 → 영상 간 최빈",
+                      blk("ease 를 판정할 수 있는 확대(느린 램프, 잡음 적음)가 검출된 영상 없음"), extra={"basis": zst}))
+    G.append(cat_item("motion.zoom.recenter", M.get("motion.zoom.recenter", []),
+                      "확대 사건의 누적 유사변환 T_k 와 (1-z_k) 로 겉보기 고정점 맞춤: 순수 확대이고 고정점이 영상 영역 안(중심 "
+                      "근처 제외) → false(고정점 제자리 = 렌더러 recenter=false 로 그대로 재현), 고정점이 영역 밖이거나 확대 중 "
+                      "화면 중심 쪽으로 이동 → true(렌더러 recenter=true: 목표점이 같은 ease 로 중심으로 이동). 중심 근처 확대는 "
+                      "두 방식 결과가 같아 제외. 한계: 목표점이 중심 가까이 있던 recenter=true 확대도 '영역 안 고정점'으로 보임",
+                      blk("고정점을 판정할 수 있는 확대(중심에서 떨어진 확대)가 검출된 영상 없음"), extra={"basis": zst}))
     G.append(num_item("motion.freeze.hold_s", M.get("motion.freeze.hold_s", []), "s",
                       "영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값", blk("정지 화면이 검출된 영상 없음"), digits=3))
     G.append(num_item("motion.speed.slowmo_factor", M.get("motion.speed.slowmo_factor", []), "ratio",
@@ -467,6 +743,11 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                       "플래시(밝기 급등) 길이 중앙값", blk("플래시가 검출된 영상 없음"), digits=3))
     G.append(color_item("motion.transitions.flash.color", M.get("motion.transitions.flash.color", []),
                         "플래시 최고 밝기 프레임의 평균 색", blk("플래시가 검출된 영상 없음")))
+    G.append(cat_item("motion.transitions.flash.scope", M.get("motion.transitions.flash.scope", []),
+                      "플래시 최고 밝기 프레임 vs 앞뒤 0.1~0.25초 프레임 중앙값: 영상 영역 밖(가장자리 2% 제외, 밝아질 여유 "
+                      "있는 픽셀) 중 영역 안 평균 상승의 40%(최소 15) 이상 밝아진 비율 ≥ 0.6 → canvas(화면 전체), ≤ 0.15 → "
+                      "region(영상 영역만), 그 사이·영상이 화면 전체 → 판정 안 함 → 영상별 최빈 → 영상 간 최빈",
+                      blk("플래시가 검출되고 영상 영역 밖이 보이는 영상 없음")))
     G.append(num_item("motion.transitions.crossfade.dur_s", M.get("motion.transitions.crossfade.dur_s", []), "s",
                       "섞임 구간(블렌드 가중치 0→1) 길이 중앙값", blk("크로스페이드가 검출된 영상 없음"), digits=3))
     # ---------------------------------------------------------------- structure
@@ -523,6 +804,11 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
     tot = sum(v["items"] for v in written.values())
     meas = sum(v["measured"] for v in written.values())
     say(f"측정 집계: 영상 {len(videos)}편, 항목 {tot}개 중 측정 {meas}개 / 못 잼 {tot - meas}개 → {paths.relp(mdir)}/visual_*.json")
+    # manual.json holds the decoration keys, whose automatic detector output lives in the same
+    # analysis files: refresh it together so it never lags behind the analysis
+    from .manual import aggregate_manual
+    man = aggregate_manual(preset, include_long=include_long, ids=list(videos))
+    written["manual"] = {"items": man["items"], "measured": man["measured"]}
     return {"videos": len(videos), "groups": written}
 
 

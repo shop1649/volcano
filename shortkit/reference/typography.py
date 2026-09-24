@@ -1642,10 +1642,58 @@ def _role_style(its: list[dict]) -> tuple[Any, str, str]:
         "given", background
 
 
+BOLD_MIN_WEIGHT = 600      # OS/2 usWeightClass at/above which a face is bold (same rule as edit.resolve)
+FONT_METHOD = "font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)"
+BOLD_METHOD = (f"동일 판정된 글꼴 면의 OS/2 usWeightClass >= {BOLD_MIN_WEIGHT} → true (렌더러 굵기 검사와 같은 파서 "
+               "shortkit.edit.captions.read_faces); 동일 판정이 없으면 못 잼")
+
+
+def face_weight(font_name: str) -> tuple[int | None, str | None]:
+    """(OS/2 usWeightClass of the exact face, blocker) -- read with the renderer's own parser."""
+    try:
+        from ..edit.captions import read_faces
+
+        fr = font_ref(font_name)
+        faces = [f for f in read_faces(str(fr.abspath)) if f.index == fr.index]
+    except Exception as e:  # noqa: BLE001 - no weight = unmeasured, never a guess
+        return None, f"글꼴 파일을 읽지 못함: {type(e).__name__}"
+    if not faces:
+        return None, "글꼴 면을 찾지 못함"
+    return int(faces[0].weight), None
+
+
+def _font_identity_unmeasured(role: str, blocker: str, resolution=None) -> list[dict]:
+    base = {"unit": None, "resolution": resolution, "measured_at": now_iso(), "evidence": [], "overall": {"n": 0},
+            "by_format": {}, "status": "unmeasured", "value": None, "blocker": blocker}
+    return [dict(base, key=f"text.roles.{role}.font_name", method=FONT_METHOD),
+            dict(base, key=f"text.roles.{role}.bold", unit="bool", method=BOLD_METHOD)]
+
+
+def write_font_identity(preset, items: list[dict]) -> Path:
+    """measurements/font_identity.json: this run's items replace the same keys; items of roles not in
+    this run are kept (a `--roles` run must not erase the others)."""
+    from .common import load_snapshot
+
+    path = preset.dir / "measurements" / "font_identity.json"
+    old = read_json(path, {}) or {}
+    new_keys = {i["key"] for i in items}
+    kept = [i for i in (old.get("items") or []) if isinstance(i, dict) and i.get("key") not in new_keys]
+    snap = load_snapshot(preset.name) or {}
+    write_json(path, {"schema": "shortkit.measurement/1", "group": "font_identity",
+                      "source_snapshot": snap.get("captured_at") if isinstance(snap, dict) else None,
+                      "generated_at": now_iso(), "items": kept + items})
+    return path
+
+
 def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max_per_role: int = 12,
                        candidates: Sequence[str] | None = None, jobs: int = 1, repeats: int = 2,
                        progress=None) -> dict:
-    """`ref fonts`: identify the font of each caption role from real reference crops."""
+    """`ref fonts`: identify the font of each caption role from real reference crops.
+
+    Writes measurements/font_identity.json ALWAYS: text.roles.<role>.font_name (value only when the
+    verdict is identical) and text.roles.<role>.bold (true iff that identical face has OS/2 weight
+    >= BOLD_MIN_WEIGHT); without crops every item is unmeasured with the blocker (the reference
+    collection blocker when no reference exists)."""
     from ..config import load_preset
     from ..fonts import candidate_names
 
@@ -1666,6 +1714,8 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
     measurement_items = []
     if not any(crops["items"].values()):
         _merge_identification(pr, ident)
+        blocker = _no_crops_blocker(preset_name)
+        write_font_identity(pr, [it for r in role_names for it in _font_identity_unmeasured(r, blocker)])
         return ident
     cond = conditions_from_videos(crops["videos"], canvas)
     refs, missing = resolve_candidates(cands)
@@ -1676,6 +1726,7 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
         its = crops["items"].get(role) or []
         if not its:
             ident["roles"][role].update({"blocker": "이 역할의 자막 crop 없음"})
+            measurement_items += _font_identity_unmeasured(role, "이 역할의 자막 crop 없음(역할 분류된 레퍼런스 자막 없음)")
             continue
         style, color_mode, background = _role_style(its)
         rcond = Conditions.from_dict({**cond.to_dict(), "background": background})
@@ -1730,10 +1781,9 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
             "ceiling_conditions": rcond.to_dict(), "caption_qp": qp, "ceiling_ink_heights_px_canvas": ink_canvas,
             "sizes_resolution": list(rcond.canvas), "color_mode": color_mode,
             "ceilings": {n: {k: v for k, v in c.items() if k not in ("rows", "conditions")} for n, c in ceilings.items()}})
+        evidence = [{"video_id": i["video_id"], "t": i["t"], "value": None, "bbox": i["bbox"]} for i in its[:10]]
         mi = {"key": f"text.roles.{role}.font_name", "unit": None, "resolution": list(rcond.ref_resolution),
-              "method": "font IoU vs candidates with measured IoU ceiling (shortkit.reference.typography)",
-              "measured_at": now_iso(),
-              "evidence": [{"video_id": i["video_id"], "t": i["t"], "value": None, "bbox": i["bbox"]} for i in its[:10]],
+              "method": FONT_METHOD, "measured_at": now_iso(), "evidence": evidence,
               "overall": {**(top["iou_stats"] if top else {"n": 0, "p10": None, "p50": None, "p90": None}),
                           "top": top["font"] if top else None, "margin": top["margin"] if top else None},
               "by_format": {f: {"n": v["n"], "value": v["value"], "verdict": v["verdict"]} for f, v in by_format.items()}}
@@ -1742,14 +1792,29 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
         else:
             mi.update({"status": "unmeasured", "value": None, "blocker": f"동일 판정 없음: {idr['summary']}"})
         measurement_items.append(mi)
+        # bold: only from an IDENTICAL face (a similar face's weight says nothing about the reference)
+        bi = {"key": f"text.roles.{role}.bold", "unit": "bool", "resolution": list(rcond.ref_resolution),
+              "method": BOLD_METHOD, "measured_at": now_iso(), "evidence": [dict(e) for e in evidence],
+              "overall": {"n": len(its), "face": top["font"] if top else None, "weight_class": None}, "by_format": {}}
+        w, wblk = face_weight(top["font"]) if identical else (None, None)
+        for f, v in by_format.items():
+            wf = face_weight(v["value"])[0] if v.get("value") else None
+            bi["by_format"][f] = {"n": v["n"], "face": v.get("value"), "weight_class": wf,
+                                  "value": None if wf is None else bool(wf >= BOLD_MIN_WEIGHT)}
+        if identical and w is not None:
+            bi["overall"]["weight_class"] = w
+            bi.update({"status": "measured", "value": bool(w >= BOLD_MIN_WEIGHT), "blocker": None})
+            for e in bi["evidence"]:
+                e["value"] = bi["value"]
+        else:
+            bi.update({"status": "unmeasured", "value": None,
+                       "blocker": wblk or f"글꼴 동일 판정 없음(굵기는 동일 판정된 글꼴에서만): {idr['summary']}"})
+        measurement_items.append(bi)
     if all(ident["roles"][r].get("status") == "measured" for r in role_names):
         ident["status"] = "measured"
         ident["label_ko"] = "측정"
     _merge_identification(pr, ident)
-    if measurement_items:
-        write_json(pr.dir / "measurements" / "font_identity.json",
-                   {"schema": "shortkit.measurement/1", "group": "font_identity", "source_snapshot": None,
-                    "items": measurement_items})
+    write_font_identity(pr, measurement_items)
     return ident
 
 

@@ -52,7 +52,24 @@ DEFAULT_FPS = 5.0
 DEFAULT_CALIB_FONT = "Noto Sans CJK KR Black"
 CALIB_TEXT = "가나다라마바사아자차카타파하한글높이"
 QUOTE_CHARS = set('"“”„‟\'‘’「」『』《》')
+QUOTE_OPEN = set('"“„‟\'‘「『《')
+QUOTE_CLOSE = set('"”‟\'’」』》')
 HANGUL_RE = re.compile(r"[가-힣]")
+
+
+def quote_pair(text: str) -> dict:
+    """Leading / trailing quote marks of an OCR'd caption (first char of the first line, last char
+    of the last line, ignoring spaces and trailing punctuation-free whitespace).
+
+    ``kind``: ``pair`` (both ends quoted), ``none`` (neither), ``partial`` (one end only -- usually an
+    OCR drop, not a style).  ``open`` / ``close`` are the exact OCR'd characters."""
+    t = (text or "").strip()
+    if not t:
+        return {"kind": "none", "open": "", "close": ""}
+    o = t[0] if t[0] in QUOTE_OPEN else ""
+    c = t[-1] if t[-1] in QUOTE_CLOSE and len(t) > 1 else ""
+    kind = "pair" if (o and c) else ("none" if not (o or c) else "partial")
+    return {"kind": kind, "open": o, "close": c}
 LETTER_RE = re.compile(r"[가-힣A-Za-z0-9]")
 
 METHOD = {

@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-pipeline-001.mlt",
-    "created_at": "2026-09-24T19:37:24+00:00",
+    "created_at": "2026-09-24T20:29:32+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -34,7 +34,18 @@
           227
         ],
         "color": "#FFFFFF",
-        "shape": "alpha = 1 - |t - cut| / (dur/2), 영상 영역에만"
+        "scope": "region",
+        "rect": [
+          0,
+          656,
+          1080,
+          608
+        ],
+        "resolution": [
+          1080,
+          1920
+        ],
+        "shape": "alpha = 1 - |t - cut| / (dur/2), 영상 영역에만(region)"
       }
     ],
     "audio": {
@@ -62,6 +73,17 @@
           ]
         ],
         "note": "시작점은 프레임(1/fps) 단위로 맞춰짐; 덕킹/정적 envelope 는 volume level 키프레임"
+      },
+      "mono_upmix_compensation": {
+        "comp_db": 3.0103,
+        "files": [
+          "assets/test/generated/sfx/whoosh.wav",
+          "assets/test/generated/sfx/click.wav",
+          "assets/test/generated/sfx/pop.wav",
+          "assets/test/generated/sfx/ding.wav",
+          "assets/test/generated/sfx/boing.wav"
+        ],
+        "why": "melt 7.22 는 모노 파일을 스테레오 프로젝트에 채널마다 -3.01 dB 로 올림(이 기계에서 측정: 비 0.70704, L=R); 마스터(shortkit.util.media.read_audio)는 모노를 양쪽 채널에 같은 크기(0 dB)로 넣음 → 모노 파일 클립마다 +3.01 dB volume 필터(역할: mono->stereo upmix compensation)"
       },
       "sfx": {
         "placed": 5,
@@ -100,9 +122,19 @@
         "clip": "s1",
         "mode": "per_frame",
         "ease": "out",
+        "recenter": false,
         "why": "줌 시작/끝이 프레임 경계에 있지 않거나 조각이 줌 중간에서 나뉨"
       }
     ],
+    "foreground_limiter": {
+      "status": "있음",
+      "source": "episodes/test-pipeline-001/build/fg_gain.json",
+      "master_max_reduction_db": 2.928,
+      "measured_max_reduction_db": 2.47,
+      "frames_limited": 4,
+      "how": "fg_gain.json 의 gain_mean(프레임 평균 k) → 프레임 경계 값(이웃 두 프레임 평균) → 효과음/원본 소리 클립의 volume 키프레임",
+      "note": "마스터 리미터는 샘플 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"
+    },
     "tracks": [
       {
         "track": "V1 배경",
@@ -148,7 +180,7 @@
       "gain_db": -0.067,
       "source": "episodes/test-pipeline-001/build/render_report.json",
       "norm_gain_db": -0.067,
-      "final_trim_db": 0.0,
+      "final_trim_db": -0.0,
       "master_limiter_max_reduction_db": 0.0,
       "note": "마스터의 정규화 이득 + 최종 트림을 타임라인 volume 필터로 적용"
     },
@@ -170,12 +202,12 @@
       "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
     ]
   },
-  "updated_at": "2026-09-24T19:37:26+00:00",
+  "updated_at": "2026-09-24T20:29:35+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-pipeline-001.fcpxml",
-    "created_at": "2026-09-24T19:37:24+00:00",
+    "created_at": "2026-09-24T20:29:33+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -190,13 +222,44 @@
     "verified": false,
     "verification": "이 기계에 DaVinci Resolve / Final Cut Pro 가 없어 가져오기·렌더 확인 못 함(못 잼). XML 형식과 시간 일관성만 테스트함",
     "loudness_gain_db": -0.067,
+    "foreground_limiter": {
+      "status": "있음",
+      "source": "episodes/test-pipeline-001/build/fg_gain.json",
+      "master_max_reduction_db": 2.928,
+      "measured_max_reduction_db": 2.47,
+      "frames_limited": 4,
+      "how": "fg_gain.json 의 gain_mean(프레임 평균 k) → 프레임 경계 값(이웃 두 프레임 평균) → 효과음/원본 소리 클립의 volume 키프레임",
+      "note": "마스터 리미터는 샘플 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"
+    },
     "zoom": [
       {
         "clip": "s1",
-        "keyframes": 4,
+        "keyframes": 14,
+        "mode": "per_frame_linear",
         "ease": "out",
-        "fcp_interp": "easeOut",
-        "note": "FCP 의 ease 곡선은 마스터의 3차 easing 과 같지 않음; 영역 마스크가 없어 확대 시 영역 밖으로 넘칠 수 있음"
+        "recenter": false,
+        "trim_animated": true,
+        "note": "줌이 움직이는 동안 프레임마다 linear 키프레임(resolve.src_to_region 값, recenter·cover 고정 포함) → 프레임 격자에서 마스터와 같은 위치·크기; 영상 영역 밖으로 넘치지 않도록 trim-rect 를 영역 안에 보이는 소스 창으로 함께 애니메이션(trim-rect param 애니메이션은 확인 못 함)"
+      }
+    ],
+    "flashes": [
+      {
+        "clip": "s3",
+        "frames": [
+          224,
+          227
+        ],
+        "scope": "region",
+        "rect": [
+          0,
+          656,
+          1080,
+          608
+        ],
+        "resolution": [
+          1080,
+          1920
+        ]
       }
     ],
     "editable": [
@@ -209,26 +272,37 @@
     ],
     "assumptions": [
       "adjust-transform position 단위 = 시퀀스 프레임 높이의 %, y 는 위쪽이 + (FCPXML 관례로 알려진 값; 이 기계에서 확인 못 함)",
-      "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 % (확인 못 함)",
-      "줌 easing: 마스터는 3차 곡선, FCPXML 은 interp(easeIn/easeOut/ease) 로 근사",
-      "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간"
+      "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 %, trim-rect 의 left/top/right/bottom param 키프레임 애니메이션(줌 중 영상 영역 마스크 대용) (확인 못 함)",
+      "줌: 움직이는 동안 프레임마다 linear 키프레임(마스터의 3차 easing·recenter 를 프레임 격자에서 그대로 재현; FCP 쪽 해석은 확인 못 함)",
+      "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간",
+      "모노 오디오 파일: 마스터는 양쪽 채널에 같은 크기(0 dB)로 넣음(shortkit.util.media.read_audio) — Resolve/FCP 가 모노를 어떻게 스테레오에 놓는지(팬/레벨) 확인 못 함",
+      "효과음/원본 소리 음량 키프레임에 마스터 전경 안전 리미터(build/fg_gain.json)를 프레임 단위로 더함"
     ],
     "not_representable": [
-      "영상 영역 마스크(확대 시 영역 밖으로 넘칠 수 있음)",
+      "영상 영역 마스크(trim-rect 로 영역 밖 소스를 잘라 대신함; 화면 가장자리 처리 차이 가능)",
       "delogo/blur (미리 정리한 중간 파일로 대체)",
       "자막·장식의 스타일/위치/모션(captions.ass 에만 있음)",
-      "마스터의 true-peak 리미터"
+      "마스터의 샘플 단위 전경 리미터(프레임 단위 음량 키프레임으로 근사)"
     ]
   },
   "otio": {
     "format": "otio",
     "file": "test-pipeline-001.otio",
-    "created_at": "2026-09-24T19:37:25+00:00",
+    "created_at": "2026-09-24T20:29:34+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",
     "verified": false,
     "verification": "OTIO 는 자체 렌더러가 없어 렌더 동등성 못 잼; 쓰기→읽기 왕복과 구조만 테스트함",
+    "foreground_limiter": {
+      "status": "있음",
+      "source": "episodes/test-pipeline-001/build/fg_gain.json",
+      "master_max_reduction_db": 2.928,
+      "measured_max_reduction_db": 2.47,
+      "frames_limited": 4,
+      "how": "fg_gain.json 의 gain_mean(프레임 평균 k) → 프레임 경계 값(이웃 두 프레임 평균) → 효과음/원본 소리 클립의 volume 키프레임",
+      "note": "마스터 리미터는 샘플 단위, MLT 키프레임은 프레임(1/fps) 단위라 피크 순간은 약간 다를 수 있음"
+    },
     "tracks": [
       {
         "name": "V1 배경",

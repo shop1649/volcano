@@ -38,7 +38,9 @@ def test_new_render_keys_are_read_through_the_preset(root, plan):
     st = r.decorations[0].style
     assert st["head_len_ratio"] == pr.get("decorations.arrow.head_len_ratio")
     # unmeasured style keys show up as provisional (못 잼); the limiter rule does not
-    assert "render.clean.blur_sigma_ratio" in r.provisional_keys and "motion.zoom.recenter" in r.provisional_keys
+    # render.clean.blur_sigma_ratio is a render parameter of our cleaning step (category rule, not provisional)
+    assert "motion.zoom.recenter" in r.provisional_keys and "render.clean.blur_sigma_ratio" not in r.provisional_keys
+    assert pr.origin("render.clean.blur_sigma_ratio") == "rule"
     assert "audio.loudness.max_limiter_db" not in r.provisional_keys
 
 

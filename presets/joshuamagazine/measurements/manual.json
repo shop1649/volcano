@@ -1,0 +1,457 @@
+{
+  "schema": "shortkit.measurement/1",
+  "group": "manual",
+  "preset_id": "joshuamagazine-v1",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "source_snapshot_status": "blocked",
+  "generated_at": "2026-09-24T20:28:31+00:00",
+  "generated_by": "shortkit ref manual-aggregate",
+  "observations_file": "presets/joshuamagazine/manual_observations.csv",
+  "csv_header": [
+    "video_id",
+    "t",
+    "key",
+    "value",
+    "observed_by",
+    "watched",
+    "note"
+  ],
+  "rows_used": 0,
+  "rows_ignored": [],
+  "px_rows_not_scaled": [],
+  "auto_decoration_rows": 0,
+  "canvas_resolution": [
+    1080,
+    1920
+  ],
+  "instructions": "영상을 실제로 본 사람만 한 줄에 한 관찰을 적는다: video_id(스냅샷 영상), t(그 관찰을 확인할 수 있는 초), key(아래 keys), value, observed_by(이름), watched=yes, note. px 는 레퍼런스 영상 자체 픽셀.",
+  "keys": {
+    "decorations.arrow.color": {
+      "type": "color",
+      "howto": "화살표 채움 색(#RRGGBB)"
+    },
+    "decorations.arrow.size_px": {
+      "type": "px",
+      "howto": "화살표 전체 길이(끝~꼬리), 레퍼런스 영상 자체 픽셀"
+    },
+    "decorations.arrow.outline_px": {
+      "type": "px",
+      "howto": "화살표 테두리 두께(영상 픽셀, 없으면 0)"
+    },
+    "decorations.arrow.outline_color": {
+      "type": "color",
+      "howto": "화살표 테두리 색"
+    },
+    "decorations.arrow.blink_hz": {
+      "type": "hz",
+      "howto": "초당 깜빡임 횟수(깜빡이지 않으면 0)"
+    },
+    "decorations.arrow.head_len_ratio": {
+      "type": "ratio",
+      "howto": "머리 길이 / 전체 길이"
+    },
+    "decorations.arrow.head_width_ratio": {
+      "type": "ratio",
+      "howto": "머리 폭 / 전체 길이"
+    },
+    "decorations.arrow.shaft_width_ratio": {
+      "type": "ratio",
+      "howto": "몸통 폭 / 전체 길이"
+    },
+    "decorations.circle.color": {
+      "type": "color",
+      "howto": "원 테두리 색"
+    },
+    "decorations.circle.stroke_px": {
+      "type": "px",
+      "howto": "원 테두리 두께(영상 픽셀)"
+    },
+    "decorations.circle.blink_hz": {
+      "type": "hz",
+      "howto": "초당 깜빡임 횟수(0 = 안 깜빡임)"
+    },
+    "decorations.box.color": {
+      "type": "color",
+      "howto": "네모 테두리 색"
+    },
+    "decorations.box.stroke_px": {
+      "type": "px",
+      "howto": "네모 테두리 두께(영상 픽셀)"
+    },
+    "decorations.box.blink_hz": {
+      "type": "hz",
+      "howto": "초당 깜빡임 횟수(0 = 안 깜빡임)"
+    },
+    "text.tone.emoji": {
+      "type": "bool",
+      "howto": "자막에 이모지를 쓰는가(yes/no) — 이모지가 보이는 시각 또는 자막 전체를 본 뒤 기록"
+    },
+    "cover.source": {
+      "type": "enum",
+      "values": [
+        "first_frame",
+        "chosen_frame"
+      ],
+      "howto": "표지(썸네일)가 첫 프레임인가(first_frame) 따로 고른 프레임인가(chosen_frame)"
+    },
+    "cover.text_role": {
+      "type": "enum",
+      "values": [
+        "title",
+        "description",
+        "situation",
+        "speaker",
+        "dialogue",
+        "reaction"
+      ],
+      "howto": "표지 문구가 어느 자막 역할인가(title/description/situation/speaker/dialogue/reaction)"
+    }
+  },
+  "items": [
+    {
+      "key": "decorations.arrow.color",
+      "unit": "rgb_hex",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "화살표 채움 색(#RRGGBB)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode of color clusters (RGB distance <= 28)",
+      "overall": {
+        "n": 0,
+        "clusters": [],
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.size_px",
+      "unit": "px",
+      "resolution": [
+        1080,
+        1920
+      ],
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "화살표 전체 길이(끝~꼬리), 레퍼런스 영상 자체 픽셀",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.outline_px",
+      "unit": "px",
+      "resolution": [
+        1080,
+        1920
+      ],
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "화살표 테두리 두께(영상 픽셀, 없으면 0)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.outline_color",
+      "unit": "rgb_hex",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "화살표 테두리 색",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode of color clusters (RGB distance <= 28)",
+      "overall": {
+        "n": 0,
+        "clusters": [],
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.blink_hz",
+      "unit": "Hz",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "초당 깜빡임 횟수(깜빡이지 않으면 0)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.head_len_ratio",
+      "unit": "ratio",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "머리 길이 / 전체 길이",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.head_width_ratio",
+      "unit": "ratio",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "머리 폭 / 전체 길이",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.arrow.shaft_width_ratio",
+      "unit": "ratio",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "몸통 폭 / 전체 길이",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.circle.color",
+      "unit": "rgb_hex",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "원 테두리 색",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode of color clusters (RGB distance <= 28)",
+      "overall": {
+        "n": 0,
+        "clusters": [],
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.circle.stroke_px",
+      "unit": "px",
+      "resolution": [
+        1080,
+        1920
+      ],
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "원 테두리 두께(영상 픽셀)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.circle.blink_hz",
+      "unit": "Hz",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "초당 깜빡임 횟수(0 = 안 깜빡임)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.box.color",
+      "unit": "rgb_hex",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "네모 테두리 색",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode of color clusters (RGB distance <= 28)",
+      "overall": {
+        "n": 0,
+        "clusters": [],
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.box.stroke_px",
+      "unit": "px",
+      "resolution": [
+        1080,
+        1920
+      ],
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "네모 테두리 두께(영상 픽셀)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "decorations.box.blink_hz",
+      "unit": "Hz",
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "초당 깜빡임 횟수(0 = 안 깜빡임)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "p50",
+      "overall": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "text.tone.emoji",
+      "unit": null,
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값)",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "자막에 이모지를 쓰는가(yes/no) — 이모지가 보이는 시각 또는 자막 전체를 본 뒤 기록",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode",
+      "overall": {
+        "n": 0,
+        "counts": {},
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "cover.source",
+      "unit": null,
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값)",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "표지(썸네일)가 첫 프레임인가(first_frame) 따로 고른 프레임인가(chosen_frame)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode",
+      "overall": {
+        "n": 0,
+        "counts": {},
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    },
+    {
+      "key": "cover.text_role",
+      "unit": null,
+      "resolution": null,
+      "method": "manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값 → 영상 간 분포(수치 p50, 색·범주 최빈값)",
+      "measured_at": "2026-09-24T20:28:31+00:00",
+      "howto": "표지 문구가 어느 자막 역할인가(title/description/situation/speaker/dialogue/reaction)",
+      "status": "unmeasured",
+      "value": null,
+      "value_rule": "mode",
+      "overall": {
+        "n": 0,
+        "counts": {},
+        "mode": null
+      },
+      "by_format": {},
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 수동 관찰도 스냅샷 영상에만 적을 수 있음"
+    }
+  ]
+}

@@ -537,6 +537,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1302,6 +1303,7 @@
                                 "transition_in": {
                                     "color": null,
                                     "dur": 0.0,
+                                    "scope": "region",
                                     "type": "cut"
                                 },
                                 "zoom": {
@@ -1312,6 +1314,8 @@
                                     "dur": 0.35,
                                     "ease": "out",
                                     "ease_curve": "cubic (render.py)",
+                                    "placement": "resolve.src_to_region (canvas_rect_by_frame 가 프레임별 결과)",
+                                    "recenter": false,
                                     "scale_from": 1.0,
                                     "scale_to": 1.25,
                                     "start": 1.3
@@ -1373,6 +1377,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1428,6 +1433,7 @@
                                 "transition_in": {
                                     "color": null,
                                     "dur": 0.0,
+                                    "scope": "region",
                                     "type": "cut"
                                 },
                                 "zoom": null
@@ -1488,6 +1494,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1543,6 +1550,7 @@
                                 "transition_in": {
                                     "color": null,
                                     "dur": 0.0,
+                                    "scope": "region",
                                     "type": "cut"
                                 },
                                 "zoom": null
@@ -1612,6 +1620,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1663,6 +1672,7 @@
                                 "transition_in": {
                                     "color": "#FFFFFF",
                                     "dur": 0.12,
+                                    "scope": "region",
                                     "type": "flash"
                                 },
                                 "zoom": null
@@ -1723,6 +1733,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1774,6 +1785,7 @@
                                 "transition_in": {
                                     "color": "#FFFFFF",
                                     "dur": 0.12,
+                                    "scope": "region",
                                     "type": "flash"
                                 },
                                 "zoom": null
@@ -1858,6 +1870,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -1909,6 +1922,7 @@
                                 "transition_in": {
                                     "color": null,
                                     "dur": 0.25,
+                                    "scope": "region",
                                     "type": "crossfade"
                                 },
                                 "zoom": null
@@ -1969,6 +1983,7 @@
                         "OTIO_SCHEMA": "Clip.2",
                         "metadata": {
                             "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
                                 "canvas_resolution": [
                                     1080,
                                     1920
@@ -2020,6 +2035,7 @@
                                 "transition_in": {
                                     "color": null,
                                     "dur": 0.25,
+                                    "scope": "region",
                                     "type": "crossfade"
                                 },
                                 "zoom": null
@@ -2120,12 +2136,17 @@
                                     1.0,
                                     0.4444
                                 ],
-                                "region": {
-                                    "h": 608.0,
-                                    "w": 1080.0,
-                                    "x": 0.0,
-                                    "y": 656.0
-                                }
+                                "rect": {
+                                    "h": 608,
+                                    "w": 1080,
+                                    "x": 0,
+                                    "y": 656
+                                },
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "scope": "region"
                             }
                         },
                         "name": "플래시 s3",
@@ -2483,6 +2504,26 @@
                             "shortkit": {
                                 "event_desc": "창가 남성이 일어서기 시작함(확대 시작)",
                                 "event_t": 1.3,
+                                "fg_limiter": {
+                                    "gain_db_by_frame": [
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        -0.07,
+                                        -0.93,
+                                        -2.13,
+                                        -1.45,
+                                        -0.26,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "note": "마스터가 효과음/원본 소리에만 건 안전 리미터(BGM 제외); 가져오는 편집기에서 음량 키프레임으로 넣어야 함",
+                                    "source": "episodes/test-pipeline-001/build/fg_gain.json"
+                                },
                                 "gain_db": -12.0,
                                 "id": "fx1",
                                 "loudness_gain_db": -0.067,
@@ -2566,6 +2607,7 @@
                             "shortkit": {
                                 "event_desc": "다시 앉은 순간 화면이 멈춤",
                                 "event_t": 6.8,
+                                "fg_limiter": null,
                                 "gain_db": -8.0,
                                 "id": "fx2",
                                 "loudness_gain_db": -0.067,
@@ -2649,6 +2691,7 @@
                             "shortkit": {
                                 "event_desc": "뒷줄 남성이 손을 들어 올림",
                                 "event_t": 7.75,
+                                "fg_limiter": null,
                                 "gain_db": -8.0,
                                 "id": "fx3",
                                 "loudness_gain_db": -0.067,
@@ -2732,6 +2775,7 @@
                             "shortkit": {
                                 "event_desc": "뒷줄 남성이 자리에서 일어섬",
                                 "event_t": 11.0,
+                                "fg_limiter": null,
                                 "gain_db": -8.0,
                                 "id": "fx4",
                                 "loudness_gain_db": -0.067,
@@ -2815,6 +2859,7 @@
                             "shortkit": {
                                 "event_desc": "두 사람이 동시에 고개를 옆으로 기울임",
                                 "event_t": 15.05,
+                                "fg_limiter": null,
                                 "gain_db": -8.0,
                                 "id": "fx5",
                                 "loudness_gain_db": -0.067,
@@ -2911,6 +2956,7 @@
                             "shortkit": {
                                 "clip_id": "s3",
                                 "fade_s": 0.04,
+                                "fg_limiter": null,
                                 "gain_db": 0.0,
                                 "loudness_gain_db": -0.067,
                                 "reason": "소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증",

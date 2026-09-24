@@ -56,6 +56,10 @@ NON_MEASURED: dict[str, str] = {
     "motion.zoom.max_consecutive": "rule",
     "motion.freeze.max_per_video": "rule",
     "motion.trim.tail_after_meaning_s": "rule",
+    # render parameter of OUR cleaning step (blur strength over a removed overlay), not a reference style
+    "render.clean.blur_sigma_ratio": "rule",
+    # free-text note about how text.tone was / will be measured (bookkeeping, drives nothing)
+    "text.tone.notes": "meta",
     "structure.formats_file": "infra",
     "audio.loudness.tolerance_lu": "rule",
     "audio.loudness.max_limiter_db": "rule",
@@ -73,17 +77,22 @@ IMPACT: dict[str, str] = {
     "text.roles.*.timing.*": "자막 등장 타이밍 불일치",
     "text.roles.*.color": "글자 색 불일치",
     "text.roles.*.highlight_color": "강조 색 불일치",
+    "text.tone.register": "자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음",
+    "text.tone.emoji": "자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음",
+    "text.tone.sentence_end_examples": "제안서의 말투 안내(종결 어미 예시)가 비어 있음 → 대본 말투가 레퍼런스와 다를 수 있음",
     "text.tone.*": "자막 말투가 레퍼런스와 다를 수 있음",
     "motion.*": "확대·정지·전환의 크기/길이 불일치",
     "decorations.*": "화살표·원 등 장식 스타일 불일치",
+    "audio.bgm.title": "BGM 곡 제목 미식별 → 음악 라이브러리 파일이 그 곡인지 판정 불가",
+    "audio.bgm.version": "BGM 버전 미식별 → 같은 곡의 다른 버전(다른 트랙)을 쓸 위험",
     "audio.bgm.*": "BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가",
     "audio.ducking.*": "보존 대사 구간의 BGM 덕킹 깊이·속도 불일치",
     "audio.loudness.*": "최종 음량 불일치",
-    "render.clean.*": "원본 정리(흐림) 강도가 달라 가린 영역이 더/덜 보일 수 있음",
     "audio.original.keep_gain_db": "보존 원음 크기 불일치",
     "audio.original.fade_s": "원음 켜고 끄는 경계 처리 불일치",
     "audio.sfx.gain_db_default": "효과음 크기 불일치",
     "audio.silence.*": "의도적 정적 처리 불일치",
+    "structure.duration_s.*": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능",
     "structure.*": "영상 길이·전개 구조 불일치",
     "cover.*": "표지 구성 불일치",
 }
@@ -310,11 +319,55 @@ def registry_path(name: str) -> Path:
     return paths.preset_dir(name) / "settings_registry.yaml"
 
 
+# Access logs written by the production commands (``Preset.save_access_log``):
+#   episodes/<id>/build/preset_access.json            resolve_episode (contract §5)
+#   episodes/<id>/build/preset_access_<command>.json  shortkit episode validate|proposal|resolve|render|export|all|...
+#   episodes/<id>/qa/preset_access.json               shortkit qa run
+ACCESS_LOG_GLOBS = ("episodes/*/build/preset_access*.json", "episodes/*/qa/preset_access.json")
+
+
+def all_access_logs(root: Path | None = None) -> list[str]:
+    """Every access log under the project's episodes (root-relative POSIX paths, sorted)."""
+    root = root or paths.project_root()
+    found: set[Path] = set()
+    for pat in ACCESS_LOG_GLOBS:
+        found.update(p for p in root.glob(pat) if p.is_file())
+    return sorted(paths.relp(p) for p in found)
+
+
+def code_link_alive(link: str, _cache: dict | None = None) -> bool:
+    """A registry code link ``<root-relative file>:<function>`` still points at existing code: the file
+    exists in this project and still defines that function (comprehensions/lambdas: the file exists).
+    Links kept from earlier syncs are dropped when they are dead, so a renamed/removed consumer cannot
+    keep a key looking 'linked' (links seen in the current access logs are always kept)."""
+    import re
+
+    path, _, func = link.rpartition(":")
+    if not path or not func or "/" not in path:
+        return False
+    try:
+        f = paths.absp(path)
+    except Exception:
+        return False
+    if not f.is_file():
+        return False
+    if func.startswith("<"):
+        return True
+    cache = _cache if _cache is not None else {}
+    if path not in cache:
+        cache[path] = f.read_text(encoding="utf-8", errors="replace")
+    return re.search(rf"^\s*(?:async\s+)?(?:def|class)\s+{re.escape(func)}\b", cache[path], re.M) is not None
+
+
 def sync_registry(name: str, access_logs: list[str | Path] | None = None,
-                  qa_declarations: dict[str, list[str]] | None = None) -> dict:
+                  qa_declarations: dict[str, list[str]] | None = None, *, discover: bool = True) -> dict:
     """(Re)build settings_registry.yaml from the preset layers, measurement files, access logs
     and QA check declarations.  Existing hand-written fields (evidence notes, resolution_state
-    notes) are preserved."""
+    notes) are preserved.
+
+    Access logs = the explicitly given ones PLUS (``discover``) every log found by
+    ``all_access_logs`` -- so the registry's code links always cover every command that consumed
+    the preset (validate / proposal / resolve / render / export / QA), whatever list a caller passes."""
     pr = load_preset(name)
     reg_file = registry_path(name)
     old = (read_yaml(reg_file, {}) or {}).get("entries", {})
@@ -330,15 +383,27 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
                     it["file"] = paths.relp(f)
                     meas[it["key"]] = it
     code: dict[str, set[str]] = defaultdict(set)
-    for lp in access_logs or []:
-        lg = read_json(lp, {}) or {}
-        if lg.get("preset_id") not in (None, pr.preset_id):
+    seen: set[str] = set()
+    used: list[str] = []
+    for lp in list(access_logs or []) + (all_access_logs() if discover else []):
+        ap = paths.absp(lp)
+        ident = str(ap.resolve())
+        if ident in seen:
             continue
+        seen.add(ident)
+        lg = read_json(ap, {}) or {}
+        if not lg or lg.get("preset_id") not in (None, pr.preset_id):
+            continue
+        try:
+            used.append(paths.relp(ap))
+        except ValueError:            # a log outside the project (explicit --access-log): name only
+            used.append(ap.name)
         for k, callers in (lg.get("reads") or {}).items():
             code[k].update(callers)
     if qa_declarations is None:
         qa_declarations = _qa_declarations()
     entries: dict[str, dict] = {}
+    src_cache: dict[str, str] = {}
     for key, value in flatten(pr.data).items():
         prev = old.get(key, {})
         cat = classify_key(key)
@@ -354,7 +419,12 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             status = "fixed_by_rule"
         else:
             status = "unmeasured"
-        prev_code = set(prev.get("code") or [])
+        cur_code = code.get(key, set())
+        named_files = {c.rpartition(":")[0] for c in cur_code if not c.rpartition(":")[2].startswith("<")}
+        # earlier links: dead ones dropped; an anonymous reader (<dictcomp>/<lambda>) of a file whose named
+        # reader is in the current logs is superseded by it
+        prev_code = {c for c in (prev.get("code") or []) if code_link_alive(c, src_cache)
+                     and not (c.rpartition(":")[2].startswith("<") and c.rpartition(":")[0] in named_files)}
         e = {
             "scope": "fixed",
             "category": cat or "style",
@@ -364,7 +434,7 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             "evidence": (m or {}).get("evidence") or prev.get("evidence") or [],
             "measurement": ({k: m.get(k) for k in ("file", "overall", "by_format", "resolution", "method",
                                                    "measured_at", "unit") if k in m} if m else None),
-            "code": sorted(prev_code | code.get(key, set())),
+            "code": sorted(prev_code | cur_code),
             "qa_checks": sorted({cid for cid, pats in qa_declarations.items()
                                  if any(_match(key, p) for p in pats)}),
             "impact_if_unmeasured": impact_of(key) if status == "unmeasured" else None,
@@ -376,6 +446,7 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             e["blocker"] = m["blocker"]
         entries[key] = e
     reg = {"schema": "shortkit.registry/1", "preset_id": pr.preset_id, "synced_at": now_iso(),
+           "access_logs": sorted(set(used)),
            "legend": {
                "status": {"measured": "레퍼런스에서 측정", "unmeasured": "못 잼(임시값 사용 중)",
                           "requested_change": "사용자 요청 변경", "fixed_by_rule": "사용자 제작 규칙으로 고정",

@@ -11,7 +11,7 @@ from .. import paths
 from ..util.hashing import sha256_file
 from ..util.jsonio import append_jsonl, now_iso, write_json
 from ..util.media import ffmpeg, probe
-from .plan import PlanError, approval_state, load_plan, plan_path, plan_sha256, write_approval
+from .plan import PlanError, approval_state_for, load_plan, plan_path, plan_sha256, write_approval
 from .validate import errors, format_issues, validate
 
 EXPORTERS = ("export_mlt", "export_fcpxml", "export_otio")
@@ -75,6 +75,22 @@ def _log(episode_id: str, row: dict) -> None:
     append_jsonl(paths.episode_dir(episode_id) / "approval_log.jsonl", {"at": now_iso(), **row})
 
 
+def access_log_path(episode_id: str, command: str) -> Path:
+    return paths.episode_dir(episode_id) / "build" / f"preset_access_{command}.json"
+
+
+def save_access(episode_id: str, preset, command: str) -> Path | None:
+    """Every command that consumes the preset saves its traced reads (``Preset.save_access_log``) to
+    episodes/<id>/build/preset_access_<command>.json; ``shortkit preset sync`` collects them
+    (``config.all_access_logs``) into the registry's code links."""
+    if preset is None or not paths.episode_dir(episode_id).is_dir():
+        return None
+    p = access_log_path(episode_id, command)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    preset.save_access_log(p)
+    return p
+
+
 # ----------------------------------------------------------------------------- new
 PLAN_TEMPLATE = """# 에피소드 계획 (스키마: shortkit/schema/plan.schema.json)
 # - 시간: sources/timeline 의 src_* 는 원본(소스) 시각, captions/sfx/decorations 는 출력 시각(초).
@@ -132,6 +148,7 @@ def cmd_new(args) -> int:
                                FMT=fmt, MODE=args.mode, IDX=idx)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(txt, encoding="utf-8")
+    save_access(args.episode_id, pr, "new")
     print(f"만듦: {paths.relp(path)}  (소스·구간·자막·효과음을 채운 뒤 `shortkit episode validate {args.episode_id}`)")
     return 0
 
@@ -143,7 +160,10 @@ def cmd_validate(args) -> int:
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
-    issues = validate(plan, preset, for_render=args.for_render, allow_unmeasured=args.allow_unmeasured)
+    try:
+        issues = validate(plan, preset, for_render=args.for_render, allow_unmeasured=args.allow_unmeasured)
+    finally:
+        save_access(args.episode_id, preset, "validate")
     if args.json:
         print(json.dumps(issues, ensure_ascii=False, indent=2))
     else:
@@ -159,13 +179,16 @@ def cmd_proposal(args) -> int:
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
-    issues, ctx = validate(plan, preset, allow_unmeasured=getattr(args, "allow_unmeasured", False),
-                           return_context=True)
-    if ctx is None or ctx.resolved is None:
-        _print_issues(issues)
-        print("제안서를 만들 수 없습니다(스키마/프리셋 오류).")
-        return 1
-    p = write_proposal(plan, ctx, issues)
+    try:
+        issues, ctx = validate(plan, preset, allow_unmeasured=getattr(args, "allow_unmeasured", False),
+                               return_context=True)
+        if ctx is None or ctx.resolved is None:
+            _print_issues(issues)
+            print("제안서를 만들 수 없습니다(스키마/프리셋 오류).")
+            return 1
+        p = write_proposal(plan, ctx, issues)
+    finally:
+        save_access(args.episode_id, preset, "proposal")
     print(f"제안서: {paths.relp(p)}  (plan_sha256 {plan_sha256(plan)[:12]}…)")
     ne = len(errors(issues))
     print(f"검증: 오류 {ne}건, 경고 {len(issues) - ne}건" + (" — 오류를 먼저 고치세요" if ne else ""))
@@ -188,7 +211,13 @@ def cmd_approve(args) -> int:
     if psha != sha:
         print("[오류] proposal.md 가 현재 plan 과 다른 버전에서 만들어졌습니다. 제안서를 다시 만든 뒤 승인하세요.")
         return 1
-    st = approval_state(plan, bool(preset.get("approval.first_episode_requires_approval")))
+    try:
+        st = approval_state_for(plan, preset)
+    except PlanError as e:
+        print(f"[오류] {e}")
+        return 1
+    finally:
+        save_access(args.episode_id, preset, "approve")
     approval = {"required": bool(st["required"]), "approved": True, "approved_by": args.by, "approved_at": now_iso(),
                 "approved_plan_sha256": sha, "note": args.note}
     write_approval(args.episode_id, approval)
@@ -202,13 +231,20 @@ def cmd_resolve(args) -> int:
     from .resolve import ResolveError, resolve_episode
 
     try:
-        r = resolve_episode(args.episode_id, args.preset, allow_unmeasured=args.allow_unmeasured)
+        plan, preset = _load(args)
+    except PlanError as e:
+        print(f"[오류] {e}")
+        return 1
+    try:
+        r = resolve_episode(args.episode_id, args.preset, allow_unmeasured=args.allow_unmeasured, preset=preset)
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
     except ResolveError as e:
         _print_issues(e.issues)
         return 1
+    finally:
+        save_access(args.episode_id, preset, "resolve")
     print(f"resolved: {len(r.clips)}클립 {r.duration:.2f}s, 자막 {len(r.captions)}, 장식 {len(r.decorations)}, "
           f"효과음 {len(r.audio.sfx)} → episodes/{r.episode_id}/build/resolved.json, captions.ass")
     for w in r.warnings:
@@ -225,21 +261,28 @@ def _render(args) -> int:
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
+    try:
+        return _render_steps(args, plan, preset, render, RenderError, resolve_episode, ResolveError)
+    finally:
+        save_access(args.episode_id, preset, "render")
+
+
+def _render_steps(args, plan, preset, render, RenderError, resolve_episode, ResolveError) -> int:
     issues = validate(plan, preset, for_render=True, allow_unmeasured=args.allow_unmeasured)
     _print_issues(issues)
     if errors(issues):
         print("렌더 중단: 위 오류를 먼저 고치세요.")
         return 1
     try:
-        r = resolve_episode(args.episode_id, args.preset, allow_unmeasured=args.allow_unmeasured)
-        out = render(r, allow_unmeasured=args.allow_unmeasured)
+        r = resolve_episode(args.episode_id, args.preset, allow_unmeasured=args.allow_unmeasured, preset=preset)
+        out = render(r, allow_unmeasured=args.allow_unmeasured, preset=preset)
     except ResolveError as e:
         _print_issues(e.issues)
         return 1
     except RenderError as e:
         print(f"[렌더 실패] {e}")
         return 1
-    st = approval_state(plan, bool(preset.get("approval.first_episode_requires_approval")))
+    st = approval_state_for(plan, preset)
     _log(args.episode_id, {"event": "render", "plan_sha256": st["plan_sha256"],
                            "approved_plan_sha256": st["approved_plan_sha256"],
                            "changed_since_approval": st["changed_since_approval"], "output": paths.relp(out),
@@ -289,17 +332,27 @@ def cmd_render(args) -> int:
 
 
 def cmd_export(args) -> int:
-    from .resolve import load_resolved, resolve_episode
-
     try:
         plan, preset = _load(args)
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
     try:
+        return _export_steps(args, plan, preset)
+    except PlanError as e:
+        print(f"[오류] {e}")
+        return 1
+    finally:
+        save_access(args.episode_id, preset, "export")
+
+
+def _export_steps(args, plan, preset) -> int:
+    from .resolve import load_resolved, resolve_episode
+
+    try:
         r = load_resolved(args.episode_id)
     except FileNotFoundError:
-        r = resolve_episode(args.episode_id, args.preset)
+        r = resolve_episode(args.episode_id, args.preset, preset=preset)
     out_dir = paths.episode_dir(args.episode_id) / "project"
     out_dir.mkdir(parents=True, exist_ok=True)
     master = paths.absp(r.output_path)
@@ -331,7 +384,7 @@ def cmd_export(args) -> int:
         unavailable.append(f"verify_project ({e})")
     try:
         pr_mod = importlib.import_module("shortkit.edit.project_readme")
-        st = approval_state(plan, bool(preset.get("approval.first_episode_requires_approval")))
+        st = approval_state_for(plan, preset)
         decisions = {"plan_sha256": st["plan_sha256"], "approval": st, "notes": plan.get("notes", ""),
                      "warnings": r.warnings, "provisional_keys": r.provisional_keys,
                      "sources": [{"id": s["id"], "path": s["path"], "sha256": s.get("sha256"),
@@ -351,10 +404,17 @@ def cmd_all(args) -> int:
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
-    st = approval_state(plan, bool(preset.get("approval.first_episode_requires_approval")))
+    try:
+        st = approval_state_for(plan, preset)
+    except PlanError as e:
+        print(f"[오류] {e}")
+        return 1
+    finally:
+        save_access(args.episode_id, preset, "all")
     if st["required"] and not st["approved"]:
         cmd_proposal(args)
-        print(f"첫 에피소드: 제안서를 확인한 뒤 `shortkit episode approve {args.episode_id} --by 이름` 후 다시 실행하세요.")
+        who = "첫 에피소드" if st["first_episode"] else f"{plan.get('episode_index')}번째 에피소드({st['rule_key']}=true)"
+        print(f"{who}: 제안서를 확인한 뒤 `shortkit episode approve {args.episode_id} --by 이름` 후 다시 실행하세요.")
         return 3
     rc = _render(args)
     if rc:

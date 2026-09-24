@@ -54,6 +54,10 @@ def _verify_summary(v: dict | None) -> tuple[str, list[str]]:
         lines.append(f"  - 화면 SSIM 전체 {g.get('ssim_overall')} (기준 ≥ {th.get('ssim_overall_min')}), "
                      f"가장 낮은 1초 {g.get('ssim_worst_second')} (기준 ≥ {th.get('ssim_sec_mean_min')}), "
                      f"평균 절대차 {g.get('mad_overall')} (1초 기준 ≤ {th.get('mad_sec_max')})")
+        ps = ((g.get("per_second") or {}).get("ssim_mean") or {})
+        if ps.get("n"):
+            lines.append(f"  - 1초별 SSIM 분포: n={ps.get('n')}, p10 {ps.get('p10')} / p50 {ps.get('p50')} / "
+                         f"p90 {ps.get('p90')}")
         lines.append(f"  - 소리 RMS 포락선 상관 {g.get('audio_env_corr')} (기준 ≥ {th.get('audio_env_corr_min')}), "
                      f"초별 레벨 차 최대 {max(diffs):.2f} dB" if diffs else
                      f"  - 소리 RMS 포락선 상관 {g.get('audio_env_corr')}; 레벨 비교 가능한 초 없음")
@@ -126,9 +130,21 @@ def write(resolved: ResolvedEdit, out_dir: Path, decisions: dict) -> Path:
         fgl = mlt.get("foreground_limiter")
         if fgl and fgl.get("status") == "있음":
             L.append(f"- 효과음/원본 소리 안전 리미터: 마스터가 최대 {fgl['master_max_reduction_db']} dB 줄인 것을 "
-                     f"{fgl['source']} 에서 프레임별로 읽어 각 클립 volume 키프레임으로 재현 ({fgl['note']})")
+                     f"`{fgl['source']}` 에서 프레임별로 읽어 각 클립 volume 키프레임으로 재현 ({fgl['note']})")
+        elif fgl and fgl.get("status") == "없음":
+            L.append(f"- 효과음/원본 소리 안전 리미터: 마스터가 줄이지 않음(최대 {fgl.get('master_max_reduction_db')} dB, "
+                     f"출처 `{fgl.get('source')}`) → 키프레임 없음")
         elif fgl:
             L.append(f"- 효과음/원본 소리 안전 리미터: **못 잼** — {fgl.get('why')}")
+        mono = (mlt.get("audio") or {}).get("mono_upmix_compensation")
+        if mono:
+            L.append(f"- 모노 오디오 {len(mono.get('files', []))}개: {mono.get('why')}")
+        for fl in mlt.get("flashes", []):
+            L.append(f"- 플래시 {fl['clip']}: 범위 {'화면 전체' if fl.get('scope') == 'canvas' else '영상 영역'}"
+                     f"({fl.get('scope')}) rect {fl.get('rect')} @ {fl.get('resolution')}, 프레임 {fl['frames']}")
+        zk = mlt.get("zoom_keyframes") or []
+        if any(z.get("recenter") for z in zk):
+            L.append("- 줌 recenter: 확대 기준점이 영역 가운데로 이동(resolve.src_to_region 과 같은 값의 affine 키프레임)")
         lim = mlt.get("limiter")
         if lim:
             L.append(f"- 피크 리미터: {lim['service']} 한도 {lim['ceiling_dbfs']} dBFS — {lim['note']}")

@@ -7,6 +7,9 @@ Rules enforced here (user's audio rules):
 - Intentional silences mute the BGM with ``audio.silence.fade_s`` ramps.
 - BGM must be a clean music file: plan.bgm.path or preset ``audio.bgm.track_id`` looked up in
   ``assets/library/music/index.yaml`` (or ``music_library_root`` from local.yaml).
+- BGM identity is title AND version: the library entry's title/version must equal the preset's
+  audio.bgm.title / audio.bgm.version (``check_bgm_identity``; a different version is a different track).
+  The used section starts at plan.bgm.section_start_s or else the preset's audio.bgm.section_start_s.
 
 Gain semantics (shared with the renderer): audio.bgm.gain_db, audio.sfx.gain_db_default / plan
 sfx gain_db and audio.original.keep_gain_db are levels AT THE FINAL PROGRAM LOUDNESS (gain applied
@@ -96,6 +99,81 @@ def lookup_track(track_id: str) -> tuple[str | None, dict]:
                     return None, {**ent, "_outside_root": True}
         return None, ent
     return None, {}
+
+
+def library_entry_for_path(stored: str) -> dict | None:
+    """The music-library index entry whose file is ``stored`` (a plan.bgm.path), or None when the
+    file is not a library track (then its title/version are unknown)."""
+    try:
+        want = paths.absp(stored).resolve()
+    except Exception:
+        return None
+    for root in music_library_roots():
+        try:
+            idx = read_yaml(library_path(root) / "index.yaml", None)
+        except FileNotFoundError:
+            continue
+        if not idx:
+            continue
+        tracks = idx.get("tracks", idx) if isinstance(idx, dict) else idx
+        ents = list(tracks.values()) if isinstance(tracks, dict) else list(tracks or [])
+        for ent in ents:
+            if not isinstance(ent, dict):
+                continue
+            f = ent.get("path") or ent.get("file")
+            if not f:
+                continue
+            cands = [f] if str(f).startswith("$") else [f, f"{root.rstrip('/')}/{f}"]
+            for cand in cands:
+                try:
+                    if library_path(cand).resolve() == want:
+                        return ent
+                except (FileNotFoundError, OSError, ValueError):
+                    continue
+    return None
+
+
+def _norm_ident(v) -> str:
+    return " ".join(str(v).split()).casefold()
+
+
+def check_bgm_identity(plan: dict, bcfg, ent: dict | None, source: str, issues: list[dict]) -> dict:
+    """BGM identity = title AND version (a different version of the same song is a different track).
+
+    ``source``: "track_id" (preset audio.bgm.track_id looked up in the music library) or "plan_path"
+    (plan.bgm.path).  The library entry's title/version must equal the preset's audio.bgm.title /
+    audio.bgm.version: a track_id entry that differs is always an error; a plan file that differs or
+    cannot be identified is an error in production and a warning in test.  When the preset itself has
+    no title/version (못 잼) nothing can be compared -- ``validate.check_audio`` reports that."""
+    want_t, want_v = bcfg["title"], bcfg["version"]
+    res = {"preset_title": want_t, "preset_version": want_v, "entry_title": (ent or {}).get("title"),
+           "entry_version": (ent or {}).get("version"), "source": source, "match": None}
+    if not want_t or not want_v:
+        return res
+    prod = plan["mode"] == "production"
+    soft = "error" if (prod or source == "track_id") else "warn"
+    where = "audio.bgm.track_id" if source == "track_id" else "bgm.path"
+    if not ent:
+        if source == "plan_path":
+            issues.append(_issue("error" if prod else "warn", "bgm_identity_unknown",
+                                 f"plan.bgm.path 파일이 음악 라이브러리(index.yaml)에 없어 프리셋 곡('{want_t}', 버전 {want_v})과 "
+                                 "같은 곡·버전인지 확인할 수 없습니다", where))
+        return res                      # track_id not found: bgm_track_missing is reported by the caller
+    got_t, got_v = ent.get("title"), ent.get("version")
+    if not got_t or not got_v:
+        issues.append(_issue(soft, "bgm_entry_unidentified",
+                             f"음악 라이브러리 항목에 제목·버전이 없습니다(title={got_t!r}, version={got_v!r}): "
+                             f"프리셋 곡('{want_t}', 버전 {want_v})인지 확인 불가", where))
+        return res
+    bad = []
+    if _norm_ident(got_t) != _norm_ident(want_t):
+        bad.append(f"제목 '{got_t}' ≠ 프리셋 '{want_t}'")
+    if _norm_ident(got_v) != _norm_ident(want_v):
+        bad.append(f"버전 '{got_v}' ≠ 프리셋 '{want_v}'(다른 버전은 다른 트랙)")
+    res["match"] = not bad
+    if bad:
+        issues.append(_issue(soft, "bgm_track_mismatch", "BGM 이 프리셋 곡과 다릅니다: " + ", ".join(bad), where))
+    return res
 
 
 # ----------------------------------------------------------------------------- envelopes
@@ -264,18 +342,32 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
             if not paths.absp(path).is_file():
                 issues.append(_issue("error", "bgm_missing", f"BGM 파일이 없습니다: {path}", "bgm.path"))
                 path = None
+            else:
+                check_bgm_identity(plan, bcfg, library_entry_for_path(path), "plan_path", issues)
         elif track_id:
             path, ent = lookup_track(track_id)
             if path is None:
                 msg = ("음악 라이브러리 파일이 프로젝트 밖에 있습니다(assets/library/music 으로 복사)"
                        if ent.get("_outside_root") else f"BGM track_id '{track_id}' 를 음악 라이브러리에서 찾지 못함")
                 issues.append(_issue("error", "bgm_track_missing", msg, "audio.bgm.track_id"))
+            check_bgm_identity(plan, bcfg, ent or None, "track_id", issues)
         else:
             sev = "error" if plan["mode"] == "production" else "warn"
             issues.append(_issue(sev, "bgm_unidentified",
                                  "BGM 미식별(못 잼): plan.bgm.path 도 preset audio.bgm.track_id 도 없습니다", "bgm"))
-        section = float(pb["section_start_s"]) if pb.get("section_start_s") is not None else float(bcfg["section_start_s"])
-        tempo = float(pb["tempo_ratio"]) if pb.get("tempo_ratio") is not None else float(bcfg["tempo_ratio"])
+        # used section and speed: the preset's (reference) values unless the plan overrides them; an override
+        # is reported -- a different part / speed of the same song is NOT the reference's music (user rule)
+        section_p, tempo_p = float(bcfg["section_start_s"]), float(bcfg["tempo_ratio"])
+        section = float(pb["section_start_s"]) if pb.get("section_start_s") is not None else section_p
+        tempo = float(pb["tempo_ratio"]) if pb.get("tempo_ratio") is not None else tempo_p
+        for key, got, want, unit in (("section_start_s", section, section_p, "s"), ("tempo_ratio", tempo, tempo_p, "")):
+            if pb.get(key) is not None and abs(got - want) > 1e-3:
+                org = preset.origin(f"audio.bgm.{key}")
+                issues.append(_issue("warn", f"bgm_{key}_override",
+                                     f"plan.bgm.{key}={got}{unit} 가 프리셋 audio.bgm.{key}={want}{unit}"
+                                     f"({'임시값·못 잼' if org == 'provisional' else org}) 와 다릅니다: 같은 곡의 "
+                                     "다른 구간/속도는 레퍼런스 음악과 일치가 아님(의도한 변경이면 requested_changes 로)",
+                                     f"bgm.{key}"))
         gain = float(pb["gain_db"]) if pb.get("gain_db") is not None else float(bcfg["gain_db"])
         fi, fo = float(bcfg["fade_in_s"]), float(bcfg["fade_out_s"])
         if tempo <= 0:

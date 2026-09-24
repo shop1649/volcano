@@ -144,11 +144,14 @@ def read_canvas(preset: config.Preset) -> dict:
     bg = c["background"]
     vr = c["video_region"]
     sm = c["safe_margin"]
+    margins = {}
+    for k in ("left", "right", "top", "bottom"):     # plain loop: the traced reader is read_canvas itself
+        margins[k] = float(sm[k])
     return {"width": int(c["width"]), "height": int(c["height"]), "fps": float(c["fps"]),
             "background": {"type": bg["type"], "color": bg["color"], "blur_sigma": float(bg["blur_sigma"])},
             "video_region": {"x": float(vr["x"]), "y": float(vr["y"]), "w": float(vr["w"]), "h": float(vr["h"]),
                              "fit": vr["fit"]},
-            "safe_margin": {k: float(sm[k]) for k in ("left", "right", "top", "bottom")}}
+            "safe_margin": margins}
 
 
 # ----------------------------------------------------------------------------- geometry
@@ -595,7 +598,10 @@ def resolve_decorations(plan: dict, preset: config.Preset, issues: list[dict]) -
         sec = preset.section(f"decorations.{kind}")
         present = set(iter(sec))
         optional = DECO_KEYS.get(f"{kind}_optional", ())
-        st = {k: sec[k] for k in DECO_KEYS[kind] + optional if k in present}
+        st = {}
+        for k in DECO_KEYS[kind] + optional:      # plain loop: the traced reader is resolve_decorations itself
+            if k in present:
+                st[k] = sec[k]
         missing = [k for k in DECO_KEYS[kind] if k not in st]
         for k in missing:
             issues.append(issue("error", "deco_key_missing", f"프리셋 키 없음: decorations.{kind}.{k}", where))
@@ -734,14 +740,16 @@ def write_build(ctx: ResolveContext) -> ResolvedEdit:
 
 
 def resolve_episode(episode_id: str, preset_name: str | None = None, *,
-                    allow_unmeasured: bool = False) -> ResolvedEdit:
+                    allow_unmeasured: bool = False, preset: config.Preset | None = None) -> ResolvedEdit:
     """Validate (all rules) + resolve an episode and write build/{resolved.json, captions.ass,
     preset_access.json, caption_layout.json}.  Raises ResolveError on errors (nothing written).
-    Warnings of every rule are stored in ``resolved.warnings``."""
+    Warnings of every rule are stored in ``resolved.warnings``.  ``preset``: an already loaded preset
+    for this plan (the CLI passes its own so one access log holds every read of the command)."""
     from .validate import validate
 
     plan = load_plan(episode_id)
-    preset = preset_for_plan(plan, preset_name)
+    if preset is None:
+        preset = preset_for_plan(plan, preset_name)
     issues, ctx = validate(plan, preset, allow_unmeasured=allow_unmeasured, return_context=True,
                            execute_clean=True)
     if ctx is None or any(i["severity"] == "error" for i in issues):

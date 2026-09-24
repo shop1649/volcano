@@ -12,7 +12,7 @@ from pathlib import Path
 from .. import config, paths
 from ..util.jsonio import now_iso
 from ..util.stats import TRI_KO
-from .plan import approval_state, plan_sha256
+from .plan import PlanError, approval_rule_key, approval_state, approval_state_for, plan_sha256
 from .resolve import ResolveContext
 from .sfxmap import MAP_STATUS_KO
 from .validate import errors, warehouse_records
@@ -40,6 +40,17 @@ def overlap_accepted_unmeasured(rec: dict) -> dict | None:
         if key == "reference_overlap":
             return a if isinstance(a, dict) else {"key": key}
     return None
+
+
+def tone_style_guide(pr: config.Preset) -> dict:
+    """The script-writing style guide printed in the proposal (the sheet the first episode is approved
+    on): the preset's register, emoji rule and measured sentence-ending examples.  Read through the
+    preset (traced) -- the proposal is where the writer of the captions gets these values;
+    ``validate.check_tone`` enforces register/emoji on the plan."""
+    ex = pr.get("text.tone.sentence_end_examples")
+    return {"register": pr.get("text.tone.register"), "emoji": pr.get("text.tone.emoji"),
+            "sentence_end_examples": [str(x) for x in ex] if isinstance(ex, (list, tuple)) else ex,
+            "origin": {k: pr.origin(f"text.tone.{k}") for k in ("register", "emoji", "sentence_end_examples")}}
 
 
 def _v(x, unit: str = "") -> str:
@@ -72,7 +83,10 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
     pr: config.Preset = ctx.preset
     r = ctx.resolved
     sha = plan_sha256(plan)
-    ap = approval_state(plan, bool(pr.get("approval.first_episode_requires_approval")))
+    try:
+        ap = approval_state_for(plan, pr)
+    except PlanError as e:          # invalid approval rule: reported by validate (approval_rule); sheet still shown
+        ap = {**approval_state(plan, True), "rule_key": approval_rule_key(plan), "rule_error": str(e)}
     L: list[str] = []
     L.append(f"# 제안서 — {plan['episode_id']}")
     L.append("")
@@ -80,7 +94,11 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
              f"회차: {plan.get('episode_index') or MISSING}")
     L.append(f"- plan_sha256: `{sha}`")
     L.append(f"- 작성 시각(UTC): {now_iso()}")
-    need = "필요" if ap["required"] else "불필요(첫 에피소드 production 이 아님)"
+    rule = f"`{ap['rule_key']}`={_peek(pr, ap['rule_key'])}"
+    need = (f"필요({rule})" if ap["required"] else
+            ("불필요(test 모드)" if plan["mode"] != "production" else f"불필요({rule})"))
+    if ap.get("rule_error"):
+        need += f" — 승인 규칙 오류: {ap['rule_error']}"
     state = "승인됨" if ap["approved"] else "미승인"
     L.append(f"- 승인: {need} / 현재 {state}"
              + (f" ({ap['approved_by']}, {ap['approved_at']})" if ap["approved"] else ""))
@@ -162,6 +180,20 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
 
     # 자막
     L.append("## 자막")
+    L.append("")
+    tg = tone_style_guide(pr)
+    ko_origin = {"measured": "측정값", "provisional": "임시값·못 잼", "requested_change": "요청 변경"}
+    ex = tg["sentence_end_examples"]
+    L.append("### 말투 안내 (프리셋 text.tone)")
+    L.append("")
+    L.append(f"- 말투: {_v(tg['register'])} ({ko_origin.get(tg['origin']['register'], tg['origin']['register'])}) — "
+             "제목·설명·상황·반응 자막에 검사(`episode validate`의 tone_register), 대사는 예외")
+    L.append(f"- 이모지: {({True: '허용', False: '쓰지 않음'}).get(tg['emoji'], MISSING)} "
+             f"({ko_origin.get(tg['origin']['emoji'], tg['origin']['emoji'])})")
+    L.append("- 종결 어미 예시(레퍼런스 빈도 순): "
+             + (", ".join(f"-{e}" for e in ex)
+                + f" ({ko_origin.get(tg['origin']['sentence_end_examples'], tg['origin']['sentence_end_examples'])})"
+                if ex else f"{MISSING}(측정 전 — 예시 없음, 말투는 위 기준만 검사)"))
     L.append("")
     pc = {c["id"]: c for c in plan.get("captions", [])}
     for role in ("title", "description", "situation", "speaker", "dialogue", "reaction"):

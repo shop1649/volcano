@@ -83,6 +83,58 @@ def make_library(root: Path, with_index: bool = True) -> dict[str, Path]:
     return out
 
 
+def random_bed(seed: int, dur: float = 60.0) -> np.ndarray:
+    """NON-PERIODIC synthetic music (random notes + bass + noise hits): every section differs, so a
+    restart/jump inside the file has a unique ground truth (the generated beds repeat every 8-10 s)."""
+    rng = np.random.default_rng(seed)
+    n = int(dur * SR)
+    y = np.zeros(n, np.float64)
+    t = 0.0
+    while t < dur:                                         # lead notes
+        d = float(rng.uniform(0.12, 0.5))
+        f0 = 440.0 * 2 ** ((int(rng.integers(48, 85)) - 69) / 12)
+        a, b = int(t * SR), min(n, int((t + d) * SR))
+        tt = np.arange(b - a) / SR
+        env = np.minimum(1.0, tt / 0.01) * np.exp(-tt / (0.6 * d))
+        tone = sum(np.sin(2 * np.pi * f0 * h * tt + rng.uniform(0, 6.3)) / h for h in (1, 2, 3, 4))
+        y[a:b] += float(rng.uniform(0.2, 0.5)) * env * tone
+        t += d
+    t = 0.0
+    while t < dur:                                         # bass
+        d = float(rng.uniform(1.0, 2.0))
+        f0 = 440.0 * 2 ** ((int(rng.integers(28, 45)) - 69) / 12)
+        a, b = int(t * SR), min(n, int((t + d) * SR))
+        tt = np.arange(b - a) / SR
+        y[a:b] += 0.35 * np.minimum(1.0, tt / 0.02) * np.sin(2 * np.pi * f0 * tt)
+        t += d
+    for th in np.cumsum(rng.exponential(0.25, int(dur * 6))):   # noise hits
+        if th >= dur - 0.1:
+            break
+        a = int(th * SR)
+        m = int(0.06 * SR)
+        y[a:a + m] += 0.3 * rng.standard_normal(m) * np.exp(-np.arange(m) / (0.012 * SR))
+    return (0.5 * y / np.max(np.abs(y))).astype(np.float32)
+
+
+def add_random_bed(root: Path, name: str = "bed_r", seed: int = 7, dur: float = 60.0) -> Path:
+    """Write a NON-PERIODIC bed into the temp library and add it to index.yaml (SYNTHETIC)."""
+    import yaml
+
+    lib = root / "assets" / "library" / "music"
+    lib.mkdir(parents=True, exist_ok=True)
+    dst = lib / f"{name}.wav"
+    _write(dst, random_bed(seed, dur))
+    idx_p = lib / "index.yaml"
+    idx = yaml.safe_load(idx_p.read_text(encoding="utf-8")) if idx_p.exists() else {}
+    idx = idx or {}
+    tracks = [t for t in (idx.get("tracks") or []) if t.get("track_id") != f"{name}_original"]
+    tracks.append({"track_id": f"{name}_original", "song_id": name, "title": f"Test Random {name}",
+                   "version": "original", "file": dst.name, "tempo_ratio_to_original": 1.0})
+    idx["tracks"] = tracks
+    idx_p.write_text(yaml.safe_dump(idx, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    return dst
+
+
 def atempo(x: np.ndarray, ratio: float, tmpdir: Path) -> np.ndarray:
     """Pitch-preserving tempo change with ffmpeg atempo (WSOLA)."""
     from shortkit.util.media import ffmpeg
@@ -140,6 +192,9 @@ class VideoSpec:
     sfx: list = field(default_factory=list)      # [(name, t, gain_db)]
     onsite: list = field(default_factory=list)   # [(seed, t, gain_db)]
     silence: tuple | None = None                 # (start, end)
+    silence_fade: float = 0.0                    # renderer shape: dB-linear 0 -> -120 dB over this, before/after
+    bgm_segments: list | None = None             # [(ref_t, clean_offset)] BGM restarts/jumps (tempo 1.0 only)
+    ambience: list = field(default_factory=list)  # [(start, end, gain_db, fade_s, seed)] room tone, linear fades
     format_id: str = "F1"
 
 
@@ -161,16 +216,27 @@ def build(spec: VideoSpec, lib: dict[str, Path], bank: dict[str, np.ndarray], tm
     bgm = np.zeros(n, np.float32)
     if spec.bgm_file:
         clean = _read(lib[spec.bgm_file])
-        if spec.bgm_tempo != 1.0:
+        if spec.bgm_segments:
+            # piecewise: from ref time t_k the BGM plays the clean file from offset o_k (restart / jump)
+            assert spec.bgm_tempo == 1.0, "bgm_segments only with tempo 1.0"
+            segs = sorted(spec.bgm_segments) + [(spec.dur, None)]
+            for (t_k, o_k), (t_n, _) in zip(segs, segs[1:]):
+                a, b = int(round(t_k * SR)), min(n, int(round(t_n * SR)))
+                s0 = int(round(o_k * SR))
+                piece = clean[s0:s0 + (b - a)]
+                bgm[a:a + len(piece)] = piece
+        elif spec.bgm_tempo != 1.0:
             # take the section first, then time-stretch it (reference re-timed the file)
             s0 = int(spec.bgm_offset * SR)
             sec = clean[s0:s0 + int((spec.dur * spec.bgm_tempo + 1.0) * SR)]
             src = atempo(sec, spec.bgm_tempo, tmpdir)
+            m = min(n, len(src))
+            bgm[:m] = src[:m]
         else:
             s0 = int(round(spec.bgm_offset * SR))
             src = clean[s0:s0 + n]
-        m = min(n, len(src))
-        bgm[:m] = src[:m]
+            m = min(n, len(src))
+            bgm[:m] = src[:m]
         env_db = np.zeros(n)
         for sp in truth["speech"]:
             s, e = sp["start"], sp["end"]
@@ -185,7 +251,9 @@ def build(spec: VideoSpec, lib: dict[str, Path], bank: dict[str, np.ndarray], tm
         bgm = (bgm * amp).astype(np.float32)
         truth["bgm"] = {"file": spec.bgm_file, "section_start_s": spec.bgm_offset, "tempo_ratio": spec.bgm_tempo,
                         "gain_db": spec.bgm_gain_db, "duck_db": spec.duck_db, "attack_s": spec.attack,
-                        "release_s": spec.release, "fade_in_s": spec.fade_in, "fade_out_s": spec.fade_out}
+                        "release_s": spec.release, "fade_in_s": spec.fade_in, "fade_out_s": spec.fade_out,
+                        "segments": [list(x) for x in spec.bgm_segments] if spec.bgm_segments else None,
+                        "loop": _has_restart(spec)}
     other = np.zeros(n, np.float32)
     for name, ts, g in spec.sfx:
         x = bank[name]
@@ -201,17 +269,62 @@ def build(spec: VideoSpec, lib: dict[str, Path], bank: dict[str, np.ndarray], tm
         m = min(len(x), n - i0)
         other[i0:i0 + m] += x[:m] * _db2a(g)
         truth["onsite"].append({"seed": seed, "t": ts})
+    truth["ambience"] = []
+    for a, b, g, fade, seed in spec.ambience:
+        # kept "original sound" room tone: stationary noise with LINEAR-AMPLITUDE edge fades (the
+        # renderer's shape for kept originals, shortkit.edit.render._lin_fade)
+        i0, i1 = int(round(a * SR)), min(n, int(round(b * SR)))
+        x = room_tone(seed, i1 - i0) * _db2a(g)
+        env = np.ones(i1 - i0, np.float32)
+        k = int(round(fade * SR))
+        if k > 0:
+            env[:k] = np.linspace(0.0, 1.0, k, endpoint=False)
+            env[-k:] = np.minimum(env[-k:], np.linspace(1.0, 0.0, k))
+        other[i0:i1] += x * env
+        truth["ambience"].append({"start": a, "end": b, "gain_db": g, "fade_s": fade})
     mix = bgm + speech + other
     if spec.silence:
         a, b = spec.silence
-        mute = ((t < a) | (t >= b)).astype(np.float32)
+        mute = silence_gain(t, a, b, spec.silence_fade)
         mix *= mute
         bgm *= mute
         speech *= mute
         other *= mute
-        truth["silence"] = {"start": a, "end": b}
+        truth["silence"] = {"start": a, "end": b, "fade_s": spec.silence_fade}
     return {"mix": mix.astype(np.float32), "vocals": speech, "other": (bgm + other).astype(np.float32),
             "truth": truth}
+
+
+def silence_gain(t: np.ndarray, a: float, b: float, fade: float) -> np.ndarray:
+    """Intentional-silence gain with the RENDERER's shape (shortkit.edit.audio.build_envelope):
+    dB-linear 0 -> -120 dB over [a - fade, a], exact 0 on [a, b), -120 -> 0 dB over [b, b + fade]."""
+    db = np.zeros(len(t))
+    if fade > 0:
+        down = (t >= a - fade) & (t < a)
+        db[down] = -120.0 * (t[down] - (a - fade)) / fade
+        up = (t >= b) & (t < b + fade)
+        db[up] = -120.0 * (1.0 - (t[up] - b) / fade)
+    g = 10 ** (db / 20)
+    g[(t >= a) & (t < b)] = 0.0
+    g[db <= -120.0 + 1e-9] = 0.0
+    return g.astype(np.float32)
+
+
+def room_tone(seed: int, n: int) -> np.ndarray:
+    """Stationary low-passed noise at ~0 dBFS RMS (different waveform for every seed)."""
+    from scipy.signal import butter, sosfilt
+
+    rng = np.random.default_rng(seed)
+    y = sosfilt(butter(2, 3000.0, "low", fs=SR, output="sos"), rng.standard_normal(n + 2048))[2048:]
+    return (y / (np.sqrt(np.mean(y ** 2)) + 1e-12)).astype(np.float32)
+
+
+def _has_restart(spec: VideoSpec) -> bool:
+    """Ground truth: does the clean position jump back by more than 1 s anywhere?"""
+    if not spec.bgm_segments:
+        return False
+    segs = sorted(spec.bgm_segments)
+    return any(o_n - (o_k + (t_n - t_k)) < -1.0 for (t_k, o_k), (t_n, o_n) in zip(segs, segs[1:]))
 
 
 class OracleSeparator:

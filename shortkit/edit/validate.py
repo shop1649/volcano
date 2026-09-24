@@ -6,6 +6,7 @@ warning (and an error in production unless ``allow_unmeasured``).
 """
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from .. import config, paths
 from ..util.hashing import sha256_file
 from ..util.jsonio import read_jsonl, read_yaml
 from . import sfxmap
-from .plan import TEST_FORMAT_ID, approval_state, schema_errors
+from .plan import TEST_FORMAT_ID, PlanError, approval_state_for, schema_errors
 from .resolve import (EPS, ResolveContext, clips_at, issue, map_src_rect, rects_intersect, resolve_context,
                       src_time_at)
 
@@ -22,6 +23,19 @@ SFX_STACK_WINDOW_S = 0.5          # user rule: never stack the same effect repea
 CUT_WORDS = {"컷", "cut", "장면전환", "장면 전환", "scene change", "scenechange", "transition", "전환"}
 NON_CUT_EVENT_KINDS = {"freeze", "zoom_in", "zoom_out", "text_pop", "flash", "action", "reaction", "speech",
                        "impact", "appear", "reveal", "emotion", "gesture"}
+# narration = our own words (tone / branding rules apply); dialogue (real lines) and speaker labels do not
+NARRATION_ROLES = ("title", "description", "situation", "reaction")
+# text.tone.register values (the reference analyzer's REGISTER_MAP values + 혼합 = no single register)
+TONE_REGISTERS = ("반말_구어체", "해요체", "음슴체", "합쇼체", "혼합")
+# emoji = pictographs, or a symbol in emoji presentation (VS16) / keycap; plain text symbols (♪ ♥ ★ →) are not emoji
+EMOJI_RE = re.compile("[\U0001F000-\U0001FAFF]|[\u2190-\u2BFF\u3030\u303D\u3297\u3299][\uFE0F\u20E3]|[0-9#*]\uFE0F?\u20E3")
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?…])\s+|\n+")
+# own-branding patterns: an @handle (not an e-mail) or URL-like text
+HANDLE_RE = re.compile(r"(?<![\w.])@[\w][\w.\-]*", re.UNICODE)
+URL_RE = re.compile(r"(?:https?://|www\.)\S+|\b[\w\-]+(?:\.[\w\-]+)*\.(?:com|net|org|kr|co|tv|io|me|ly|gg|be|app|link|xyz|shop)"
+                    r"\b(?:/\S*)?", re.IGNORECASE | re.ASCII)
+# segments whose purpose makes a held tail the point (reaction shots, the ending)
+TAIL_EXEMPT_PURPOSES = {"reaction", "outro", "반응", "마무리"}
 
 
 def errors(issues: list[dict]) -> list[dict]:
@@ -259,17 +273,23 @@ def check_protected_framing(plan: dict, ctx: ResolveContext, out: list[dict]) ->
 
 
 def check_structure(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
+    """Planned duration vs the measured range structure.duration_s p10..p90 (of this plan's format when
+    the preset was loaded for a format): outside -> error in production / warning in test.  All four
+    keys are read through the preset every time (unmeasured -> the unmeasured warning)."""
     pr, r = ctx.preset, ctx.resolved
-    ds = pr.get("structure.duration_s")
-    n = int(ds.get("n") or 0)
+    prod = plan["mode"] == "production"
+    ds = pr.section("structure.duration_s")
+    n, p10, p50, p90 = ds.get("n"), ds.get("p10"), ds.get("p50"), ds.get("p90")
+    n = int(n or 0)
     if r.duration <= 0:
         out.append(issue("error", "duration_zero", "타임라인 길이가 0 입니다", "timeline"))
-    elif n == 0 or ds.get("p10") is None:
-        out.append(issue("warn", "duration_unmeasured", f"영상 길이 분포 미측정(못 잼): {r.duration:.2f}s 의 적합성 판정 불가",
-                         "structure.duration_s"))
-    elif not (float(ds["p10"]) <= r.duration <= float(ds["p90"])):
-        out.append(issue("warn", "duration_range", f"길이 {r.duration:.2f}s 가 관측 범위 p10..p90 "
-                         f"({ds['p10']}..{ds['p90']}) 밖", "timeline"))
+    elif n == 0 or p10 is None or p90 is None:
+        out.append(issue("warn", "duration_unmeasured", f"영상 길이 분포 미측정(못 잼, n={n}, p10={p10}, p50={p50}, "
+                         f"p90={p90}): {r.duration:.2f}s 의 적합성 판정 불가", "structure.duration_s"))
+    elif not (float(p10) - 1e-6 <= r.duration <= float(p90) + 1e-6):
+        out.append(issue("error" if prod else "warn", "duration_range",
+                         f"길이 {r.duration:.2f}s 가 관측 범위 p10..p90 ({p10}..{p90}, 중앙값 {p50}, n={n}"
+                         f"{', 포맷 ' + str(pr.format_id) if pr.format_id else ''}) 밖", "timeline"))
     fc = float(pr.get("structure.first_caption_at_s"))
     if r.captions:
         first = min(c.start for c in r.captions)
@@ -377,7 +397,7 @@ def check_captions(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
                                          f"자막이 보호 영역 '{p['label']}'(소스 {clip.source_id})을 가립니다: 출력 {t:.2f}s, "
                                          f"자막 ({crect[0]:.0f},{crect[1]:.0f},{crect[2]:.0f}x{crect[3]:.0f}) vs "
                                          f"보호 ({m[0]:.0f},{m[1]:.0f},{m[2]:.0f}x{m[3]:.0f})", f"captions[{c.id}]"))
-    # decorations vs protected (warn: pointing AT something is allowed, covering it is not)
+    # decorations vs protected (warn: pointing AT / encircling something is allowed, covering it is not)
     for d in r.decorations:
         from .captions import deco_shape
 
@@ -398,7 +418,7 @@ def check_captions(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
                             (p.get("end") is not None and st > p["end"] + EPS):
                         continue
                     m = map_src_rect(clip, u, p)
-                    if m and rects_intersect(drect, m) and (clip.source_id, k) not in reported:
+                    if m and deco_covers(d.kind, kf, d.style, drect, m) and (clip.source_id, k) not in reported:
                         reported.add((clip.source_id, k))
                         out.append(issue("warn", "decoration_covers_protected",
                                          f"장식 {d.id} 이 보호 영역 '{p['label']}' 과 겹칩니다(출력 {t:.2f}s)",
@@ -430,6 +450,27 @@ def check_captions(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
     _ = plan_caps
 
 
+def deco_covers(kind: str, kf: dict, style: dict, drect, m) -> bool:
+    """Does a decoration's ink cover canvas rect ``m``?  A circle/box is a RING: a protected rect
+    lying entirely inside the ring's inner edge is pointed at (enclosed), not covered.  Arrows and
+    rotated rings use the bounding box (conservative)."""
+    if not rects_intersect(drect, m):
+        return False
+    if kind not in ("circle", "box") or kf.get("rotation") or not kf.get("w") or not kf.get("h"):
+        return True
+    cx, cy = float(kf["x"]), float(kf["y"])
+    st = float(style.get("stroke_px") or 0.0)
+    ia, ib = float(kf["w"]) / 2.0 - st, float(kf["h"]) / 2.0 - st
+    if ia <= 0 or ib <= 0:
+        return True
+    corners = [(m[0], m[1]), (m[0] + m[2], m[1]), (m[0], m[1] + m[3]), (m[0] + m[2], m[1] + m[3])]
+    if kind == "box":
+        inside = all(abs(x - cx) <= ia and abs(y - cy) <= ib for x, y in corners)
+    else:                       # ellipse is convex: all four corners inside -> the whole rect inside
+        inside = all(((x - cx) / ia) ** 2 + ((y - cy) / ib) ** 2 <= 1.0 for x, y in corners)
+    return not inside
+
+
 def _kf_at(d, t: float) -> dict:
     from .captions import _interp_kf
 
@@ -440,6 +481,160 @@ def _kf_at(d, t: float) -> dict:
         if t <= b["t"]:
             return _interp_kf(a, b, t)
     return kfs[-1]
+
+
+# ----------------------------------------------------------------------------- tone / own branding
+def _sentences(text: str) -> list[str]:
+    return [p.strip() for p in SENTENCE_SPLIT_RE.split(text or "") if p and p.strip()]
+
+
+def _ending_classifier():
+    """The reference analyzer's ending classifier (``shortkit.reference.aggregate.ending_class``), so
+    the register measured from the reference and the register enforced here are the same thing."""
+    from ..reference.aggregate import REGISTER_MAP, ending_class
+
+    return ending_class, REGISTER_MAP
+
+
+def check_tone(plan: dict, preset: config.Preset, out: list[dict]) -> None:
+    """text.tone.register / text.tone.emoji on narration captions (title, description, situation,
+    reaction).  Dialogue (real lines), speaker labels and on-screen-text transcriptions are exempt.
+    Every sentence is classified by its ending (합쇼체 -습니다/-입니다, 해요체 -요/-죠, 음슴체 -음/-함,
+    반말 -다/-어/-야 ...; noun phrases are neutral); a sentence in another register than the preset's
+    is an error in production / a warning in test.  혼합 = no single register (nothing to enforce)."""
+    prod = plan["mode"] == "production"
+    sev = "error" if prod else "warn"
+    reg = preset.get("text.tone.register")
+    emoji_ok = preset.get("text.tone.emoji")
+    check_reg = False
+    if reg is None:
+        out.append(issue("warn", "tone_register_unmeasured", "자막 말투(text.tone.register) 미측정(못 잼): 종결 어미 검사 안 함",
+                         "text.tone.register"))
+    elif reg not in TONE_REGISTERS:
+        out.append(issue("error", "tone_register_value", f"text.tone.register={reg!r} 미지원 {TONE_REGISTERS}",
+                         "text.tone.register"))
+    else:
+        check_reg = reg != "혼합"
+    if emoji_ok is None:
+        out.append(issue("warn", "tone_emoji_unmeasured", "자막 이모지 허용 여부(text.tone.emoji) 미측정(못 잼): 검사 안 함",
+                         "text.tone.emoji"))
+    elif not isinstance(emoji_ok, bool):
+        out.append(issue("error", "tone_emoji_value", f"text.tone.emoji={emoji_ok!r}: true/false 만 허용", "text.tone.emoji"))
+        emoji_ok = None
+    classify = register_map = None
+    if check_reg:
+        try:
+            classify, register_map = _ending_classifier()
+        except Exception as e:          # never skip silently
+            out.append(issue(sev, "tone_check_unavailable",
+                             f"종결 어미 분류기(shortkit.reference.aggregate)를 불러오지 못해 말투 검사를 못 함: "
+                             f"{type(e).__name__}: {e}", "text.tone.register"))
+            check_reg = False
+    for c in plan.get("captions", []):
+        if c["role"] not in NARRATION_ROLES or (c.get("grounding") or {}).get("kind") == "on_screen_text":
+            continue
+        where = f"captions[{c['id']}]"
+        if emoji_ok is False and EMOJI_RE.search(c["text"]):
+            out.append(issue(sev, "tone_emoji", f"프리셋 text.tone.emoji=false 인데 {c['role']} 자막에 이모지가 있습니다", where))
+        if not check_reg:
+            continue
+        for sent in _sentences(c["text"]):
+            got = classify(sent)
+            if got is None or got[0] not in register_map:
+                continue                # noun phrase / other: register-neutral
+            if register_map[got[0]] != reg:
+                out.append(issue(sev, "tone_register",
+                                 f"'{sent}' 의 끝 '{got[1]}' 은 {register_map[got[0]]} 입니다 — 프리셋 말투는 {reg} "
+                                 "(대사 dialogue 는 예외)", where))
+
+
+def check_own_branding(plan: dict, preset: config.Preset, out: list[dict]) -> None:
+    """identity_exclusions.own_branding: 'none' = this preset adds no channel branding, so narration
+    captions (title/description/situation/reaction) must not carry an @handle or URL-like text unless
+    the caption transcribes text really visible in the footage (grounding.kind = on_screen_text).
+    A string / list value = those exact handles/URLs are the allowed own branding (requested change)."""
+    own = preset.get("identity_exclusions.own_branding")
+    if own in (None, False) or (isinstance(own, str) and own.strip().casefold() == "none"):
+        allowed: list[str] = []
+    elif isinstance(own, str):
+        allowed = [own.strip()]
+    elif isinstance(own, (list, tuple)) and all(isinstance(x, str) for x in own):
+        allowed = [x.strip() for x in own]
+    else:
+        out.append(issue("error", "own_branding_value", f"identity_exclusions.own_branding={own!r}: 'none' 또는 허용할 "
+                         "핸들/주소 문자열(목록)만 가능", "identity_exclusions.own_branding"))
+        return
+    allow = {a.casefold() for a in allowed}
+    for c in plan.get("captions", []):
+        if c["role"] not in NARRATION_ROLES or (c.get("grounding") or {}).get("kind") == "on_screen_text":
+            continue
+        hits = [m.group(0) for rx in (HANDLE_RE, URL_RE) for m in rx.finditer(c["text"])]
+        hits = [h for h in dict.fromkeys(hits) if h.casefold().rstrip(".,!?") not in allow]
+        if hits:
+            out.append(issue("error", "own_branding_text",
+                             f"자막에 채널 핸들/주소 형태 문구 {hits} 가 있습니다: 프리셋 own_branding={own!r} "
+                             "(화면 속 글자를 옮긴 것이면 grounding.kind=on_screen_text)", f"captions[{c['id']}]"))
+
+
+# ----------------------------------------------------------------------------- meaningless tails
+def segment_meaning_marks(plan: dict, r, clip, vis_end: float) -> list[tuple[float, str]]:
+    """Output times that carry meaning inside one clip: ends of grounded captions shown over it, SFX
+    events, kept original sound, freeze end, zoom end, decorations pointing at something, the reveal."""
+    grounded = {c["id"] for c in plan.get("captions", []) if c.get("grounding")}
+    a, b = clip.out_start, vis_end
+    marks: list[tuple[float, str]] = []
+    for c in r.captions:
+        if c.id in grounded and c.start < b - EPS and c.end > a + EPS:
+            marks.append((min(c.end, b), f"자막 {c.id}"))
+    for s in r.audio.sfx:
+        if a - EPS <= s.event_t <= b + EPS:
+            marks.append((s.event_t, f"효과음 사건 {s.id}"))
+    for o in r.audio.originals:
+        if o.clip_id == clip.id:
+            marks.append((min(o.out_end, b), "살린 원음"))
+    if clip.freeze:
+        marks.append((min(clip.freeze.out_start + clip.freeze.hold, b), "정지"))
+    if clip.zoom:
+        marks.append((min(clip.out_start + clip.zoom.start + clip.zoom.dur, b), "확대"))
+    for d in r.decorations:
+        if d.start < b - EPS and d.end > a + EPS:
+            marks.append((min(d.end, b), f"장식 {d.id}"))
+    rv = plan.get("reveal") or {}
+    if rv.get("t") is not None and a - EPS <= float(rv["t"]) <= b + EPS:
+        marks.append((float(rv["t"]), "반전"))
+    return marks
+
+
+def check_trim_tail(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
+    """User rule 'trim meaningless tails': a segment must not keep running longer than
+    motion.trim.tail_after_meaning_s after its last meaning mark (``segment_meaning_marks``).
+    Segments whose purpose is reaction/outro are exempt (the held tail is their point).  The tail
+    ends where the next shot starts to appear (crossfade start) or at the clip end."""
+    r = ctx.resolved
+    tail_max = float(ctx.preset.get("motion.trim.tail_after_meaning_s"))
+    segs = {s["id"]: s for s in plan["timeline"]}
+    for i, clip in enumerate(r.clips):
+        purpose = (segs.get(clip.id, {}).get("purpose") or "").strip().casefold()
+        if purpose and purpose.split()[0] in TAIL_EXEMPT_PURPOSES:
+            continue
+        nxt = r.clips[i + 1] if i + 1 < len(r.clips) else None
+        vis_end = nxt.out_start if (nxt is not None and nxt.transition_in.type == "crossfade") else clip.out_end
+        where = f"timeline[{clip.id}]"
+        marks = segment_meaning_marks(plan, r, clip, vis_end)
+        if not marks:
+            if vis_end - clip.out_start > tail_max + 1e-6:
+                out.append(issue("warn", "trim_no_meaning",
+                                 f"세그먼트 {clip.id}({vis_end - clip.out_start:.2f}s)에 의미 표지(근거 있는 자막·효과음 사건·"
+                                 "살린 원음·정지·확대·장식)가 없습니다: 필요 없는 구간이면 자르고, 반응/마무리면 purpose 에 적기",
+                                 where))
+            continue
+        t_last, what = max(marks)
+        tail = vis_end - t_last
+        if tail > tail_max + 1e-6:
+            out.append(issue("warn", "trim_tail",
+                             f"세그먼트 {clip.id} 가 마지막 의미({what}, {t_last:.2f}s) 뒤로 {tail:.2f}s 더 이어집니다 "
+                             f"(> motion.trim.tail_after_meaning_s {tail_max}s): 의미가 끝난 꼬리는 자르기"
+                             "(중요한 동작이면 자막/사건으로 표시, 반응·마무리 구간이면 purpose 에 적기)", where))
 
 
 # ----------------------------------------------------------------------------- SFX
@@ -573,11 +768,15 @@ def check_audio(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasur
         if bp.startswith("presets/") and ("/analysis/" in bp or "/reference/" in bp) or "/stems/" in bp:
             out.append(issue("error", "bgm_from_reference",
                              f"BGM 은 깨끗한 음악 파일이어야 합니다(레퍼런스에서 분리한 stem 금지): {b.path}", "bgm.path"))
-    if prod and b is not None and not (plan.get("bgm") or {}).get("path"):
+    if b is not None:
+        # the preset's BGM identity (title AND version); the library entry / plan file is compared
+        # against it in ``audio.check_bgm_identity`` (resolve)
         title, version = pr.get("audio.bgm.title"), pr.get("audio.bgm.version")
         if not title or not version:
-            out.append(issue("warn" if allow_unmeasured else "error", "bgm_identity_unmeasured",
-                             "BGM 제목·버전 미식별(못 잼): 곡 일치 판정 불가", "audio.bgm"))
+            sev = ("warn" if allow_unmeasured else "error") if prod else "warn"
+            out.append(issue(sev, "bgm_identity_unmeasured",
+                             f"프리셋 BGM 제목·버전 미식별(못 잼: title={title!r}, version={version!r}): 쓰는 음악 파일이 "
+                             "레퍼런스 곡·버전과 같은지 판정 불가", "audio.bgm"))
 
 
 # ----------------------------------------------------------------------------- cover
@@ -629,17 +828,29 @@ def check_cover(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
 
 # ----------------------------------------------------------------------------- approval / audit
 def check_approval(plan: dict, preset: config.Preset, out: list[dict], for_render: bool) -> None:
-    st = approval_state(plan, bool(preset.get("approval.first_episode_requires_approval")))
+    """The approval gate (``plan.approval_state_for``): episode 1 (or no episode_index) follows
+    approval.first_episode_requires_approval, episode_index > 1 follows
+    approval.later_episodes_require_approval.  Test mode never needs approval."""
+    try:
+        st = approval_state_for(plan, preset)
+    except PlanError as e:
+        out.append(issue("error", "approval_rule", str(e), "approval"))
+        return
+    if plan["mode"] == "production" and plan.get("episode_index") is None:
+        out.append(issue("warn", "episode_index_missing",
+                         "episode_index 가 없어 첫 에피소드로 취급합니다(승인 필요 여부를 정하려면 회차를 적으세요)",
+                         "episode_index"))
+    who = "첫 에피소드" if st["first_episode"] else f"{plan.get('episode_index')}번째 에피소드({st['rule_key']}=true)"
     if st["required"] and not st["approved"]:
         out.append(issue("error" if for_render else "warn", "approval_required",
-                         "첫 에피소드: 제안서(proposal.md) 승인 전에는 렌더할 수 없습니다 "
+                         f"{who}: 제안서(proposal.md) 승인 전에는 렌더할 수 없습니다 "
                          f"(`shortkit episode proposal {plan['episode_id']}` → `... approve --by 이름`)", "approval"))
     if st["required"]:
         cov = ((plan.get("cover") or {}).get("text") or "").strip()
         tcs = [t for t in plan.get("title_candidates") or [] if str(t).strip()]
         if not cov or len(tcs) < 3:
             out.append(issue("error", "proposal_incomplete",
-                             f"첫 에피소드 제안서에는 표지 문구와 제목 후보 3종이 필요합니다(표지 {'있음' if cov else '없음'}, "
+                             f"{who} 제안서에는 표지 문구와 제목 후보 3종이 필요합니다(표지 {'있음' if cov else '없음'}, "
                              f"제목 후보 {len(tcs)}개)", "cover/title_candidates"))
     if st["changed_since_approval"]:
         out.append(issue("warn", "approval_plan_changed",
@@ -693,6 +904,9 @@ def validate(plan: dict, preset: config.Preset | None = None, *, preset_name: st
     check_structure(plan, ctx, out)
     check_protected_framing(plan, ctx, out)
     check_captions(plan, ctx, out)
+    check_tone(plan, preset, out)
+    check_own_branding(plan, preset, out)
+    check_trim_tail(plan, ctx, out)
     check_cover(plan, ctx, out)
     check_sfx(plan, ctx, out, allow_unmeasured)
     check_audio(plan, ctx, out, allow_unmeasured)

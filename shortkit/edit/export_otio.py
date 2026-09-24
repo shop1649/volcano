@@ -7,8 +7,9 @@ SMPTE_Dissolve transitions centred on the middle of the IR overlap), V3 플래�
 generator clips), A1 BGM, A2 효과음 (+ extra lanes when SFX overlap), A3 원본 소리.
 Media references are ExternalReference with target_url RELATIVE to the .otio file.
 Metadata ``shortkit`` on every clip carries what OTIO has no schema for: zoom (from/to/centre/
-start/dur/ease + per-frame canvas rects of the zoom), freeze, cleaning (crop, delogo, inpaint,
-blur), region/fit, volume envelope.  Markers: one per SFX event (A2) and per caption (V2).
+start/dur/ease/recenter + per-frame canvas rects from resolve.src_to_region), freeze, cleaning
+(crop, delogo, inpaint, blur + blur_sigma_ratio), region/fit, flash scope/rect, volume envelope,
+the master's per-frame foreground limiter (build/fg_gain.json) on SFX / kept originals.  Markers: one per SFX event (A2) and per caption (V2).
 """
 from __future__ import annotations
 
@@ -19,8 +20,9 @@ from pathlib import Path
 from .. import paths
 from ..util.jsonio import now_iso
 from ..util.media import probe
-from .export_mlt import (EPS_PICK, Piece, build_segments, canvas_rect, crop_int, flash_runs, fps_of,
-                         load_render_report, merge_decisions, n_frames, write_caption_files)
+from .export_mlt import (EPS_PICK, Piece, build_segments, canvas_rect, fg_gain_db_at_frame_start, flash_runs, fps_of,
+                         load_render_report, master_foreground_gain, merge_decisions, n_frames, write_caption_files,
+                         zoom_animates)
 from .ir import Clip, ResolvedEdit
 
 ROLE_COLOR = {"title": "RED", "description": "ORANGE", "situation": "YELLOW", "speaker": "CYAN", "dialogue": "GREEN",
@@ -42,6 +44,7 @@ class OtioBuilder:
         self.fps = fps_of(r)
         self.N = n_frames(r)
         self._refs: dict[str, object] = {}
+        self.fg_gain: list[float] | None = None      # master foreground limiter per output frame (fg_gain.json)
 
     def rt(self, frames: float):
         return self.otio.opentime.RationalTime(frames, self.fps)
@@ -84,18 +87,22 @@ class OtioBuilder:
                           "blur": [dict(rect(d), start=d.start, end=d.end, reason=d.reason) for d in c.blur],
                           "inpaint_baked_into_source": bool(c.inpaint)},
              "zoom": None, "freeze": None, "transition_in": {"type": c.transition_in.type, "dur": c.transition_in.dur,
-                                                             "color": c.transition_in.color}}
+                                                             "color": c.transition_in.color,
+                                                             "scope": getattr(c.transition_in, "scope", "region")},
+             "blur_sigma_ratio": c.blur_sigma_ratio}
         if c.zoom:
             z = c.zoom
             m["zoom"] = {"scale_from": z.scale_from, "scale_to": z.scale_to, "center_src": list(z.center_src),
-                         "start": z.start, "dur": z.dur, "ease": z.ease, "ease_curve": "cubic (render.py)"}
+                         "start": z.start, "dur": z.dur, "ease": z.ease, "ease_curve": "cubic (render.py)",
+                         "recenter": bool(getattr(z, "recenter", False)),
+                         "placement": "resolve.src_to_region (canvas_rect_by_frame 가 프레임별 결과)"}
         if c.freeze:
             f = c.freeze
             m["freeze"] = {"src_t": f.src_t, "out_start": f.out_start, "hold": f.hold}
         if p is not None:
             m["piece"] = {"kind": p.kind, "out_frames": [p.n0, p.n1], "source_time_at_start": round(p.s0, 6)}
             rects = {}
-            if c.zoom and abs(c.zoom.scale_to - c.zoom.scale_from) > 1e-9:
+            if zoom_animates(c):
                 for n in range(p.n0, p.n1):
                     rects[str(n - p.n0)] = [round(v, 3) for v in canvas_rect(c, n, self.fps)]
             else:
@@ -203,9 +210,11 @@ class OtioBuilder:
                 tr.append(otio.schema.Gap(source_range=self.tr(0, fr["n0"] - cur)))
             c = self.r.clips[fr["clip_index"]]
             n = fr["n1"] - fr["n0"]
+            x, y, w, h = fr["rect"]
             tr.append(self.solid(f"플래시 {c.id}", fr["color"], n,
-                                 {"opacity_by_frame": [round(a, 4) for a in fr["alphas"]],
-                                  "region": {"x": c.region.x, "y": c.region.y, "w": c.region.w, "h": c.region.h}}))
+                                 {"opacity_by_frame": [round(a, 4) for a in fr["alphas"]], "scope": fr["scope"],
+                                  "rect": {"x": x, "y": y, "w": w, "h": h},
+                                  "resolution": [self.r.canvas["width"], self.r.canvas["height"]]}))
             cur = fr["n1"]
         return tr
 
@@ -231,6 +240,17 @@ class OtioBuilder:
             tr.append(clip)
             cur = n1
         return tr
+
+    def fg_meta(self, n0: int, n: int) -> dict | None:
+        """The master's foreground safety limiter over this clip (build/fg_gain.json), dB per clip frame
+        (value at the frame start); None when it did not act here."""
+        if not self.fg_gain:
+            return None
+        vals = [round(fg_gain_db_at_frame_start(self.fg_gain, n0 + k), 2) for k in range(n)]
+        if min(vals, default=0.0) >= -0.05:
+            return None
+        return {"source": f"episodes/{self.r.episode_id}/build/fg_gain.json", "gain_db_by_frame": vals,
+                "note": "마스터가 효과음/원본 소리에만 건 안전 리미터(BGM 제외); 가져오는 편집기에서 음량 키프레임으로 넣어야 함"}
 
     def audio_tracks(self, gain_extra: float) -> list:
         otio = self.otio
@@ -266,7 +286,8 @@ class OtioBuilder:
             cl = otio.schema.Clip(name=f"효과음 {s.type}", media_reference=self.ref(s.path), source_range=self.tr(0, n),
                                   metadata={"shortkit": {"id": s.id, "type": s.type, "gain_db": s.gain_db,
                                                          "loudness_gain_db": gain_extra, "event_t": s.event_t,
-                                                         "event_desc": s.event_desc, "map_status": s.map_status}})
+                                                         "event_desc": s.event_desc, "map_status": s.map_status,
+                                                         "fg_limiter": self.fg_meta(n0, n)}})
             sfx_items.append((n0, n0 + n, cl, s))
         for li, lane in enumerate(self.lanes([(a, b_, (c, s)) for a, b_, c, s in sfx_items])):
             tr = self.audio_track("A2 효과음" if li == 0 else f"A2 효과음 {li + 1}", [(a, b_, cs[0]) for a, b_, cs in lane])
@@ -291,7 +312,8 @@ class OtioBuilder:
                                   source_range=self.tr(int(round(start * self.fps)), n),
                                   metadata={"shortkit": {"clip_id": o.clip_id, "stem": o.stem, "gain_db": o.gain_db,
                                                          "loudness_gain_db": gain_extra, "fade_s": o.fade_s,
-                                                         "speed": o.speed, "reason": o.reason}})
+                                                         "speed": o.speed, "reason": o.reason,
+                                                         "fg_limiter": self.fg_meta(n0, n)}})
             orig_items.append((n0, n0 + n, cl))
         for li, lane in enumerate(self.lanes(orig_items)):
             out.append(self.audio_track("A3 원본 소리" if li == 0 else f"A3 원본 소리 {li + 1}", lane))
@@ -330,6 +352,7 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path) -> tuple[Path, 
     a = (rep or {}).get("audio") or {}
     gain = float(a.get("norm_gain_db") or 0.0) + float(a.get("final_trim_db") or 0.0)
     b = OtioBuilder(r, out_dir, dec)
+    b.fg_gain = master_foreground_gain(r, dec)
     tl = b.build(gain)
     out = out_dir / f"{r.episode_id}.otio"
     otio.adapters.write_to_file(tl, str(out))

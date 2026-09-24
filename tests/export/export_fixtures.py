@@ -41,7 +41,7 @@ def make_root(base: Path) -> Path:
 
 # ----------------------------------------------------------------------------- IR
 def build_resolved(episode_id: str = "test-export-001", *, W: int = 360, H: int = 640, fps: float = 30.0,
-                   bgm_tempo: float = 1.0):
+                   bgm_tempo: float = 1.0, blur_sigma_ratio: float | None = None):
     """3 clips (crop+delogo+zoom / flash+freeze / crossfade+speed+off-grid zoom), captions,
     one decoration, BGM with ducking under one kept original line, one SFX."""
     from shortkit.edit.ir import (AudioPlan, Bgm, CaptionBox, Clip, Decoration, Freeze, OriginalAudio, Rect,
@@ -65,6 +65,8 @@ def build_resolved(episode_id: str = "test-export-001", *, W: int = 360, H: int 
              transition_in=Transition("crossfade", 0.4, None), purpose="reveal"),
     ]
     duration = 5.7
+    for c in clips:
+        c.blur_sigma_ratio = blur_sigma_ratio      # preset render.clean.blur_sigma_ratio as resolved into the IR
 
     def cap(cid, role, text, start, end, y, size):
         return CaptionBox(id=cid, role=role, text=text, lines=[text], start=start, end=end, anchor=(W / 2, y),
@@ -178,9 +180,24 @@ def _placement(c, u):
             else (zz.scale_to if u >= zz.start else zz.scale_from)
     if z == 1.0:
         return b, ox, oy
-    px = min(max(ox + b * (c.zoom.center_src[0] - ex), 0), R.w)
-    py = min(max(oy + b * (c.zoom.center_src[1] - ey), 0), R.h)
-    return z * b, px * (1 - z) + z * ox, py * (1 - z) + z * oy
+    cx, cy = c.zoom.center_src
+    px = min(max(ox + b * (cx - ex), 0), R.w)
+    py = min(max(oy + b * (cy - ey), 0), R.h)
+    if not getattr(c.zoom, "recenter", False):
+        return z * b, px * (1 - z) + z * ox, py * (1 - z) + z * oy
+    # recenter (ir.py doc): the anchor travels with the SAME eased progress to the region centre;
+    # cover keeps covering the region (translation clamped)
+    zz = c.zoom
+    e = (_ease((u - zz.start) / zz.dur, zz.ease) if zz.dur > 0 else (1.0 if u >= zz.start else 0.0))
+    qx, qy = px + (R.w / 2 - px) * e, py + (R.h / 2 - py) * e
+    s = z * b
+    tx, ty = qx - s * (cx - ex), qy - s * (cy - ey)
+    if c.fit == "cover":
+        if s * ew >= R.w:
+            tx = min(0.0, max(R.w - s * ew, tx))
+        if s * eh >= R.h:
+            ty = min(0.0, max(R.h - s * eh, ty))
+    return s, tx, ty
 
 
 class _Source:
@@ -327,9 +344,12 @@ def render_master(root: Path, r, out: Path) -> dict:
             tr = c.transition_in
             if tr.type == "flash" and abs(tt - c.out_start) < tr.dur / 2:
                 al = 1 - abs(tt - c.out_start) / (tr.dur / 2)
-                R = c.region
-                ry, rh = int(round(R.y)), int(round(R.h))
-                rx, rw = int(round(R.x)), int(round(R.w))
+                if getattr(tr, "scope", "region") == "canvas":        # whole frame
+                    rx, ry, rw, rh = 0, 0, W, H
+                else:                                                 # video region
+                    R = c.region
+                    ry, rh = int(round(R.y)), int(round(R.h))
+                    rx, rw = int(round(R.x)), int(round(R.w))
                 fr[ry:ry + rh, rx:rx + rw] = fr[ry:ry + rh, rx:rx + rw] * (1 - al) + _hex(tr.color or "#FFFFFF") * al
         proc.stdin.write(np.clip(fr + 0.5, 0, 255).astype(np.uint8).tobytes())
     proc.stdin.close()
@@ -338,12 +358,23 @@ def render_master(root: Path, r, out: Path) -> dict:
     return {"pre_lufs": pre, "norm_gain_db": round(gain_db, 3)}
 
 
-def write_render_report(root: Path, r, loud: dict) -> Path:
-    """build/render_report.json in the shape shortkit.edit.render writes (audio.norm_gain_db)."""
+def write_render_report(root: Path, r, loud: dict, k: list[float] | None = None) -> Path:
+    """build/render_report.json + build/fg_gain.json in the shape shortkit.edit.render writes
+    (audio.norm_gain_db; per-frame foreground limiter gain, all 1.0 = the reference master limits nothing)."""
     p = root / "episodes" / r.episode_id / "build" / "render_report.json"
     p.parent.mkdir(parents=True, exist_ok=True)
+    fps = float(r.canvas["fps"])
+    N = int(round(r.duration * fps))
+    k = list(k) if k is not None else [1.0] * N
+    red = round(max(0.0, -20 * math.log10(max(1e-9, min(k)))), 3) if k else 0.0
     p.write_text(json.dumps({"schema": "shortkit.render_report/1", "episode_id": r.episode_id,
                              "note": "written by tests/export reference master (synthetic test)",
-                             "audio": {"norm_gain_db": loud["norm_gain_db"], "limiter_max_reduction_db": 0.0}}),
+                             "audio": {"norm_gain_db": loud["norm_gain_db"], "final_trim_db": 0.0,
+                                       "limiter_max_reduction_db": 0.0, "fg_limiter_max_reduction_db": red}}),
                  encoding="utf-8")
+    (p.parent / "fg_gain.json").write_text(json.dumps({
+        "schema": "shortkit.fg_gain/1", "episode_id": r.episode_id, "fps": fps, "frames": N,
+        "sample_rate": r.audio.sample_rate, "applies_to": ["originals", "sfx"],
+        "semantics": "synthetic test file (tests/export)", "norm_gain_db": loud["norm_gain_db"], "final_trim_db": 0.0,
+        "max_limiter_db": 3.0, "max_reduction_db": red, "gain_min": k, "gain_mean": k}), encoding="utf-8")
     return p

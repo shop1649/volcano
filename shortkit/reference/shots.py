@@ -9,7 +9,9 @@ width.  Output ``analysis/<id>/shots.json`` (docs/CONTRACT.md section 11)::
      "presence": {"cut"|"flash"|"crossfade": present|absent|unmeasured}}
 
 ``t`` is the first frame of the new shot for a cut, the first brightened frame for a flash and
-the first blended frame for a crossfade (``dur`` = blend length).
+the first blended frame for a crossfade (``dur`` = blend length).  Flashes also carry ``scope``
+``{value: canvas|region|None, outside_share, ...}``: whether the flash brightened the whole canvas
+or only the video region (``motion.transitions.flash.scope``).
 """
 from __future__ import annotations
 
@@ -132,6 +134,10 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
         cur = s if typ == "cut" else e + 1     # a cut frame is the first frame of the new shot
     if cur < n:
         shots.append({"start": round(cur / fps, 3), "end": round(n / fps, 3)})
+    full_frame = not (region or {}).get("video_region")
+    for ev in events:
+        if ev["type"] == "flash":
+            ev["scope"] = flash_scope(video, ev, reg, W, H, fps, full_frame=full_frame)
     res["cuts"] = events
     res["shots"] = shots
     res["n_shots"] = len(shots)
@@ -139,6 +145,73 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
     res["presence_note"] = "없다 = 이 영상 전체를 검사해서 찾지 못함(검출기 기준)"
     _write(res, preset, video_id, out_dir)
     return res
+
+
+FLASH_SCOPE_CANVAS = 0.6      # share of brightened pixels outside the video region -> whole canvas
+FLASH_SCOPE_REGION = 0.15     # at most this share -> the flash covers only the video region
+FLASH_SCOPE_METHOD = ("peak flash frame vs per-pixel median of the frames 0.1-0.25 s before / after the flash, full "
+                      "canvas at 180 px width: share of pixels OUTSIDE the video region (2 % border trimmed, pixels "
+                      "without brightening headroom excluded) that brighten by >= max(15, 0.4 x the region's mean "
+                      f"rise); >= {FLASH_SCOPE_CANVAS} -> canvas, <= {FLASH_SCOPE_REGION} -> region, else unmeasured; "
+                      "full-frame footage -> unmeasured (no outside area)")
+METHOD["flash_scope"] = FLASH_SCOPE_METHOD
+
+
+def flash_scope(video: Path, ev: dict, reg: dict, W: int, H: int, fps: float, full_frame: bool = False,
+                width: int = 180) -> dict:
+    """Did a flash brighten the whole canvas or only the video region?  (``motion.transitions.flash.scope``)"""
+    import cv2
+
+    from .common import read_segment
+
+    out: dict = {"value": None}
+    if full_frame or (reg["w"] >= 0.97 * W and reg["h"] >= 0.97 * H):
+        out["note"] = "영상이 화면 전체를 덮음 → 영역 밖이 없어 범위 판정 불가"
+        return out
+    t0, dur = float(ev["t"]), float(ev.get("dur") or 1.0 / fps)
+    peak_t = float(ev.get("peak_t", t0))
+    pre = read_segment(video, max(0.0, t0 - 0.25), max(0.0, t0 - 0.1 + 1e-6), fps, width=width, gray=True)
+    post = read_segment(video, t0 + dur + 0.1, t0 + dur + 0.25 + 1e-6, fps, width=width, gray=True)
+    peak = read_segment(video, peak_t, peak_t + 0.5 / fps, fps, width=width, gray=True)
+    base_frames = [f for _, f in pre + post]
+    if not peak or len(base_frames) < 2:
+        out["note"] = "플래시 앞뒤 프레임 부족"
+        return out
+    P = peak[0][1].astype(np.float32)
+    B = np.median(np.stack(base_frames).astype(np.float32), axis=0)
+    h, w = P.shape
+    kx, ky = w / W, h / H
+    inside = np.zeros((h, w), bool)
+    x0, y0 = int(round(reg["x"] * kx)), int(round(reg["y"] * ky))
+    x1, y1 = int(round((reg["x"] + reg["w"]) * kx)), int(round((reg["y"] + reg["h"]) * ky))
+    inside[y0:y1, x0:x1] = True
+    m = max(1, int(round(0.02 * min(h, w))))
+    grown = cv2.dilate(inside.astype(np.uint8), np.ones((2 * m + 1, 2 * m + 1), np.uint8)).astype(bool)
+    shrunk = cv2.erode(inside.astype(np.uint8), np.ones((2 * m + 1, 2 * m + 1), np.uint8)).astype(bool)
+    outside = ~grown
+    outside[:m, :] = outside[-m:, :] = False
+    outside[:, :m] = outside[:, -m:] = False
+    D = P - B
+    rise_in = float(np.mean(D[shrunk])) if shrunk.any() else 0.0
+    out["region_rise"] = round(rise_in, 1)
+    if rise_in < 20:
+        out["note"] = "영상 영역 안의 밝기 상승이 작음 → 판정 불가"
+        return out
+    thr = max(15.0, 0.4 * rise_in)
+    usable = outside & (B <= 255.0 - thr)
+    if usable.sum() < 0.03 * h * w:
+        out["note"] = "영역 밖에 밝아질 여유가 있는 픽셀이 너무 적음(이미 밝은 배경 등)"
+        return out
+    share = float((D[usable] >= thr).mean())
+    out.update({"outside_share": round(share, 3), "outside_pixels": int(usable.sum()),
+                "outside_rise_p50": round(float(np.median(D[usable])), 1)})
+    if share >= FLASH_SCOPE_CANVAS:
+        out["value"] = "canvas"
+    elif share <= FLASH_SCOPE_REGION:
+        out["value"] = "region"
+    else:
+        out["note"] = "영역 밖 일부만 밝아짐 → 판정 불가"
+    return out
 
 
 def _crossfades(grays, hists, dh, fps, blocked) -> list[dict]:

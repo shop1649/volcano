@@ -12,15 +12,19 @@ Mapping decisions (also written to export_decisions.json -> "fcpxml"):
     segment); a crossfade becomes a spine <transition> centred on the middle of the IR overlap
     (both clips have the needed media handles because the IR plays them through the overlap).
   * clips with delogo / blur reference a pre-cleaned intermediate (media/*_nleclean_*.mp4) so the
-    source overlay can never come back in Resolve/FCP (they have no delogo); inpaint is already
-    baked into the IR source path.
-  * geometry: adjust-conform none + adjust-crop trim (clean crop and the part outside the video
-    region, % of the source dimension) + adjust-transform position/scale (position in % of the
-    sequence height, y up - the usual FCPXML convention; not confirmable here).  Zoom = scale /
-    position keyframes; FCP has no region mask, so a zoomed frame can spill outside the region.
-  * flash = connected still (solid colour PNG, region size) with adjust-blend keyframes.
+    source overlay can never come back in Resolve/FCP (they have no delogo); blur sigma =
+    render.blur_sigma_src (render.clean.blur_sigma_ratio); inpaint is already baked into the IR
+    source path.
+  * geometry (resolve.src_to_region: fit, eased zoom, Zoom.recenter, cover clamp): adjust-conform
+    none + adjust-crop trim (the source window visible inside the video region, % of the source
+    dimension; FCP has no region mask) + adjust-transform position/scale (position in % of the
+    sequence height, y up - the usual FCPXML convention; not confirmable here).  While the zoom
+    moves, position / scale / trim get one linear keyframe per output frame (exact on the grid).
+  * flash = connected still (solid colour PNG of the Transition.scope rect: video region or the
+    whole canvas) with adjust-blend keyframes.
   * audio = connected clips below the spine (BGM lane -1, SFX lane -2.., originals lane -3..)
-    with adjust-volume keyframes (gain + ducking/silence envelope + fades + master loudness gain).
+    with adjust-volume keyframes (gain + ducking/silence envelope + fades + master loudness gain +
+    the master's per-frame foreground limiter from build/fg_gain.json on SFX / kept originals).
   * captions = FCPXML caption elements (iTT, ko) for every role, text only; the styled captions
     and decorations are the ASS file (captions.ass) - see README.
   * media src are relative URLs by default; absolute=True writes file:// URLs for local import
@@ -38,14 +42,14 @@ from .. import paths
 from ..util.hashing import sha256_text
 from ..util.jsonio import now_iso
 from ..util.media import ffmpeg, probe
-from .export_mlt import (EPS_PICK, clip_frame_range, crop_int, fps_fraction, fps_of, hex_rgb, load_render_report,
-                         merge_decisions, n_frames, region_int, source_time, write_caption_files)
+from .export_mlt import (EPS_PICK, clip_frame_range, fg_gain_db_at_frame_start, fps_fraction, fps_of, hex_rgb,
+                         load_render_report, master_foreground_gain, merge_decisions, n_frames, source_time,
+                         write_caption_files, zoom_animates, zoom_motion_frames)
 from .ir import Clip, ResolvedEdit
-from .resolve import base_fit, src_to_region
+from .resolve import effective_src_rect, src_to_region
 
 FCPXML_VERSION = "1.9"
 CROSS_DISSOLVE_UID = "FxPlug:4731E73A-8DAC-4113-9A30-AE85B1761265"
-EASE_FCP = {"linear": "linear", "in": "easeIn", "out": "easeOut", "inout": "ease"}
 ROLE_KO = {"title": "제목", "description": "설명", "situation": "상황", "speaker": "화자", "dialogue": "대사",
            "reaction": "반응"}
 
@@ -93,6 +97,7 @@ class FcpBuilder:
         self._assets: dict[str, str] = {}
         self._formats: dict[tuple, str] = {}
         self._ts = 0
+        self.fg_gain: list[float] | None = None      # master foreground limiter per output frame (fg_gain.json)
         self.seq_format = self.format_for(self.W, self.H, self.fps, "FFVideoFormatRateUndefined")
         self.dissolve = self.new_id()
         ET.SubElement(self.res, "effect", {"id": self.dissolve, "name": "Cross Dissolve", "uid": CROSS_DISSOLVE_UID})
@@ -147,14 +152,17 @@ class FcpBuilder:
         """(root-relative file, time offset) for clips that need cleaning the NLE cannot do."""
         if not c.delogo and not c.blur:
             return c.source_path, 0.0
-        from .render import BLUR_SIGMA_FRAC
+        from .render import blur_sigma_src
 
+        # master's blur strength (render.clean.blur_sigma_ratio via the IR); RenderError on an old IR
+        sigmas = [blur_sigma_src(c, bl) for bl in c.blur]
         info = probe(paths.absp(c.source_path))
         sfps = info.fps or 30.0
         a = max(0.0, math.floor((c.src_in - 1.0) * sfps) / sfps)
         b = c.src_out + 1.0
         key = sha256_text(repr((c.source_path, a, b, [(d.x, d.y, d.w, d.h, d.start, d.end) for d in c.delogo],
-                                [(d.x, d.y, d.w, d.h, d.start, d.end) for d in c.blur])))[:12]
+                                [(d.x, d.y, d.w, d.h, d.start, d.end) for d in c.blur],
+                                [round(x, 6) for x in sigmas])))[:12]
         media = self.out_dir / "media"
         media.mkdir(parents=True, exist_ok=True)
         out = media / f"{c.id}_nleclean_{key}.mp4"
@@ -171,10 +179,10 @@ class FcpBuilder:
             chain.append(f"{last}delogo=x={x}:y={y}:w={w}:h={h}:enable='between(t,{s0:.4f},{s1:.4f})'[d{j}]")
             last = f"[d{j}]"
             j += 1
-        for bl in c.blur:
+        for bi, bl in enumerate(c.blur):
             x, y = int(round(bl.x)), int(round(bl.y))
             w, h = max(2, int(round(bl.w))), max(2, int(round(bl.h)))
-            sig = max(1.0, max(bl.w, bl.h) * BLUR_SIGMA_FRAC)
+            sig = sigmas[bi]
             s0 = (bl.start if bl.start is not None else 0.0) - a
             s1 = (bl.end if bl.end is not None else 1e9) - a
             chain.append(f"{last}split[m{j}][c{j}];[c{j}]crop={w}:{h}:{x}:{y},gblur=sigma={sig:.3f}[b{j}];"
@@ -187,6 +195,8 @@ class FcpBuilder:
                     "-c:v", "libx264", "-preset", "veryfast", "-crf", "12", "-pix_fmt", "yuv420p", out])
         rec = {"kind": "nle_clean_intermediate", "clip": c.id,
                "file": Path(os.path.relpath(out, self.out_dir)).as_posix(), "source_range_s": [round(a, 4), round(b, 4)],
+               "blur_sigmas_src_px": [round(x, 3) for x in sigmas],
+               "sigma_rule": "gaussian sigma = max(w, h) × render.clean.blur_sigma_ratio (render.blur_sigma_src)",
                "why": "Resolve/FCP 에는 delogo 가 없어 원본 오버레이가 다시 보이지 않도록 delogo·blur 를 미리 적용한 "
                       "중간 파일을 FCPXML/OTIO 소스로 사용"}
         if not any(x.get("file") == rec["file"] for x in self.dec["prerendered"]):
@@ -265,53 +275,69 @@ class FcpBuilder:
         return el
 
     def transform(self, el: ET.Element, c: Clip, sp: dict, L0_frames: int, off: float) -> None:
+        """adjust-crop trim (the source window visible inside the video region: clean crop ∩ region,
+        the only region mask FCPXML has) + adjust-transform position/scale, all from
+        resolve.src_to_region (cover/contain fit, eased zoom, Zoom.recenter, cover clamp).  While the
+        zoom moves, every output frame gets a linear keyframe, so the values equal the master's on
+        the frame grid (FCP's own ease curves are not the master's cubic ones)."""
         sw, sh = c.src_size
-        cx, cy, cw, ch = crop_int(c)
-        rx, ry, rw, rh = region_int(c)
-        b, ox, oy = base_fit(c)
-        # visible window at zoom 1 (clean crop ∩ region), SOURCE px
-        vx0 = max(cx, cx + (0 - ox) / b)
-        vy0 = max(cy, cy + (0 - oy) / b)
-        vx1 = min(cx + cw, cx + (rw - ox) / b)
-        vy1 = min(cy + ch, cy + (rh - oy) / b)
-        ET.SubElement(el, "adjust-conform", {"type": "none"})
-        crop = ET.SubElement(el, "adjust-crop", {"mode": "trim"})
-        ET.SubElement(crop, "trim-rect", {"left": f"{100 * vx0 / sw:.4f}", "top": f"{100 * vy0 / sh:.4f}",
-                                          "right": f"{100 * (sw - vx1) / sw:.4f}",
-                                          "bottom": f"{100 * (sh - vy1) / sh:.4f}"})
+        ex, ey, ew, eh = effective_src_rect(c)
+        R = c.region
+
+        def placement(n: int) -> tuple[float, float, float]:
+            return src_to_region(c, n / self.fps - c.out_start)
+
+        def trim(n: int) -> tuple[float, float, float, float]:
+            s, tx, ty = placement(n)
+            vx0, vx1 = max(ex, ex - tx / s), min(ex + ew, ex + (R.w - tx) / s)
+            vy0, vy1 = max(ey, ey - ty / s), min(ey + eh, ey + (R.h - ty) / s)
+            return (round(100 * vx0 / sw, 4), round(100 * vy0 / sh, 4), round(100 * (sw - vx1) / sw, 4),
+                    round(100 * (sh - vy1) / sh, 4))
 
         def pos_scale(n: int) -> tuple[str, str]:
-            s, tx, ty = src_to_region(c, n / self.fps - c.out_start)
+            s, tx, ty = placement(n)
             # canvas position of the ORIGINAL frame centre (FCP transforms about the frame centre)
-            fx = rx + tx + s * (sw / 2 - cx)
-            fy = ry + ty + s * (sh / 2 - cy)
+            fx = R.x + tx + s * (sw / 2 - ex)
+            fy = R.y + ty + s * (sh / 2 - ey)
             px = (fx - self.W / 2) / self.H * 100
             py = -(fy - self.H / 2) / self.H * 100
             return f"{px:.4f} {py:.4f}", f"{s:.6f} {s:.6f}"
 
-        p0, s0 = pos_scale(sp["s"])
-        tr = ET.SubElement(el, "adjust-transform", {"position": p0, "scale": s0, "anchor": "0 0"})
-        z = c.zoom
-        if z is not None and abs(z.scale_to - z.scale_from) > 1e-9:
-            n0 = sp["n0"]
-            k0 = int(round((c.out_start + z.start) * self.fps))
-            k1 = int(round((c.out_start + z.start + z.dur) * self.fps))
-            ks = [k for k in (sp["s"], k0, k1, sp["e"] - 1) if sp["s"] <= k <= sp["e"] - 1]
-            ks = sorted(set(ks))
-            pp = ET.SubElement(tr, "param", {"name": "position"})
-            pa = ET.SubElement(pp, "keyframeAnimation")
-            sc = ET.SubElement(tr, "param", {"name": "scale"})
-            sa = ET.SubElement(sc, "keyframeAnimation")
-            for k in ks:
-                p, s = pos_scale(k)
+        first, last, n0 = sp["s"], sp["e"] - 1, sp["n0"]
+        ks = [first]
+        if zoom_animates(c):
+            zf0, zf1 = zoom_motion_frames(c, self.fps)
+            lo, hi = max(first, int(math.floor(zf0))), min(last, int(math.ceil(zf1)))
+            ks = sorted({first, last, *range(lo, hi + 1)})
+        trims = [trim(k) for k in ks]
+        ps = [pos_scale(k) for k in ks]
+        ET.SubElement(el, "adjust-conform", {"type": "none"})
+        crop = ET.SubElement(el, "adjust-crop", {"mode": "trim"})
+        t0 = trims[0]
+        tr_el = ET.SubElement(crop, "trim-rect", {"left": f"{t0[0]:.4f}", "top": f"{t0[1]:.4f}",
+                                                  "right": f"{t0[2]:.4f}", "bottom": f"{t0[3]:.4f}"})
+        trim_anim = len(set(trims)) > 1
+        if trim_anim:
+            for j, name in enumerate(("left", "top", "right", "bottom")):
+                ka = ET.SubElement(ET.SubElement(tr_el, "param", {"name": name}), "keyframeAnimation")
+                for k, v in zip(ks, trims):
+                    self.keyframe(ka, self.clk.frames(L0_frames + (k - n0)), f"{v[j]:.4f}", "linear")
+        tr = ET.SubElement(el, "adjust-transform", {"position": ps[0][0], "scale": ps[0][1], "anchor": "0 0"})
+        if len(set(ps)) > 1:
+            pa = ET.SubElement(ET.SubElement(tr, "param", {"name": "position"}), "keyframeAnimation")
+            sa = ET.SubElement(ET.SubElement(tr, "param", {"name": "scale"}), "keyframeAnimation")
+            for k, (p, s) in zip(ks, ps):
                 t = self.clk.frames(L0_frames + (k - n0))
-                interp = EASE_FCP.get(z.ease, "linear") if k == k0 else "linear"
-                self.keyframe(pa, t, p, interp)
-                self.keyframe(sa, t, s, interp)
-            self.dec.setdefault("zoom", []).append({"clip": c.id, "keyframes": len(ks), "ease": z.ease,
-                                                    "fcp_interp": EASE_FCP.get(z.ease, "linear"),
-                                                    "note": "FCP 의 ease 곡선은 마스터의 3차 easing 과 같지 않음; "
-                                                            "영역 마스크가 없어 확대 시 영역 밖으로 넘칠 수 있음"})
+                self.keyframe(pa, t, p, "linear")
+                self.keyframe(sa, t, s, "linear")
+        if c.zoom is not None:
+            z = c.zoom
+            self.dec.setdefault("zoom", []).append({
+                "clip": c.id, "keyframes": len(ks) if len(set(ps)) > 1 else 0, "mode": "per_frame_linear",
+                "ease": z.ease, "recenter": bool(getattr(z, "recenter", False)), "trim_animated": trim_anim,
+                "note": "줌이 움직이는 동안 프레임마다 linear 키프레임(resolve.src_to_region 값, recenter·cover 고정 포함) "
+                        "→ 프레임 격자에서 마스터와 같은 위치·크기; 영상 영역 밖으로 넘치지 않도록 trim-rect 를 영역 안에 "
+                        "보이는 소스 창으로 함께 애니메이션(trim-rect param 애니메이션은 확인 못 함)"})
 
     # ---------------------------------------------------------------- connected clips
     def anchor_for(self, spans: list[dict], spine_els: list[tuple[int, int, ET.Element, Fraction]], n: int):
@@ -323,14 +349,21 @@ class FcpBuilder:
         return el, local0 + Fraction(n - s) * self.clk.fd
 
     def volume(self, el: ET.Element, gain_db: float, local0: Fraction, nframes: int, env_fn=None,
-               fade_in: float = 0.0, fade_out: float = 0.0) -> None:
+               fade_in: float = 0.0, fade_out: float = 0.0, fg_db: list[float] | None = None) -> None:
+        """adjust-volume: constant gain + envelope (dB) + linear fades + the master's foreground limiter
+        (``fg_db``: dB per clip frame k, value at the start of the frame; build/fg_gain.json)."""
         from .export_mlt import SILENCE_DB_FLOOR
+
+        if fg_db is not None and min(fg_db, default=0.0) >= -0.05:
+            fg_db = None
 
         def val(k: int) -> float:
             t = k / self.fps
             v = gain_db
             if env_fn is not None:
                 v += env_fn(t)
+            if fg_db is not None:
+                v += fg_db[min(k, len(fg_db) - 1)]
             g = 1.0
             if fade_in > 0:
                 g *= min(1.0, t / fade_in)
@@ -340,14 +373,14 @@ class FcpBuilder:
             return max(SILENCE_DB_FLOOR, v)
 
         av = ET.SubElement(el, "adjust-volume", {"amount": f"{gain_db:.2f}dB"})
-        if env_fn is None and fade_in <= 0 and fade_out <= 0:
+        if env_fn is None and fade_in <= 0 and fade_out <= 0 and fg_db is None:
             return
         ks = {0, nframes - 1}
         if fade_in > 0:
             ks.update(range(0, min(nframes, int(math.ceil(fade_in * self.fps)) + 1)))
         if fade_out > 0:
             ks.update(range(max(0, nframes - int(math.ceil(fade_out * self.fps)) - 1), nframes))
-        if env_fn is not None:
+        if env_fn is not None or fg_db is not None:
             ks.update(range(nframes))
         ks = sorted(ks)
         vals = [(k, val(k)) for k in ks]
@@ -356,7 +389,8 @@ class FcpBuilder:
             (k0, v0), (k1, v1), (k2, v2) = keep[-1], vals[i], vals[i + 1]
             if abs(v0 + (v2 - v0) * (k1 - k0) / (k2 - k0) - v1) > 0.05:
                 keep.append(vals[i])
-        keep.append(vals[-1])
+        if len(vals) > 1:
+            keep.append(vals[-1])
         p = ET.SubElement(av, "param", {"name": "amount"})
         ka = ET.SubElement(p, "keyframeAnimation")
         for k, v in keep:
@@ -393,7 +427,7 @@ class FcpBuilder:
             el = ET.SubElement(parent, "asset-clip", {
                 "ref": self.asset(s.path), "lane": str(-2 - (k % 2)), "offset": self.clk.fmt(local),
                 "name": f"SFX {s.type}", "start": "0s", "duration": self.clk.frames(n), "audioRole": "effects"})
-            self.volume(el, s.gain_db + gain_extra, Fraction(0), n)
+            self.volume(el, s.gain_db + gain_extra, Fraction(0), n, fg_db=self.fg_db(n0, n))
             ET.SubElement(el, "note").text = f"event {s.event_t:.2f}s: {s.event_desc}"
         for o in r.audio.originals:
             n0 = int(round(o.out_start * self.fps))
@@ -411,7 +445,14 @@ class FcpBuilder:
                 "start": self.clk.seconds_on_grid(start), "duration": self.clk.frames(n), "audioRole": "dialogue"})
             if info.width:
                 el.set("srcEnable", "audio")
-            self.volume(el, o.gain_db + gain_extra, self.start_of(el), n, None, o.fade_s, o.fade_s)
+            self.volume(el, o.gain_db + gain_extra, self.start_of(el), n, None, o.fade_s, o.fade_s,
+                        fg_db=self.fg_db(n0, n))
+
+    def fg_db(self, n0: int, n: int) -> list[float] | None:
+        """The master's foreground limiter (build/fg_gain.json) in dB for output frames n0 .. n0+n-1."""
+        if not self.fg_gain:
+            return None
+        return [fg_gain_db_at_frame_start(self.fg_gain, n0 + k) for k in range(n)]
 
     def start_of(self, el: ET.Element) -> Fraction:
         return parse_time(el.get("start", "0s"))
@@ -421,7 +462,7 @@ class FcpBuilder:
 
         for fr in flash_runs(self.r):
             c = self.r.clips[fr["clip_index"]]
-            rx, ry, rw, rh = region_int(c)
+            rx, ry, rw, rh = fr["rect"]           # Transition.scope: region or whole canvas
             still = self.flash_still(fr["color"], rw, rh)
             aid = self.asset(still, still=True)
             parent, local = self.anchor_for(spans, spine_els, fr["n0"])
@@ -437,6 +478,8 @@ class FcpBuilder:
             ka = ET.SubElement(p, "keyframeAnimation")
             for k, a in enumerate(fr["alphas"]):
                 self.keyframe(ka, self.clk.frames(k), f"{a:.4f}", "linear")
+            self.dec.setdefault("flashes", []).append({"clip": c.id, "frames": [fr["n0"], fr["n1"]], "scope": fr["scope"],
+                                                       "rect": fr["rect"], "resolution": [self.W, self.H]})
 
     def captions(self, spans, spine_els) -> None:
         for i, cap in enumerate(sorted(self.r.captions, key=lambda c: c.start)):
@@ -519,6 +562,7 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path, absolute: bool 
     if a.get("norm_gain_db") is None:
         dec["warnings"].append("render_report.json 이 없어 음량 정규화 이득을 넣지 않음(못 잼)")
     b = FcpBuilder(r, out_dir, absolute, dec)
+    b.fg_gain = master_foreground_gain(r, dec)
     b.build(gain)
     name = f"{r.episode_id}.local.fcpxml" if absolute else f"{r.episode_id}.fcpxml"
     out = out_dir / name
@@ -529,12 +573,19 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path, absolute: bool 
                        "자막 텍스트(caption 요소, 스타일 없음)"]
     dec["assumptions"] = [
         "adjust-transform position 단위 = 시퀀스 프레임 높이의 %, y 는 위쪽이 + (FCPXML 관례로 알려진 값; 이 기계에서 확인 못 함)",
-        "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 % (확인 못 함)",
-        "줌 easing: 마스터는 3차 곡선, FCPXML 은 interp(easeIn/easeOut/ease) 로 근사",
-        "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간"]
+        "adjust-crop trim-rect 단위 = 소스 가로/세로 각각의 %, trim-rect 의 left/top/right/bottom param 키프레임 "
+        "애니메이션(줌 중 영상 영역 마스크 대용) (확인 못 함)",
+        "줌: 움직이는 동안 프레임마다 linear 키프레임(마스터의 3차 easing·recenter 를 프레임 격자에서 그대로 재현; "
+        "FCP 쪽 해석은 확인 못 함)",
+        "timeMap 의 time 은 클립 로컬 시간(start 기준), value 는 소스 시간",
+        "모노 오디오 파일: 마스터는 양쪽 채널에 같은 크기(0 dB)로 넣음(shortkit.util.media.read_audio) — "
+        "Resolve/FCP 가 모노를 어떻게 스테레오에 놓는지(팬/레벨) 확인 못 함",
+        "효과음/원본 소리 음량 키프레임에 마스터 전경 안전 리미터(build/fg_gain.json)를 프레임 단위로 더함"]
     dec["not_representable"] = [
-        "영상 영역 마스크(확대 시 영역 밖으로 넘칠 수 있음)", "delogo/blur (미리 정리한 중간 파일로 대체)",
-        "자막·장식의 스타일/위치/모션(captions.ass 에만 있음)", "마스터의 true-peak 리미터"]
+        "영상 영역 마스크(trim-rect 로 영역 밖 소스를 잘라 대신함; 화면 가장자리 처리 차이 가능)",
+        "delogo/blur (미리 정리한 중간 파일로 대체)",
+        "자막·장식의 스타일/위치/모션(captions.ass 에만 있음)",
+        "마스터의 샘플 단위 전경 리미터(프레임 단위 음량 키프레임으로 근사)"]
     if not absolute:
         merge_decisions(out_dir, "fcpxml", dec)
     return out, dec

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.9">
+  <resources>
+    <format id="r1" name="FFVideoFormatRateUndefined" width="1080" height="1920" colorSpace="1-1-1 (Rec. 709)" frameDuration="1/30s" />
+    <effect id="r2" name="Cross Dissolve" uid="FxPlug:4731E73A-8DAC-4113-9A30-AE85B1761265" />
+    <format id="r4" name="FFVideoFormatRateUndefined" width="768" height="432" colorSpace="1-1-1 (Rec. 709)" frameDuration="1/12s" />
+    <asset id="r3" name="people-detection.mp4" uid="488F1CD31C34223D4C0BA9EAB9B8ECC0" start="0s" hasVideo="1" hasAudio="1" duration="149/3s" format="r4" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/video/people-detection.mp4" />
+    </asset>
+    <asset id="r5" name="face-demographics-walking-and-pause.mp4" uid="BA5AA7AAE469F9AE87D6A934AAEB3A49" start="0s" hasVideo="1" hasAudio="1" duration="909/10s" format="r4" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/video/face-demographics-walking-and-pause.mp4" />
+    </asset>
+    <asset id="r6" name="music_bed_b.wav" uid="4C58828CC2B69EC125D67242604D05A0" start="0s" hasVideo="0" hasAudio="1" duration="60s" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/music_bed_b.wav" />
+    </asset>
+    <asset id="r7" name="whoosh.wav" uid="72C218DCFFF3D73FF82533A2995F8115" start="0s" hasVideo="0" hasAudio="1" duration="13/30s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/whoosh.wav" />
+    </asset>
+    <asset id="r8" name="click.wav" uid="A4E2239AAAC2567620EFD44A5B24D1B2" start="0s" hasVideo="0" hasAudio="1" duration="1/15s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/click.wav" />
+    </asset>
+    <asset id="r9" name="ding.wav" uid="2A9FAE51E7D952C9790365E632DFBECD" start="0s" hasVideo="0" hasAudio="1" duration="6/5s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/ding.wav" />
+    </asset>
+    <format id="r11" name="FFVideoFormatRateUndefined" width="1080" height="608" colorSpace="1-1-1 (Rec. 709)" />
+    <asset id="r10" name="flash_FFFFFF_1080x608.png" uid="DEFB76E0A6B9B11A784B1F26EF1FFB38" start="0s" hasVideo="1" hasAudio="0" duration="0s" format="r11">
+      <media-rep kind="original-media" src="media/flash_FFFFFF_1080x608.png" />
+    </asset>
+  </resources>
+  <library>
+    <event name="shortkit test-coverage-001">
+      <project name="test-coverage-001">
+        <sequence format="r1" duration="45/2s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+            <asset-clip ref="r3" offset="0s" name="s1" start="2s" duration="24/5s" tcFormat="NDF" srcEnable="video">
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <asset-clip ref="r6" lane="-1" offset="2s" name="BGM" start="0s" duration="45/2s" audioRole="music">
+                <adjust-volume amount="-0.07dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-0.07dB" interp="linear" />
+                      <keyframe time="217/10s" value="-0.07dB" interp="linear" />
+                      <keyframe time="328/15s" value="-2.10dB" interp="linear" />
+                      <keyframe time="22s" value="-4.15dB" interp="linear" />
+                      <keyframe time="221/10s" value="-6.09dB" interp="linear" />
+                      <keyframe time="133/6s" value="-7.67dB" interp="linear" />
+                      <keyframe time="111/5s" value="-8.59dB" interp="linear" />
+                      <keyframe time="667/30s" value="-9.61dB" interp="linear" />
+                      <keyframe time="334/15s" value="-10.77dB" interp="linear" />
+                      <keyframe time="223/10s" value="-12.11dB" interp="linear" />
+                      <keyframe time="67/3s" value="-13.69dB" interp="linear" />
+                      <keyframe time="671/30s" value="-15.63dB" interp="linear" />
+                      <keyframe time="112/5s" value="-18.13dB" interp="linear" />
+                      <keyframe time="673/30s" value="-21.65dB" interp="linear" />
+                      <keyframe time="337/15s" value="-27.67dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
+              </asset-clip>
+              <asset-clip ref="r7" lane="-2" offset="98/15s" name="SFX whoosh" start="0s" duration="7/15s" audioRole="effects">
+                <adjust-volume amount="-8.07dB" />
+                <note>event 4.60s: 걷던 사람이 오른쪽 화면 밖으로 나감</note>
+              </asset-clip>
+              <caption lane="10" offset="2s" name="제목" start="3600s" duration="45/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="top">
+                  <text-style ref="ts1">빈 방에 들어온 사람들</text-style>
+                </text>
+                <text-style-def id="ts1">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="84" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="11" offset="2s" name="설명" start="3600s" duration="4s" role="iTT?captionFormat=ITT.ko">
+                <text placement="top">
+                  <text-style ref="ts2">설정 연결 검증 테스트 2편</text-style>
+                </text>
+                <text-style-def id="ts2">
+                  <text-style font="Noto Sans CJK KR Bold" fontSize="46" fontColor="0.902 0.902 0.902 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="12" offset="23/10s" name="상황" start="3600s" duration="9/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts3">한 사람이 빈 방을 가로질러 나간다</text-style>
+                </text>
+                <text-style-def id="ts3">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r5" offset="24/5s" name="s2" start="5s" duration="5s" tcFormat="NDF" srcEnable="video">
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <caption lane="13" offset="26/5s" name="상황" start="3600s" duration="24/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts4">한 남성이 카메라 앞까지 걸어온다</text-style>
+                </text>
+                <text-style-def id="ts4">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r5" offset="49/5s" name="s3" start="10s" duration="37/10s" tcFormat="NDF" srcEnable="video">
+              <timeMap>
+                <timept time="10s" value="10s" interp="linear" />
+                <timept time="11s" value="11s" interp="linear" />
+                <timept time="117/10s" value="11s" interp="linear" />
+                <timept time="137/10s" value="13s" interp="linear" />
+              </timeMap>
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <asset-clip ref="r8" lane="-3" offset="11s" name="SFX click" start="0s" duration="1/10s" audioRole="effects">
+                <adjust-volume amount="-8.07dB" />
+                <note>event 10.80s: 정면을 보고 선 순간 화면이 멈춤</note>
+              </asset-clip>
+              <video ref="r10" lane="2" offset="41/3s" name="플래시 s4" start="0s" duration="1/10s">
+                <adjust-conform type="none" />
+                <adjust-transform position="0.0000 -0.0000" scale="1 1" anchor="0 0" />
+                <adjust-blend amount="1">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="0.4444" interp="linear" />
+                      <keyframe time="1/30s" value="1.0000" interp="linear" />
+                      <keyframe time="1/15s" value="0.4444" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-blend>
+              </video>
+              <caption lane="14" offset="51/5s" name="반응" start="3600s" duration="13/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts5">빤히</text-style>
+                </text>
+                <text-style-def id="ts5">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="76" fontColor="1.000 0.894 0.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r5" offset="27/2s" name="s4" start="32s" duration="5s" tcFormat="NDF" srcEnable="video">
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <asset-clip ref="r9" lane="-2" offset="174/5s" name="SFX ding" start="0s" duration="6/5s" audioRole="effects">
+                <adjust-volume amount="-8.07dB" />
+                <note>event 16.30s: 걸어 들어온 두 사람이 나란히 멈춰 섬</note>
+              </asset-clip>
+              <caption lane="10" offset="161/5s" name="상황" start="3600s" duration="24/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts6">두 사람이 나란히 와서 선다</text-style>
+                </text>
+                <text-style-def id="ts6">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r5" offset="37/2s" name="s5" start="42s" duration="4s" tcFormat="NDF" srcEnable="video">
+              <timeMap>
+                <timept time="42s" value="42s" interp="linear" />
+                <timept time="46s" value="44s" interp="linear" />
+              </timeMap>
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <caption lane="11" offset="211/5s" name="상황" start="3600s" duration="18/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts7">그리고 둘 다 떠난다</text-style>
+                </text>
+                <text-style-def id="ts7">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>

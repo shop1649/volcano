@@ -68,6 +68,14 @@ FEAT_NFFT, FEAT_HOP, FEAT_MELS, FEAT_FMAX = 2048, 512, 40, 8000.0
 GAIN_WIN_S, GAIN_HOP_S = 0.05, 0.01
 PRESENT_BELOW_BASE_DB = 25.0  # BGM counted present while gain > base - 25 dB
 CUT_MIN_S = 0.3
+# restart / loop detection (piecewise alignment against the SAME clean file at the found tempo)
+LOOP_WIN_S, LOOP_HOP_S = 3.0, 1.0   # analysis windows (shorter repeats cannot be detected)
+LOOP_MIN_NCC = 0.5            # a window "is this clean file at another offset" only above this feature NCC ...
+LOOP_MARGIN = 0.1             # ... and when it beats the main line by this much (spectral mode)
+LOOP_TIE = 0.02               # main line within this of the best feature NCC -> stays on the main line
+LOOP_SPECTRAL_NCC = 0.6       # spectral mode (no waveform check possible): stricter NCC and >= 2 windows
+LOOP_LINE_TOL_S = 0.3         # windows whose clean offsets differ by less than this belong to one line
+LOOP_JUMP_S = 1.0             # line change that counts as a jump: backward = restart/loop, forward = skip
 CRITERIA = {"tempo_tol": TEMPO_TOL, "offset_tol_s": OFFSET_TOL_S, "id_min_score": ID_MIN_SCORE,
             "id_min_margin": ID_MIN_MARGIN, "tempo_range": list(TEMPO_RANGE),
             "rule": "같은 곡 AND 같은 버전 AND 속도 허용오차 이내 AND 사용 구간 시작 허용오차 이내 — 같은 곡의 다른 구간은 불일치"}
@@ -350,7 +358,13 @@ def waveform_refine(ref: np.ndarray, clean: np.ndarray, sr: int, r0: float, off0
         return None
     t = np.array([p["t"] for p in probes])
     c = np.array([p["clean_t"] for p in probes])
-    keep = np.ones(len(t), bool)
+    # start from the largest consensus set (probes on one line within 10 ms), not from all probes: when
+    # the reference cut/restarted the music, probes of the other part would pull a least-squares line
+    d = c - r0 * t
+    votes = np.array([(np.abs(d - di) < 0.010).sum() for di in d])
+    keep = np.abs(d - d[int(np.argmax(votes))]) < 0.010
+    if keep.sum() < 2:
+        keep = np.ones(len(t), bool)
     r, off = r0, off0
     for _ in range(3):
         if keep.sum() >= 2 and np.ptp(t[keep]) > 0.5:
@@ -704,6 +718,184 @@ def describe_gain(model: BgmModel, speech_mask_fn=None) -> dict:
             "present_mask": present}
 
 
+# ============================================================================ restart / loop
+def detect_restarts(bgm_sig: np.ndarray, clean: np.ndarray, sr: int, al: Alignment,
+                    clean_feat: np.ndarray | None = None) -> dict:
+    """Does the BGM restart (jump back to an earlier point of the same clean file) inside the video?
+
+    The reference BGM signal is cut into LOOP_WIN_S windows (hop LOOP_HOP_S); each window is aligned
+    against the SAME clean file at the identified tempo (gain-invariant feature NCC over all offsets,
+    window fully inside the file).  A window stays on the main line when the main line is (nearly,
+    LOOP_TIE) the best feature match.  Otherwise the candidate offsets (main line + feature peaks within
+    REPEAT_NCC_BAND of the best, NCC >= LOOP_MIN_NCC) are verified:
+      waveform mode: GCC-PHAT probe line fit + pre-emphasised waveform coherence (the same test as the
+        main alignment); the highest coherence wins, the main line wins ties (AMBIG_COHERENCE);
+      spectral mode (re-timed file, no waveform test): best feature offset, NCC >= LOOP_SPECTRAL_NCC,
+        better than the main line by LOOP_MARGIN, on >= 2 consecutive windows.
+    Consecutive lines in time order give jumps: clean offset change < -LOOP_JUMP_S = restart (loop),
+    > +LOOP_JUMP_S = forward skip.
+
+    presence: present = at least one restart; absent = no restart and the main line explains >= 1
+    window; unmeasured otherwise.  Repeats shorter than one window cannot be detected (``limits``); a
+    restart into a part that sounds identical to the main line is not distinguishable (and not audible)."""
+    hop_s = FEAT_HOP / sr
+    r = float(al.tempo_ratio)
+    waveform = al.mode == "waveform"
+    method = (f"{LOOP_WIN_S:g} s 창(간격 {LOOP_HOP_S:g} s)마다 같은 깨끗한 음원과 특징 NCC 정렬(속도 {r:.4f} 고정); "
+              f"주 정렬선이 최고 점수(차 {LOOP_TIE} 이내)면 유지, 아니면 후보 시작점(주 정렬선 + 특징 봉우리) 검증 — "
+              + ("파형 모드: GCC-PHAT 탐침 직선 + 파형 일치도 최고(동률이면 주 정렬선)" if waveform else
+                 f"스펙트럼 모드: 특징 NCC >= {LOOP_SPECTRAL_NCC}, 주 정렬선보다 +{LOOP_MARGIN}, 연속 2창 이상")
+              + f" → 시간순 정렬선 사이 시작점 변화 < -{LOOP_JUMP_S:g} s = 되감김(반복), > +{LOOP_JUMP_S:g} s = 건너뜀")
+    limits = [f"{LOOP_WIN_S:g} s 보다 짧은 반복 구간은 검출 불가",
+              "주 정렬선과 소리가 같은 구간으로의 되감김은 구분 불가(들리는 차이도 없음)"]
+    R = align_features(bgm_sig, sr)
+    C = align_features(clean, sr) if clean_feat is None else clean_feat
+    Cr = _resample_frames(C, r)
+    M = max(8, int(round(LOOP_WIN_S / hop_s)))
+    H = max(1, int(round(LOOP_HOP_S / hop_s)))
+    if R.shape[0] < M or Cr.shape[0] < M:
+        return {"presence": "unmeasured", "status": "unmeasured", "method": method, "limits": limits,
+                "blocker": f"영상 또는 음원이 분석 창({LOOP_WIN_S:g} s)보다 짧음", "windows": [], "jumps": [],
+                "segments": []}
+    main_lag = al.offset_s / (r * hop_s)            # Cr frame = ref frame + main_lag
+    wlen = int(round(LOOP_WIN_S * sr))
+
+    def verify(seg: np.ndarray, t0: float, off: float) -> tuple[float | None, float]:
+        """(waveform coherence if the probes fit one line, refined offset at reference t = 0)."""
+        wr = waveform_refine(seg, clean, sr, r, off + r * t0, n_probes=4, win_s=0.75)
+        if not wr or wr["n_inliers"] < min(3, wr["n_probes"]) or wr["coherence_max"] < MIN_COHERENCE_MAX \
+                or wr["coherence"] < MIN_COHERENCE:
+            return None, off
+        return float(wr["coherence"]), float(wr["offset_s"] - r * t0)
+
+    wins = []
+    for i0 in range(0, R.shape[0] - M + 1, H):
+        Rw = R[i0:i0 + M]
+        t0 = round(i0 * hop_s, 3)
+        if float(np.mean(np.abs(Rw).sum(1) == 0)) > 0.5:
+            wins.append({"t": t0, "label": "quiet"})
+            continue
+        lags, ncc = _ncc_lags(Rw, Cr, M)
+        k = int(np.argmax(ncc))
+        best = float(ncc[k])
+        j = i0 + main_lag + (M - 1)                   # index of the main-line lag in `lags`
+        on = [ncc[q] for q in (int(np.floor(j)), int(np.ceil(j))) if 0 <= q < len(ncc)]
+        n_main = float(max(on)) if on else -1.0
+        rec = {"t": t0, "ncc_main": round(n_main, 4), "ncc_best": round(best, 4)}
+        main_ok = n_main > -1 and n_main >= LOOP_MIN_NCC - 0.2
+        if main_ok and n_main >= best - LOOP_TIE:
+            rec.update({"label": "main", "offset_s": round(al.offset_s, 3)})
+            wins.append(rec)
+            continue
+        if best < LOOP_MIN_NCC:
+            rec.update({"label": "main", "offset_s": round(al.offset_s, 3)} if main_ok and n_main >= best - LOOP_MARGIN
+                       else {"label": "unexplained"})
+            wins.append(rec)
+            continue
+        offs = []
+        for q in _peaks(ncc, max(1, int(round(1.0 / hop_s))), k=6):
+            if ncc[q] < max(LOOP_MIN_NCC, best - REPEAT_NCC_BAND):
+                continue
+            off = (float(lags[0] + _parabolic(ncc, q)) - i0) * r * hop_s   # clean time at reference t = 0
+            if abs(off - al.offset_s) > LOOP_LINE_TOL_S:
+                offs.append((off, float(ncc[q])))
+        if waveform:
+            seg = bgm_sig[int(round(t0 * sr)):int(round(t0 * sr)) + wlen]
+            coh_main = verify(seg, t0, al.offset_s)[0] if main_ok else None
+            scored = []
+            for off, nc in offs:
+                coh, off_r = verify(seg, t0, off)
+                if coh is not None:
+                    scored.append((coh, off_r, nc))
+            rec["coherence_main"] = None if coh_main is None else round(coh_main, 4)
+            top = max(scored) if scored else None
+            if top and (coh_main is None or top[0] > coh_main + AMBIG_COHERENCE):
+                rec.update({"label": "other", "offset_s": round(top[1], 3), "coherence": round(top[0], 4),
+                            "verified": "waveform"})
+            elif coh_main is not None or (main_ok and n_main >= best - LOOP_MARGIN):
+                rec.update({"label": "main", "offset_s": round(al.offset_s, 3)})
+            else:
+                rec["label"] = "unexplained"
+        else:
+            if offs and best >= LOOP_SPECTRAL_NCC and (not main_ok or best >= n_main + LOOP_MARGIN):
+                off, nc = max(offs, key=lambda z: z[1])
+                rec.update({"label": "other", "offset_s": round(off, 3), "verified": "feature"})
+            elif main_ok:
+                rec.update({"label": "main", "offset_s": round(al.offset_s, 3)})
+            else:
+                rec["label"] = "unexplained"
+        wins.append(rec)
+    # group consecutive line windows into segments (a line may be interrupted by quiet/unexplained windows)
+    segs: list[dict] = []
+    for w in wins:
+        if w["label"] not in ("main", "other") or (w["label"] == "other" and not w.get("verified")):
+            continue
+        if segs and segs[-1]["label"] == w["label"] and abs(segs[-1]["offset_s"] - w["offset_s"]) <= LOOP_LINE_TOL_S:
+            segs[-1]["end"] = round(w["t"] + LOOP_WIN_S, 3)
+            segs[-1]["last_start"] = w["t"]
+            segs[-1]["n_windows"] += 1
+            continue
+        segs.append({"label": w["label"], "start": w["t"], "end": round(w["t"] + LOOP_WIN_S, 3), "last_start": w["t"],
+                     "offset_s": w["offset_s"], "n_windows": 1, "verified": w.get("verified") or "main_line"})
+    if not waveform:                                   # spectral mode: a lone window is not enough evidence
+        segs = [s for s in segs if s["label"] == "main" or s["n_windows"] >= 2]
+    jumps = []
+    for a, b in zip(segs, segs[1:]):
+        d = b["offset_s"] - a["offset_s"]
+        if abs(d) <= LOOP_JUMP_S:
+            continue
+        # change point: between the last window of line a and the first window of line b, the frame where
+        # line b starts to explain the features better than line a (least-squares split of the difference)
+        lo, hi = a["last_start"], b["start"] + LOOP_WIN_S
+        tj = _change_point(R, Cr, lo, hi, a["offset_s"], b["offset_s"], r, hop_s)
+        jumps.append({"t": tj, "t_range": [round(a["last_start"] + LOOP_WIN_S / 2, 3),
+                                           round(b["start"] + LOOP_WIN_S / 2, 3)],
+                      "from_offset_s": a["offset_s"],
+                      "to_offset_s": b["offset_s"], "jump_s": round(d, 3), "kind": "restart" if d < 0 else "skip",
+                      "clean_t_before": round(a["offset_s"] + r * tj, 3),
+                      "clean_t_after": round(b["offset_s"] + r * tj, 3)})
+    n_main = sum(1 for w in wins if w["label"] == "main")
+    if any(j["kind"] == "restart" for j in jumps):
+        presence = "present"
+    elif n_main:
+        presence = "absent"
+    else:
+        presence = "unmeasured"
+    unexplained = [w["t"] for w in wins if w["label"] == "unexplained"]
+    out = {"presence": presence, "status": "measured" if presence != "unmeasured" else "unmeasured",
+           "method": method, "limits": limits, "segments": segs, "jumps": jumps,
+           "unexplained_window_starts": unexplained, "windows": wins}
+    if presence == "unmeasured":
+        out["blocker"] = "주 정렬선이 설명하는 창이 없음"
+    return out
+
+
+def _change_point(R: np.ndarray, Cr: np.ndarray, t_lo: float, t_hi: float, off_a: float, off_b: float, r: float,
+                  hop_s: float) -> float:
+    """Time in [t_lo, t_hi] where line b (clean = off_b + r*t) takes over from line a, from per-frame
+    feature cosine similarity (split point maximising sum(a before) + sum(b after))."""
+    i_lo, i_hi = max(0, int(t_lo / hop_s)), min(R.shape[0], int(np.ceil(t_hi / hop_s)))
+
+    def sim(off: float) -> np.ndarray:
+        idx = np.arange(i_lo, i_hi) + int(round(off / (r * hop_s)))
+        ok = (idx >= 0) & (idx < Cr.shape[0])
+        out = np.zeros(i_hi - i_lo)
+        x = R[i_lo:i_hi][ok]
+        y = Cr[idx[ok]]
+        den = np.linalg.norm(x, axis=1) * np.linalg.norm(y, axis=1)
+        out[ok] = np.where(den > 1e-9, (x * y).sum(1) / np.maximum(den, 1e-9), 0.0)
+        return out
+
+    if i_hi - i_lo < 2:
+        return round(t_lo, 3)
+    d = sim(off_b) - sim(off_a)                  # > 0 where line b explains better
+    # score(k) = -sum(d[:k]) + sum(d[k:]) -> maximise
+    cs = np.concatenate([[0.0], np.cumsum(d)])
+    score = (cs[-1] - cs) - cs
+    k = int(np.argmax(score))
+    return round((i_lo + k) * hop_s, 3)
+
+
 # ============================================================================ identification
 def identify(ref: np.ndarray, sr: int = SR, library: list[LibraryTrack] | None = None,
              tempo_range=TEMPO_RANGE) -> dict:
@@ -883,7 +1075,7 @@ def analyze_bgm(preset_name: str, video_id: str, audio_path: str | os.PathLike |
     ch = ident["chosen"]
     tr: LibraryTrack = ch["track"]
     al: Alignment = ch["alignment"]
-    clean, _ = _track_audio_and_features(tr, SR)
+    clean, clean_feat = _track_audio_and_features(tr, SR)
     model = build_bgm_model(bgm_sig, clean, SR, al)
     g = describe_gain(model, speech_fn)
     if not g.get("present"):
@@ -942,6 +1134,7 @@ def analyze_bgm(preset_name: str, video_id: str, audio_path: str | os.PathLike |
             "fade_in_s": _field(g["fade_in_s"], method="선형 진폭 페이드 모델: -25→-1.5 dB 구간/0.785"),
             "fade_out_s": _field(g["fade_out_s"], method="선형 진폭 페이드 모델: -25→-1.5 dB 구간/0.785"),
             "cuts": _field(g["cuts"]),
+            "loop": detect_restarts(bgm_sig, clean, SR, al, clean_feat=clean_feat),
             "alignment": {"mode": al.mode, "feature_ncc": round(al.feature_ncc, 4),
                           "coherence": None if al.coherence is None else round(al.coherence, 4),
                           "probes": al.probes, "margin_vs_other_tracks": round(ident["margin"], 4),

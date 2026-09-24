@@ -66,10 +66,12 @@ def _threads() -> str:
 
 
 # ----------------------------------------------------------------------------- gates
-def production_gate(r: ResolvedEdit, allow_unmeasured: bool = False) -> None:
+def production_gate(r: ResolvedEdit, allow_unmeasured: bool = False, preset: config.Preset | None = None) -> None:
     """Refuse production renders that break the user's gates, even when called directly
-    (not only through the CLI): unresolved SFX, missing first-episode approval, preset keys
-    that are unmeasured (unless allow_unmeasured) or linked to no code / no output check."""
+    (not only through the CLI): unresolved SFX, missing approval (first episode, or a later one when
+    approval.later_episodes_require_approval), preset keys that are unmeasured (unless allow_unmeasured)
+    or linked to no code / no output check.  ``preset``: the caller's preset object, so the reads of
+    this gate land in the caller's access log (``shortkit episode render``)."""
     if r.mode != "production":
         return
     res = config.audit(r.preset_name, production=True)
@@ -81,13 +83,15 @@ def production_gate(r: ResolvedEdit, allow_unmeasured: bool = False) -> None:
     bad = [s.id for s in r.audio.sfx if not s.path]
     if bad:
         raise RenderError(f"production 렌더 거부: 파일이 해결되지 않은 효과음 {bad} (sfx_map have 필요)")
-    from .plan import approval_state, load_plan
+    from .plan import approval_state_for, load_plan
 
     plan = load_plan(r.episode_id)
-    pr = config.load_preset(r.preset_name, None if r.format_id == "UNCLASSIFIED" else r.format_id)
-    st = approval_state(plan, bool(pr.get("approval.first_episode_requires_approval")))
+    pr = preset if preset is not None else \
+        config.load_preset(r.preset_name, None if r.format_id == "UNCLASSIFIED" else r.format_id)
+    st = approval_state_for(plan, pr)
     if st["required"] and not st["approved"]:
-        raise RenderError("production 렌더 거부: 첫 에피소드 제안서가 승인되지 않았습니다")
+        what = "첫 에피소드" if st["first_episode"] else f"{plan.get('episode_index')}번째 에피소드({st['rule_key']}=true)"
+        raise RenderError(f"production 렌더 거부: {what} 제안서가 승인되지 않았습니다")
 
 
 # ----------------------------------------------------------------------------- audio
@@ -777,10 +781,11 @@ def check_output_fonts(r: ResolvedEdit) -> dict:
     return cap_mod.verify_libass_fonts(ass_txt, paths.absp(r.fonts_dir), expected)
 
 
-def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False) -> Path:
-    """Render the master MP4 (contract API). Writes build/{mix.wav, stems/*.wav, render_report.json}."""
+def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False, preset: config.Preset | None = None) -> Path:
+    """Render the master MP4 (contract API). Writes build/{mix.wav, stems/*.wav, render_report.json}.
+    ``preset`` (optional): the caller's preset object for the production gate's traced reads."""
     r = resolved
-    production_gate(r, allow_unmeasured)
+    production_gate(r, allow_unmeasured, preset)
     build = paths.absp(f"episodes/{r.episode_id}/build")
     build.mkdir(parents=True, exist_ok=True)
     if not paths.absp(r.ass_path).is_file():

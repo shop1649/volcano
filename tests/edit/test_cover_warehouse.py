@@ -155,7 +155,7 @@ def test_cli_render_marks_used_only_in_production(root, plan, monkeypatch):
     write_plan(root, plan)
     out = root / "episodes/t1/output/t1.mp4"
 
-    def fake_render(r, allow_unmeasured=False):
+    def fake_render(r, allow_unmeasured=False, preset=None):
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_bytes(b"x")
         (root / "episodes/t1/build").mkdir(parents=True, exist_ok=True)
