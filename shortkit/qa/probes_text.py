@@ -112,7 +112,28 @@ def ink_mask(img: np.ndarray, cap, tol: float = 80.0) -> np.ndarray:
         k = int(op * 1.5) + 3
         near = cv2.dilate(om.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool)
         m &= near
+    elif (cap.box or {}).get("enabled"):
+        m &= box_regions(img, float(cap.size_px or 30))
     return m
+
+
+def box_regions(img: np.ndarray, size_px: float) -> np.ndarray:
+    """Mask of dark, rectangular label boxes (text holes closed) -- where box captions can be."""
+    cv2 = _cv2()
+    g = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    dark = (g < 110).astype(np.uint8)
+    k = max(3, int(size_px * 0.5))
+    closed = cv2.morphologyEx(dark, cv2.MORPH_CLOSE, np.ones((k, k), np.uint8))
+    n, lab, st, _ = cv2.connectedComponentsWithStats(closed, connectivity=4)
+    out = np.zeros(g.shape, bool)
+    for i in range(1, n):
+        x, y, w, h, a = st[i]
+        if h < 0.6 * size_px or h > 5 * size_px or w < 0.8 * h or w > g.shape[1] * 0.98:
+            continue
+        if a / float(w * h) < 0.75:
+            continue
+        out[y + 2:y + h - 2, x + 2:x + w - 2] = True
+    return out
 
 
 def _line_candidates(m: np.ndarray, line_h: float) -> list[list[int]]:
@@ -135,13 +156,25 @@ def _line_candidates(m: np.ndarray, line_h: float) -> list[list[int]]:
     return out
 
 
-def _ocr_mask_crop(m: np.ndarray, box: list[int], pad: int = 12) -> str:
+def _ocr_mask_crop(m: np.ndarray, box: list[int], pad: int = 12, short: bool = False) -> str:
     x, y, w, h = box
     H, W = m.shape
     x0, y0, x1, y1 = max(0, x - pad), max(0, y - pad), min(W, x + w + pad), min(H, y + h + pad)
     crop = np.where(m[y0:y1, x0:x1], 0, 255).astype(np.uint8)
-    up = 2 if h < 28 else 1
-    return ocr_text(crop, psm=7, upscale=up, lang=OCR_LANG)
+    up = 3 if h < 22 else (2 if h < 32 else 1)
+    txt = ocr_text(crop, psm=7, upscale=up, lang=OCR_LANG)
+    if short and len(norm_text(txt)) == 0:
+        txt = ocr_text(crop, psm=8, upscale=max(2, up), lang=OCR_LANG)
+    return txt
+
+
+def _matched_chars(a: str, b: str) -> int:
+    import difflib
+
+    na, nb = norm_text(a), norm_text(b)
+    if not na or not nb:
+        return 0
+    return sum(bl.size for bl in difflib.SequenceMatcher(None, na, nb).get_matching_blocks())
 
 
 def expected_lines(cap) -> list[str]:
@@ -161,27 +194,44 @@ def locate_caption(frame: np.ndarray, cap, max_ocr: int = 10) -> dict:
     cands = _line_candidates(m, line_h)
     ecx, ecy = ex + ew / 2, ey + eh / 2
     cands.sort(key=lambda b: math.hypot(b[0] + b[2] / 2 - ecx, b[1] + b[3] / 2 - ecy))
+    short = max((len(norm_text(l)) for l in lines), default=0) <= 3
     scored = []
     for b in cands[:max_ocr]:
-        txt = _ocr_mask_crop(m, b)
+        txt = _ocr_mask_crop(m, b, short=short)
         sims = [text_similarity(txt, l) for l in lines] or [0.0]
-        scored.append({"box": b, "ocr": txt, "sims": sims})
-    # assign each expected line its best candidate (greedy, distinct)
+        chars = [_matched_chars(txt, l) for l in lines] or [0]
+        scored.append({"box": b, "ocr": txt, "sims": sims, "chars": chars})
+    # assign each expected line its best candidate (greedy, distinct).  A match needs a similar
+    # text AND at least 2 matching characters (or the whole line when it is that short)
     used, chosen = set(), []
     for li in range(len(lines)):
+        need = min(2, len(norm_text(lines[li])))
         best = None
-        for k, s in enumerate(scored):
+        for k, s_ in enumerate(scored):
             if k in used:
                 continue
-            v = s["sims"][li] if li < len(s["sims"]) else 0.0
+            v = s_["sims"][li] if li < len(s_["sims"]) else 0.0
+            if s_["chars"][li] < need:
+                continue
             if best is None or v > best[0]:
                 best = (v, k)
         if best is not None and best[0] >= 0.34:
             used.add(best[1])
             chosen.append((li, scored[best[1]], best[0]))
-    res = {"n_candidates": len(cands), "mask_px": int(m.sum())}
+    res = {"n_candidates": len(cands), "mask_px": int(m.sum()), "match": "ocr"}
+    if not chosen and short and len(lines) == 1:
+        # 1-3 syllable captions ("헉!") are often unreadable for tesseract: accept the caption-coloured
+        # text block that overlaps the expected box (a caption drawn elsewhere is still not found)
+        from . import rect_iou
+
+        geo = [(rect_iou(s_["box"], [ex, ey, ew, eh]), k) for k, s_ in enumerate(scored)]
+        geo = [g for g in geo if g[0] >= 0.3]
+        if geo:
+            _, k = max(geo)
+            chosen.append((0, scored[k], scored[k]["sims"][0]))
+            res["match"] = "geometry(짧은 문구 OCR 실패)"
     if not chosen:
-        res.update(found=False, candidates=[{"box": s["box"], "ocr": s["ocr"]} for s in scored[:5]])
+        res.update(found=False, candidates=[{"box": s_["box"], "ocr": s_["ocr"]} for s_ in scored[:5]])
         return res
     boxes = [c[1]["box"] for c in chosen]
     x0 = min(b[0] for b in boxes)
@@ -295,6 +345,37 @@ def _ink_diff(frames: list[np.ndarray], rest: np.ndarray, mask: np.ndarray) -> n
     return np.array([float(np.abs(f.astype(np.float32)[mask] - r).mean()) for f in frames])
 
 
+def _presence(frames: list[np.ndarray], rest: np.ndarray, mask: np.ndarray, cap) -> tuple[np.ndarray, float]:
+    """Caption presence per frame, 0..1:
+    max( ink-vs-surround luminance contrast / contrast at rest  (fades, any background),
+         caption-coloured ink pixel count / count at rest       (pops, scaled text) ).
+    A white flash or a bright background gives neither contrast nor caption-coloured ink."""
+    cv2 = _cv2()
+    if mask.sum() < 10:
+        return np.full(len(frames), np.nan), 0.0
+    op = float(cap.outline_px or 0)
+    k1 = np.ones((3, 3), np.uint8)
+    k2 = np.ones((int(2 * max(op, 1.5) + 3),) * 2, np.uint8)
+    mu = mask.astype(np.uint8)
+    ring = cv2.dilate(mu, k2).astype(bool) & ~cv2.dilate(mu, k1).astype(bool)
+
+    def contrast(f):
+        g = cv2.cvtColor(f, cv2.COLOR_RGB2GRAY).astype(np.float32)
+        return float(g[mask].mean() - g[ring].mean()) if ring.sum() > 10 else 0.0
+
+    c_rest = contrast(rest)
+    # caption-coloured ink near the rest glyph positions (position-specific: other text elsewhere
+    # in the crop does not count)
+    near = cv2.dilate(mu, np.ones((int(max(3, float(cap.size_px or 30) * 0.12)),) * 2, np.uint8)).astype(bool)
+    n_rest = float((ink_mask(rest, cap) & near).sum()) or 1.0
+    out = []
+    for f in frames:
+        pc = contrast(f) / c_rest if abs(c_rest) >= 20 else 0.0
+        pn = float((ink_mask(f, cap) & near).sum()) / n_rest
+        out.append(min(1.0, max(0.0, max(pc, min(1.0, pn)))))
+    return np.array(out), c_rest
+
+
 def _ramp_start(ts, p, i) -> float:
     """Onset: frame i is the first clearly visible frame; if it is only partly visible (fade),
     extrapolate the presence ramp back to 0."""
@@ -334,29 +415,33 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
     out: dict = {"region": [X, Y, RW, RH]}
     dur_in = float(mi.get("dur_s") or 0.0)
     dur_out = float(mo.get("dur_s") or 0.0) if (mo.get("type") or "none") != "none" else 0.0
+    # other captions planned at the same place: keep the measurement windows off them
+    from . import rect_intersection
+
+    same_place = [o for o in ctx.resolved.captions if o.id != cap.id and
+                  rect_intersection([o.bbox.x, o.bbox.y, o.bbox.w, o.bbox.h], [X, Y, RW, RH]) > 0]
+    prev_end = max([o.end for o in same_place if o.end <= cap.start + fr], default=None)
+    next_start = min([o.start for o in same_place if o.start >= cap.end - fr], default=None)
     # ---------------- onset
     t_rest = min(cap.start + dur_in + 0.12, (cap.start + cap.end) / 2)
     t_a = max(0.0, cap.start - 0.35)
+    if prev_end is not None and prev_end > t_a:
+        t_a = prev_end
     t_b = max(t_rest + 2 * fr, cap.start + dur_in + 0.45)
     ts, frs = grab_window(ctx.mp4, t_a, t_b - t_a, crop=[X, Y, RW, RH])
     if frs:
         ir = int(np.argmin([abs(t - t_rest) for t in ts]))
         rest = frs[ir]
-        D = _ink_diff(frs, rest, mask)
-        norm = float(np.nanmax(D)) if np.any(np.isfinite(D)) else float("nan")
-        out["onset_contrast"] = rnd(norm, 1)
-        if not np.isfinite(norm):
+        p, c_rest = _presence(frs, rest, mask, cap)
+        out["onset_contrast"] = rnd(c_rest, 1)
+        if np.all(np.isnan(p)):
             out["onset"] = None
             out["onset_note"] = "자막 잉크 화소가 너무 적음"
-        elif norm < 12.0:
-            if cap.start < 2 * fr:
-                out["onset"] = round(ts[0], 4)
-                out["onset_note"] = "첫 프레임부터 표시"
-            else:
-                out["onset"] = None
-                out["onset_note"] = "자막 전후 화면 차이가 작아 등장 시점 측정 불가"
+        elif cap.start < 2 * fr and p[0] >= 0.85:
+            out["onset"] = round(ts[0], 4)
+            out["onset_note"] = "첫 프레임부터 표시"
+            out["motion_in_obs"] = {"type": "none", "note": "첫 프레임부터 완전히 표시(등장 모션 없음)"}
         else:
-            p = 1.0 - np.clip(D / norm, 0.0, 1.0)
             idx = None
             for i in range(len(p)):
                 if p[i] >= 0.15 and all(p[j] >= 0.15 for j in range(i, min(len(p), i + 3))):
@@ -365,43 +450,46 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
             if idx is None:
                 out["onset"] = None
                 out["onset_note"] = "자막이 기대 구간에 나타나지 않음"
+            elif idx == 0 and cap.start >= 2 * fr and ts[0] < cap.start - 1.5 * fr:
+                out["onset"] = None
+                out["onset_note"] = "측정 창 시작부터 이미 보임(기대보다 이른 등장?)"
+                out["onset_frame_t"] = round(ts[0], 4)
             else:
                 out["onset_frame_t"] = round(ts[idx], 4)
                 out["onset"] = round(_ramp_start(ts, p, idx), 4)
                 out.update(_motion_in(ts, frs, p, idx, rest, mask, cap, fps))
-            out["presence_in"] = [[rnd(a, 3), rnd(b, 3)] for a, b in zip(ts, p)]
+        out["presence_in"] = [[rnd(a, 3), rnd(b, 3)] for a, b in zip(ts, p)]
     # ---------------- offset
     if cap.end >= ctx.info.duration - 1.5 * fr:
-        ts2, frs2 = grab_window(ctx.mp4, max(0.0, ctx.info.duration - 1.0), 1.0, crop=[X, Y, RW, RH])
-        if frs2:
-            ir = 0
-            D2 = _ink_diff([frs2[-1]], frs2[ir], mask) if len(frs2) > 1 else np.array([np.nan])
-            # compare the last frame with the rest look measured at onset (same decode path)
-            if frs:
-                D2 = _ink_diff([frs2[-1]], rest, mask)
-            vis = bool(np.isfinite(D2[0]) and D2[0] < max(12.0, 0.3 * (out.get("onset_contrast") or 0)))
+        ts2, frs2 = grab_window(ctx.mp4, max(0.0, ctx.info.duration - 0.5), 0.5, crop=[X, Y, RW, RH])
+        if frs2 and frs:
+            p2, _ = _presence([frs2[-1]], rest, mask, cap)
+            vis = bool(np.isfinite(p2[0]) and p2[0] >= 0.85)
             out["offset"] = round(ctx.info.duration, 4) if vis else None
             out["offset_note"] = "영상 끝까지 표시" if vis else "마지막 프레임에 없음"
     else:
         t_c = max(0.0, cap.end - max(0.45, dur_out + 0.3))
-        ts2, frs2 = grab_window(ctx.mp4, t_c, (cap.end - t_c) + 0.35, crop=[X, Y, RW, RH])
+        t_d = cap.end + 0.35
+        if next_start is not None and next_start < t_d:
+            t_d = max(cap.end + fr, next_start)
+        ts2, frs2 = grab_window(ctx.mp4, t_c, t_d - t_c, crop=[X, Y, RW, RH])
         if frs2:
             t_r2 = max(t_c, cap.end - dur_out - 0.12)
             ir = int(np.argmin([abs(t - t_r2) for t in ts2]))
-            D2 = _ink_diff(frs2, frs2[ir], mask)
-            norm2 = float(np.nanmax(D2)) if np.any(np.isfinite(D2)) else float("nan")
-            if not np.isfinite(norm2) or norm2 < 12.0:
+            p2, c2 = _presence(frs2, frs2[ir], mask, cap)
+            if np.all(np.isnan(p2)):
                 out["offset"] = None
-                out["offset_note"] = "자막 전후 화면 차이가 작아 퇴장 시점 측정 불가"
+                out["offset_note"] = "자막 잉크 화소가 너무 적음"
             else:
-                p2 = 1.0 - np.clip(D2 / norm2, 0.0, 1.0)
                 vis = [i for i in range(len(p2)) if p2[i] >= 0.15]
                 last = vis[-1] if vis else None
-                if last is None or last >= len(p2) - 1:
+                if last is not None and last == len(p2) - 1 and next_start is not None and ts2[-1] + fr >= next_start - 1e-3:
+                    out["offset"] = round(ts2[last] + fr, 4)
+                    out["offset_note"] = "다음 자막과 붙어 있음(창 끝까지 표시)"
+                elif last is None or last >= len(p2) - 1:
                     out["offset"] = None
-                    out["offset_note"] = "퇴장 시점이 측정 창 밖"
+                    out["offset_note"] = "퇴장 시점이 측정 창 밖(기대보다 늦게까지 보임?)" if last is not None else "퇴장 직전 자막이 보이지 않음"
                 else:
-                    # fade-out: extrapolate the falling ramp to zero; hard cut: next frame time
                     k0 = last
                     while k0 > 0 and 0.12 < p2[k0 - 1] < 0.92:
                         k0 -= 1
@@ -470,20 +558,30 @@ def measure_font(frame: np.ndarray, cap, bbox) -> dict:
     pad = int(float(cap.outline_px or 0) + 6)
     crop = frame[max(0, y - pad):y + h + pad, max(0, x - pad):x + w + pad]
     text = "\n".join(expected_lines(cap))
-    cands = [(cap.font_name, exp_path)]
+    # fonts are passed by exact NAME so .ttc collections resolve to the right face
+    cands = [cap.font_name]
     if find_font is not None:
-        for alt in ("NanumGothic", "Noto Sans CJK KR Regular", "NanumMyeongjo"):
+        for alt in ("NanumGothic", "Noto Sans CJK KR Regular", "NanumMyeongjo", "Noto Sans CJK KR Black",
+                    "Noto Sans CJK KR Bold"):
             if alt.replace(" ", "").lower() == str(cap.font_name).replace(" ", "").lower():
                 continue
-            ap = find_font(alt)
-            if ap is not None and ap != exp_path:
-                cands.append((alt, ap))
-            if len(cands) >= 3:
+            if find_font(alt) is not None:
+                cands.append(alt)
+            if len(cands) >= 4:
                 break
     scores = []
-    for name, fp in cands:
+    for name in cands:
         try:
-            r = font_iou(crop, text, fp, cap.size_px, fill_rgb=hex_rgb(cap.color),
+            target = name
+            if name == cap.font_name and cap.font_file:
+                try:
+                    from ..fonts import font_face_index
+                    from ..reference.typography import font_ref
+
+                    target = font_ref(exp_path, font_face_index(exp_path, cap.font_name) or 0)
+                except Exception:
+                    target = name
+            r = font_iou(crop, text, target, cap.size_px, fill_rgb=hex_rgb(cap.color),
                          outline_rgb=hex_rgb(cap.outline_color) if cap.outline_px else None)
             scores.append({"font": name, "iou": rnd((r or {}).get("iou"), 4), "scale": rnd((r or {}).get("scale"), 3)})
         except Exception as e:
@@ -512,11 +610,12 @@ def classify_register(texts: list[str]) -> dict:
             cnt["반말_구어체"] += 1
         else:
             cnt["기타"] += 1
-    n = sum(cnt.values())
-    mode = cnt.most_common(1)[0][0] if n else None
-    if n and cnt.most_common(1)[0][1] / n < 0.7 and len([k for k in cnt if k != "기타"]) > 1:
+    real = {k: v for k, v in cnt.items() if k != "기타"}
+    n = sum(real.values())
+    mode = max(real, key=real.get) if n else None
+    if n and max(real.values()) / n < 0.7 and len(real) > 1:
         mode = "혼합"
-    return {"n": n, "counts": dict(cnt), "mode": mode}
+    return {"n": n, "counts": dict(cnt), "mode": mode, "note": "기타(감탄사·명사 끝)는 판정에서 제외"}
 
 
 # ----------------------------------------------------------------------------- identity / corners
@@ -726,8 +825,11 @@ def probe_text(ctx: QAContext) -> dict:
     except Exception as e:
         res["errors"]["identity"] = f"{type(e).__name__}: {e}"
     try:
-        good = [c.get("ocr", "") for c in res["captions"] if c.get("found") and (c.get("similarity") or 0) >= 0.6]
+        # the channel's own voice: narration roles only (dialogue quotes real speech; title/speaker are labels)
+        good = [c.get("ocr", "") for c in res["captions"] if c.get("found") and (c.get("similarity") or 0) >= 0.6
+                and c.get("role") in ("situation", "description", "reaction")]
         res["tone"] = classify_register(good)
+        res["tone"]["roles_used"] = ["situation", "description", "reaction"]
     except Exception as e:
         res["errors"]["tone"] = f"{type(e).__name__}: {e}"
     try:

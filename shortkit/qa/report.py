@@ -110,7 +110,7 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         "output": {"path": paths.relp(ctx.mp4), "sha256": sha, "duration": round(ctx.info.duration, 4),
                    "resolution": [ctx.info.width, ctx.info.height], "fps": ctx.info.fps,
                    "has_audio": ctx.info.has_audio},
-        "reference": {"path": paths.relp(ctx.reference_mp4) if ctx.reference_mp4 else None, "video_id": ctx.reference_id,
+        "reference": {"path": _safe_rel(ctx.reference_mp4), "video_id": ctx.reference_id,
                       "analysis_files": sorted(ctx.reference_analysis.keys())},
         "tools": _tools(probes),
         "timing_s": {**timing, "total_s": round(time.time() - t0, 1)},
@@ -135,6 +135,19 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         rep["defects"] = {"error": f"{type(e).__name__}: {e}"}
     (ctx.qa_dir / "report.md").write_text(render_md(rep), encoding="utf-8")
     return rep
+
+
+def _safe_rel(p) -> str | None:
+    """Root-relative path for storage; a file outside the project is recorded by name only
+    (absolute / machine-specific paths are never stored)."""
+    from .. import paths
+
+    if p is None:
+        return None
+    try:
+        return paths.relp(p)
+    except ValueError:
+        return f"(프로젝트 밖 파일: {Path(p).name})"
 
 
 def _tools(probes: dict) -> dict:

@@ -36,7 +36,7 @@ import re
 import subprocess
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Iterable
 
 import numpy as np
 
@@ -455,7 +455,7 @@ def detect_overlays(src: str | Path, params: DetectParams | None = None) -> dict
         cur.prev_small = small
 
     def close_shot(t_end: float) -> None:
-        nonlocal buffer, shot_samples
+        nonlocal buffer
         if cur is None:
             return
         # every shot gets >= 2 analysed samples when it has the frames for it

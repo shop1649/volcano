@@ -15,7 +15,7 @@ ground truth we control exactly, plus the matching ``build/resolved.json`` and `
           SFX pop/whoosh/ding/boom at known times, then one linear loudness gain
 
 The BAD variant contains deliberate mistakes (the IR stays the GOOD plan):
-  situation caption drawn 353 px higher (over the declared male face), BGM from 20.0 s
+  situation caption drawn 353 px higher (over the declared male face), BGM from 17.0 s
   (wrong section), extra ducking 1.2-1.9 s (outside kept dialogue), an extra planned-type SFX
   (pop at 6.9 s, no event), an unknown SFX (click at 1.6 s), watermark left in (no delogo),
   decoration drawn 40 px to the right (blink kept).
@@ -82,7 +82,7 @@ ORIG = dict(clip_id="c2", path=f"{GEN}/dirty_source.mp4", src=(8.0, 10.3), out=(
 TARGET_LUFS = -18.0
 PROTECTED = dict(label="남성 얼굴", x=456, y=80, w=136, h=170, start=10.0, end=12.5)
 
-BAD = dict(caption_dy={"s1": -353}, bgm_section=20.0, extra_duck=[(1.2, 1.9)],
+BAD = dict(caption_dy={"s1": -353}, bgm_section=17.0, extra_duck=[(1.2, 1.9)],
            extra_sfx=[dict(type="pop", t=6.9, gain=-6.0), dict(type="click", t=1.6, gain=-3.0)],
            no_delogo=True, deco_dx=40.0)
 
@@ -243,7 +243,8 @@ def build_audio(bad: bool, out_wav: Path) -> dict:
     bgm = music[a:a + n]
     mix = np.zeros((n, 2), np.float64)
     mix[:len(bgm)] += bgm * _db(BGM["gain"]) * _bgm_env(n, bad)[:len(bgm), None]
-    o = read_audio(root / ORIG["path"], sr=SR, mono=True, start=ORIG["src"][0], duration=ORIG["src"][1] - ORIG["src"][0])
+    o = read_audio(root / ORIG["path"], sr=SR, mono=False, start=ORIG["src"][0],
+                   duration=ORIG["src"][1] - ORIG["src"][0]).mean(axis=1)          # (L+R)/2
     k = len(o)
     fl = int(ORIG["fade"] * SR)
     env = np.ones(k)

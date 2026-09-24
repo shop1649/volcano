@@ -131,6 +131,23 @@ def snapshot_blocker(preset: str) -> str:
     return "레퍼런스 영상 분석 결과 없음(`shortkit ref download` → `shortkit ref analyze` 필요)"
 
 
+def scrub(text: str) -> str:
+    """Remove machine-specific locations (project root, home directory) from text that is stored
+    (error messages from yt-dlp/ffmpeg can contain absolute paths)."""
+    import os
+
+    out = str(text or "")
+    try:
+        root = str(paths.project_root())
+        out = out.replace(root + os.sep, "").replace(root, ".")
+    except RuntimeError:
+        pass
+    home = os.path.expanduser("~")
+    if home and home not in ("/", "~"):
+        out = out.replace(home, "~")
+    return out
+
+
 # ----------------------------------------------------------------------------- colors
 def hexrgb(rgb: Iterable[float]) -> str:
     r, g, b = [int(round(min(255.0, max(0.0, float(c))))) for c in list(rgb)[:3]]

@@ -187,14 +187,6 @@ def detect_lines(rgb: np.ndarray, prev_gray: np.ndarray | None) -> tuple[list[tu
     m = grad >= 60
     if prev_gray is not None:
         m &= cv2.absdiff(gray, prev_gray) < 14
-    # long straight edges (box borders, table edges, frame lines) would glue glyphs to the scenery:
-    # cut them out before looking at components (glyph strokes are shorter than these kernels)
-    mu8 = m.astype(np.uint8)
-    lh = max(40, int(round(0.06 * W)))
-    lv = max(40, int(round(0.06 * H)))
-    straight = cv2.morphologyEx(mu8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (lh, 1))) | \
-        cv2.morphologyEx(mu8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1, lv)))
-    m &= straight == 0
     # edge components -> keep only glyph-like ones (strong contrast, not long thin frames/lines)
     n0, lab0, st0, _ = cv2.connectedComponentsWithStats(m.astype(np.uint8), 8)
     min_h = max(8, int(round(0.008 * H)))
@@ -235,7 +227,9 @@ def detect_lines(rgb: np.ndarray, prev_gray: np.ndarray | None) -> tuple[list[tu
 def _split_rows(mask: np.ndarray, min_h: int) -> list[tuple[int, int]]:
     prof = mask.sum(axis=1).astype(float)
     h = len(prof)
-    if h < 2 * min_h or prof.max() <= 0:
+    # only boxes tall enough to hold two lines are split; each part must itself be line-sized
+    # (small unoutlined Hangul has empty rows between stacked jamo inside ONE line)
+    if h < 2.2 * min_h or prof.max() <= 0:
         return [(0, h)]
     empty = prof <= 0.04 * prof.max()
     parts, start = [], None
@@ -249,8 +243,9 @@ def _split_rows(mask: np.ndarray, min_h: int) -> list[tuple[int, int]]:
     parts = [p for p in parts if p[1] >= max(3, 0.3 * min_h)]
     if len(parts) <= 1:
         return [(0, h)] if not parts else [parts[0]]
-    good = [p for p in parts if p[1] >= 0.3 * h or p[1] >= min_h]
-    return good or [(0, h)]
+    if any(p[1] < max(min_h, 0.35 * h / len(parts)) for p in parts):
+        return [(0, h)]
+    return parts
 
 
 def _merge_lines(boxes: list[tuple[int, int, int, int]]) -> list[tuple[int, int, int, int]]:
@@ -562,6 +557,8 @@ def _shadow(crop: np.ndarray, ink: np.ndarray, bg_col) -> tuple[float | None, st
     import cv2
     if bg_col is None:
         return None, None
+    if float(np.dot(np.asarray(bg_col, float), [0.2126, 0.7152, 0.0722])) < 50:
+        return None, None       # a (dark) shadow on a dark background is invisible: cannot tell
     Hc, Wc = ink.shape
     near = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
     best = 0
@@ -1101,9 +1098,22 @@ def box_alpha(item: dict, ref: dict) -> dict:
 
 
 # ============================================================================= roles
-def assign_roles(items: list[dict], duration: float, H: int, speech: list[tuple[float, float]] | None) -> None:
+def _norm_text(t: str) -> str:
+    return re.sub(r"[^0-9a-z\uac00-\ud7a3]", "", (t or "").lower())
+
+
+def assign_roles(items: list[dict], duration: float, H: int, speech: list[tuple[float, float]] | None,
+                 identity_texts: list[str] | None = None) -> None:
     for it in items:
         it["role"], it["role_reason"] = "unknown", ""
+    # the reference channel's own name/logo text is an identity mark, never a caption style sample
+    marks = [m for m in (_norm_text(x) for x in identity_texts or []) if len(m) >= 3]
+    for it in items:
+        nt = _norm_text(it["text"])
+        if marks and any(m in nt for m in marks):
+            it["role"] = "identity_mark"
+            it["role_reason"] = "채널 고유 식별 문구(identity_exclusions.forbidden_text)와 일치 → 자막 스타일 측정에서 제외"
+    items = [it for it in items if it["role"] == "unknown"]
     if not items:
         return
 
@@ -1185,8 +1195,13 @@ def assign_roles(items: list[dict], duration: float, H: int, speech: list[tuple[
 # ============================================================================= main entry
 def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: float = DEFAULT_FPS,
             region: dict | None = None, out_dir: Path | None = None, save_frames: bool = True,
-            role_fonts: dict[str, str] | None = None, max_seconds: float | None = None) -> tuple[dict, dict]:
-    """Analyze one video; writes captions.json + layout.json (+ evidence frames) into out_dir."""
+            role_fonts: dict[str, str] | None = None, max_seconds: float | None = None,
+            identity_texts: list[str] | None = None) -> tuple[dict, dict]:
+    """Analyze one video; writes captions.json + layout.json (+ evidence frames) into out_dir.
+
+    ``identity_texts``: the reference channel's own name variants (preset
+    ``identity_exclusions.forbidden_text``); matching lines get role ``identity_mark`` and are
+    excluded from the role style summaries."""
     video = Path(video)
     info = probe(video)
     W, H = int(info.width), int(info.height)
@@ -1226,7 +1241,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
         it["style"] = _item_style(grp)
         it["_ref"] = ref
         items.append(it)
-    assign_roles(items, duration, H, speech)
+    assign_roles(items, duration, H, speech, identity_texts)
     for it in items:
         # dialogue timing relative to the real line it quotes (needs the audio analysis)
         it["style"]["lead_s"] = None
@@ -1292,6 +1307,8 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
                 "speech_source": "audio/original.json" if speech else None,
                 "items": captions_items,
                 "presence": {r: tri_state([any(c["role"] == r for c in captions_items)]) for r in ROLES},
+                "identity_marks": [{"text": c["text"], "bbox": c["bbox"], "start": c["start"], "end": c["end"],
+                                    "frame": c.get("frame")} for c in captions_items if c["role"] == "identity_mark"],
                 "presence_note": "없다 = 이 영상의 자동 검출에서 해당 역할 자막을 찾지 못함"}
     layout = {"schema": SCHEMA_LAYOUT, "video_id": video_id, "resolution": [W, H],
               "video_region": region.get("video_region"), "background": region.get("background", "unmeasured"),

@@ -21,7 +21,7 @@ from ..util.hashing import sha256_file
 from ..util.jsonio import append_jsonl, now_iso, read_jsonl
 from ..util.media import probe
 from .collect import Blocked, classify_error
-from .common import reference_dir, safe_id, say, videos_dir, warn
+from .common import reference_dir, safe_id, say, scrub, videos_dir, warn
 
 FORMAT = ("bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]/"
           "bv*[height<=1080]+ba/b[height<=1080]")
@@ -88,7 +88,7 @@ def download(preset: str, ids: list[str], max_height: int = 1080, cookies: str |
         try:
             info = fetch(url, vdir, max_height, cookies)
         except Exception as e:
-            msg = f"{type(e).__name__}: {e}"
+            msg = scrub(f"{type(e).__name__}: {e}")
             kind = classify_error(msg)
             append_jsonl(rdir / "download_log.jsonl", {"video_id": vid, "status": kind, "error": msg[:2000],
                                                        "at": now_iso()})

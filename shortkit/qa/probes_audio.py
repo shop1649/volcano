@@ -35,29 +35,38 @@ FINE = 0.05
 # ----------------------------------------------------------------------------- decoding
 def load_mono(path, sr: int = SR, start: float | None = None, duration: float | None = None,
               tempo: float = 1.0) -> np.ndarray:
-    """Decode to mono float32; optional pitch-preserving tempo change (ffmpeg atempo chain)."""
-    from ..util.media import FFMPEG, probe, read_audio
+    """Decode to mono float32 with an explicit (L+R)/2 downmix for stereo (ffmpeg's default -ac 1
+    uses 0.707*(L+R), which would make a mono signal placed on both channels look +3 dB louder
+    than a stereo one).  Optional pitch-preserving tempo change (ffmpeg atempo chain)."""
+    from ..util.media import FFMPEG, probe
 
-    if abs(tempo - 1.0) < 1e-6:
-        return read_audio(path, sr=sr, mono=True, start=start, duration=duration)
     info = probe(path)
     if not info.has_audio:
-        return np.zeros(0, np.float32)
-    chain, r = [], float(tempo)
-    while r > 2.0:
-        chain.append("atempo=2.0")
-        r /= 2.0
-    while r < 0.5:
-        chain.append("atempo=0.5")
-        r /= 0.5
-    chain.append(f"atempo={r:.6f}")
+        dur = duration if duration is not None else max(0.0, info.duration - (start or 0.0))
+        return np.zeros(int(round(dur * sr)), np.float32)
+    chain = []
+    ch = int(info.audio_channels or 1)
+    if ch == 2:
+        chain.append("pan=mono|c0=0.5*c0+0.5*c1")
+    if abs(tempo - 1.0) >= 1e-6:
+        r = float(tempo)
+        while r > 2.0:
+            chain.append("atempo=2.0")
+            r /= 2.0
+        while r < 0.5:
+            chain.append("atempo=0.5")
+            r /= 0.5
+        chain.append(f"atempo={r:.6f}")
     args = [FFMPEG, "-hide_banner", "-nostdin", "-v", "error"]
     if start is not None:
         args += ["-ss", f"{start:.6f}"]
     args += ["-i", str(path)]
     if duration is not None:
         args += ["-t", f"{duration:.6f}"]
-    args += ["-vn", "-af", ",".join(chain), "-ac", "1", "-ar", str(sr), "-f", "f32le", "-"]
+    args += ["-vn"]
+    if chain:
+        args += ["-af", ",".join(chain)]
+    args += ["-ac", "1", "-ar", str(sr), "-f", "f32le", "-"]
     raw = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
     return np.frombuffer(raw, np.float32).copy()
 
@@ -152,15 +161,58 @@ def global_align(y: np.ndarray, ref: np.ndarray, min_overlap: float = 0.5, sr: i
     ey = float((y.astype(np.float64) ** 2).sum())
     ncc_all = c / np.sqrt(np.maximum(e, 1e-12) * ey + 1e-12)
     ok = (b - a) >= min_overlap * min(ny, nr)
+    valid = ncc_all[ok]
     ncc_all = np.where(ok, ncc_all, -np.inf)
     k = int(np.argmax(ncc_all))
     best = float(ncc_all[k])
+    # detection significance: how far the peak stands above the correlation at all other lags
+    z = float((best - valid.mean()) / (valid.std() + 1e-12)) if valid.size > 10 else 0.0
     sr_guard = int(0.5 * sr)
     far = ncc_all.copy()
     far[max(0, k - sr_guard):k + sr_guard] = -np.inf
     k2 = int(np.argmax(far))
     ru = {"lag": int(L[k2]), "ncc": round(float(far[k2]), 4)} if np.isfinite(far[k2]) else None
-    return {"lag": int(L[k]), "ncc": best, "runner_up": ru}
+    return {"lag": int(L[k]), "ncc": best, "runner_up": ru, "z": z}
+
+
+def local_match(y: np.ndarray, ref_al: np.ndarray, sr: int = SR, win: float = 0.25) -> dict:
+    """How well an aligned reference explains the mix, window by window.
+    q95/q70 of per-window NCC (the music matches almost perfectly wherever it dominates) and the
+    energy fraction a per-window gain fit explains, versus the same fit with the reference
+    shifted to unrelated offsets (null)."""
+    L = int(win * sr)
+    vals = []
+    for a in range(0, len(y) - L + 1, L):
+        yw = y[a:a + L].astype(np.float64)
+        rw = ref_al[a:a + L].astype(np.float64)
+        er = float((rw ** 2).sum())
+        ey = float((yw ** 2).sum())
+        if er < 1e-9 or ey < 1e-12:
+            continue
+        vals.append(float((yw * rw).sum() / np.sqrt(er * ey)))
+
+    def explained(r):
+        _, _, res = window_ls(y, [r], sr, win)
+        return 1.0 - float((res.astype(np.float64) ** 2).sum()) / max(1e-12, float((y.astype(np.float64) ** 2).sum()))
+
+    ex = explained(ref_al)
+    nulls = []
+    for sh in (0.31, 0.73, 1.37):
+        k = int(sh * sr)
+        nulls.append(explained(np.r_[ref_al[k:], np.zeros(k, np.float32)]))
+    null = float(np.median(nulls))
+    if not vals:
+        return {"n": 0, "q95": 0.0, "q70": 0.0, "explained": round(ex, 4), "explained_null": round(null, 4)}
+    return {"n": len(vals), "q95": round(float(np.percentile(vals, 95)), 4), "q70": round(float(np.percentile(vals, 70)), 4),
+            "explained": round(ex, 4), "explained_null": round(null, 4)}
+
+
+def match_found(lm: dict) -> bool:
+    """The file is in the mix at this alignment when, in the windows where it dominates, the mix
+    matches it almost exactly (q95 of 0.25 s window NCC >= 0.7; unrelated music stays < 0.5).
+    The explained-energy numbers are reported but not used: per-window gain fits also explain some
+    energy with a wrong tempo."""
+    return bool(lm.get("q95", 0) >= 0.7)
 
 
 def refine_offset(y: np.ndarray, ref: np.ndarray, approx_lag: int, search: int) -> tuple[int, float]:
@@ -503,27 +555,34 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
                         continue
                     ref = music if r_used == 1.0 else load_mono(bp, sr, tempo=r_used)
                     ga = global_align(y, ref, sr=sr)
+                    ga["local"] = local_match(y, align_signal(ref, ga["lag"], n), sr)
                     tried[r_used] = ga
                     refs[r_used] = ref
-                b_info["tempo_candidates"] = {str(k): rnd(v["ncc"], 4) for k, v in tried.items()}
-                r_best = max(tried, key=lambda k: tried[k]["ncc"])
+                b_info["tempo_candidates"] = {str(k): {"ncc": rnd(v["ncc"], 4), **v["local"]} for k, v in tried.items()}
+                r_best = max(tried, key=lambda k: (tried[k]["local"]["q95"], tried[k]["ncc"]))
                 ga = tried[r_best]
                 pl = next((v for k, v in tried.items() if abs(k - (1.0 if abs(rp - 1) < 0.0025 else rp)) < 0.002), None)
                 b_info["planned_tempo_waveform_ncc"] = rnd(pl["ncc"], 4) if pl else None
                 b_info["waveform_ncc"] = rnd(ga["ncc"], 4)
-                if ga["ncc"] >= 0.3:
+                b_info["local_match"] = ga["local"]
+                # the planned file is "found" when, at its best lag, the mix matches it almost exactly
+                # wherever it dominates
+                if match_found(ga["local"]):
                     L = ga["lag"]
                     b_info["found"] = True
                     b_info["offset_method"] = "waveform cross-correlation"
                     b_info["tempo_obs"] = round(r_best, 4)
                     b_info["section_start_obs"] = rnd(L / sr * r_best, 4)
                     if ga.get("runner_up"):
-                        b_info["runner_up_section"] = {"section_start_s": rnd(ga["runner_up"]["lag"] / sr * r_best, 3),
-                                                       "ncc": ga["runner_up"]["ncc"]}
+                        ru_l = ga["runner_up"]["lag"]
+                        lm_ru = local_match(y, align_signal(refs[r_best], ru_l, n), sr)
+                        b_info["runner_up_section"] = {"section_start_s": rnd(ru_l / sr * r_best, 3),
+                                                       "ncc": ga["runner_up"]["ncc"], "explained": lm_ru["explained"],
+                                                       "q95": lm_ru["q95"]}
                     bgm_al = align_signal(refs[r_best], L, n)
                 else:
                     b_info["found"] = False
-                    b_info["reason"] = "계획한 음악 파일의 파형을 출력에서 찾지 못함(파형 상관 < 0.3)"
+                    b_info["reason"] = "계획한 음악 파일의 파형을 출력에서 찾지 못함(0.25초 창별 상관 q95 < 0.7)"
                 b_info["status"] = "measured"
             except Exception as e:
                 b_info["status"] = "unmeasured"

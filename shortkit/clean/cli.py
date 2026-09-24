@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from .. import paths
@@ -19,6 +18,8 @@ def register(p: argparse.ArgumentParser) -> None:
     d = sub.add_parser("detect", help="원본 로고·출처 오버레이·원어 자막 검출 → warehouse/overlays/<sha256>.json")
     d.add_argument("--source", required=True, help="소스 영상 경로(프로젝트 루트 기준 또는 절대 경로)")
     d.add_argument("--sample-fps", type=float, default=2.0, help="분석 프레임 수/초 (기본 2)")
+    d.add_argument("--max-samples", type=int, default=240,
+                   help="분석 프레임 상한(긴 영상은 sample-fps 가 자동으로 낮아짐 → 짧은 자막을 놓칠 수 있음)")
     d.add_argument("--no-ocr", action="store_true", help="OCR 끄기(글자 검사는 '못 잼'으로 기록)")
     d.add_argument("--json", action="store_true", help="결과 JSON 을 그대로 출력")
     d.set_defaults(func=cmd_detect)
@@ -163,7 +164,12 @@ def cmd_detect(args) -> int:
     from .detect import DetectParams, detect_overlays, summary_ko
 
     src = _src(args.source)
-    doc = detect_overlays(src, DetectParams(sample_fps=args.sample_fps, ocr=not args.no_ocr))
+    doc = detect_overlays(src, DetectParams(sample_fps=args.sample_fps, max_samples=args.max_samples,
+                                            ocr=not args.no_ocr))
+    used = doc["params"]["sample_fps_used"]
+    if used < args.sample_fps - 1e-6:
+        print(f"주의: 영상이 길어 분석 간격이 {1 / used:.2f}s 로 늘어남 → 그보다 짧은 자막은 놓칠 수 있음 "
+              f"(--max-samples 로 늘리기)")
     if args.json:
         print(json.dumps(doc, ensure_ascii=False, indent=2))
     else:
@@ -278,6 +284,8 @@ def cmd_apply(args) -> int:
             return 1
         clean = plan["clean"]
         res = apply_clean(src, clean, out, threads=args.threads)
+        res["plan_status"] = plan.get("status")
+        res["review_reasons"] = plan.get("review_reasons") or []
     ver = verify_doc(out, doc, clean=clean)
     append_history(sha, {"action": "apply", "out": _rel(out), "out_sha256": res["sha256"], "clean": clean,
                          "verify": ver["rows"]})
@@ -286,6 +294,13 @@ def cmd_apply(args) -> int:
     _append_removals(sha, removals)
     print(f"출력: {_rel(out) or out.name}  sha256={res['sha256'][:12]}")
     _print_verify(ver["rows"])
+    checks = doc.get("checks") or {}
+    pending = res.get("review_reasons") or [f"{k}: {v.get('status')}" for k, v in checks.items()
+                                            if isinstance(v, dict) and v.get("status") != "measured"]
+    if pending:
+        print("주의: 검출된 오버레이는 처리했지만 이 소스의 정리는 '완료'가 아님(사람 확인 필요):")
+        for r in pending:
+            print(f"  ! {r}")
     bad = [r for r in ver["rows"] if r["residual"] or r["status"] != "measured"]
     return 1 if bad else 0
 

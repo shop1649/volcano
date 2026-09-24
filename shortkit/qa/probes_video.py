@@ -949,26 +949,43 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
             og = cv2.cvtColor(oreg, cv2.COLOR_RGB2GRAY).astype(np.float32)
             exp_s = src_time(c, t)
             try:
-                ts, frs = grab_window(p, max(0.0, exp_s - 0.8), 1.6)
+                ts, frs = grab_window(p, max(0.0, exp_s - 1.2), 2.4)
             except Exception:
                 continue
             tr = clip_transform(c, t)
             M = np.array([[tr["s"] * k, 0, (tr["tx"] - rx) * k], [0, tr["s"] * k, (tr["ty"] - ry) * k]], np.float32)
-            best = (-2.0, None)
-            vals = []
+            warped = []
             for st, sf in zip(ts, frs):
                 w_ = cv2.warpAffine(sf, M, (work_w, wh), flags=cv2.INTER_AREA)
-                g = cv2.cvtColor(w_, cv2.COLOR_RGB2GRAY).astype(np.float32)
-                v = ncc(g, og)
+                warped.append(cv2.cvtColor(w_, cv2.COLOR_RGB2GRAY).astype(np.float32))
+            if not warped:
+                continue
+            # compare only where the source actually changes over the search window (people moving);
+            # a still background matches every source time equally
+            stack = np.stack(warped)
+            tstd = stack.std(axis=0)
+            thr = max(3.0, float(np.percentile(tstd, 85)))
+            mmask = tstd >= thr
+            use_mask = mmask.mean() >= 0.01
+            vals = []
+            best = (-2.0, None)
+            for st, g in zip(ts, warped):
+                v = ncc(g[mmask], og[mmask]) if use_mask else ncc(g, og)
                 vals.append(v)
                 if v > best[0]:
                     best = (v, st)
             if best[1] is not None:
-                # how sharply does the best source time stand out?  (a still scene matches every time)
-                contrast = float(best[0] - np.percentile(vals, 20)) if len(vals) >= 5 else 0.0
+                # does the best source time stand out?  prominence = best minus the best match at least
+                # 0.25 s away (a still scene matches every time); a best at the window edge may lie outside
+                far = [v for st, v in zip(ts, vals) if abs(st - best[1]) >= 0.25]
+                prominence = float(best[0] - max(far)) if far else 0.0
+                at_edge = best[1] <= ts[0] + 1e-3 or best[1] >= ts[-1] - 1e-3
+                full_ncc = ncc(warped[int(np.argmax(vals))], og)
                 samples.append({"t": rnd(t, 3), "expected_src_t": rnd(exp_s, 3), "matched_src_t": rnd(best[1], 3),
-                                "ncc": rnd(best[0], 3), "offset": rnd(best[1] - exp_s, 3), "contrast": rnd(contrast, 4),
-                                "decisive": bool(contrast >= 0.02)})
+                                "ncc": rnd(full_ncc, 3), "ncc_moving": rnd(best[0], 3), "offset": rnd(best[1] - exp_s, 3),
+                                "prominence": rnd(prominence, 4), "moving_frac": rnd(float(mmask.mean()), 3),
+                                "at_window_edge": bool(at_edge),
+                                "decisive": bool(use_mask and prominence >= 0.03 and not at_edge)})
         item["samples"] = samples
         item["src_fps"] = rnd(_info(p).fps, 3)
         good = [s for s in samples if s["ncc"] >= 0.6 and s["decisive"]]

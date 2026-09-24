@@ -41,6 +41,7 @@ def analyze_video(preset: str, vid: str, video: Path, fps: float = 5.0, only: se
 
     pr = load_preset(preset)
     role_fonts = {r: pr.get(f"text.roles.{r}.font_name") for r in pr.section("text.roles").keys()}
+    identity = list(pr.get("identity_exclusions.forbidden_text", []) or [])
     out_dir = analysis_dir(preset, vid)
     out_dir.mkdir(parents=True, exist_ok=True)
     region = detect_video_region(video, max_seconds=max_seconds)
@@ -51,7 +52,7 @@ def analyze_video(preset: str, vid: str, video: Path, fps: float = 5.0, only: se
     if "text" in only:
         res["captions"], res["layout"] = textboxes.analyze(video, vid, preset, fps=fps, region=region,
                                                             out_dir=out_dir, role_fonts=role_fonts,
-                                                            max_seconds=max_seconds)
+                                                            max_seconds=max_seconds, identity_texts=identity)
     if "motion" in only:
         res["motion"] = motion.analyze(video, vid, preset, region=region, out_dir=out_dir, max_seconds=max_seconds)
     return res

@@ -471,18 +471,22 @@ def aggregate(preset: str, ids: list[str] | None = None) -> dict:
             dur = (d.get("shots") or {}).get("duration") or (d.get("captions") or {}).get("duration")
             if dur:
                 S.append({"video_id": vid, "format_id": d["format_id"], "value": float(dur), "t": None, "frame": None})
-    dur_item = num_item("structure.duration_s", S, "s",
-                        "latest100 스냅샷의 영상 길이(플랫폼 메타데이터)" if snap_ok else "분석한 영상 파일의 길이",
-                        snapshot_blocker(preset) if not S else "", digits=2)
-    if dur_item["status"] == "measured":
-        # the preset stores the whole distribution under this key
-        dur_item["value"] = {k: dur_item["overall"][k] for k in ("n", "p10", "p50", "p90")}
-        for fmt, st in dur_item["by_format"].items():
-            st["value"] = {k: st[k] for k in ("n", "p10", "p50", "p90")}
-    groups["visual_structure"].append(dur_item)
+    # the preset stores the distribution itself (structure.duration_s.{n,p10,p50,p90}): one item per leaf
+    dmethod = ("latest100 스냅샷의 영상 길이(플랫폼 메타데이터)" if snap_ok else "분석한 영상 파일의 길이")
+    dblk = snapshot_blocker(preset) if not S else ""
+    for leaf in ("p10", "p50", "p90"):
+        groups["visual_structure"].append(num_item(f"structure.duration_s.{leaf}", S, "s", dmethod + f" → {leaf}",
+                                                   dblk, rule=leaf, digits=2))
+    n_item = num_item("structure.duration_s.n", S, "videos", dmethod + " → 표본 수", dblk, digits=0)
+    if n_item["status"] == "measured":
+        n_item["value"] = int(n_item["overall"]["n"])
+        for st in n_item["by_format"].values():
+            st["value"] = int(st["n"])
+    groups["visual_structure"].append(n_item)
     F = []
     for vid, d in videos.items():
-        items = [c for c in (d.get("captions") or {}).get("items") or [] if c["role"] not in ("title", "description")]
+        items = [c for c in (d.get("captions") or {}).get("items") or []
+                 if c["role"] not in ("title", "description", "identity_mark", "unknown")]
         if items:
             first = min(items, key=lambda c: c["start"])
             F.append({"video_id": vid, "format_id": d["format_id"], "value": first["start"], "t": first["start"],

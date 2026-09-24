@@ -160,9 +160,11 @@ def test_aggregate_overall_and_by_format(fivevids):
     assert items["canvas.background.color"]["value"] == "#101010"
     assert items["motion.zoom.scale_to"]["value"] == 1.2
     assert items["motion.transitions.default"]["value"] == "cut"
-    dur = items["structure.duration_s"]
-    assert dur["value"] == {k: dur["overall"][k] for k in ("n", "p10", "p50", "p90")} and dur["overall"]["n"] == 6
-    assert dur["by_format"]["F2"]["value"]["n"] == 2
+    dur = items["structure.duration_s.p50"]
+    assert dur["value"] == dur["overall"]["p50"] == 32.5 and dur["overall"]["n"] == 6
+    assert items["structure.duration_s.n"]["value"] == 6
+    assert items["structure.duration_s.n"]["by_format"]["F2"]["value"] == 2
+    assert items["structure.duration_s.p10"]["value"] == dur["overall"]["p10"]
     # nothing observed -> unmeasured with a reason, never a default
     hl = items["text.roles.situation.highlight_color"]
     assert hl["status"] == "unmeasured" and hl["value"] is None and hl["blocker"]
@@ -224,3 +226,18 @@ def test_prepare_packets_and_label_template(proj):
     K.prepare("joshuamagazine", ["vid0000001"])
     rows = list(csv.DictReader((proj / P / "format_labels.csv").open(encoding="utf-8")))
     assert rows[0]["structure_type"] == "setup-reveal" and len(rows) == 1
+
+
+def test_identity_mark_is_not_a_title():
+    """The reference channel's own name burned into the frame must not become a style sample."""
+    from shortkit.reference.textboxes import assign_roles
+
+    def item(text, bbox, start, end, ink_h, color="#FFFFFF", box="absent"):
+        return {"text": text, "bbox": bbox, "start": start, "end": end,
+                "style": {"ink_h": ink_h, "color": color, "box": {"present": box}}}
+
+    items = [item("조슈아매거진", [800, 40, 200, 60], 0, 30, 50),          # SYNTHETIC channel mark, biggest
+             item("오늘의 사건", [300, 200, 480, 50], 0, 30, 40),
+             item("학생들이 모여 있다", [300, 1400, 480, 40], 2, 5, 30)]
+    assign_roles(items, 30.0, 1920, None, identity_texts=["조슈아매거진", "joshuamagazine"])
+    assert [i["role"] for i in items] == ["identity_mark", "title", "situation"]

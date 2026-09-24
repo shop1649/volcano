@@ -120,7 +120,7 @@ TOL = {
     "pos_px_min": 10.0, "pos_frac_line": 0.2, "size_frac": 0.15, "text_sim": 0.6, "time_frames": 1.0,
     "color_rgb": 45.0, "scale_first": 0.08, "zoom_ratio": 0.04, "src_offset_s": 0.07, "speed_frac": 0.05,
     "deco_abs_px": 14.0, "deco_path_px": 10.0, "blink_frac": 0.15, "bgm_tempo": 0.01, "bgm_section_s": 0.1,
-    "bgm_ncc": 0.5, "duck_depth_db": 3.0, "silence_db": -30.0, "orig_present_frac": 0.7, "sfx_t_s": 0.05,
+    "bgm_ncc": 0.3, "duck_depth_db": 3.0, "silence_db": -30.0, "orig_present_frac": 0.7, "sfx_t_s": 0.05,
     "sfx_gain_db": 3.0, "region_px": 8.0, "bg_rgb": 30.0, "fade_s": 0.15,
 }
 
@@ -422,11 +422,14 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
               note="채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선)")
         # text similarity (OCR)
         sim = m.get("similarity") or 0.0
+        geo = str(m.get("match") or "").startswith("geometry")
         b.add("caption.text", cap.id, f"자막 문구(OCR) {label}", CAT["cap_text"], expected=cap.text,
-              observed={"ocr": m.get("ocr"), "similarity": sim}, tolerance=f"OCR 유사도 ≥ {TOL['text_sim']}",
-              status="same" if sim >= TOL["text_sim"] else "different", evidence=ev,
+              observed={"ocr": m.get("ocr"), "similarity": sim, "match": m.get("match")},
+              tolerance=f"OCR 유사도 ≥ {TOL['text_sim']}",
+              status="same" if sim >= TOL["text_sim"] else ("unmeasured" if geo else "different"), evidence=ev,
               keys=_role_keys(role, ["quote_marks"]) if role == "dialogue" else [],
-              note="굵은 글꼴 OCR 오차가 있어 유사도로 판정")
+              note=("짧은 문구를 OCR 이 읽지 못해 위치·색으로만 찾음 — 문구 일치는 못 잼" if geo and sim < TOL["text_sim"]
+                    else "굵은 글꼴 OCR 오차가 있어 유사도로 판정"))
         # colour / outline / box
         fill = m.get("fill_color")
         dcol = _cdist(fill, cap.color)
@@ -469,20 +472,28 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
         # font
         fnt = m.get("font") or {}
         if fnt.get("status") == "measured":
-            margin = max((s.get("iou") or 0) for s in fnt["scores"]) - (fnt.get("iou_expected") or 0)
-            fok = fnt.get("best") == fnt.get("expected") or margin <= 0.02
-            fok = fok and (fnt.get("iou_expected") or 0) >= 0.45
+            best_iou = max((s.get("iou") or 0) for s in fnt["scores"])
+            exp_iou = fnt.get("iou_expected") or 0
+            margin = best_iou - exp_iou
+            if margin <= 0.03:
+                fst = "same" if exp_iou >= 0.45 else "unmeasured"
+                fnote = "" if fst == "same" else "기대 글꼴이 가장 잘 맞지만 IoU 가 낮아 판별 불확실"
+            else:
+                fst = "different" if best_iou >= 0.6 else "unmeasured"
+                fnote = (f"다른 글꼴({fnt.get('best')})이 더 잘 맞음" if fst == "different"
+                         else f"다른 글꼴({fnt.get('best')})이 약간 더 맞지만 IoU<0.6 이라 판별 불확실")
             b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name,
-                  observed={"best": fnt.get("best"), "iou_expected": fnt.get("iou_expected"), "scores": fnt.get("scores")},
-                  tolerance="기대 글꼴이 후보 중 최고 IoU(차 ≤0.02) 이고 IoU ≥ 0.45", status="same" if fok else "different",
-                  keys=_role_keys(role, ["font_name", "bold"]), evidence=ev)
+                  observed={"best": fnt.get("best"), "iou_expected": exp_iou, "scores": fnt.get("scores")},
+                  tolerance="기대 글꼴 IoU 가 최고와 0.03 이내·≥0.45 → 같다 / 다른 글꼴이 0.03 넘게 높고 IoU≥0.6 → 다르다",
+                  status=fst, keys=_role_keys(role, ["font_name", "bold"]), evidence=ev, note=fnote)
         else:
             b.add("caption.font", cap.id, f"자막 글꼴 {label}", CAT["font"], expected=cap.font_name, observed=None,
                   status="unmeasured", keys=_role_keys(role, ["font_name", "bold"]), evidence=ev,
                   note=fnt.get("reason") or "글꼴 비교 못 함")
         # timing
         on, off = m.get("onset"), m.get("offset")
-        tol_t = TOL["time_frames"] * fr + 0.005
+        fade_io = (cap.motion_in or {}).get("type") == "fade" or (cap.motion_out or {}).get("type") == "fade"
+        tol_t = (1.5 if fade_io else TOL["time_frames"]) * fr + 0.005
         t_ok = []
         notes = []
         if on is None:
@@ -498,7 +509,8 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
             st = "different"
         b.add("caption.timing", cap.id, f"자막 등장·퇴장 시각 {label}", CAT["cap_timing"],
               expected={"start": _r(cap.start), "end": _r(cap.end)}, observed={"onset": on, "offset": off},
-              tolerance=f"±{TOL['time_frames']:.0f}프레임", status=st, keys=_role_keys(role, ["timing.lead_s", "timing.min_dur_s", "persist"]),
+              tolerance=f"±{TOL['time_frames']:.0f}프레임(페이드 ±1.5프레임: 투명도 경사 외삽)", status=st,
+              keys=_role_keys(role, ["timing.lead_s", "timing.min_dur_s", "persist"]),
               evidence={"t": on, "frame": m.get("evidence_frame")}, note="; ".join(notes))
         # motion in / out
         mi = cap.motion_in or {}
@@ -999,13 +1011,22 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
         b.add("audio.bgm", "file", "BGM 곡·버전 일치", CAT["music"], expected={"path": bgm.path if bgm else None},
               observed=None, status="unmeasured", keys=bkeys[:3], note=bi.get("reason", ""))
     else:
-        found = (bi.get("waveform_ncc") or 0) >= TOL["bgm_ncc"]
+        found = bool(bi.get("found"))
         b.add("audio.bgm", "file", "BGM 곡·버전 일치(파형 대조)", CAT["music"],
               expected={"path": bgm.path, "track_id": bgm.track_id},
-              observed={"waveform_ncc": bi.get("waveform_ncc"), "env_score": (bi.get("search") or {}).get("env_score")},
-              tolerance=f"파형 상관 ≥ {TOL['bgm_ncc']}", status="same" if found else "different",
+              observed={"waveform_ncc": bi.get("waveform_ncc"), "local_match": bi.get("local_match"),
+                        "tempo_candidates": bi.get("tempo_candidates")},
+              tolerance="0.25초 창별 파형 상관 q95 ≥ 0.7 (무관한 음악 < 0.5)", status="same" if found else "different",
               keys=["audio.bgm.track_id", "audio.bgm.title", "audio.bgm.version"],
               note="출력 믹스에서 계획한 음악 파일의 파형을 찾음" if found else "계획한 음악 파일의 파형이 출력에서 확인되지 않음(다른 곡/버전?)")
+        if not found:
+            for sub, it_ in (("tempo", "BGM 속도(버전)"), ("section", "BGM 사용 구간"), ("ducking", "BGM 덕킹·정적")):
+                b.add("audio.bgm" if sub != "ducking" else "audio.ducking", sub, it_, CAT["music"], status="unmeasured",
+                      note="계획한 BGM 을 출력에서 찾지 못해 측정 불가")
+            b.style_row("audio.bgm", "bgm_ref", "BGM 곡·버전·속도·구간 (레퍼런스 대비)", CAT["music"], bkeys, None,
+                        lambda o, r: False, note="출력에서 BGM 을 찾지 못함")
+            bgm = None
+    if bgm is not None and bi.get("status") == "measured":
         to = bi.get("tempo_obs")
         b.add("audio.bgm", "tempo", "BGM 속도(버전)", CAT["music"], expected=bgm.tempo_ratio, observed=to,
               tolerance=f"±{TOL['bgm_tempo']}",
@@ -1014,8 +1035,9 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
               note=f"후보 템포 상위: {(bi.get('search') or {}).get('top_tempi')}")
         so = bi.get("section_start_obs")
         ru = bi.get("runner_up_section")
-        ncc_best = bi.get("waveform_ncc") or 0.0
-        equiv = ru is not None and (ru.get("ncc") or 0) >= ncc_best - 0.01
+        q_best = (bi.get("local_match") or {}).get("q95") or 0.0
+        n_best = bi.get("waveform_ncc") or 0.0
+        equiv = ru is not None and (ru.get("q95") or 0) >= q_best - 0.01 and (ru.get("ncc") or 0) >= n_best - 0.005
         exp_s = float(bgm.section_start_s)
         if so is None or not found:
             st = "unmeasured"
@@ -1030,7 +1052,7 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
               observed={"section_start_s": so, "used_section": bi.get("used_section_obs"), "runner_up": ru},
               tolerance=f"±{TOL['bgm_section_s']}s (같은 곡 다른 부분은 불일치)", status=st,
               keys=["audio.bgm.section_start_s"], evidence={"t": 0.0},
-              note=("파형이 똑같이 반복되는 곡이라 다른 위치도 같은 소리(상관 차 ≤ 0.01) — 구간 구별 한계" if equiv else ""))
+              note=("파형이 거의 똑같이 반복되는 곡이라 다른 위치도 같은 소리(상관 차 ≤ 0.005) — 구간 구별 한계" if equiv else ""))
         # fades
         curve = bi.get("gain_curve_fine") or []
         if curve:

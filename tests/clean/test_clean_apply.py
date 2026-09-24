@@ -84,8 +84,10 @@ def test_inpaint_removes_watermark_and_subtitle(dirty_doc, dirty_short, clean_ro
 def test_apply_clean_crop_plus_inpaint_verified(dirty_doc, dirty_short, clean_root):
     from shortkit.clean.strategy import plan_clean
 
+    # SYNTHETIC protected rect just above the subtitle: the bottom cut would clip it, so the
+    # subtitle must be restored locally while the top-left watermark can still be cropped away
     face = {"status": "measured", "resolution": [1920, 1080],
-            "protected": [{"label": "face", "x": 480, "y": 480, "w": 120, "h": 120, "start": 0, "end": 20}]}
+            "protected": [{"label": "face", "x": 600, "y": 880, "w": 160, "h": 120, "start": 0, "end": 20}]}
     plan = plan_clean(dirty_doc, region_aspect=1080 / 608, fit="cover", faces=face)
     clean = plan["clean"]
     assert clean["crop"] is not None and clean["inpaint"]

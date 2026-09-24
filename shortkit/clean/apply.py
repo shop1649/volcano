@@ -121,8 +121,6 @@ def inpaint_video(src: str | Path, rects: list[dict], out: str | Path, *, radius
     source duration and audio sync.  Result dict: out, sha256, source_sha256, ops_hash, frames,
     frames_inpainted, per_rect methods (plate/telea), audio handling, cached flag.
     """
-    import cv2
-
     src, out = Path(src), Path(out)
     info = probe(src)
     W, H = info.width, info.height

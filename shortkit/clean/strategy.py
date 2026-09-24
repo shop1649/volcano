@@ -426,7 +426,8 @@ def plan_clean(doc: dict, *, region_aspect: float, fit: str = "cover", faces: di
                       if d["action"] in ACTION_KO)
     # a plan is only "complete" when every check was measured and nothing waits for a person
     review_reasons = list(warnings)
-    clean["notes"] = (f"shortkit clean plan ({doc['source'].get('sha256', '')[:12]}): " + (notes or "오버레이 없음"))
+    clean["notes"] = (f"shortkit clean plan ({doc['source'].get('sha256', '')[:12]}, 좌표 {W}x{H} 원본 px 기준): "
+                      + (notes or "오버레이 없음"))
     return {**base, "replace_source": None, "clean": clean, "decisions": decisions, "rationale": rationale,
             "warnings": warnings, "crop_check": crop_check,
             "status": "needs_review" if review_reasons else "complete", "review_reasons": review_reasons}

@@ -37,7 +37,7 @@ from typing import Any, Callable
 from .. import paths
 from ..config import load_preset
 from ..util.jsonio import append_jsonl, now_iso, read_json, write_json
-from .common import SNAPSHOT_SCHEMA, reference_dir, safe_id, say, warn
+from .common import SNAPSHOT_SCHEMA, reference_dir, safe_id, say, scrub, warn
 
 LISTING_SCHEMA = "shortkit.ref_channel_listing/1"
 HIGH_SCHEMA = "shortkit.ref_high_views/1"
@@ -130,7 +130,7 @@ def list_ytdlp(channel_url: str, latest_n: int, cookies: str | None = None, max_
         except Exception as e:  # yt_dlp.utils.DownloadError and friends
             msg = f"{type(e).__name__}: {e}"
             kind = classify_error(msg)
-            tabs[tab] = {"status": kind, "error": msg}
+            tabs[tab] = {"status": kind, "error": scrub(msg)}
             if kind == "blocked":
                 raise Blocked(f"{url}: {msg}") from None
             continue
@@ -178,7 +178,7 @@ def list_ytdlp(channel_url: str, latest_n: int, cookies: str | None = None, max_
             msg = f"{type(e).__name__}: {e}"
             k = classify_error(msg)
             blocked_n += k == "blocked"
-            failures.append({"video_id": vid, "kind": k, "error": msg[:500]})
+            failures.append({"video_id": vid, "kind": k, "error": scrub(msg)[:500]})
             continue
         meta[vid] = {"checked_at": now_iso(), "info": info, "url": url}
     if want and not meta and blocked_n:
@@ -372,7 +372,7 @@ def collect(preset: str = "joshuamagazine", method: str = "auto", refresh_snapsh
             res = list_ytdlp(channel_url, latest_n, cookies=cookies, max_meta=max_meta, extract=extract)
     except Blocked as e:
         label = f"yt-dlp {_ydl_version()}" if method == "ytdlp" else "youtube-data-api-v3"
-        return _write_blocked(preset, rdir, channel_url, label, attempted_at, str(e))
+        return _write_blocked(preset, rdir, channel_url, label, attempted_at, scrub(str(e)))
     latest, all_recs, notes = build_records(res, latest_n)
     status = "ok"
     blocker = None

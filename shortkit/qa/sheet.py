@@ -20,7 +20,7 @@ import numpy as np
 from . import QAContext
 
 CELL_W = 132
-LABEL_W = 150
+LABEL_W = 176
 HEAD_H = 46
 CAP_H = 64
 SFX_H = 34
@@ -207,7 +207,7 @@ def make_sheets(ctx: QAContext, text_probe: dict | None, audio_probe: dict | Non
                     if track is None:
                         dr.text((x0 + 4, y + 4), "자막 분석 없음\n(못 잼)", fill=MUTED, font=small)
                         continue
-                    act = [c for c in track if c["start"] <= t + 0.5 < c["end"]]
+                    act = [c for c in track if c["start"] < t + 1.0 and c["end"] > t]   # shown during [t, t+1)
                     txt = " / ".join(("" if c["measured"] else "?") + c["text"] for c in act)
                     for li, line in enumerate(_wrap(dr, txt, small, CELL_W - 8, 4)):
                         dr.text((x0 + 4, y + 3 + li * 15), line, fill=INK, font=small)

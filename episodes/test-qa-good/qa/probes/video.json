@@ -1447,21 +1447,36 @@
             "expected_src_t": 10.48,
             "matched_src_t": 10.417,
             "ncc": 0.998,
-            "offset": -0.063
+            "ncc_moving": 0.987,
+            "offset": -0.063,
+            "prominence": 0.297,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "decisive": true
           },
           {
             "t": 1.1,
             "expected_src_t": 11.1,
             "matched_src_t": 11.083,
             "ncc": 0.998,
-            "offset": -0.017
+            "ncc_moving": 0.989,
+            "offset": -0.017,
+            "prominence": 0.2015,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "decisive": true
           },
           {
             "t": 1.72,
             "expected_src_t": 11.72,
             "matched_src_t": 11.667,
             "ncc": 0.998,
-            "offset": -0.053
+            "ncc_moving": 0.983,
+            "offset": -0.053,
+            "prominence": 0.0789,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "decisive": true
           }
         ],
         "src_fps": 12.0,
@@ -1483,27 +1498,42 @@
             "expected_src_t": 8.38,
             "matched_src_t": 8.3,
             "ncc": 0.94,
-            "offset": -0.08
+            "ncc_moving": 0.884,
+            "offset": -0.08,
+            "prominence": 0.0276,
+            "moving_frac": 0.141,
+            "at_window_edge": false,
+            "decisive": false
           },
           {
             "t": 3.85,
             "expected_src_t": 9.15,
             "matched_src_t": 9.2,
             "ncc": 0.943,
-            "offset": 0.05
+            "ncc_moving": 0.916,
+            "offset": 0.05,
+            "prominence": 0.0386,
+            "moving_frac": 0.082,
+            "at_window_edge": false,
+            "decisive": true
           },
           {
             "t": 4.62,
             "expected_src_t": 9.92,
             "matched_src_t": 9.9,
             "ncc": 0.976,
-            "offset": -0.02
+            "ncc_moving": 0.914,
+            "offset": -0.02,
+            "prominence": 0.0353,
+            "moving_frac": 0.076,
+            "at_window_edge": false,
+            "decisive": true
           }
         ],
         "src_fps": 30.0,
         "status": "measured",
-        "offset_p50": -0.02,
-        "speed_obs": 1.039
+        "offset_p50": 0.015,
+        "speed_obs": 0.909
       },
       {
         "clip_id": "c3",
@@ -1519,27 +1549,42 @@
             "expected_src_t": 24.543,
             "matched_src_t": 24.067,
             "ncc": 0.967,
-            "offset": -0.476
+            "ncc_moving": 0.78,
+            "offset": -0.476,
+            "prominence": 0.0115,
+            "moving_frac": 0.042,
+            "at_window_edge": false,
+            "decisive": false
           },
           {
             "t": 6.277,
             "expected_src_t": 25.077,
-            "matched_src_t": 24.9,
+            "matched_src_t": 24.033,
             "ncc": 0.972,
-            "offset": -0.177
+            "ncc_moving": 0.875,
+            "offset": -1.043,
+            "prominence": 0.0052,
+            "moving_frac": 0.08,
+            "at_window_edge": false,
+            "decisive": false
           },
           {
             "t": 6.811,
             "expected_src_t": 25.611,
-            "matched_src_t": 24.9,
+            "matched_src_t": 24.433,
             "ncc": 0.982,
-            "offset": -0.711
+            "ncc_moving": 0.922,
+            "offset": -1.177,
+            "prominence": 0.0064,
+            "moving_frac": 0.107,
+            "at_window_edge": true,
+            "decisive": false
           }
         ],
         "src_fps": 30.0,
-        "status": "measured",
-        "offset_p50": -0.476,
-        "speed_obs": 0.78
+        "status": "unmeasured",
+        "reason": "장면이 거의 정지해 있어 어느 소스 시각인지 구별되지 않음(NCC 곡선이 평평함)",
+        "ncc_max": 0.982
       }
     ]
   },

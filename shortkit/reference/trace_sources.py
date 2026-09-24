@@ -177,6 +177,8 @@ def ocr_watermarks(video: Path, region: dict, fps: float = 0.5, own: set[str] | 
             for acc, conf in _read_handles(crop, (bx, by, bw, bh)):
                 if own and _is_own(acc, own):
                     continue
+                if any(h["t"] == round(t, 2) for h in hits[acc]):
+                    continue
                 hits[acc].append({"t": round(t, 2), "conf": conf, "text": acc, "bbox": [bx + x0, by + y0, bw, bh]})
     # partial readings of one handle ("@fake_re", "@fakere", "@fake_repos") are merged by their
     # normalized prefix; the most frequent longest reading is reported, all variants are kept
@@ -196,8 +198,7 @@ def ocr_watermarks(video: Path, region: dict, fps: float = 0.5, own: set[str] | 
         hs = g["reads"]
         frames = sorted({h["t"] for h in hs})
         if len(frames) >= 2 or max(h["conf"] for h in hs) >= 70:
-            maxlen = max(len(_norm(v)) for v in g["variants"])
-            best = max((v for v in g["variants"] if len(_norm(v)) == maxlen), key=lambda v: g["variants"][v])
+            best = max(g["variants"], key=lambda v: (g["variants"][v], len(_norm(v))))
             out.append({"platform": "reddit" if re.match(r"[ur]/", best) else "unknown(watermark)",
                         "account": best, "kind": "watermark_ocr", "verified": False,
                         "note": "OCR 판독(끝 글자·밑줄 누락 가능) — 검색 단서로만 사용",
@@ -210,9 +211,11 @@ _HANDLE_IN_TEXT = re.compile(r"(@[A-Za-z0-9_][A-Za-z0-9_.]{2,29}|(?<![A-Za-z0-9]
 
 
 def _read_handles(crop: np.ndarray, box) -> list[tuple[str, float]]:
-    """Handles read from one overlay line: the line is widened (watermarks often overrun their
-    backing box, which cuts the detected line short) and read from its fill mask and from the
-    gray crop in both polarities; the longest handle reading wins."""
+    """Handle readings of one overlay line.  The line is read at two widths (a watermark that
+    overruns its backing box gets glued to the box edge and cut short by the line detector, but a
+    very wide crop picks up scenery), from its fill mask and from the gray crop in both
+    polarities.  Every reading with confidence >= 60 is returned; the caller keeps the variant
+    seen in the most frames."""
     import cv2
     import pytesseract
 
@@ -220,37 +223,36 @@ def _read_handles(crop: np.ndarray, box) -> list[tuple[str, float]]:
 
     bx, by, bw, bh = box
     H, W = crop.shape[:2]
-    ex = int(1.5 * bh)
-    pad = max(6, bh // 2)
-    x0, y0 = max(0, bx - ex - pad), max(0, by - pad)
-    x1, y1 = min(W, bx + bw + ex + pad), min(H, by + bh + pad)
-    sub = crop[y0:y1, x0:x1]
-    reads: list[tuple[str, float]] = []
-    seg = segment_line(sub, (max(0, bx - ex - x0), by - y0, min(bw + 2 * ex, x1 - x0 - max(0, bx - ex - x0)), bh))
-    if seg is not None:
-        reads.append(_ocr_once(seg["fill"], seg["fill_bbox"], 40.0, "eng"))
-    g = cv2.cvtColor(sub, cv2.COLOR_RGB2GRAY)
-    g = cv2.resize(g, None, fx=40.0 / max(1, bh), fy=40.0 / max(1, bh), interpolation=cv2.INTER_CUBIC)
-    for img in (255 - g, g):
-        try:
-            d = pytesseract.image_to_data(img, lang="eng", config="--psm 7", output_type=pytesseract.Output.DICT,
-                                          timeout=30)
-        except Exception:
-            continue
-        words = [(w, float(c)) for w, c in zip(d.get("text", []), d.get("conf", [])) if (w or "").strip()]
-        if words:
-            reads.append(("".join(w for w, _ in words), float(np.mean([c for _, c in words]))))
     best: dict[str, float] = {}
-    for txt, conf in reads:
-        if conf < 50:
-            continue
-        for m in _HANDLE_IN_TEXT.finditer(txt or ""):
-            acc = m.group(1).rstrip(".:")
-            best[acc] = max(best.get(acc, 0.0), conf)
-    if not best:
-        return []
-    top = max(best, key=lambda a: (len(_norm(a)), best[a]))
-    return [(top, best[top])]
+    for fac in (1.0, 2.0):
+        ex = int(fac * bh)
+        pad = max(6, bh // 2)
+        x0, y0 = max(0, bx - ex - pad), max(0, by - pad)
+        x1, y1 = min(W, bx + bw + ex + pad), min(H, by + bh + pad)
+        sub = crop[y0:y1, x0:x1]
+        reads: list[tuple[str, float]] = []
+        cx = max(0, bx - ex - x0)
+        seg = segment_line(sub, (cx, by - y0, min(bw + 2 * ex, x1 - x0 - cx), bh))
+        if seg is not None:
+            reads.append(_ocr_once(seg["fill"], seg["fill_bbox"], 40.0, "eng"))
+        g = cv2.cvtColor(sub, cv2.COLOR_RGB2GRAY)
+        g = cv2.resize(g, None, fx=40.0 / max(1, bh), fy=40.0 / max(1, bh), interpolation=cv2.INTER_CUBIC)
+        for img in (255 - g, g):
+            try:
+                d = pytesseract.image_to_data(img, lang="eng", config="--psm 7", output_type=pytesseract.Output.DICT,
+                                              timeout=30)
+            except Exception:
+                continue
+            words = [(w, float(c)) for w, c in zip(d.get("text", []), d.get("conf", [])) if (w or "").strip()]
+            if words:
+                reads.append(("".join(w for w, _ in words), float(np.mean([c for _, c in words]))))
+        for txt, conf in reads:
+            if conf < 60:
+                continue
+            for m in _HANDLE_IN_TEXT.finditer(txt or ""):
+                acc = m.group(1).rstrip(".:")
+                best[acc] = max(best.get(acc, 0.0), conf)
+    return sorted(best.items(), key=lambda kv: -kv[1])
 
 
 # ============================================================================= keyframes / phash
@@ -394,7 +396,8 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
             if hs and (vid, tuple(hs)) not in have_ph:
                 row = {"kind": "reference_footage", "ref_video_id": vid, "ref_url": ref_url,
                        "original_urls": sorted(set(original_urls)), "phash": hs, "frame_times": ts,
-                       "region": region, "hash": "imagehash.phash (8x8 DCT, 64 bit hex) of the footage region",
+                       "region": region, "resolution": [int(info.width), int(info.height)],
+                       "hash": "imagehash.phash (8x8 DCT, 64 bit hex) of the footage region",
                        "added_at": now_iso(), "added_by": ADDED_BY}
                 new_rows.append(row)
                 have_ph.add((vid, tuple(hs)))

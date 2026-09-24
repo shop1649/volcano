@@ -7,7 +7,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from shortkit import paths
 from shortkit.clean.detect import DetectParams, detect_overlays, load_overlays, rect_iou, summary_ko
 from shortkit.util.media import ffmpeg, read_frames
 
