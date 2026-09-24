@@ -213,3 +213,34 @@ Gate passes only when no row is `different` without `intended_change`, required 
 `defects.jsonl` with {id, check_id, found, fix, recheck_same_cases[], final_gate}.
 Compare sheet: 1-second grid at the same absolute times (reference row / ours row), each with a
 caption strip, and under it a 0.5-second SFX strip.
+
+## 11. Cross-module APIs and files (agreed names — implement exactly)
+
+### Per-reference-video analysis files (written by reference visual/audio modules)
+`presets/<name>/analysis/<video_id>/`
+- `shots.json` `{"video_id", "resolution": [w,h], "fps", "duration", "cuts": [{"t", "type": "cut|flash|crossfade", "score"}]}`
+- `captions.json` `{"video_id", "resolution": [w,h], "items": [{"start", "end", "role", "text", "bbox": [x,y,w,h], "motion_in": "pop|fade|slide|none|unmeasured", "style": {...measured style...}}]}`
+- `motion.json` `{"video_id", "resolution": [w,h], "events": [{"t", "end", "type": "zoom_in|zoom_out|freeze|speed|flash", "value"}]}`
+- `layout.json` `{"video_id", "resolution": [w,h], "video_region": {x,y,w,h}|null, "background": "color|blur_source|unmeasured", "roles": {role: {...measured style...}}}`
+- `audio/bgm.json`, `audio/original.json`, `audio/sfx_events.json` `{"video_id", "events": [{"t", "dur", "type_id"|null, "class", "gain_db", "fp": "<npy path>"}]}`
+- `review/` contact sheet + packet for human/agent viewing; `labels` are filled only by someone who actually watched.
+
+### Exclusions — `warehouse/exclusions.jsonl` (written by reference trace step, read by sourcing)
+`{"kind": "reference_footage", "ref_video_id", "ref_url", "original_urls": [], "phash": ["<16-hex imagehash.phash>"...],
+  "frame_times": [...], "added_at", "added_by"}` and `{"kind": "url", "url", "reason", "added_at", "added_by"}`.
+Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming ≤ 10 on ≥ 3 keyframes, or URL/original_url equality → excluded.
+
+### Function names
+- `shortkit.clean.apply.inpaint_video(src: Path, rects: list[dict], out: Path) -> dict`  (rects: {x,y,w,h,start,end} SOURCE px/time)
+- `shortkit.clean.verify.residual_score(video: Path, rect: dict, template_png: Path|None, times: list[float], text: str|None) -> dict`
+- `shortkit.reference.typography.font_iou(crop_rgb, text, font_path, size_hint_px, fill_rgb=None, outline_rgb=None) -> dict {iou, scale, dx, dy}`
+- `shortkit.reference.typography.register(subparsers)` and `shortkit.reference.audio_cli.register(subparsers)` —
+  called by `shortkit/reference/cli.py` (inside try/except ImportError) to add their `ref` sub-commands.
+- `shortkit.fonts.find_font(name) -> Path|None` (exact family match; never silently accept a fallback),
+  `shortkit.fonts.fetch_all() -> dict`.
+- `shortkit.edit.export_mlt.export(resolved, out_dir: Path) -> Path`, same for `export_fcpxml`, `export_otio`;
+  `shortkit.edit.verify_project.verify(resolved, master_mp4: Path, project_file: Path) -> dict`;
+  `shortkit.edit.project_readme.write(resolved, out_dir: Path, decisions: dict) -> Path`.
+- `shortkit.qa.checks.declarations() -> dict[str, list[str]]`.
+- `shortkit.edit.resolve.resolve_episode(episode_id) -> ResolvedEdit` (writes build/resolved.json, captions.ass, preset_access.json);
+  `shortkit.edit.render.render(resolved) -> Path`.

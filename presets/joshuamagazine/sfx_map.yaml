@@ -1,0 +1,5 @@
+schema: shortkit.sfx_map/1
+preset_id: joshuamagazine-v1
+library_root: assets/library/sfx   # 사용자가 제공하는 효과음 창고. local.yaml 의 sfx_library_root 로 바꿀 수 있음
+library_status: not_provided        # 2026-09-24: 효과음 창고가 저장소에 제공되지 않음
+types: {}                           # 카탈로그 종류가 측정되면 `shortkit ref sfx-map` 이 채운다

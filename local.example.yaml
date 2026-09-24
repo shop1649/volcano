@@ -1,0 +1,22 @@
+# 컴퓨터별 설정. 이 파일을 local.yaml 로 복사해서 쓴다(local.yaml 은 git 에 올라가지 않음).
+# 경로는 프로젝트 루트 기준 상대 경로 또는 이 컴퓨터의 절대 경로. 절대 경로는 local.yaml 에만 둔다.
+
+# 사용자가 제공하는 깨끗한 음악 파일 창고 (레퍼런스에서 분리한 음원 사용 금지)
+music_library_root: assets/library/music
+# 사용자가 제공하는 효과음 창고
+sfx_library_root: assets/library/sfx
+
+# 플랫폼 로그인 쿠키(Netscape 형식, 브라우저 확장으로 내보내기). 로그인은 자동으로 되지 않는다.
+cookies:
+  youtube: null        # 예: cookies/youtube.txt
+  tiktok: null
+  instagram: null
+  reddit: null
+
+# YouTube Data API v3 키를 담은 환경 변수 이름(선택). 키 값 자체를 여기 적지 말 것.
+youtube_api_key_env: YOUTUBE_API_KEY
+
+# 레퍼런스 분석 시 Demucs 장치
+demucs:
+  model: htdemucs
+  device: cpu          # cpu | cuda | mps

@@ -1,0 +1,8 @@
+{
+  "schema": "shortkit.sfx_catalog/1",
+  "preset_id": "joshuamagazine-v1",
+  "status": "unmeasured",
+  "blocker": "2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단",
+  "basis": {"videos": [], "n_videos": 0, "separator": null},
+  "types": []
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from . import config, paths
 from .util.jsonio import now_iso, read_json, read_yaml, write_yaml
@@ -25,6 +26,10 @@ def register(p: argparse.ArgumentParser) -> None:
     m = sub.add_parser("apply-measurements", help="measurements/*.json 의 측정값을 measured.yaml 로 반영")
     m.add_argument("--preset", default="joshuamagazine")
     m.set_defaults(func=cmd_apply)
+
+    u = sub.add_parser("unresolved", help="미확정(못 잼) 항목·제작 영향·해결 상태 문서(unresolved.md) 생성")
+    u.add_argument("--preset", default="joshuamagazine")
+    u.set_defaults(func=cmd_unresolved)
 
     sh = sub.add_parser("show", help="유효 프리셋 값과 출처(measured/provisional/requested_change) 출력")
     sh.add_argument("--preset", default="joshuamagazine")
@@ -110,6 +115,91 @@ def cmd_show(args) -> int:
         if args.key and not k.startswith(args.key):
             continue
         print(f"{k} = {v!r}   [{pr.origin(k)}]")
+    return 0
+
+
+# Blockers that are not single preset keys (whole pipeline stages). Each is re-evaluated from files.
+def _stage_blockers(preset: str) -> list[dict]:
+    d = paths.preset_dir(preset)
+    root = paths.project_root()
+    out = []
+
+    def add(item, status, impact, state, evidence):
+        out.append({"item": item, "status": status, "impact": impact, "state": state, "evidence": evidence})
+
+    snap = read_json(d / "reference" / "latest100.json", {}) or {}
+    n = len(snap.get("videos") or [])
+    add("최신 100편 목록·게시일 고정", "measured" if snap.get("status") == "ok" and n >= 100 else "unmeasured",
+        "포맷 분류·모든 측정의 기준 표본이 없음 → 모든 스타일 값이 임시값",
+        "resolved" if snap.get("status") == "ok" else "blocked_network",
+        f"reference/latest100.json status={snap.get('status', '없음')} videos={n} blocker={snap.get('blocker')}")
+    hv = read_json(d / "reference" / "high_views.json", {}) or {}
+    add("조회수 80만 이상 영상 전체 분석", "measured" if hv.get("status") == "ok" else "unmeasured",
+        "고조회 영상의 공통 구조를 확인할 수 없음", "resolved" if hv.get("status") == "ok" else "blocked_network",
+        f"reference/high_views.json status={hv.get('status', '없음')} videos={len(hv.get('videos') or [])}")
+    fm = read_yaml(d / "formats.yaml", {}) or {}
+    add("포맷 분류표·포맷별 대표 영상", fm.get("status", "unmeasured"),
+        "포맷별 p10/p50/p90, 효과음 개수 범위, 대표 영상 비교(QA)를 쓸 수 없음 → 에피소드는 test 모드(UNCLASSIFIED)만 가능",
+        "resolved" if fm.get("status") == "measured" else "blocked_network", f"formats.yaml status={fm.get('status')}")
+    cat = read_json(d / "sfx_catalog.json", {}) or {}
+    add("효과음 카탈로그(최신 50편 Demucs)", cat.get("status", "unmeasured"),
+        "효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼",
+        "resolved" if cat.get("status") == "measured" else "blocked_network", f"sfx_catalog.json blocker={cat.get('blocker')}")
+    sm = read_yaml(d / "sfx_map.yaml", {}) or {}
+    add("효과음 창고 연결(sfx_map)", "unmeasured" if sm.get("library_status") != "provided" else "measured",
+        "제작에 쓸 효과음 파일이 정해지지 않음 → production 렌더 불가", "open_user_asset",
+        f"sfx_map.yaml library_status={sm.get('library_status')}")
+    pr = read_yaml(d / "preset.yaml", {}) or {}
+    add("BGM 곡·버전·속도·사용 구간 식별", "unmeasured" if not (pr.get("audio", {}).get("bgm", {}) or {}).get("track_id")
+        else "measured", "음악 구간 일치 판정 불가, 깨끗한 음악 파일 확보 불가", "blocked_network",
+        "preset audio.bgm.track_id=null, assets/library/music 비어 있음")
+    fr = read_json(d / "fonts_report.json", {}) or {}
+    add("글꼴 식별(IoU 상한 + 후보 검증)", "unmeasured", "글꼴이 레퍼런스와 같은지 판정 불가(현재 임시 글꼴)",
+        "blocked_network", f"fonts_report.json status={fr.get('status', '없음')}")
+    acc = read_json(root / "warehouse" / "source_accounts.json", {}) or {}
+    add("레퍼런스 소재 출처·반복 계정·키워드 역추적", "measured" if acc.get("accounts") else "unmeasured",
+        "새 소재 검색어/계정 목록이 없음, 레퍼런스 촬영본 제외 목록이 비어 있음", "blocked_network",
+        f"warehouse/source_accounts.json accounts={len(acc.get('accounts') or [])}")
+    return out
+
+
+def write_unresolved(preset: str) -> Path:
+    reg = read_yaml(config.registry_path(preset), {}) or {}
+    ents = reg.get("entries") or {}
+    stage = _stage_blockers(preset)
+    groups: dict[str, list[str]] = {}
+    for k, e in ents.items():
+        if e.get("status") == "unmeasured":
+            groups.setdefault(e.get("impact_if_unmeasured") or "-", []).append(k)
+    lines = ["# 미확정 항목·제작 영향·해결 상태", "",
+             f"자동 생성: `shortkit preset unresolved` ({now_iso()}). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물.",
+             "", "못 잼 = 측정하지 못함. 못 잼 항목은 임시값으로만 테스트 렌더가 가능하고, QA 에서 완료로 승격되지 않는다.", "",
+             "## 1. 단계 단위 미확정", "", "| 항목 | 상태 | 제작 영향 | 해결 상태 | 근거 |", "|---|---|---|---|---|"]
+    ko = {"measured": "측정됨", "unmeasured": "못 잼"}
+    for s in stage:
+        lines.append(f"| {s['item']} | {ko.get(s['status'], s['status'])} | {s['impact']} | {s['state']} | {s['evidence']} |")
+    counts: dict[str, int] = {}
+    for e in ents.values():
+        counts[e.get("status")] = counts.get(e.get("status"), 0) + 1
+    lines += ["", "## 2. 프리셋 설정 키 단위", "",
+              "상태별 개수: " + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())), "",
+              "| 제작 영향 | 못 잼 키 수 | 키 |", "|---|---|---|"]
+    for impact, keys in sorted(groups.items(), key=lambda x: -len(x[1])):
+        shown = ", ".join(f"`{k}`" for k in sorted(keys)[:12]) + (" …" if len(keys) > 12 else "")
+        lines.append(f"| {impact} | {len(keys)} | {shown} |")
+    lines += ["", "## 3. 해결 방법", "",
+              "1. 네트워크가 열린 컴퓨터(또는 환경 설정에서 youtube.com, *.googlevideo.com, i.ytimg.com, tiktok.com, instagram.com, "
+              "reddit.com, v.redd.it, dl.fbaipublicfiles.com 허용)에서 AGENTS.md 의 '레퍼런스 분석 실행 순서'를 실행.",
+              "2. 효과음 창고·깨끗한 음악 파일을 assets/library/ 또는 local.yaml 경로에 제공.",
+              "3. 측정 후 `shortkit preset apply-measurements` → `shortkit preset sync` → `shortkit preset unresolved` 로 이 문서 갱신.", ""]
+    out = paths.preset_dir(preset) / "unresolved.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+    return out
+
+
+def cmd_unresolved(args) -> int:
+    p = write_unresolved(args.preset)
+    print(f"wrote {paths.relp(p)}")
     return 0
 
 
