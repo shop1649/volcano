@@ -90,6 +90,7 @@ python -m shortkit ref download --set high_views   # 80만 이상 영상 전부
 python -m shortkit ref audio-analyze --set latest100            # 먼저 오디오(기준 표본): Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트
 python -m shortkit ref audio-analyze --set high_views_outside   # 80만+ 중 최신 100편 밖 영상(참고용 보고서에만 사용)
 python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/색/외곽선/박스/모션/역할)·화면 모션·장식 → analysis/<id>/
+python -m shortkit ref identity-templates          # 원 채널 고유 로고·워터마크·핸들 템플릿(검토 --accept/--reject) → reference/identity_templates/
 python -m shortkit ref transcribe --set latest100  # (선택) faster-whisper 가 설치된 경우 음성 대본 → analysis/<id>/audio/transcript.json
 python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자료 + format_labels.csv(빈 줄)
 #  ▶ 에이전트/사람이 analysis/<id>/review/ 를 "실제로 보고" format_labels.csv 를 채운다
@@ -158,6 +159,7 @@ python -m shortkit episode new <ep-id> --mode production --format <F?> --index 1
 #    - 얼굴·손·핵심 물체는 sources[].protected 에 기록(자막이 가리면 검증 실패).
 #    - 원음은 기본 OFF. 살릴 구간만 timeline[].original_audio.keep + reason. 원본 음악 여부 has_embedded_music 기록.
 #    - 효과음은 사건(event t/desc)이 있을 때만, 사건과 ±0.3초, 포맷 관측 범위 안의 개수·종류.
+#    - intro_type 은 formats.yaml 의 그 포맷 intro_variants 중 하나. 컷 빈도·샷 길이는 포맷 관측 범위 안.
 #    - clean 블록은 `clean plan` 결과를 붙인다.
 #    - sources[].watched(누가 언제 처음부터 끝까지 보고 들었는지), 얼굴·손·물체가 없으면 protected_reviewed 로 명시.
 #    - 반전이 없으면 reveal: {none: true, reason: ...}. 잘리면 안 되는 중요한 동작은 actions 에 기록(컷이 가르면 오류).

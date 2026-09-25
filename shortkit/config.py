@@ -76,6 +76,23 @@ NON_MEASURED: dict[str, str] = {
     "audio.loudness.tolerance_lu": "rule",
     "audio.bgm.loop_xfade_s": "rule",
     "audio.loudness.max_limiter_db": "rule",
+    # sample sizes of a measured distribution: measurement metadata, not a style value (the p10/p50/p90 are the setting)
+    "structure.*.n": "meta",
+    # measured example sentence endings shown to caption writers (proposal 말투 안내); the enforceable style is
+    # text.tone.register (validate + QA), so the examples themselves are guidance, not an output property
+    "text.tone.sentence_end_examples": "meta",
+}
+
+# Keys read only on a conditional code path that no tracked episode run exercises (e.g. the BGM loop crossfade is
+# read only when audio.bgm.loop is true AND the music is shorter than the episode).  The link is NOT taken on trust:
+# tests/core/test_conditional_readers.py drives each reader and asserts, through the Preset access log, that the
+# named function really reads the key; sync marks the link as conditional.
+CONDITIONAL_READERS: dict[str, dict[str, str]] = {
+    "audio.bgm.loop_xfade_s": {
+        "reader": "shortkit/edit/audio.py:bgm_loop_xfade_s",
+        "condition": "audio.bgm.loop 가 true 이고 음악(section_start 부터, tempo 적용)이 에피소드보다 짧을 때만 읽음",
+        "test": "tests/core/test_conditional_readers.py::test_loop_xfade_reader",
+    },
 }
 
 # Infra keys whose VALUE locates a measurement-like artifact: the key stays infra (a path is not a style value), but
@@ -1081,12 +1098,14 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             "measurement": ({k: m.get(k) for k in ("file", "overall", "by_format", "resolution", "scaled_to", "method",
                                                    "measured_at", "unit", "refused", "refused_in") if k in m}
                             if m else None),
-            "code": sorted(code.get(key, set())),
+            "code": sorted(code.get(key, set())) or ([CONDITIONAL_READERS[key]["reader"]] if key in CONDITIONAL_READERS else []),
             "qa_checks": sorted({cid for cid, pats in qa_declarations.items()
                                  if any(_match(key, p) for p in pats)}),
             "impact_if_unmeasured": impact_of(key) if status == "unmeasured" else None,
             "resolution_state": resolution_state(status, m, route, ident, has_music),
         }
+        if key in CONDITIONAL_READERS and not code.get(key):
+            e["code_basis"] = {"kind": "conditional_reader", **CONDITIONAL_READERS[key]}
         if px_space_moved and origin == "measured" and px_axis(key):
             # measured.yaml px values were placed on another canvas (e.g. canvas changed by a requested change)
             e["resolution_state"] = "apply_pending"

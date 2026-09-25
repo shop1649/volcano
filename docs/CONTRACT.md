@@ -374,6 +374,21 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   reference media (sha256 incl. separation-record hashes, waveform containment, level following); `bgm.json
   library.refused_reference_audio`; `separation.json stems_sha256`.
 
+### 12.5 Review-fix additions (wave 4)
+- **Plan** `intro_type` must be one of the format's `intro_variants` (production error; unmeasured variants → error in production,
+  warning in test). Validate checks the planned cut rate / median shot length against `structure.cuts_per_10s` / `structure.shot_len_s`
+  (same definition as `reference.aggregate.cut_structure_rows`; QA compares the output with the same `cut_structure`). The first-caption
+  rule uses `reference.aggregate.FIRST_CAPTION_EXCLUDED_ROLES` (title/description excluded) everywhere.
+- **One BGM reference-audio rule** for validate, QA (`audio.bgm:clean_file`) and the library: `reference.audio_bgm.reference_audio_copy`.
+- **SFX catalog `partial`**: counts are judged when `column_status.per_video_count == measured`; a partial column is not a rule;
+  production stays blocked (`sfx_catalog_partial`).
+- **Identity templates**: `python -m shortkit ref identity-templates` (after `ref analyze`, needs captions.json) extracts the reference
+  channel's own persistent marks into `reference/identity_templates/` with `manifest.json` (exit 0 measured, 4 partial, 3 no reference
+  data; `--accept/--reject` review step). QA's logo check reads the manifest (measured with no templates = the reference has no mark).
+- **Registry**: `structure.*.n` (sample sizes) and `text.tone.sentence_end_examples` (writing guide) are meta. `CONDITIONAL_READERS`
+  lists keys read only on a code path no tracked run exercises (e.g. `audio.bgm.loop_xfade_s`); each link is proven by a test that
+  drives the reader and checks the Preset access log.
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
