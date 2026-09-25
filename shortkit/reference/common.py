@@ -85,9 +85,20 @@ def video_path(preset: str, video_id: str) -> Path | None:
     return None
 
 
+SET_NAMES = ("latest100", "high_views", "high_views_outside", "reference", "all_videos", "downloaded", "analyzed")
+
+
 def resolve_ids(preset: str, ids: str | Sequence[str] | None = None, set_name: str | None = None,
                 limit: int | None = None) -> list[str]:
-    """Explicit ids (comma separated) or a named set: latest100 | high_views | downloaded | analyzed."""
+    """Explicit ids (comma separated) or a named set:
+
+    ``latest100``           the fixed snapshot (the production-measurement basis)
+    ``high_views``          every video with an exact view count >= the threshold (reference/high_views.json)
+    ``high_views_outside``  high_views minus latest100 (reference-only analysis)
+    ``reference``           latest100 ∪ high_views ∪ downloaded (what `ref trace` fences off by default)
+    ``all_videos``          the whole-channel listing
+    ``downloaded``          reference/downloads.jsonl
+    ``analyzed``            analysis/<id>/ folders."""
     out: list[str] = []
     if ids:
         items = ids.split(",") if isinstance(ids, str) else list(ids)
@@ -95,6 +106,14 @@ def resolve_ids(preset: str, ids: str | Sequence[str] | None = None, set_name: s
     elif set_name in ("latest100", "high_views", "all_videos"):
         d = load_reference_list(preset, set_name) or {}
         out = [v["video_id"] for v in d.get("videos") or [] if v.get("video_id")]
+    elif set_name == "high_views_outside":
+        snap = set(resolve_ids(preset, set_name="latest100"))
+        out = [v for v in resolve_ids(preset, set_name="high_views") if v not in snap]
+    elif set_name == "reference":
+        for part in ("latest100", "high_views", "downloaded"):
+            for v in resolve_ids(preset, set_name=part):
+                if v not in out:
+                    out.append(v)
     elif set_name == "downloaded":
         seen = []
         for row in read_jsonl(reference_dir(preset) / "downloads.jsonl"):
@@ -109,15 +128,70 @@ def resolve_ids(preset: str, ids: str | Sequence[str] | None = None, set_name: s
     return out
 
 
+# ----------------------------------------------------------------------------- production basis
+BASIS_STATUSES = ("ok", "partial")      # a snapshot with these statuses is a FIXED baseline (collect never replaces it)
+
+
+def snapshot_members(preset: str) -> tuple[list[str], dict]:
+    """(member ids in rank order, snapshot) of the fixed latest-N snapshot; [] when there is no usable
+    snapshot (missing / blocked).  A ``partial`` snapshot is a fixed baseline too; its ``missing_members``
+    (metadata failures among the newest N) are carried into every basis record."""
+    snap = load_snapshot(preset) or {}
+    if snap.get("status") not in BASIS_STATUSES:
+        return [], snap
+    return [v["video_id"] for v in snap.get("videos") or [] if v.get("video_id")], snap
+
+
+def production_basis(preset: str, ids: Sequence[str] | None = None, include_long: bool = False,
+                     default_set: str = "analyzed") -> dict:
+    """Restrict a set of videos to the production-measurement basis: members of the fixed latest-N snapshot
+    (AGENTS.md rule 2 -- older / high-view videos outside it are reference-only and never enter production
+    measurements).  Long-form uploads (``kind: video``) are dropped unless ``include_long``.
+
+    -> {"ids", "excluded_non_snapshot", "excluded_long_form", "snapshot_status", "captured_at",
+        "missing_members", "n_members", "blocker"}; ``blocker`` is set when no usable snapshot exists."""
+    members, snap = snapshot_members(preset)
+    cand = list(ids) if ids is not None else resolve_ids(preset, set_name=default_set)
+    mset = set(members)
+    kinds = {v["video_id"]: v.get("kind") for v in snap.get("videos") or [] if v.get("video_id")}
+    use, outside, longf = [], [], []
+    for v in cand:
+        if v not in mset:
+            outside.append(v)
+        elif kinds.get(v) == "video" and not include_long:
+            longf.append(v)
+        elif v not in use:
+            use.append(v)
+    blocker = None
+    if not members:
+        blocker = snapshot_blocker(preset) + " — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    return {"ids": use, "excluded_non_snapshot": outside, "excluded_long_form": longf,
+            "snapshot_status": snap.get("status"), "captured_at": snap.get("captured_at"),
+            "missing_members": [m.get("video_id") for m in snap.get("missing_members") or [] if isinstance(m, dict)],
+            "n_members": len(members), "blocker": blocker,
+            "rule": "제작 측정 = 고정된 최신 100편 스냅샷(latest100.json) 구성원만. 그 밖의 영상(80만+ 과거 영상 등)은 "
+                    "참고용 보고서(reference/high_views_report.json)에만 쓰고 제작 측정에 섞지 않음"}
+
+
+def basis_record(b: dict) -> dict:
+    """The part of a production_basis() result stored in measurement files."""
+    return {k: b.get(k) for k in ("snapshot_status", "captured_at", "n_members", "missing_members",
+                                  "excluded_non_snapshot", "excluded_long_form", "rule")}
+
+
 def views_of(preset: str) -> dict[str, int]:
-    """video_id -> view_count from the fixed snapshot (latest100 wins over all_videos)."""
-    out: dict[str, int] = {}
-    for name in ("all_videos", "latest100"):
+    """video_id -> the most recently checked view_count (a view count changes over time, so it is not a
+    'conflict' the snapshot wins: the freshest ``view_count_checked_at`` of latest100 / all_videos /
+    high_views is used)."""
+    best: dict[str, tuple[str, int]] = {}
+    for name in ("latest100", "all_videos", "high_views"):
         d = load_reference_list(preset, name) or {}
         for v in d.get("videos") or []:
             if v.get("video_id") and isinstance(v.get("view_count"), (int, float)):
-                out[v["video_id"]] = int(v["view_count"])
-    return out
+                at = str(v.get("view_count_checked_at") or "")
+                if v["video_id"] not in best or at >= best[v["video_id"]][0]:
+                    best[v["video_id"]] = (at, int(v["view_count"]))
+    return {k: c for k, (_, c) in best.items()}
 
 
 def snapshot_blocker(preset: str) -> str:

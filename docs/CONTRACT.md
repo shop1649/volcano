@@ -236,9 +236,11 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
 
 ## 12. As-built conventions (decided during integration — binding)
 
-- **Font names in ASS**: styles use the face's PostScript name (libass does not resolve fullnames such as
-  "Noto Sans CJK KR Bold" and silently falls back). `shortkit.edit.render.check_output_fonts` asks libass itself
-  (ffmpeg -v verbose fontselect) and the render is refused on any substitution or glyph fallback.
+- **Font names in ASS**: styles name a face the way libass 0.17 matches it (Windows/GDI rule): PostScript name for CFF
+  outlines, Windows full name (name id 4) for TrueType outlines; the resolver confirms the name against libass's fontselect
+  log (`captions.probe_ass_names`). The style Bold field is −1 only for faces of weight ≥ 550, else 0 (libass reads it as a
+  boolean and would embolden synthetically). `render.check_output_fonts` checks the exact face (PostScript name, index,
+  file) with the characters each style really renders and refuses glyph fallback and synthetic bold.
 - **size_px** = font EM size in canvas px (renderer: ASS Fontsize = size_px × (winAscent+winDescent)/unitsPerEm;
   line pitch = size_px × line_spacing). The reference analyzer writes size_px in the same unit (plus `ass_fontsize`).
 - **box.pad_x/pad_y** = box edge − visible ink edge (ink incl. outline).
@@ -268,6 +270,15 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
 - **OCR**: run tesseract with `OMP_THREAD_LIMIT=1` (shared machines otherwise stall).
 - **Faces**: OpenCV ≥5 wheels have no Haar cascades; `shortkit clean fetch-models` stores sha256-pinned XMLs in
   `warehouse/cache/models/haarcascades/`; `shortkit.clean.faces` runs them (numpy implementation if cv2 lacks CascadeClassifier).
+
+- **SFX count rule**: per-episode SFX counts count only catalog types of class `edit_sfx` (plus `intentional_silence` when
+  the plan has `bgm.silences`); `onsite_sound` types are the reference footage's own sound — never counted, never placeable.
+  Allowed count per type and for the total = [floor(p10), ceil(p90)] of the observed per-video counts of the plan's format
+  (by_format[F], else overall) OR any count observed in at least one of those reference videos; counts from
+  lower_bound_videos are lower bounds (warning).
+- **QA font rows**: the REQUIRED font row is per role (`caption.font:role_<role>`): pooled rest-frame crops of all captions of
+  the role vs the bootstrapped ceiling of the pooled median. Per-caption font rows are informational (a per-caption
+  'different' still fails the gate). Defects can be `superseded` when a check id is replaced.
 
 ### 12.1 Coverage-round additions
 - **Access logs**: every episode command saves `episodes/<id>/build/preset_access_<command>.json`; QA saves

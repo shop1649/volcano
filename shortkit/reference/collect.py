@@ -12,12 +12,26 @@ Two methods (``--method auto`` picks the API when ``YOUTUBE_API_KEY`` is set):
   derived from duration (<= 180 s -> short) and marked as such.
 
 Files (presets/<name>/reference/):
-  latest100.json   the fixed baseline.  An existing ``status: ok`` snapshot is NEVER overwritten
-                   unless ``--refresh-snapshot`` is given; a failed attempt never replaces it.
-  all_videos.json  whole-channel listing, reference only (latest100 wins on conflicting fields).
-  high_views.json  videos with an exact view_count >= reference.high_view_threshold (+checked_at);
-                   flat-listing approximations above the threshold are kept apart as ``unverified``.
-  meta/<id>.json   per-video metadata (title, description, tags) used by `ref trace`.
+  latest100.json   the fixed baseline.  An existing ``status: ok`` OR ``status: partial`` snapshot is
+                   NEVER replaced unless ``--refresh-snapshot`` is given (a replaced one is archived as
+                   ``latest100.replaced_<time>.json``); a failed attempt never replaces it.  A partial
+                   snapshot stores ``failures`` / ``missing_members`` (metadata failures among the newest
+                   N of a tab, with the reason); the next ``ref collect`` re-queries only those ids and
+                   COMPLETES the same snapshot (membership as of its ``captured_at``; each step is logged
+                   under ``completions`` and the previous version archived as
+                   ``latest100.completed_<time>.json``).
+  all_videos.json  whole-channel listing, reference only.  Stable fields (url, title, published_at,
+                   duration, kind) of snapshot members come from latest100; TIME-VARYING fields
+                   (view_count, view_count_checked_at) are this run's freshest values, the snapshot's
+                   count is kept apart as ``view_count_at_snapshot``.
+  high_views.json  EVERY channel video with an exact view_count >= reference.high_view_threshold
+                   (+checked_at).  With yt-dlp, per-video metadata is fetched for the newest N of each
+                   tab AND for every other listing entry whose approximate (flat) count is >= 90 % of
+                   the threshold or unknown, so the set is exact over the whole channel; candidates whose
+                   metadata could not be read are listed under ``unverified`` with the reason and the
+                   file is ``status: partial``.
+  meta/<id>.json   per-video metadata (title, description, tags) used by `ref trace` (latest N of each
+                   tab + every high-view candidate).
   collect_log.jsonl every attempt (method, status, exact blocker).
 
 A network block (HTTP 403 from the egress proxy, DNS failure, timeouts ...) is written as
@@ -37,12 +51,13 @@ from typing import Any, Callable
 from .. import paths
 from ..config import load_preset
 from ..util.jsonio import append_jsonl, now_iso, read_json, write_json
-from .common import SNAPSHOT_SCHEMA, reference_dir, safe_id, say, scrub, warn
+from .common import BASIS_STATUSES, SNAPSHOT_SCHEMA, reference_dir, safe_id, say, scrub, warn
 
 LISTING_SCHEMA = "shortkit.ref_channel_listing/1"
 HIGH_SCHEMA = "shortkit.ref_high_views/1"
 API_BASE = "https://www.googleapis.com/youtube/v3/"
 TABS = ("shorts", "videos")
+HV_MARGIN = 0.9          # flat-listing counts are rounded ("79만", "1.2M"): candidates from 90 % of the threshold
 
 _BLOCK_PATTERNS = ("403", "forbidden", "tunnel connection failed", "urlopen error", "connection refused",
                    "timed out", "timeout", "name or service not known", "temporary failure in name resolution",
@@ -117,8 +132,14 @@ def _flat_entries(info: dict) -> list[dict]:
 
 
 def list_ytdlp(channel_url: str, latest_n: int, cookies: str | None = None, max_meta: int | None = None,
-               extract: Callable[..., dict] | None = None) -> dict:
-    """Listing + per-video metadata with yt-dlp.  Raises Blocked when the channel is unreachable."""
+               extract: Callable[..., dict] | None = None, threshold: int | None = None,
+               extra_ids: list[str] | tuple = ()) -> dict:
+    """Listing + per-video metadata with yt-dlp.  Raises Blocked when the channel is unreachable.
+
+    Metadata is fetched for (1) the newest ``latest_n`` of each tab, (2) ``extra_ids`` (members a
+    partial snapshot is missing) and (3) when ``threshold`` is given, every other listing entry whose
+    flat (approximate) view count is >= HV_MARGIN x threshold or unknown -- so the high-view set is exact
+    over the whole channel.  Failures of (1)/(2) go to ``failures``, of (3) to ``hv_failures``."""
     extract = extract or ydl_extract
     tabs: dict[str, dict] = {}
     listing: dict[str, dict] = {}
@@ -165,26 +186,46 @@ def list_ytdlp(channel_url: str, latest_n: int, cookies: str | None = None, max_
         for vid in order.get(tab, [])[:latest_n]:
             if vid not in want:
                 want.append(vid)
+    for vid in extra_ids:
+        if vid not in want:
+            want.append(vid)
+    # high-view candidates outside the newest N: approximate count near/above the threshold, or unknown
+    hv_want: list[str] = []
+    if threshold:
+        cands = [(v, r.get("view_count_flat")) for v, r in listing.items() if v not in want]
+        cands = [(v, c) for v, c in cands if c is None or c >= HV_MARGIN * threshold]
+        hv_want = [v for v, _ in sorted(cands, key=lambda x: (x[1] is None, -(x[1] or 0), x[0]))]
+    hv_not_fetched: list[str] = []
     if max_meta is not None:
         want = want[:max_meta]
+        room = max(0, max_meta - len(want))
+        hv_want, hv_not_fetched = hv_want[:room], hv_want[room:]
     meta: dict[str, dict] = {}
     failures: list[dict] = []
+    hv_failures: list[dict] = []
     blocked_n = 0
-    for vid in want:
-        url = listing[vid]["url"]
-        try:
-            info = extract(f"https://www.youtube.com/watch?v={vid}", False, cookies)
-        except Exception as e:
-            msg = f"{type(e).__name__}: {e}"
-            k = classify_error(msg)
-            blocked_n += k == "blocked"
-            failures.append({"video_id": vid, "kind": k, "error": scrub(msg)[:500]})
-            continue
-        meta[vid] = {"checked_at": now_iso(), "info": info, "url": url}
+    rank_of = {v: (tab, i + 1) for tab in TABS for i, v in enumerate(order.get(tab, []))}
+    for group, ids in (("latest", want), ("high_views", hv_want)):
+        for vid in ids:
+            url = (listing.get(vid) or {}).get("url") or f"https://www.youtube.com/watch?v={vid}"
+            try:
+                info = extract(f"https://www.youtube.com/watch?v={vid}", False, cookies)
+            except Exception as e:
+                msg = f"{type(e).__name__}: {e}"
+                k = classify_error(msg)
+                blocked_n += k == "blocked"
+                tab, rk = rank_of.get(vid, (None, None))
+                (failures if group == "latest" else hv_failures).append(
+                    {"video_id": vid, "kind": k, "error": scrub(msg)[:500], "tab": tab, "tab_rank": rk,
+                     "at": now_iso(), "view_count_flat": (listing.get(vid) or {}).get("view_count_flat")})
+                continue
+            meta[vid] = {"checked_at": now_iso(), "info": info, "url": url}
     if want and not meta and blocked_n:
         raise Blocked(f"영상 메타데이터 {len(want)}건 모두 실패: {failures[0]['error']}")
     return {"tabs": tabs, "listing": listing, "meta": meta, "failures": failures, "order": order,
-            "method": f"yt-dlp {_ydl_version()} (extract_flat /shorts,/videos + per-video metadata)"}
+            "hv_candidates": hv_want + hv_not_fetched, "hv_failures": hv_failures, "hv_not_fetched": hv_not_fetched,
+            "method": f"yt-dlp {_ydl_version()} (extract_flat /shorts,/videos + per-video metadata: newest "
+                      f"{latest_n}/tab + every high-view candidate)"}
 
 
 def _record_from_meta(vid: str, base: dict, m: dict) -> dict:
@@ -344,13 +385,87 @@ LATEST_KEYS = ("rank", "video_id", "url", "title", "published_at", "upload_date"
                "view_count_checked_at", "kind")
 ALL_KEYS = ("video_id", "url", "title", "published_at", "upload_date", "duration", "view_count",
             "view_count_source", "view_count_checked_at", "kind", "in_latest100")
+# fields of a snapshot member that do not change over time: latest100 wins on these in all_videos
+STABLE_KEYS = ("url", "title", "published_at", "upload_date", "duration", "kind")
+
+
+def _member_sort(v: dict) -> float:
+    ts = _ts_from_iso(v.get("published_at")) if v.get("published_at") else None
+    if ts is None:
+        ts = _date_sort(v.get("upload_date"))
+    return float(ts) if ts is not None else float("-inf")
+
+
+def missing_members_of(res: dict, latest_ids: set[str]) -> list[dict]:
+    """Metadata failures among the newest N of a tab (possible snapshot members), with the reason."""
+    return [{"video_id": f["video_id"], "tab": f.get("tab"), "tab_rank": f.get("tab_rank"), "kind": f.get("kind"),
+             "error": f.get("error"), "at": f.get("at"),
+             "url": (res["listing"].get(f["video_id"]) or {}).get("url")}
+            for f in res.get("failures") or [] if f["video_id"] not in latest_ids]
+
+
+def complete_snapshot(old: dict, res: dict, latest_n: int) -> tuple[dict, dict | None]:
+    """Complete a PARTIAL snapshot in place: members whose metadata failed at capture time are
+    re-queried (``res`` holds this run's metadata for them); a recovered video published no later than
+    ``captured_at`` enters the list when it ranks within the newest ``latest_n`` as of that time (the
+    last-ranked member then drops out).  Membership stays defined by the original capture time.
+    -> (snapshot, completion record or None when nothing changed)."""
+    missing = [m for m in old.get("missing_members") or [] if isinstance(m, dict) and m.get("video_id")]
+    if not missing:
+        return old, None
+    cap_ts = _ts_from_iso(old.get("captured_at"))
+    recovered, still, non_members = [], [], []
+    fails = {f["video_id"]: f for f in res.get("failures") or []}
+    for m in missing:
+        vid = m["video_id"]
+        if vid in res.get("meta", {}):
+            base = res["listing"].get(vid) or {"url": m.get("url") or f"https://www.youtube.com/watch?v={vid}",
+                                               "kind": {"shorts": "short", "videos": "video"}.get(m.get("tab"))}
+            r = _record_from_meta(vid, base, res["meta"][vid])
+            if r["_sort"] is None:
+                still.append({**m, "error": "게시 시각을 받지 못함", "at": now_iso()})
+            elif cap_ts is not None and r["_sort"] > cap_ts:
+                non_members.append({"video_id": vid, "reason": "고정 시각 이후 게시(구성원 아님)"})
+            else:
+                recovered.append(_clean(r, LATEST_KEYS))
+        else:
+            f = fails.get(vid)
+            still.append({**m, "error": (f or {}).get("error") or "이번 시도에서 조회되지 않음",
+                          "kind": (f or {}).get("kind", m.get("kind")), "at": now_iso()})
+    if not recovered and not non_members:
+        new = dict(old)
+        new["missing_members"] = still
+        return new, {"at": now_iso(), "recovered": [], "dropped": [], "resolved_non_members": [],
+                     "still_missing": [m["video_id"] for m in still], "changed": False}
+    videos = [dict(v) for v in old.get("videos") or []] + recovered
+    videos.sort(key=lambda v: (-_member_sort(v), v["video_id"]))
+    keep, dropped = videos[:latest_n], videos[latest_n:]
+    for i, v in enumerate(keep, 1):
+        v["rank"] = i
+    rec_ids = {v["video_id"] for v in recovered}
+    non_members += [{"video_id": v["video_id"], "reason": f"다시 조회 결과 최신 {latest_n}편 밖"} for v in dropped
+                    if v["video_id"] in rec_ids]
+    comp = {"at": now_iso(), "recovered": [v["video_id"] for v in keep if v["video_id"] in rec_ids],
+            "dropped": [v["video_id"] for v in dropped if v["video_id"] not in rec_ids],
+            "resolved_non_members": non_members, "still_missing": [m["video_id"] for m in still], "changed": True}
+    new = dict(old)
+    new.update({"videos": keep, "n": len(keep), "missing_members": still,
+                "completions": list(old.get("completions") or []) + [comp]})
+    if not still and (len(keep) >= latest_n or not old.get("partial_reason_listing_short")):
+        new["status"] = "ok"
+        new["blocker"] = None
+    else:
+        new["blocker"] = (f"구성원 후보 {len(still)}편의 메타데이터를 아직 받지 못함: "
+                          + ", ".join(f"{m['video_id']}({str(m.get('error'))[:80]})" for m in still[:5]))
+    return new, comp
 
 
 def collect(preset: str = "joshuamagazine", method: str = "auto", refresh_snapshot: bool = False,
             cookies: str | None = None, max_meta: int | None = None,
             extract: Callable[..., dict] | None = None, api_getter: Callable[[str], dict] | None = None) -> dict:
     """Run a collection attempt and write the reference files.  Returns a summary dict with
-    ``status`` (ok|partial|blocked|kept) and ``exit_code``."""
+    ``status`` (ok|partial|blocked|kept), ``snapshot_status`` and ``exit_code`` (0 only when the
+    snapshot is ok AND the high-view set is exact)."""
     pr = load_preset(preset)
     channel_url = pr.get("reference.channel_url")
     latest_n = int(pr.get("reference.latest_n"))
@@ -363,26 +478,37 @@ def collect(preset: str = "joshuamagazine", method: str = "auto", refresh_snapsh
     if method == "auto":
         method = "api" if key else "ytdlp"
     attempted_at = now_iso()
+    snap_path = rdir / "latest100.json"
+    old = read_json(snap_path)
+    kept = bool(old and old.get("status") in BASIS_STATUSES and not refresh_snapshot)
+    extra_ids = [m["video_id"] for m in (old or {}).get("missing_members") or []
+                 if isinstance(m, dict) and m.get("video_id")] if kept else []
     try:
         if method == "api":
             if not key:
                 raise Blocked("YOUTUBE_API_KEY 환경 변수가 없음")
             res = list_api(handle, channel_id, latest_n, key, getter=api_getter)
         else:
-            res = list_ytdlp(channel_url, latest_n, cookies=cookies, max_meta=max_meta, extract=extract)
+            res = list_ytdlp(channel_url, latest_n, cookies=cookies, max_meta=max_meta, extract=extract,
+                             threshold=threshold, extra_ids=extra_ids)
     except Blocked as e:
         label = f"yt-dlp {_ydl_version()}" if method == "ytdlp" else "youtube-data-api-v3"
         return _write_blocked(preset, rdir, channel_url, label, attempted_at, scrub(str(e)))
     latest, all_recs, notes = build_records(res, latest_n)
+    latest_ids = {r["video_id"] for r in latest}
     status = "ok"
     blocker = None
-    if res.get("failures"):
+    listing_short = False
+    missing = missing_members_of(res, latest_ids)
+    if missing:
         status = "partial"
-        blocker = f"메타데이터 실패 {len(res['failures'])}건: {res['failures'][0]['error'][:300]}"
+        blocker = (f"메타데이터 실패 {len(missing)}건(최신 {latest_n}편 후보): "
+                   + "; ".join(f"{m['video_id']}: {str(m['error'])[:160]}" for m in missing[:3]))
     if len(latest) < latest_n:
         n_total = len(res["listing"])
-        if n_total >= latest_n or res.get("failures"):
+        if n_total >= latest_n or missing:
             status = "partial"
+            listing_short = True
             blocker = blocker or f"게시 시각이 확인된 영상이 {len(latest)}편뿐(목록 {n_total}편)"
         else:
             notes.append(f"채널 전체 영상이 {n_total}편뿐이라 최신 {latest_n}편을 채우지 못함")
@@ -391,32 +517,43 @@ def collect(preset: str = "joshuamagazine", method: str = "auto", refresh_snapsh
         if r.get("_meta"):
             write_json(rdir / "meta" / f"{r['video_id']}.json", {"video_id": r["video_id"], **r["_meta"],
                                                                   "source": res["method"]})
-    snap_path = rdir / "latest100.json"
-    old = read_json(snap_path)
-    kept = bool(old and old.get("status") == "ok" and not refresh_snapshot)
     snapshot = {"schema": SNAPSHOT_SCHEMA, "preset_id": pr.preset_id, "channel_url": channel_url,
                 "captured_at": attempted_at, "method": res["method"], "status": status, "blocker": blocker,
                 "latest_n": latest_n, "n": len(latest), "sort": "published_at desc (timestamp; upload_date if no time)",
-                "tabs": res.get("tabs"), "notes": notes, "videos": [_clean(r, LATEST_KEYS) for r in latest]}
+                "tabs": res.get("tabs"), "notes": notes, "failures": res.get("failures") or [],
+                "missing_members": missing, "partial_reason_listing_short": listing_short,
+                "videos": [_clean(r, LATEST_KEYS) for r in latest]}
+    completion = None
     if kept:
-        say(f"기존 최신 {latest_n}편 스냅샷(고정 시각 {old.get('captured_at')})을 유지합니다. "
-            "새로 고정하려면 --refresh-snapshot 을 주세요.")
-        snapshot = old
+        snapshot, completion = complete_snapshot(old, res, latest_n)
+        if completion and completion.get("changed"):
+            write_json(rdir / f"latest100.completed_{_stamp(attempted_at)}.json", old)
+            write_json(snap_path, snapshot)
+            say(f"부분(partial) 스냅샷을 같은 고정 시각({old.get('captured_at')}) 기준으로 보완했습니다: 복구 "
+                f"{len(completion['recovered'])}편, 빠짐 {len(completion['dropped'])}편, 아직 못 받음 "
+                f"{len(completion['still_missing'])}편 → 상태 {snapshot.get('status')}")
+        elif completion:
+            write_json(snap_path, snapshot)          # refreshed failure reasons only
+        say(f"기존 최신 {latest_n}편 스냅샷(고정 시각 {old.get('captured_at')}, 상태 {snapshot.get('status')})을 "
+            "유지합니다. 새로 고정하려면 --refresh-snapshot 을 주세요.")
     else:
-        if old and old.get("status") == "ok":
+        if old and old.get("status") in BASIS_STATUSES:
             write_json(rdir / f"latest100.replaced_{_stamp(old.get('captured_at'))}.json", old)
         write_json(snap_path, snapshot)
-    # all_videos: latest100 (the kept or new snapshot) wins on conflicts
+    # all_videos: latest100 wins on STABLE fields; view counts are this run's freshest values
     snap_by_id = {v["video_id"]: v for v in snapshot.get("videos") or []}
     all_out = []
     for r in all_recs:
         rr = _clean(r, ALL_KEYS)
         if r["video_id"] in snap_by_id:
             s = snap_by_id[r["video_id"]]
-            for k in ("url", "title", "published_at", "upload_date", "duration", "view_count", "view_count_checked_at",
-                      "kind"):
+            for k in STABLE_KEYS:
                 rr[k] = s.get(k)
-            rr["view_count_source"] = "latest100_snapshot"
+            rr["view_count_at_snapshot"] = s.get("view_count")
+            rr["view_count_at_snapshot_checked_at"] = s.get("view_count_checked_at")
+            if rr.get("view_count") is None and s.get("view_count") is not None:
+                rr.update(view_count=s.get("view_count"), view_count_checked_at=s.get("view_count_checked_at"),
+                          view_count_source="latest100_snapshot")
             rr["in_latest100"] = True
         else:
             rr["in_latest100"] = False
@@ -424,28 +561,69 @@ def collect(preset: str = "joshuamagazine", method: str = "auto", refresh_snapsh
     write_json(rdir / "all_videos.json", {
         "schema": LISTING_SCHEMA, "preset_id": pr.preset_id, "channel_url": channel_url, "captured_at": attempted_at,
         "method": res["method"], "status": status, "blocker": blocker, "n": len(all_out),
-        "note": "채널 전체 목록(참고용). 분석 기준은 latest100.json 이며 같은 영상의 값이 다르면 latest100 을 따른다.",
+        "note": "채널 전체 목록(참고용). 분석 기준은 latest100.json 이며 같은 영상의 고정 필드(주소·제목·게시일·길이·종류)가 다르면 "
+                "latest100 을 따른다. 조회수는 시간에 따라 변하므로 이번 수집의 최신값(view_count, 확인일)이고 스냅샷 당시 값은 "
+                "view_count_at_snapshot.",
         "videos": all_out})
-    exact = [r for r in all_out if r.get("view_count") is not None and r["view_count"] >= threshold
-             and r.get("view_count_source") in ("video_metadata", "latest100_snapshot")]
-    approx = [r for r in all_out if r.get("view_count") is not None and r["view_count"] >= threshold
-              and r.get("view_count_source") == "flat_listing_approx"]
+    hv = high_view_sets(all_out, res, threshold)
+    hv_status = "ok" if status in ("ok", "partial") and not hv["unverified"] else "partial"
+    hv_blocker = None
+    if hv["unverified"]:
+        hv_blocker = (f"조회수 {threshold:,} 이상일 수 있는 영상 {len(hv['unverified'])}편의 정확한 조회수를 확인하지 못함: "
+                      + ", ".join(f"{u['video_id']}({u['reason'][:60]})" for u in hv["unverified"][:5]))
     write_json(rdir / "high_views.json", {
         "schema": HIGH_SCHEMA, "preset_id": pr.preset_id, "threshold": threshold, "checked_at": attempted_at,
-        "status": status, "blocker": blocker, "n": len(exact),
+        "status": hv_status, "blocker": hv_blocker, "n": len(hv["exact"]),
+        "method": ("yt-dlp: 각 탭 최신 N편 + 목록 근사 조회수가 기준의 90% 이상이거나 없는 모든 영상의 영상별 메타데이터"
+                   if method != "api" else "YouTube Data API v3 videos.list statistics.viewCount (채널 전체)"),
+        "candidates_checked": len(res.get("hv_candidates") or []),
         "videos": [{"video_id": r["video_id"], "url": r["url"], "title": r["title"], "view_count": r["view_count"],
-                    "view_count_checked_at": r["view_count_checked_at"], "published_at": r["published_at"],
+                    "view_count_checked_at": r["view_count_checked_at"], "view_count_source": r.get("view_count_source"),
+                    "view_count_at_snapshot": r.get("view_count_at_snapshot"), "published_at": r["published_at"],
                     "kind": r["kind"], "in_latest100": r["in_latest100"]}
-                   for r in sorted(exact, key=lambda r: -r["view_count"])],
-        "unverified": [{"video_id": r["video_id"], "view_count_approx": r["view_count"],
-                        "reason": "목록 화면의 근사 조회수만 있음(영상 메타데이터 미확인)"} for r in approx]})
+                   for r in sorted(hv["exact"], key=lambda r: -r["view_count"])],
+        "unverified": hv["unverified"]})
     append_jsonl(rdir / "collect_log.jsonl", {"at": attempted_at, "method": res["method"], "status": status,
                                               "blocker": blocker, "n_listing": len(res["listing"]),
-                                              "n_latest": len(latest), "snapshot_kept": kept})
+                                              "n_latest": len(latest), "snapshot_kept": kept,
+                                              "snapshot_status": snapshot.get("status"),
+                                              "completion": completion, "n_high": len(hv["exact"]),
+                                              "n_high_unverified": len(hv["unverified"])})
     say(f"수집 {status}: 채널 목록 {len(res['listing'])}편, 최신 {len(latest)}편, "
-        f"조회수 {threshold:,} 이상(정확) {len(exact)}편, 근사치만 {len(approx)}편")
-    return {"status": "kept" if kept else status, "exit_code": 0 if status == "ok" else 4,
-            "n_latest": len(latest), "n_all": len(all_out), "n_high": len(exact)}
+        f"조회수 {threshold:,} 이상(정확) {len(hv['exact'])}편, 확인 못 함 {len(hv['unverified'])}편")
+    ok = snapshot.get("status") == "ok" and hv_status == "ok"
+    return {"status": "kept" if kept else status, "snapshot_status": snapshot.get("status"),
+            "exit_code": 0 if ok else 4, "n_latest": len(latest), "n_all": len(all_out), "n_high": len(hv["exact"]),
+            "n_high_unverified": len(hv["unverified"])}
+
+
+def high_view_sets(all_out: list[dict], res: dict, threshold: int) -> dict:
+    """{"exact": records with a metadata (or earlier exact snapshot) count >= threshold,
+        "unverified": entries that may be >= threshold but whose exact count was not read (with the reason)}."""
+    exact, unverified = [], []
+    hv_fail = {f["video_id"]: f for f in res.get("hv_failures") or []}
+    fail = {f["video_id"]: f for f in res.get("failures") or []}
+    not_fetched = set(res.get("hv_not_fetched") or [])
+    flat = {v: (b or {}).get("view_count_flat") for v, b in res.get("listing", {}).items()}
+    for r in all_out:
+        vc, src = r.get("view_count"), r.get("view_count_source")
+        if src in ("video_metadata", "latest100_snapshot") and vc is not None and vc >= threshold:
+            exact.append(r)            # (view counts do not go down: an earlier exact count >= threshold stays high)
+            continue
+        if src == "video_metadata":
+            continue                   # exact and below the threshold
+        fl = flat.get(r["video_id"])
+        if fl is not None and fl < HV_MARGIN * threshold:
+            continue                   # far below the threshold even allowing for rounding
+        vid = r["video_id"]
+        f = hv_fail.get(vid) or fail.get(vid)
+        reason = (f"영상 메타데이터 조회 실패: {str(f.get('error'))[:200]}" if f else
+                  "메타데이터 조회 상한(--max-meta)으로 조회하지 않음" if vid in not_fetched else
+                  "목록 화면의 근사 조회수만 있음(영상 메타데이터 미확인)" if fl is not None else
+                  "조회수 정보 없음(영상 메타데이터 미확인)")
+        unverified.append({"video_id": vid, "view_count_approx": fl, "reason": reason,
+                           "url": r.get("url"), "kind": r.get("kind")})
+    return {"exact": exact, "unverified": unverified}
 
 
 def _stamp(iso: str | None) -> str:
