@@ -48,23 +48,11 @@ Hard rules from the user (verbatim intent; they are acceptance criteria):
   strip. Table: 같다/다르다/못 잼, intended changes marked separately. Unmeasured never becomes
   complete.
 
-### Environment facts (first build machine only, 2026-09-24 — other machines differ; never hard-code these paths)
-- Network policy blocks youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com,
-  reddit.com, lens.google.com, namu.wiki, freesound.org, pixabay.com, dl.fbaipublicfiles.com
-  (Demucs weights), huggingface.co, archive.org. Allowed: github.com / raw.githubusercontent.com
-  (public repos), pypi, npm, ubuntu apt.
-- Therefore: code that talks to those platforms must be written against their documented
-  formats (yt-dlp info-dict fields, Reddit JSON, YouTube Data API v3) and unit-tested with
-  **clearly labelled synthetic fixtures**; mark such paths "not live-tested here". Never try to
-  route around the block (no mirrors/proxies/Invidious etc.).
-- Installed: Python 3.11, ffmpeg 6.1.1 (libass, libx264, xfade, delogo, zoompan, loudnorm,
-  rubberband, sidechaincompress), melt 7.22 (affine, freeze, volume, qtblend, avfilter.subtitles,
-  avfilter.ass, kdenlivetitle), tesseract 5 (kor, eng), fpcalc (chromaprint), espeak-ng (ko),
-  sox, Korean fonts (Noto Sans CJK KR all weights, Nanum*), numpy/scipy/opencv-headless/pillow/
-  pyyaml/jsonschema/yt-dlp/pytesseract/opentimelineio/imagehash/pytest. NOT installed: torch,
-  demucs (weights host blocked). 4 CPUs, no GPU.
-- Candidate OFL Korean fonts (sha256-pinned) are cached in `/home/user/fontcache` on this
-  machine only; code must fetch them via a manifest (see §7), never hard-code that path.
+### Environment
+- Platform access depends on the machine's network policy: check with `python -m shortkit doctor --network`. Code that
+  talks to YouTube/TikTok/Instagram/Reddit/YouTube Data API must record access status honestly (ok / blocked /
+  login_required / error) and never route around a block (no mirrors/proxies). The first build machine's facts are in
+  Appendix A.
 
 ## 1. Conventions
 - Package `shortkit` (Python ≥3.10). CLI `python -m shortkit <area> <cmd>`; each area
@@ -87,9 +75,10 @@ Hard rules from the user (verbatim intent; they are acceptance criteria):
   create their own temporary project root when they write files (copy `shortkit.root` marker
   into `tmp_path` and set `SHORTKIT_ROOT`), or write only under `assets/test/generated/` /
   `episodes/_pytest_*`. Test media: run `python -m shortkit testassets synth`,
-  `... fetch-video --local-dir /home/user/intel-iot-devkit/sample-videos`, `... dirty-source`
-  (already done on this machine: `assets/test/generated/`).
-- Do not run `git commit/checkout/stash/reset`. Do not edit files outside your ownership list.
+  `... fetch-video [--local-dir <folder with the Intel sample-videos clips>]`, `... dirty-source`, and
+  `python -m shortkit episode test-source`.
+- Multi-agent builds only: when several agents edit the tree at once, each edits only its own files and the orchestrator
+  commits (Appendix A). A single agent follows AGENTS.md rule 16 (commit progress and the resume point).
 
 ## 2. Preset layers and registry (implemented: `shortkit/config.py`, `shortkit/preset_cli.py`)
 `presets/<name>/preset.yaml` (base, PROVISIONAL) ← `measured.yaml` (generated from
@@ -299,3 +288,29 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
 - **Reference download** caps the SHORT side (`format_sort res:<N>`), so vertical Shorts come at 1080×1920.
 - **Exit code 3** from `ref collect/download/analyze/aggregate/trace/classify` means "no reference data (blocked or empty)" — the
   unmeasured files were still written.
+
+
+## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
+
+### Environment facts of the first build machine
+- Network policy blocks youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com,
+  reddit.com, lens.google.com, namu.wiki, freesound.org, pixabay.com, dl.fbaipublicfiles.com
+  (Demucs weights), huggingface.co, archive.org. Allowed: github.com / raw.githubusercontent.com
+  (public repos), pypi, npm, ubuntu apt.
+- Therefore: code that talks to those platforms must be written against their documented
+  formats (yt-dlp info-dict fields, Reddit JSON, YouTube Data API v3) and unit-tested with
+  **clearly labelled synthetic fixtures**; mark such paths "not live-tested here". Never try to
+  route around the block (no mirrors/proxies/Invidious etc.).
+- Installed: Python 3.11, ffmpeg 6.1.1 (libass, libx264, xfade, delogo, zoompan, loudnorm,
+  rubberband, sidechaincompress), melt 7.22 (affine, freeze, volume, qtblend, avfilter.subtitles,
+  avfilter.ass, kdenlivetitle), tesseract 5 (kor, eng), fpcalc (chromaprint), espeak-ng (ko),
+  sox, Korean fonts (Noto Sans CJK KR all weights, Nanum*), numpy/scipy/opencv-headless/pillow/
+  pyyaml/jsonschema/yt-dlp/pytesseract/opentimelineio/imagehash/pytest. NOT installed: torch,
+  demucs (weights host blocked). 4 CPUs, no GPU.
+- Candidate OFL Korean fonts (sha256-pinned) are cached in `/home/user/fontcache` on this
+  machine only; code must fetch them via a manifest (see §7), never hard-code that path.
+
+
+- The system was built by an orchestrator running several agents in parallel on one working tree; each agent owned a
+  disjoint set of files, did not run git state commands, and the orchestrator committed. Paths such as `/home/user/...`
+  above existed only on that machine.

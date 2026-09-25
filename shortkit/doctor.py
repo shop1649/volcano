@@ -134,6 +134,14 @@ def check_tools() -> list[Item]:
     melt = shutil.which("melt") or shutil.which("melt.exe")
     items.append(Item("tool", "melt", False, bool(melt), melt or "없음 — 편집 프로젝트(MLT) 렌더 검증 불가(프로젝트 생성은 됨)",
                       _hint("melt")))
+    if melt:
+        import os as _os
+
+        disp = bool(_os.environ.get("DISPLAY")) or platform.system() in ("Windows", "Darwin")
+        xvfb = shutil.which("xvfb-run")
+        items.append(Item("tool", "melt Qt 렌더(DISPLAY 또는 xvfb-run)", False, disp or bool(xvfb),
+                          "DISPLAY 있음" if disp else (xvfb or "없음 — 편집 프로젝트 melt 검증이 못 잼으로 끝남"),
+                          "sudo apt-get install xvfb" if platform.system() == "Linux" else ""))
     tess = shutil.which("tesseract")
     if tess:
         rc, out = _run([tess, "--list-langs"])
@@ -167,7 +175,20 @@ def check_fonts() -> list[Item]:
     for n in names:
         p = find_font(n)
         items.append(Item("font", n, True, p is not None, str(p) if p else "없음(대체 글꼴 자동 사용 안 함)",
-                          _hint("fonts") + " 또는 `shortkit doctor --fetch-fonts`"))
+                          _hint("fonts") + " (프리셋 글꼴이 manifest 의 받을 수 있는 글꼴이면 `shortkit doctor --fetch-fonts`)"))
+    try:
+        import yaml
+
+        from . import paths as _paths
+
+        man = yaml.safe_load((_paths.project_root() / "assets/fonts/manifest.yaml").read_text(encoding="utf-8")) or {}
+        cands = [f for f in (man.get("fonts") or []) if f.get("status", "acquirable") == "acquirable"]
+        have = [f for f in cands if _paths.absp(str(f.get("file", ""))).is_file()]
+        items.append(Item("font", "후보 글꼴(글꼴 판정용)", False, len(have) == len(cands),
+                          f"{len(have)}/{len(cands)} 확보" + ("" if len(have) == len(cands) else " — `ref fonts` 후보 검증이 줄어듦"),
+                          "python -m shortkit doctor --fetch-fonts"))
+    except Exception as e:
+        items.append(Item("font", "후보 글꼴(글꼴 판정용)", False, None, f"manifest 확인 실패: {e}"))
     return items
 
 
@@ -216,8 +237,8 @@ def check_models(load_demucs: bool = False) -> list[Item]:
 
         for kind in ("frontal", "profile"):
             p = faces.find_cascade(kind)
-            items.append(Item("model", f"face cascade:{kind}", False, p is not None,
-                              "ok" if p else "없음 — 얼굴 가림/크롭 보호 검사가 못 잼으로 남음",
+            items.append(Item("model", f"face cascade:{kind}", True, p is not None,
+                              "ok" if p else "없음 — 얼굴 가림/크롭 보호 검사가 못 잼(QA 필수 항목)으로 남음",
                               "python -m shortkit clean fetch-models (PyPI wheel 에서 sha256 고정 XML 추출)"))
     except Exception as e:
         items.append(Item("model", "face cascade", False, False, f"확인 실패: {e}"))

@@ -16,6 +16,28 @@ and independent of libass' own line layout.
 Font rule (user: never guess): the requested family/full name must match the resolved face
 exactly.  ``fc-match`` substitutes silently (e.g. "Noto Sans CJK KR Bold" -> DejaVu Sans), so
 it is never trusted; a non-matching name is an error.
+
+Name written into the ASS style (``FaceMetrics.ass_name``) -- libass 0.17.1 ``ass_fontselect.c``,
+confirmed per face with the ``fontselect`` log (tests/edit/test_font_libass_names.py):
+
+* libass indexes a face by its Windows-platform (3) family names (name id 1) and full names
+  (id 4) plus its PostScript name (id 6), and ``matches_full_or_postscript_name`` uses the
+  PostScript name ONLY for PostScript/CFF outlines and the full name ONLY for TrueType outlines
+  (the GDI rule).  So "BlackHanSans-Regular" (TrueType) falls back to DejaVu/WenQuanYi while
+  "Black Han Sans Regular" matches; "Noto Sans CJK KR Bold" (CFF) falls back while
+  "NotoSansCJKkr-Bold" matches.
+* A family-name match picks the member closest in weight, so a shared family such as
+  "NanumGothic" or "Noto Sans CJK KR" selects another weight -> family names are only a last
+  resort, accepted when the libass probe proves they select this very face.
+* => ``ass_name`` = PostScript name for CFF faces, Windows full name for TrueType faces.
+  :func:`probe_ass_names` asks libass itself (the resolver uses it) and falls back to other
+  names of the SAME face only when libass selects exactly that face with them.
+
+Weight: libass reads the style ``Bold`` field as a boolean (``style->Bold = !!style->Bold``:
+400 and 900 both request weight 700) and emboldens synthetically when the requested weight
+exceeds the face's ``usWeightClass`` + 150.  ``style_line`` therefore writes ``-1`` (700) only
+for faces of weight >= 550 and ``0`` (400) otherwise; :func:`verify_libass_fonts` rejects any
+synthetic emboldening it can see in the log.
 """
 from __future__ import annotations
 
@@ -53,13 +75,30 @@ class FaceMetrics:
     hhea_ascent: int
     hhea_descent: int
     weight: int
-    postscript: str | None = None   # name id 6: the name libass is guaranteed to match exactly
+    postscript: str | None = None   # name id 6
+    cff: bool = False               # PostScript/CFF outlines ('CFF ' / 'CFF2' table) vs TrueType ('glyf')
+    win_fullnames: list[str] = field(default_factory=list)   # platform 3 name id 4 (en-US first)
+    win_families: list[str] = field(default_factory=list)    # platform 3 name id 1 (en-US first)
 
     @property
     def ass_name(self) -> str:
-        """Name written into ASS styles. libass (fontconfig provider) does NOT resolve fullnames such as
-        'Noto Sans CJK KR Bold' (it silently falls back to DejaVu/WenQuanYi), but it does match PostScript names."""
-        return self.postscript or (self.names[0] if self.names else self.family)
+        """Name written into ASS styles (see module doc): libass matches the PostScript name of CFF
+        faces and the Windows full name of TrueType faces; everything else may fall back silently."""
+        cands = self.libass_name_candidates
+        return cands[0] if cands else (self.postscript or (self.names[0] if self.names else self.family))
+
+    @property
+    def libass_name_candidates(self) -> list[str]:
+        """Names libass can resolve to this face, best first: the GDI-rule name (PostScript for CFF,
+        Windows full name for TrueType), then the other name kind, then Windows family names (these
+        are shared by every weight of a family, so :func:`probe_ass_names` must prove them)."""
+        ps = [self.postscript] if self.postscript else []
+        first = ps + self.win_fullnames if self.cff else self.win_fullnames + ps
+        out: list[str] = []
+        for n in first + self.win_families:
+            if n and not re.search(r"[,{}\\\r\n]", n) and all(_norm(n) != _norm(o) for o in out):
+                out.append(n)
+        return out
 
     @property
     def win_sum(self) -> int:
@@ -133,6 +172,31 @@ def _names(data: bytes, off: int, length: int) -> dict[int, list[str]]:
     return res
 
 
+def _win_names(data: bytes, off: int, length: int) -> dict[int, list[str]]:
+    """Windows-platform (3) names -- the only ones libass indexes (``get_font_info``) --
+    en-US (0x409) first, then the other languages in table order."""
+    count = _u16(data, off + 2)
+    str_off = off + _u16(data, off + 4)
+    rows: list[tuple[int, int, int, str]] = []
+    for i in range(count):
+        r = off + 6 + 12 * i
+        pid, lid, nid, ln, so = (_u16(data, r), _u16(data, r + 4), _u16(data, r + 6), _u16(data, r + 8),
+                                 _u16(data, r + 10))
+        if pid != 3 or nid not in (1, 4):
+            continue
+        try:
+            s = data[str_off + so:str_off + so + ln].decode("utf-16-be").strip("\x00").strip()
+        except UnicodeDecodeError:
+            continue
+        if s:
+            rows.append((0 if lid == 0x409 else 1, i, nid, s))
+    res: dict[int, list[str]] = {}
+    for _, _, nid, s in sorted(rows):
+        if s not in res.setdefault(nid, []):
+            res[nid].append(s)
+    return res
+
+
 @lru_cache(maxsize=64)
 def read_faces(path: str) -> tuple[FaceMetrics, ...]:
     """All faces of a TTF/OTF/TTC with names and the metrics libass uses."""
@@ -162,11 +226,14 @@ def read_faces(path: str) -> tuple[FaceMetrics, ...]:
         for f in nm.get(16, []) or nm.get(1, []):
             for s in nm.get(17, []) or nm.get(2, []):
                 names.append(f"{f} {s}")
+        wn = _win_names(data, *t["name"])
         faces.append(FaceMetrics(path=str(path), index=idx, names=list(dict.fromkeys(names)),
                                  family=(fams or [Path(path).stem])[0], style=(styles or ["Regular"])[0],
                                  units_per_em=upem or 1000, win_ascent=wa, win_descent=wd, hhea_ascent=ha,
                                  hhea_descent=hd, weight=weight,
-                                 postscript=(nm.get(6) or [None])[0]))
+                                 postscript=(nm.get(6) or [None])[0],
+                                 cff=("CFF " in t or "CFF2" in t),
+                                 win_fullnames=wn.get(4, []), win_families=wn.get(1, [])))
     return tuple(faces)
 
 
@@ -187,10 +254,15 @@ class ResolvedFont:
     name: str
     face: FaceMetrics
     how: str                     # font_file | shortkit.fonts | font_dirs | fontconfig
+    libass_name: str | None = None   # name proven by probe_ass_names (None: not probed -> face.ass_name)
 
     @property
     def path(self) -> Path:
         return Path(self.face.path)
+
+    @property
+    def ass_name(self) -> str:
+        return self.libass_name or self.face.ass_name
 
 
 _FONT_CACHE: dict[tuple, ResolvedFont] = {}
@@ -469,17 +541,28 @@ class AssDoc:
         return "\n".join(head + body) + "\n"
 
 
+LIBASS_EMBOLDEN_MARGIN = 150   # libass ass_font.c: embolden when requested weight > face weight + 150
+
+
+def ass_bold_flag(face_weight: int) -> int:
+    """ASS style ``Bold`` value for a face of ``face_weight`` (usWeightClass).  libass reads the style
+    field as a boolean (non-zero -> weight 700, zero -> 400) and emboldens synthetically when the
+    request exceeds the face weight + 150, so -1 (700) is written only when that cannot happen."""
+    return -1 if int(face_weight or 400) + LIBASS_EMBOLDEN_MARGIN >= 700 else 0
+
+
 def style_line(name: str, fontname: str, fontsize: float, color: str, outline_color: str, shadow_color: str,
                weight: int, outline: float, shadow: float) -> str:
+    """``weight`` = the selected face's usWeightClass (mapped to the libass-safe Bold flag)."""
     return (f"Style: {name},{fontname},{_f(fontsize)},{ass_color(color)},{ass_color(color)},"
-            f"{ass_color(outline_color)},{ass_color(shadow_color)},{int(weight)},0,0,0,100,100,0,0,1,"
+            f"{ass_color(outline_color)},{ass_color(shadow_color)},{ass_bold_flag(weight)},0,0,0,100,100,0,0,1,"
             f"{_f(outline)},{_f(shadow)},5,0,0,0,1")
 
 
 def role_style_line(role: str, st: dict, font: "ResolvedFont") -> str:
-    """The ASS style line of a caption role (PostScript font name, win-metric font size)."""
+    """The ASS style line of a caption role (libass-matched face name, win-metric font size)."""
     f = font
-    return style_line(role, f.face.ass_name, f.face.ass_fontsize(float(st["size_px"])), st["color"],
+    return style_line(role, f.ass_name, f.face.ass_fontsize(float(st["size_px"])), st["color"],
                       st["outline_color"], st["shadow_color"], f.face.weight,
                       float(st["outline_px"]), float(st["shadow_px"]))
 
@@ -783,7 +866,7 @@ def write_ass(path: str | os.PathLike, canvas: dict, captions: list, layouts: di
     for role, st in role_styles.items():
         doc.styles.append(role_style_line(role, st, fonts[role]))
     # decorations are vector drawings; the style font only has to exist (no fallback lookups)
-    deco_font = fonts[next(iter(role_styles))].face.ass_name if role_styles else "sans-serif"
+    deco_font = fonts[next(iter(role_styles))].ass_name if role_styles else "sans-serif"
     doc.styles.append(style_line("deco", deco_font, 20, "#FFFFFF", "#000000", "#000000", 400, 0, 0))
     for cap in captions:
         doc.events += caption_events(cap, layouts[cap.id], cap.role)
@@ -797,51 +880,276 @@ def write_ass(path: str | os.PathLike, canvas: dict, captions: list, layouts: di
 
 # ----------------------------------------------------------------------------- libass font-selection guard
 _FONTSELECT_RE = re.compile(r"fontselect: \((?P<req>.+?), (?P<w>\d+), (?P<i>\d+)\) -> (?P<path>.*?), (?P<idx>\d+), (?P<ps>\S+)")
-_FALLBACK_RE = re.compile(r"Glyph 0x(?P<cp>[0-9A-Fa-f]+) not found, selecting one more font for \((?P<req>.+?), ")
+_FALLBACK_RE = re.compile(r"Glyph 0x(?P<cp>[0-9A-Fa-f]+) not found, selecting one more font for \((?P<req>.+?), (?P<w>\d+), ")
+DEFAULT_SAMPLE = "가나다 ABC 123 !?"
+_FONT_EXTS = (".ttf", ".otf", ".ttc", ".otc")
+_EVENT_FORMAT = "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"
 
 
-def verify_libass_fonts(ass_text: str, fonts_dir: str | os.PathLike, expected: dict[str, str],
-                        sample: str = "가나다 ABC 123 !?") -> dict:
-    """Render every style once through ffmpeg/libass with verbose logging and confirm that libass selected
-    exactly the expected face (PostScript name) with no glyph fallback.  ``expected`` maps style name ->
-    PostScript name.  Returns {ok, styles: {style: {requested, selected, fallback}}, log_tail}.
+def _style_rows(head: str) -> dict[str, list[str]]:
+    """style name -> the fields of its ``Style:`` line (V4+ order)."""
+    out: dict[str, list[str]] = {}
+    for ln in head.splitlines():
+        if ln.startswith("Style:"):
+            parts = [x.strip() for x in ln.split(":", 1)[1].split(",")]
+            out[parts[0]] = parts
+    return out
 
-    This checks the OUTPUT renderer's real behaviour instead of trusting our own font resolution."""
+
+def _libass_request_weight(bold_field: str) -> int:
+    """libass ass.c: ``style->Bold = !!style->Bold`` then 1 -> 700, 0 -> 400."""
+    try:
+        return 700 if int(float(bold_field)) != 0 else 400
+    except ValueError:
+        return 400
+
+
+def event_chars(ass_text: str) -> dict[str, str]:
+    """style -> the distinct visible characters of its Dialogue events (override tags and vector
+    drawings removed).  This is what the font check must cover: a glyph missing from the face
+    makes libass pick another font for that character."""
+    chars: dict[str, set[str]] = {}
+    for ln in ass_text.splitlines():
+        if not ln.startswith("Dialogue:"):
+            continue
+        parts = ln.split(":", 1)[1].split(",", 9)
+        if len(parts) < 10:
+            continue
+        st, text = parts[3].strip(), parts[9]
+        vis, pos, drawing = [], 0, False
+        for m in re.finditer(r"\{([^}]*)\}", text):
+            if not drawing:
+                vis.append(text[pos:m.start()])
+            pm = re.findall(r"\\p(\d+)", m.group(1))
+            if pm:
+                drawing = int(pm[-1]) > 0
+            pos = m.end()
+        if not drawing:
+            vis.append(text[pos:])
+        s = "".join(vis).replace("\\N", "").replace("\\n", "").replace("\\h", "")
+        chars.setdefault(st, set()).update(ch for ch in s if not ch.isspace())
+    return {k: "".join(sorted(v)) for k, v in chars.items() if v}
+
+
+def _dir_faces(fonts_dir: str | os.PathLike) -> list[FaceMetrics]:
+    """Faces libass loads from ``fontsdir`` (it reads the directory itself, not recursively)."""
+    d = Path(fonts_dir)
+    if not d.is_dir():
+        return []
+    out: list[FaceMetrics] = []
+    for p in sorted(d.iterdir()):
+        if p.suffix.lower() in _FONT_EXTS and p.is_file():
+            try:
+                out.extend(read_faces(str(p)))
+            except (OSError, struct.error, IndexError):
+                continue
+    return out
+
+
+def _same_file(a: str | os.PathLike, b: str | os.PathLike) -> bool:
+    try:
+        pa, pb = Path(a).resolve(), Path(b).resolve()
+        if pa == pb:
+            return True
+        if pa.stat().st_size != pb.stat().st_size:
+            return False
+        from ..util.hashing import sha256_file
+
+        return sha256_file(pa) == sha256_file(pb)
+    except OSError:
+        return False
+
+
+def _expected_faces(spec, dir_faces: list[FaceMetrics]) -> tuple[str, list[FaceMetrics], str]:
+    """(expected PostScript name, candidate faces, how).  ``spec`` is a FaceMetrics / ResolvedFont
+    (exact face), a PostScript name, or a face name that identifies exactly ONE face (one PostScript
+    name) among the fonts_dir files; anything else is compared verbatim with the selected PS name."""
+    if isinstance(spec, ResolvedFont):
+        spec = spec.face
+    if isinstance(spec, FaceMetrics):
+        return spec.postscript or "", [spec], "face"
+    s = str(spec)
+    by_ps = [f for f in dir_faces if f.postscript and _norm(f.postscript) == _norm(s)]
+    if by_ps:
+        return by_ps[0].postscript or s, by_ps, "postscript"
+    by_name = [f for f in dir_faces
+               if any(_norm(n) == _norm(s) for n in f.names + f.win_fullnames + f.win_families)]
+    pss = {_norm(f.postscript or "") for f in by_name}
+    if by_name and len(pss) == 1 and by_name[0].postscript:
+        return by_name[0].postscript, by_name, "name_in_fonts_dir"
+    return s, [], "as_given"
+
+
+def _selected_face_weight(m, faces: list[FaceMetrics], dir_faces: list[FaceMetrics]) -> int | None:
+    """usWeightClass of the face a fontselect line names: the expected face, else the fonts-dir face with
+    that PostScript name, else the logged system file itself; None only if none of them can be read."""
+    ps, path, idx = m.group("ps"), m.group("path"), int(m.group("idx"))
+    for pool in (faces, dir_faces):
+        cand = [f for f in pool if f.postscript and _norm(f.postscript) == _norm(ps)]
+        if cand:
+            return int(cand[0].weight or 400)
+    if os.path.isabs(path) and Path(path).is_file():
+        try:
+            got = [f for f in read_faces(path) if f.index == idx]
+        except (OSError, struct.error, IndexError):
+            got = []
+        if got:
+            return int(got[0].weight or 400)
+    return None
+
+
+def _judge_selection(matches: list, ps: str, faces: list[FaceMetrics], dir_faces: list[FaceMetrics] = ()) -> dict:
+    """Compare libass' fontselect lines for one request with the expected face."""
+    selected = [m.group("ps") for m in matches]
+    files, wrong_file, synth = [], False, False
+    face_w = None
+    for m in matches:
+        path, idx, w = m.group("path"), int(m.group("idx")), int(m.group("w"))
+        face_w = _selected_face_weight(m, faces, list(dir_faces))
+        if face_w is None:
+            synth = None if synth is False else synth       # weight unreadable: cannot rule it out
+        elif w > face_w + LIBASS_EMBOLDEN_MARGIN:
+            synth = True
+        if os.path.isabs(path):                      # fontconfig (system) face: check the very file
+            files.append(f"<system>/{Path(path).name}")
+            if faces and not any(_same_file(path, f.path) and idx == f.index for f in faces):
+                wrong_file = True
+        else:                                        # memory font loaded from fontsdir (logged by PS name)
+            files.append(f"<fontsdir>/{path}#{idx}")
+            if faces and not any(idx == f.index for f in faces):
+                wrong_file = True
+    ok = bool(selected) and all(_norm(g) == _norm(ps) for g in selected) and not wrong_file and synth is False
+    return {"selected": selected, "selected_files": files, "face_weight": face_w, "synthetic_bold": synth,
+            "wrong_file": wrong_file, "ok": ok}
+
+
+def _run_libass(ass_text: str, fonts_dir: str | os.PathLike | None, font_files: Iterable = ()) -> tuple[int, str]:
+    """Render one 640x360 frame through ffmpeg/libass at verbose level; returns (rc, log).  The fonts
+    directory is linked as ./fonts so no path escaping is needed in the filter string."""
     import tempfile
 
     from ..util.media import FFMPEG
 
-    head, _, _ = ass_text.partition("[Events]")
-    styles = [ln.split(":", 1)[1].split(",")[0].strip() for ln in head.splitlines() if ln.startswith("Style:")]
-    events = "\n".join(f"Dialogue: 0,0:00:00.00,0:00:01.00,{st},,0,0,0,,{sample}" for st in styles if st in expected)
-    test_ass = head + "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n" + events + "\n"
-    res: dict = {"ok": True, "styles": {}}
-    with tempfile.TemporaryDirectory() as td:
-        ap = Path(td) / "fontcheck.ass"
-        ap.write_text(test_ass, encoding="utf-8")
-        fd = Path(fonts_dir).resolve()
+    with tempfile.TemporaryDirectory(prefix="shortkit_fontsel_") as td:
+        tdp = Path(td)
+        fd = tdp / "fonts"
+        if fonts_dir is not None:
+            fd.symlink_to(Path(fonts_dir).resolve(), target_is_directory=True)
+        else:
+            fd.mkdir()
+            for f in font_files:
+                src = Path(f).resolve()
+                dst = fd / src.name
+                if not dst.exists():
+                    dst.symlink_to(src)
+        (tdp / "fontcheck.ass").write_text(ass_text, encoding="utf-8")
         proc = subprocess.run([FFMPEG, "-hide_banner", "-nostdin", "-v", "verbose", "-f", "lavfi", "-i",
-                               "color=black:s=640x360:d=0.2", "-vf", f"subtitles=filename=fontcheck.ass:fontsdir={fd}",
+                               "color=black:s=640x360:d=0.2", "-vf", "subtitles=filename=fontcheck.ass:fontsdir=fonts",
                                "-frames:v", "1", "-f", "null", "-"], cwd=td, capture_output=True, text=True)
-        log = proc.stderr or ""
-    sel: dict[str, list[str]] = {}
-    for m in _FONTSELECT_RE.finditer(log):
-        sel.setdefault(m.group("req"), []).append(m.group("ps"))
-    fb: dict[str, list[str]] = {}
-    for m in _FALLBACK_RE.finditer(log):
-        fb.setdefault(m.group("req"), []).append("U+" + m.group("cp").upper())
-    for st in styles:
+    return proc.returncode, proc.stderr or ""
+
+
+def _sample_events(style: str, sample: str, chunk: int = 12) -> list[str]:
+    s = "".join(ch for ch in sample if not ch.isspace() and ch not in "{}\\") or DEFAULT_SAMPLE
+    return [f"Dialogue: 0,0:00:00.00,0:00:01.00,{style},,0,0,0,,{{\\an7\\pos(4,{4 + 30 * (k % 10)})}}{s[i:i + chunk]}"
+            for k, i in enumerate(range(0, len(s), chunk))]
+
+
+def verify_libass_fonts(ass_text: str, fonts_dir: str | os.PathLike, expected: dict,
+                        sample: str | None = None) -> dict:
+    """Render every expected style through ffmpeg/libass with verbose logging and confirm from the
+    ``fontselect`` log that libass selected exactly the expected face, with no glyph fallback and no
+    synthetic emboldening.  ``expected`` maps style name -> the face: a FaceMetrics/ResolvedFont, a
+    PostScript name, or a name identifying exactly one face among the ``fonts_dir`` files.
+
+    Each style is rendered with the characters its own events use (``event_chars``); styles without
+    events (and every style when ``sample`` is given) use ``sample`` / ``DEFAULT_SAMPLE``.
+    Returns {ok, styles: {style: {requested, expected, expected_postscript, selected, selected_files,
+    requested_weight, face_weight, synthetic_bold, fallback_glyphs, sample, ok}}}.
+
+    This checks the OUTPUT renderer's real behaviour instead of trusting our own font resolution."""
+    head, _, _ = ass_text.partition("[Events]")
+    rows = _style_rows(head)
+    used = event_chars(ass_text) if sample is None else {}
+    dir_faces = _dir_faces(fonts_dir)
+    events, samples = [], {}
+    for st in rows:
+        if st in expected:
+            samples[st] = sample if sample is not None else used.get(st, DEFAULT_SAMPLE)
+            events += _sample_events(st, samples[st])
+    test_ass = head + "[Events]\n" + _EVENT_FORMAT + "\n" + "\n".join(events) + "\n"
+    rc, log = _run_libass(test_ass, fonts_dir)
+    sel_all = list(_FONTSELECT_RE.finditer(log))
+    fb_all = list(_FALLBACK_RE.finditer(log))
+    res: dict = {"ok": True, "styles": {}}
+    for st, parts in rows.items():
         if st not in expected:
             continue
-        # the style line's font name is what libass requested
-        req = next((ln.split(":", 1)[1].split(",")[1].strip() for ln in head.splitlines()
-                    if ln.startswith("Style:") and ln.split(":", 1)[1].split(",")[0].strip() == st), None)
-        got = sel.get(req, [])
-        ok = bool(got) and all(_norm(g) == _norm(expected[st]) for g in got) and not fb.get(req)
-        res["styles"][st] = {"requested": req, "expected": expected[st], "selected": got, "fallback_glyphs": fb.get(req, []),
-                             "ok": ok}
+        req = parts[1] if len(parts) > 1 else None
+        w = _libass_request_weight(parts[7]) if len(parts) > 7 else 400
+        ps, faces, how = _expected_faces(expected[st], dir_faces)
+        matches = [m for m in sel_all if m.group("req") == req and int(m.group("w")) == w]
+        fb = ["U+" + m.group("cp").upper() for m in fb_all if m.group("req") == req and int(m.group("w")) == w]
+        j = _judge_selection(matches, ps, faces, dir_faces)
+        ok = j["ok"] and not fb
+        exp = expected[st]
+        res["styles"][st] = {"requested": req, "expected": exp if isinstance(exp, str) else ps,
+                             "expected_postscript": ps, "expected_by": how, "requested_weight": w,
+                             "selected": j["selected"], "selected_files": j["selected_files"],
+                             "face_weight": j["face_weight"], "synthetic_bold": j["synthetic_bold"],
+                             "wrong_file": j["wrong_file"], "fallback_glyphs": fb, "sample": samples[st], "ok": ok}
         res["ok"] = res["ok"] and ok
-    if proc.returncode != 0:
+    if rc != 0:
         res["ok"] = False
         res["error"] = log[-1500:]
     return res
+
+
+_PROBE_CACHE: dict[tuple, dict] = {}
+
+
+def probe_ass_names(faces: Iterable[FaceMetrics], extra_font_files: Iterable[str | os.PathLike] = ()) -> dict:
+    """Ask libass which name selects each face.  The fonts directory holds every given face's file
+    (plus ``extra_font_files``) -- the same set ``build/fonts`` gets -- and fontconfig adds the system
+    fonts, exactly as in the render.  Every candidate name of every face
+    (``FaceMetrics.libass_name_candidates``) is rendered once; the chosen name is the first whose
+    PRIMARY selection (the first fontselect line; glyph coverage is checked later by
+    ``verify_libass_fonts`` with the real caption text) is this very face (PostScript name, face
+    index, file) without synthetic emboldening.
+
+    Returns ``{(path, index): {"name": str | None, "tried": [{name, selected, selected_files, ok}]}}``;
+    ``name`` None = libass reaches this face under none of its names (the caller must refuse it)."""
+    uniq: dict[tuple[str, int], FaceMetrics] = {}
+    for f in faces:
+        uniq.setdefault((str(f.path), int(f.index)), f)
+    files = sorted({str(Path(f.path).resolve()) for f in uniq.values()} |
+                   {str(Path(p).resolve()) for p in extra_font_files})
+    key = tuple((p, Path(p).stat().st_mtime) for p in files) + tuple(sorted(uniq))
+    hit = _PROBE_CACHE.get(key)
+    if hit is not None:
+        return hit
+    doc = AssDoc(640, 360)
+    plan: list[tuple[tuple[str, int], str, str]] = []
+    for fi, (k, f) in enumerate(uniq.items()):
+        for ci, name in enumerate(f.libass_name_candidates):
+            sn = f"p{fi}_{ci}"
+            doc.styles.append(style_line(sn, name, 40, "#FFFFFF", "#000000", "#000000", f.weight, 0, 0))
+            doc.events.append(AssEvent(0, 0.0, 1.0, sn, "가A"))
+            plan.append((k, sn, name))
+    rc, log = _run_libass(doc.render(), None, files)
+    if rc != 0:
+        raise FontError("libass 글꼴 이름 확인 렌더 실패: " + log[-600:])
+    sel_all = list(_FONTSELECT_RE.finditer(log))
+    out: dict = {k: {"name": None, "tried": []} for k in uniq}
+    for k, sn, name in plan:
+        f = uniq[k]
+        w = 700 if ass_bold_flag(f.weight) else 400
+        first = [m for m in sel_all if m.group("req") == name and int(m.group("w")) == w][:1]
+        j = _judge_selection(first, f.postscript or "", [f]) if f.postscript else \
+            {"selected": [m.group("ps") for m in first], "selected_files": [], "ok": False}
+        out[k]["tried"].append({"name": name, "selected": j["selected"], "selected_files": j["selected_files"],
+                                "ok": j["ok"]})
+        if j["ok"] and out[k]["name"] is None:
+            out[k]["name"] = name
+    _PROBE_CACHE[key] = out
+    return out

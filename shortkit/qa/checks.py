@@ -232,8 +232,23 @@ class RowBuilder:
         return row
 
     def style_row(self, check_id: str, subject: str, item: str, category: str, keys: list[str], observed: Any,
-                  compare, *, evidence=None, note: str = "", required: bool | None = None) -> dict:
-        """style-vs-reference row: compare the OUTPUT measurement with the reference value."""
+                  compare, *, evidence=None, note: str = "", required: bool | None = None,
+                  na: dict[str, str] | None = None) -> dict:
+        """style-vs-reference row: compare the OUTPUT measurement with the reference value.
+        ``na``: {key: reason} keys that do not APPLY here (e.g. box.* of a role without a box) -- left out of the row
+        (their provisional state cannot make it unmeasured) and listed in the note with the reason."""
+        na = {k: v for k, v in (na or {}).items() if k in keys}
+        if na:
+            note = ("적용되지 않아 판정에서 뺀 키: " + "; ".join(f"{_short_key(k)} — {v}" for k, v in na.items())
+                    + ". " + note).strip()
+        row = self._style_row(check_id, subject, item, category, [k for k in keys if k not in na], observed, compare,
+                              evidence=evidence, note=note, required=required)
+        if na:
+            row["not_applicable"] = dict(na)
+        return row
+
+    def _style_row(self, check_id: str, subject: str, item: str, category: str, keys: list[str], observed: Any,
+                   compare, *, evidence=None, note: str = "", required: bool | None = None) -> dict:
         keys = [k for k in keys if self._has(k)]
         ref, prov, req = self.reference_of(keys)
         expected = {k: self.pget(k) for k in keys}
@@ -321,6 +336,55 @@ def _role_keys(role: str, names: list[str]) -> list[str]:
     return [f"text.roles.{role}.{n}" for n in names]
 
 
+def _short_key(k: str) -> str:
+    """'text.roles.speaker.box.alpha' -> 'box.alpha' (the row already names the role)."""
+    parts = k.split(".")
+    return ".".join(parts[3:]) if k.startswith("text.roles.") and len(parts) > 3 else k
+
+
+def _num(v, default: float = 0.0) -> float:
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
+def role_not_applicable(b: "RowBuilder", role: str, caps: list) -> dict[str, str]:
+    """{preset key: reason} of the role's style keys that do not APPLY to this role -- decided from the preset's role
+    style (the value the renderer uses) and the plan's captions of that role.  The governing key itself (box.enabled,
+    shadow_px, motion_in.type, max_lines, persist ...) stays in its row, so a provisional governing key still makes the
+    row 못 잼."""
+    k = lambda n: f"text.roles.{role}.{n}"   # noqa: E731
+    na: dict[str, str] = {}
+    if not b.pget(k("box.enabled")):
+        for n in ("box.color", "box.alpha", "box.pad_x", "box.pad_y"):
+            na[k(n)] = "box.enabled=false(박스 없음)"
+    if _num(b.pget(k("shadow_px"))) <= 0:
+        na[k("shadow_color")] = "shadow_px=0(그림자 없음)"
+    if _num(b.pget(k("outline_px"))) <= 0:
+        na[k("outline_color")] = "outline_px=0(외곽선 없음)"
+    if not any(getattr(c, "highlight", None) for c in caps):
+        na[k("highlight_color")] = "이 편의 이 역할 자막에 강조 단어 없음(계획)"
+    lines = [len([ln for ln in (getattr(c, "lines", None) or str(getattr(c, "text", "")).split("\n")) if str(ln).strip()])
+             for c in caps]
+    if int(_num(b.pget(k("max_lines")), 99)) <= 1 and all(n <= 1 for n in lines):
+        na[k("line_spacing")] = "max_lines=1 이고 이 편의 자막도 한 줄(줄 간격이 없음)"
+    if role != "dialogue":
+        na[k("timing.lead_s")] = "lead_s 는 대사(말소리 대비) 자막에만 적용"
+    if b.pget(k("persist")) == "whole_video":
+        na[k("timing.min_dur_s")] = "persist=whole_video(영상 전체에 떠 있음)"
+    mi = b.pget(k("motion_in.type"))
+    if mi in (None, "none"):
+        na[k("motion_in.dur_s")] = "motion_in.type=none"
+    if mi != "pop":
+        na[k("motion_in.scale_from")] = f"motion_in.type={mi}(pop 아님)"
+    if mi != "slide":
+        na[k("motion_in.offset_px")] = f"motion_in.type={mi}(slide 아님)"
+    if b.pget(k("motion_out.type")) in (None, "none"):
+        na[k("motion_out.dur_s")] = "motion_out.type=none"
+    return na
+
+
 # ----------------------------------------------------------------------------- canvas
 def rows_canvas(b: RowBuilder, probes: dict) -> None:
     ctx = b.ctx
@@ -363,11 +427,15 @@ def rows_canvas(b: RowBuilder, probes: dict) -> None:
                   tolerance=f"종류 일치, 색 거리 ≤ {TOL['bg_rgb']:.0f}", status="same" if same else "different",
                   keys=["canvas.background.type", "canvas.background.color", "canvas.background.blur_sigma"],
                   required=False, note="blur_sigma 는 측정하지 않음")
+        btype = b.pget("canvas.background.type")
+        bg_na = ({"canvas.background.blur_sigma": "background.type=color(단색 배경에는 블러 없음)"} if btype == "color" else
+                 {"canvas.background.color": f"background.type={btype}(단색이 아님)"})
         b.style_row("canvas.background", "background_ref", "배경 (레퍼런스 대비)", CAT["canvas"],
                     ["canvas.background.type", "canvas.background.color", "canvas.background.blur_sigma"],
                     bg if bg.get("color") else None,
                     lambda ob, r: ob.get("type") == r.get("canvas.background.type") and
-                    (_cdist(ob.get("color"), r.get("canvas.background.color")) or 999) <= TOL["bg_rgb"])
+                    (btype != "color" or (_cdist(ob.get("color"), r.get("canvas.background.color")) or 999) <= TOL["bg_rgb"]),
+                    na=bg_na)
     else:
         b.add("canvas.video_region", "region", "영상 영역 위치·크기", CAT["canvas"], status="unmeasured",
               keys=vr_keys, required=False, note=lay.get("reason") or "레이아웃 측정 실패")
@@ -395,9 +463,9 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
     if tp.get("status") != "measured":
         for cap in ctx.resolved.captions:
             for cid, it, cat in (("caption.position", "자막 위치", CAT["text_pos"]),
-                                 ("caption.timing", "자막 타이밍", CAT["cap_timing"]),
-                                 ("caption.font", "자막 글꼴", CAT["font"])):
+                                 ("caption.timing", "자막 타이밍", CAT["cap_timing"])):
                 b.add(cid, cap.id, f"{it} [{cap.id}]", cat, status="unmeasured", note=tp.get("reason") or "문자 검사 실패")
+        _font_role_rows(b, {}, tp.get("reason") or "문자 검사 실패")
         return
     meas = {c["id"]: c for c in tp.get("captions") or []}
     for cap in ctx.resolved.captions:
@@ -566,6 +634,8 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                   keys=_role_keys(role, ["motion_in.type", "motion_in.dur_s", "motion_in.scale_from", "motion_in.offset_px"]),
                   evidence={"t": m.get("onset"), "frame": m.get("evidence_frame")},
                   note="slide/offset 는 측정하지 않음" if et not in ("pop", "fade", "none") else "")
+    # font: the REQUIRED rows are per role (every caption of a role uses one face); per-caption rows are informational
+    _font_role_rows(b, tp.get("font_roles") or {}, (tp.get("errors") or {}).get("font_roles"))
     # information order: captions shown before the reveal must not contain its keywords
     rv = (ctx.plan or {}).get("reveal") or {}
     if rv.get("t") is not None and rv.get("keywords"):
@@ -605,6 +675,7 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
         rc = [meas.get(c.id) or {} for c in ctx.resolved.captions if c.role == role]
         rc_found = [m for m in rc if m.get("found")]
         caps_r = [c for c in ctx.resolved.captions if c.role == role]
+        na = role_not_applicable(b, role, caps_r)
         no_override = [m for m, c in zip(rc, caps_r) if m.get("found") and not _has_pos_override(b, c)]
         obs_anchor = ({"x": _r(_median([m["bbox_obs"][0] + m["bbox_obs"][2] / 2 for m in no_override]), 1),
                        "y": _r(_median([m["bbox_obs"][1] + m["bbox_obs"][3] / 2 for m in no_override]), 1)}
@@ -620,31 +691,42 @@ def rows_captions(b: RowBuilder, probes: dict) -> None:
                     _role_keys(role, ["size_px", "line_spacing", "max_lines", "max_chars_per_line"]),
                     {"size_px_est": _r(size_obs, 1)} if size_obs else None,
                     lambda o, r, role=role: abs(o["size_px_est"] - float(r.get(f"text.roles.{role}.size_px", 0))) <=
-                    0.08 * float(r.get(f"text.roles.{role}.size_px", 1)))
+                    0.08 * float(r.get(f"text.roles.{role}.size_px", 1)), na=na)
         fills = [m.get("fill_color") for m in rc_found if m.get("fill_color")]
         b.style_row("caption.style", f"{role}_ref", f"자막 색·외곽선·박스 [{role}] (레퍼런스 대비)", CAT["cap_style"],
                     _role_keys(role, ["color", "highlight_color", "outline_px", "outline_color", "shadow_px", "shadow_color",
                                       "box.enabled", "box.color", "box.alpha", "box.pad_x", "box.pad_y"]),
                     {"fill_color": fills[0]} if fills else None,
-                    lambda o, r, role=role: (_cdist(o["fill_color"], r.get(f"text.roles.{role}.color")) or 999) <= TOL["color_rgb"])
-        # only an 'identical' verdict names the output font (similar/different/fallback scores do not)
-        fonts = [((m.get("font") or {}).get("identify") or {}).get("top") for m in rc_found
-                 if ((m.get("font") or {}).get("identify") or {}).get("top_verdict") == "identical"]
+                    lambda o, r, role=role: (_cdist(o["fill_color"], r.get(f"text.roles.{role}.color")) or 999) <= TOL["color_rgb"],
+                    na=na)
+        # only the role's pooled 'identical' verdict names the output font (similar/different/per-caption do not)
+        fonts = [r.get("expected_canonical") for r in (tp.get("font_roles") or {}).values()
+                 if r.get("role") == role and r.get("verdict") == "identical"]
         b.style_row("caption.font", f"{role}_ref", f"자막 글꼴 [{role}] (레퍼런스 대비)", CAT["font"],
-                    _role_keys(role, ["font_name", "bold"]), {"best": fonts[0]} if fonts else None,
+                    _role_keys(role, ["font_name", "bold"]), {"best": fonts[0]} if len(fonts) == 1 else None,
                     lambda o, r, role=role: str(o["best"]).replace(" ", "").lower() ==
                     str(r.get(f"text.roles.{role}.font_name")).replace(" ", "").lower())
-        durs = [(m.get("offset") - m.get("onset")) for m in rc_found if m.get("onset") is not None and m.get("offset") is not None]
+        spans = [(m.get("onset"), m.get("offset")) for m in rc_found if m.get("onset") is not None and m.get("offset") is not None]
+        durs = [b_ - a for a, b_ in spans]
+        whole = b.pget(f"text.roles.{role}.persist") == "whole_video"
+        dur_v = float(ctx.info.duration)
+        t_obs = ({"min_dur_s": _r(min(durs), 3), "first_onset": _r(min(a for a, _ in spans), 3),
+                  "last_offset": _r(max(b_ for _, b_ in spans), 3), "duration": _r(dur_v, 3)} if durs else None)
+
+        def _timing_ok(o, r, role=role, whole=whole):
+            if whole:        # persist=whole_video: on screen from the first frame to the last
+                return o["first_onset"] <= 2 * fr + 0.01 and o["last_offset"] >= dur_v - 2 * fr - 0.01
+            return o["min_dur_s"] >= float(r.get(f"text.roles.{role}.timing.min_dur_s", 0)) - 0.05
         b.style_row("caption.timing", f"{role}_ref", f"자막 표시 시간 [{role}] (레퍼런스 대비)", CAT["cap_timing"],
-                    _role_keys(role, ["timing.lead_s", "timing.min_dur_s", "persist"]),
-                    {"min_dur_s": _r(min(durs), 3)} if durs else None,
-                    lambda o, r, role=role: o["min_dur_s"] >= float(r.get(f"text.roles.{role}.timing.min_dur_s", 0)) - 0.05)
+                    _role_keys(role, ["timing.lead_s", "timing.min_dur_s", "persist"]), t_obs, _timing_ok, na=na,
+                    note=("persist=whole_video: 첫 프레임부터 끝 프레임까지 표시되는지 확인" if whole else
+                          "측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s"))
         mts = [(m.get("motion_in_obs") or {}).get("type") for m in rc_found if m.get("motion_in_obs")]
         b.style_row("caption.motion", f"{role}_ref", f"자막 등장·퇴장 모션 [{role}] (레퍼런스 대비)", CAT["cap_motion"],
                     _role_keys(role, ["motion_in.type", "motion_in.dur_s", "motion_in.scale_from", "motion_in.offset_px",
                                       "motion_out.type", "motion_out.dur_s"]),
                     {"type": _mode(mts)} if mts else None,
-                    lambda o, r, role=role: o["type"] == r.get(f"text.roles.{role}.motion_in.type"))
+                    lambda o, r, role=role: o["type"] == r.get(f"text.roles.{role}.motion_in.type"), na=na)
     b.style_row("caption.tone", "tone_ref", "자막 말투 (레퍼런스 대비)", CAT["cap_text"],
                 ["text.tone.register", "text.tone.sentence_end_examples", "text.tone.emoji", "text.tone.notes"],
                 {"register": tone.get("mode")} if tone.get("n") else None,
@@ -676,7 +758,15 @@ def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> d
     fnt = m.get("font") or {}
     idt = fnt.get("identify") or {}
     keys = _role_keys(role, ["font_name", "bold"])
-    item = f"자막 글꼴 {label}"
+    item = f"자막 글꼴 {label} (자막 1개·정지 프레임 1장, 참고)"
+    info = (f"참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_{role} 이 "
+            "한다 — 이 행의 못 잼은 관문을 막지 않지만 '다르다'는 그대로 관문(G1)에 걸린다(한 자막만 다른 글꼴일 수 있음). ")
+    add = b.add
+
+    def _add(*a, **kw):            # every per-caption font row is informational
+        kw["required"] = False
+        kw["note"] = info + (kw.get("note") or "")
+        return add(*a, **kw)
     if idt.get("status") == "measured":
         v = idt.get("verdict") or "unmeasured"
         st = FONT_VERDICT_STATUS.get(v, "unmeasured")
@@ -694,7 +784,7 @@ def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> d
             note = "판정 못 잼: " + (reasons or idt.get("reason") or "")
         cond = idt.get("conditions") or {}
         ce = idt.get("ceiling") or {}
-        return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
+        return _add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
                      observed={"verdict": v, "verdict_ko": idt.get("verdict_ko"), "iou_expected": idt.get("iou_expected"),
                                "margin": idt.get("margin"), "top": top, "top_verdict": idt.get("top_verdict"),
                                "ranked": (idt.get("ranked") or [])[:5],
@@ -720,15 +810,81 @@ def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> d
             st, note = "different", (f"기대 글꼴 IoU {exp_iou} ≪ 같은 글꼴 천장 {ceil} — 다른(대체) 글꼴로 그려진 것으로 보임. {why}")
         else:
             st, note = "unmeasured", why
-        return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
+        return _add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
                      observed={"method": "font_iou(대체 방법)", "best": fnt.get("best"), "iou_expected": exp_iou,
                                "scores": fnt.get("scores"), "same_font_ceiling_p10(fonts_report)": ceil,
                                "glyph_h": _r(glyph_h, 1)},
                      tolerance="대체 방법: 다른 글꼴이 0.03 넘게 더 잘 맞거나 IoU<0.7(글자 ≥30px) → 다르다, 그 밖은 못 잼(같다 없음)",
                      status=st, keys=keys, evidence=ev, note=note)
-    return b.add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name, observed=None,
+    return _add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name, observed=None,
                  status="unmeasured", keys=keys, evidence=ev,
                  note=fnt.get("reason") or idt.get("reason") or "글꼴 비교 못 함")
+
+
+def _font_role_rows(b: RowBuilder, roles: dict, error: str | None = None) -> None:
+    """caption.font:role_<role> -- the REQUIRED font rows.  'same' ONLY for the pooled verdict ``identical``
+    (font_id.identify_role_font: median IoU of every rest-frame crop of the role >= the p10 of the median of as many
+    true-font crops (bootstrap from the ceiling samples), margin over the runner-up > noise, per-glyph rule passed);
+    ``different`` -> 다르다; ``similar`` / unmeasured -> 못 잼."""
+    ctx = b.ctx
+    by_role: dict[str, list] = {}
+    for cap in ctx.resolved.captions:
+        by_role.setdefault(cap.role, []).append(cap)
+    done = set()
+    for subject, r in sorted(roles.items()):
+        role = r.get("role") or subject.split(":")[0]
+        done.add(role)
+        caps = [c for c in by_role.get(role, []) if ":" not in subject or c.font_name == subject.split(":", 1)[1]]
+        keys = _role_keys(role, ["font_name", "bold"])
+        item = f"자막 글꼴 [{subject}] (역할 단위: 자막 {len(caps)}개의 정지 프레임 합동)"
+        v = r.get("verdict") or "unmeasured"
+        st = FONT_VERDICT_STATUS.get(v, "unmeasured") if r.get("status") == "measured" else "unmeasured"
+        crops = r.get("crops") or []
+        ev_crop = next((c for c in crops if c.get("iou_expected") is not None), None)
+        ev = {"t": ev_crop.get("t") if ev_crop else None}
+        miss = r.get("captions_without_crops") or []
+        tail = (f" crop 을 얻지 못한 자막: {', '.join(miss)}." if miss else "")
+        if r.get("status") != "measured":
+            b.add("caption.font", f"role_{subject}", item, CAT["font"], expected=r.get("expected"), observed=None,
+                  status="unmeasured", keys=keys, evidence=ev, required=True,
+                  note=("판정 못 잼: " + (r.get("reason") or "") + tail).strip())
+            continue
+        reasons = "; ".join(r.get("reasons") or [])
+        top_is_exp = str(r.get("top") or "").replace(" ", "").lower() == \
+            str(r.get("expected_canonical") or "").replace(" ", "").lower()
+        if v == "identical":
+            note = f"판정: 동일(identical) — {reasons}"
+        elif v == "similar":
+            note = "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. " + reasons + \
+                ("" if top_is_exp else f"; 가장 잘 맞는 후보는 {r.get('top')}")
+        elif v == "different":
+            note = f"판정: 다름(different) — {reasons}" + ("" if top_is_exp else f"; 가장 잘 맞는 후보 {r.get('top')}")
+        else:
+            note = "판정 못 잼: " + reasons
+        ce = r.get("ceiling") or {}
+        cond = r.get("conditions") or {}
+        b.add("caption.font", f"role_{subject}", item, CAT["font"], expected=r.get("expected"),
+              observed={"verdict": v, "verdict_ko": r.get("verdict_ko"), "iou_expected_median": r.get("iou_expected"),
+                        "iou_stats": r.get("iou_stats"), "n_crops": r.get("n_crops"), "n_captions": r.get("n_captions"),
+                        "margin": r.get("margin"), "runner_up": r.get("runner_up"), "top": r.get("top"),
+                        "ranked": (r.get("ranked") or [])[:5],
+                        "ceiling_of_median": {k: ce.get(k) for k in ("p10", "p50", "p90", "noise_p90", "n_crops", "method")},
+                        "glyph": r.get("glyph"),
+                        "crops": [{k: c.get(k) for k in ("caption", "delay_frames", "t", "iou_expected")} for c in crops],
+                        "other_font": r.get("other_font"),
+                        "conditions": {k: cond.get(k) for k in ("label", "crf", "x264_preset", "renderer", "assumed",
+                                                                "source")}},
+              tolerance="identical(합동 중앙값 IoU ≥ 같은 개수 crop 중앙값의 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 "
+                        "같다 · different(중앙값 < 천장 p10 − 잡음, 또는 1위인 다른 글꼴이 같은 규칙으로 identical)는 다르다 · "
+                        "similar 는 못 잼",
+              status=st, keys=keys, evidence=ev, required=True, note=(note + tail).strip())
+    for role in sorted(by_role):
+        if role in done:
+            continue
+        b.add("caption.font", f"role_{role}", f"자막 글꼴 [{role}] (역할 단위)", CAT["font"],
+              expected=by_role[role][0].font_name, observed=None, status="unmeasured",
+              keys=_role_keys(role, ["font_name", "bold"]), required=True,
+              note="판정 못 잼: " + (error or "역할 단위 글꼴 측정 결과 없음"))
 
 
 def _font_ceiling(b: RowBuilder, font_name: str) -> float:
@@ -851,6 +1007,21 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
             b.add("video.mapping", c.id, f"소스 구간 [{c.id}]", CAT["cut"],
                   expected={"src_in": c.src_in, "src_out": c.src_out}, observed=None, status="unmeasured",
                   note=(it or {}).get("reason") or err.get("mapping") or "측정 안 됨")
+            continue
+        if it.get("mode") in ("still_match", "still_mismatch"):
+            stl = it.get("still") or {}
+            same = it["mode"] == "still_match"
+            b.add("video.mapping", c.id, f"소스 구간 [{c.id}]", CAT["cut"],
+                  expected={"src_in": c.src_in, "src_out": c.src_out, "source": c.source_path},
+                  observed={"mode": it["mode"], "ncc_planned_min": stl.get("ncc_planned_min"),
+                            "ncc_planned": stl.get("ncc_planned"), "n_samples": stl.get("n_samples"),
+                            **({"mismatch_times": it.get("mismatch_times")} if not same else {})},
+                  tolerance=f"정지 장면(어느 시각도 두드러지지 않음): 모든 표본 시각에서 계획한 소스 프레임과 NCC ≥ "
+                            f"{stl.get('threshold')} (자막·장식·가림 영역 제외)",
+                  status="same" if same else "different",
+                  evidence={"t": (it.get("mismatch_times") or [None])[0] if not same else
+                            (it.get("samples") or [{}])[0].get("t")},
+                  note="정지 장면: 계획 구간과 시각적으로 동일 (시점 특정 불가)" if same else it.get("reason", ""))
             continue
         tol = max(TOL["src_offset_s"], 1.1 / float(it.get("src_fps") or 30.0))
         off = it.get("offset_p50")
@@ -1842,6 +2013,32 @@ def _catalog(b: RowBuilder) -> dict | None:
 
 
 # ----------------------------------------------------------------------------- structure / cover
+# structure.first_caption_at_s is measured by the reference analyzer (shortkit.reference.aggregate) as the start of each
+# video's first TIMED caption: captions whose role is one of these are left out (title and description frame the
+# whole video).  QA applies the identical definition to the output (tests/qa/test_qa_rows2.py runs both on one set).
+FIRST_CAPTION_EXCLUDED_ROLES = ("title", "description", "identity_mark", "unknown")
+FIRST_CAPTION_TOL_S = 0.2
+
+
+def first_timed_caption(captions, measured: list[dict]) -> dict:
+    """Onset measured in the output of the first timed caption (roles not in FIRST_CAPTION_EXCLUDED_ROLES).
+    ``captions``: the ResolvedEdit captions (roles); ``measured``: text-probe caption items (id, onset).  If a timed
+    caption whose onset could not be measured is planned early enough to have been the first one, the value is
+    None (unmeasured) -- a later caption must not stand in for it."""
+    on = {m.get("id"): m.get("onset") for m in measured}
+    timed = [c for c in captions if c.role not in FIRST_CAPTION_EXCLUDED_ROLES]
+    got = [(float(on[c.id]), c) for c in timed if on.get(c.id) is not None]
+    base = "정의: 제목·설명을 뺀 첫 시간제 자막의 출력 등장 시각(레퍼런스 분석기 structure.first_caption_at_s 와 같음)"
+    if not timed:
+        return {"t": None, "caption": None, "role": None, "note": base + " — 시간제 자막이 없음"}
+    t0, c0 = min(got, key=lambda x: x[0]) if got else (None, None)
+    blind = [c.id for c in timed if on.get(c.id) is None and (t0 is None or float(c.start) < t0 + FIRST_CAPTION_TOL_S)]
+    if blind:
+        return {"t": None, "caption": None, "role": None,
+                "note": base + f" — 먼저 나왔을 수 있는 자막의 등장 시각을 측정하지 못함: {', '.join(blind)}"}
+    return {"t": round(t0, 3), "caption": c0.id, "role": c0.role, "note": base}
+
+
 def rows_structure(b: RowBuilder, probes: dict) -> None:
     ctx = b.ctx
     fr = 1.0 / ctx.fps
@@ -1853,11 +2050,12 @@ def rows_structure(b: RowBuilder, probes: dict) -> None:
                 {"duration": _r(d_obs, 2)},
                 lambda o, r: r.get("structure.duration_s.p10") is not None and
                 float(r["structure.duration_s.p10"]) <= o["duration"] <= float(r["structure.duration_s.p90"]))
-    caps = [c for c in (probes.get("text") or {}).get("captions") or [] if c.get("onset") is not None]
-    first = min((c["onset"] for c in caps), default=None)
-    b.style_row("structure.duration", "first_caption_ref", "첫 자막 시각 (레퍼런스 대비)", CAT["structure"],
-                ["structure.first_caption_at_s"], {"first_caption_at_s": first} if first is not None else None,
-                lambda o, r: abs(o["first_caption_at_s"] - float(r.get("structure.first_caption_at_s") or 0)) <= 0.2)
+    fc = first_timed_caption(ctx.resolved.captions, (probes.get("text") or {}).get("captions") or [])
+    b.style_row("structure.duration", "first_caption_ref", "첫 시간제 자막 시각 (레퍼런스 대비)", CAT["structure"],
+                ["structure.first_caption_at_s"],
+                {"first_caption_at_s": fc["t"], "caption": fc["caption"], "role": fc["role"]} if fc["t"] is not None else None,
+                lambda o, r: abs(o["first_caption_at_s"] - float(r.get("structure.first_caption_at_s") or 0)) <= FIRST_CAPTION_TOL_S,
+                evidence={"t": fc["t"]}, note=fc["note"])
     cov = (probes.get("text") or {}).get("cover")
     if cov:
         sim = cov.get("similarity")

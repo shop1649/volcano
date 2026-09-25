@@ -12,13 +12,13 @@ Kerning: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: title,NotoSansCJKkr-Black,121.63,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: description,NotoSansCJKkr-Bold,66.61,&H00E6E6E6,&H00E6E6E6,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,4,0,5,0,0,0,1
-Style: speaker,NotoSansCJKkr-Bold,57.92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,700,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
-Style: situation,NotoSansCJKkr-Black,95.57,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: dialogue,NotoSansCJKkr-Black,89.78,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
-Style: reaction,NotoSansCJKkr-Black,110.05,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,900,0,0,0,100,100,0,0,1,7,0,5,0,0,0,1
-Style: deco,NotoSansCJKkr-Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,400,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
+Style: title,NotoSansCJKkr-Black,121.63,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: description,NotoSansCJKkr-Bold,66.61,&H00E6E6E6,&H00E6E6E6,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,5,0,0,0,1
+Style: speaker,NotoSansCJKkr-Bold,57.92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
+Style: situation,NotoSansCJKkr-Black,95.57,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: dialogue,NotoSansCJKkr-Black,89.78,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,6,0,5,0,0,0,1
+Style: reaction,NotoSansCJKkr-Black,110.05,&H0000E4FF,&H0000E4FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,7,0,5,0,0,0,1
+Style: deco,NotoSansCJKkr-Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text

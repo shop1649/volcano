@@ -24,8 +24,9 @@
   `presets/joshuamagazine/unresolved.md`, `presets/joshuamagazine/reference/latest100.json` 의 blocker 기록).
 - 그래서 `presets/joshuamagazine/preset.yaml` 의 스타일 값은 전부 **임시값(provisional)** 이다. 레지스트리
   (`settings_registry.yaml`)에서 상태가 `unmeasured`(못 잼)이다. production 렌더와 QA 최종 관문은 이 상태에서 통과하지 않는다.
-- 파이프라인 자체(렌더·편집 프로젝트·QA·분석기·소재 창고·로고 제거)는 합성/공개 테스트 소스로 실제 실행해 검증했다.
-  검증 범위는 `docs/VALIDATION.md`.
+- 렌더·편집 프로젝트(MLT 는 melt 렌더로 대조)·출력 QA·레퍼런스 분석기·로고 제거는 합성/공개(CC-BY) 테스트 소스로 실제 실행해
+  검증했다. 소재 창고의 플랫폼 검색·다운로드는 이 환경에서 모든 플랫폼이 차단되어 **실제 접속으로는 검증하지 못했다**(차단 기록과
+  합성 픽스처 테스트만 있음). FCPXML/OTIO 는 NLE 가 없어 열어 보지 못했다. 검증 범위·OS·버전은 `docs/VALIDATION.md`.
 - 네트워크가 열린 컴퓨터에서 아래 **5장 A → B → C** 순서대로 실행하면 미측정 항목이 채워진다.
 
 ## 3. 절대 규칙 (사용자 요구사항 — 위반 시 작업 실패)

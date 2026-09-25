@@ -1,7 +1,7 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-24T22:26:21+00:00",
+  "saved_at": "2026-09-25T02:21:57+00:00",
   "reads": {
     "audio.bgm.fade_in_s": [
       "shortkit/qa/checks.py:pget"
@@ -65,9 +65,6 @@
       "shortkit/qa/probes_audio.py:_sfx_templates"
     ],
     "audio.sfx.max_event_offset_s": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "canvas.background.blur_sigma": [
       "shortkit/qa/checks.py:pget"
     ],
     "canvas.background.color": [
@@ -189,31 +186,13 @@
     "text.roles.description.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.description.box.alpha": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.description.box.enabled": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.box.pad_x": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.font_name": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.highlight_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.line_spacing": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.max_chars_per_line": [
@@ -228,16 +207,7 @@
     "text.roles.description.motion_in.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.description.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.motion_in.scale_from": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.description.motion_in.type": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.motion_out.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.motion_out.type": [
@@ -252,16 +222,10 @@
     "text.roles.description.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.description.shadow_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.description.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.size_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.description.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.timing.min_dur_s": [
@@ -282,28 +246,13 @@
     "text.roles.dialogue.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.box.alpha": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.dialogue.box.enabled": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.box.pad_x": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.font_name": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.highlight_color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.line_spacing": [
@@ -318,19 +267,7 @@
     "text.roles.dialogue.max_width_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.motion_in.dur_s": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.motion_in.scale_from": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.dialogue.motion_in.type": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.motion_out.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.motion_out.type": [
@@ -343,9 +280,6 @@
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.persist": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.dialogue.shadow_color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.shadow_px": [
@@ -375,31 +309,13 @@
     "text.roles.reaction.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.reaction.box.alpha": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.reaction.box.enabled": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.box.pad_x": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.font_name": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.highlight_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.line_spacing": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.max_chars_per_line": [
@@ -414,16 +330,10 @@
     "text.roles.reaction.motion_in.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.reaction.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.reaction.motion_in.scale_from": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.motion_in.type": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.motion_out.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.motion_out.type": [
@@ -438,16 +348,10 @@
     "text.roles.reaction.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.reaction.shadow_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.reaction.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.size_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.reaction.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.timing.min_dur_s": [
@@ -468,19 +372,7 @@
     "text.roles.situation.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.situation.box.alpha": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.situation.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.situation.box.enabled": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.situation.box.pad_x": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.situation.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.color": [
@@ -507,16 +399,10 @@
     "text.roles.situation.motion_in.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.situation.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.situation.motion_in.scale_from": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.motion_in.type": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.situation.motion_out.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.motion_out.type": [
@@ -531,16 +417,10 @@
     "text.roles.situation.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.situation.shadow_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.situation.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.size_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.situation.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.timing.min_dur_s": [
@@ -582,12 +462,6 @@
     "text.roles.speaker.font_name": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.speaker.highlight_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.speaker.line_spacing": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.speaker.max_chars_per_line": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -600,12 +474,6 @@
     "text.roles.speaker.motion_in.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.speaker.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.speaker.motion_in.scale_from": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.speaker.motion_in.type": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -615,25 +483,16 @@
     "text.roles.speaker.motion_out.type": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.speaker.outline_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.speaker.outline_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.speaker.shadow_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.speaker.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.size_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.speaker.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.timing.min_dur_s": [
@@ -654,28 +513,13 @@
     "text.roles.title.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.title.box.alpha": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.title.box.enabled": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.box.pad_x": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.font_name": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.highlight_color": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.line_spacing": [
@@ -690,19 +534,7 @@
     "text.roles.title.max_width_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.title.motion_in.dur_s": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.motion_in.offset_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.motion_in.scale_from": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.title.motion_in.type": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.motion_out.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.motion_out.type": [
@@ -717,19 +549,10 @@
     "text.roles.title.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.title.shadow_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.title.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.size_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.timing.lead_s": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "text.roles.title.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.tone.emoji": [

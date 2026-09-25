@@ -6,13 +6,14 @@ warning (and an error in production unless ``allow_unmeasured``).
 """
 from __future__ import annotations
 
+import math
 import re
 from collections import defaultdict
 from pathlib import Path
 
 from .. import config, paths
 from ..util.hashing import sha256_file
-from ..util.jsonio import read_jsonl, read_yaml
+from ..util.jsonio import read_json, read_jsonl, read_yaml
 from . import sfxmap
 from .plan import TEST_FORMAT_ID, PlanError, approval_state_for, schema_errors
 from .resolve import (EPS, ResolveContext, clips_at, issue, map_src_rect, rects_intersect, resolve_context,
@@ -704,34 +705,166 @@ def check_sfx(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasured
                          f"효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 "
                          f"({cat.get('blocker') or cat.get('_path')})", "sfx"))
     else:
-        types = {t.get("type_id"): t for t in cat.get("types") or []}
-        for typ in by_type:
-            if typ not in types:
-                out.append(issue("error", "sfx_type_unknown", f"카탈로그에 없는 효과음 종류 '{typ}'", "sfx"))
-        for typ, ent in types.items():
-            if ent.get("class") == "intentional_silence":
-                continue
-            st, basis = sfxmap.count_range(ent.get("per_video_count"), fid)
-            cnt = len(by_type.get(typ, []))
-            if st is None:
-                out.append(issue("warn", "sfx_count_unmeasured", f"'{typ}' 영상당 개수 분포 미측정(못 잼)", "sfx"))
-            elif not (float(st["p10"]) <= cnt <= float(st["p90"])):
-                out.append(issue("error", "sfx_count_range", f"'{typ}' {cnt}개가 관측 범위 {st['p10']}..{st['p90']} "
-                                 f"({basis}) 밖", "sfx"))
-        tot = cat.get("per_video_total")
-        st, basis = sfxmap.count_range(tot, fid)
-        n_all = len(plan.get("sfx") or [])
-        if st is None:
-            out.append(issue("error" if (prod and not allow_unmeasured) else "warn", "sfx_total_unmeasured",
-                             "영상당 효과음 총개수 분포 미측정(못 잼)", "sfx"))
-        elif not (float(st["p10"]) <= n_all <= float(st["p90"])):
-            out.append(issue("error", "sfx_total_range", f"효과음 총 {n_all}개가 관측 범위 {st['p10']}..{st['p90']} ({basis}) 밖",
-                             "sfx"))
+        check_sfx_counts(plan, ctx, cat, fid, by_type, out, prod and not allow_unmeasured)
     for sp in r.audio.sfx:
         if prod and sp.path and sp.map_status != "have":
             out.append(issue("warn", "sfx_explicit_unmapped",
                              f"'{sp.type}' 는 명시 파일을 쓰지만 레퍼런스 종류와의 유사도는 미측정(맵 상태 {sp.map_status})",
                              f"sfx[{sp.id}]"))
+
+
+# SFX count rule (user: "편당 개수와 종류 분포는 해당 포맷의 관측 범위에 맞춘다"):
+# * Only ADDED effects are counted: catalog types of class ``edit_sfx``, plus ``intentional_silence``
+#   when the plan has silences (plan.bgm.silences).  ``onsite_sound`` types are sounds of the reference's
+#   own footage (source audio), not effects an editor adds, so they are neither counted nor placeable.
+# * Allowed per-episode count for a type (and for the total) = [floor(p10), ceil(p90)] of the observed
+#   per-video counts of the plan's format (``per_video_count.by_format[F]``, else ``overall``): counts are
+#   integers, and the linearly interpolated p10/p90 of a small sample can fall between integers.
+# * ALSO allowed: any count observed at least once in that format's reference videos (with n = 5 the
+#   interpolated p10 = 0.4 would otherwise exclude a count of 0 that a reference video really has).
+#   The per-video counts come from the catalog entry's ``per_video_count.videos`` when present, otherwise
+#   from the per-video ``sfx_events.json`` files into which ``ref sfx-catalog`` writes the type ids (only
+#   when they reproduce the catalog's own n/p10/p50/p90; otherwise only the range rule is applied).
+#   Counts of ``lower_bound_videos`` (SFX under speech not measurable) are lower bounds: a count accepted
+#   only because such a video showed it gets a warning.
+COUNTED_SFX_CLASS = "edit_sfx"
+SILENCE_CLASS = "intentional_silence"
+ONSITE_CLASS = "onsite_sound"
+
+
+def allowed_count_range(st: dict) -> tuple[int, int]:
+    """[floor(p10), ceil(p90)] of an observed per-video count distribution."""
+    return int(math.floor(float(st["p10"]) + 1e-9)), int(math.ceil(float(st["p90"]) - 1e-9))
+
+
+def observed_sfx_counts(cat: dict, preset, format_id: str | None) -> dict:
+    """Per-video counts behind the catalog statistics, restricted to the videos of ``format_id`` (all
+    videos when None).  Returns {"types": {type_id: {video_id: count}}, "videos", "lower_bound", "source",
+    "problem"}; ``problem`` set = no usable per-video counts (then only the range rule applies)."""
+    basis = cat.get("basis") or {}
+    vids = [str(v) for v in basis.get("videos") or []]
+    types = [t for t in cat.get("types") or [] if t.get("type_id")]
+    res: dict = {"types": {}, "videos": [], "all_types": {}, "all_videos": vids, "formats": {},
+                 "lower_bound": set(), "source": None, "problem": None}
+    if not vids or not types:
+        res["problem"] = "카탈로그 basis.videos 가 비어 있음"
+        return res
+    for t in types:
+        res["lower_bound"] |= set((t.get("per_video_count") or {}).get("lower_bound_videos") or [])
+    counts: dict[str, dict[str, int]] = {t["type_id"]: {v: 0 for v in vids} for t in types}
+    if all(isinstance((t.get("per_video_count") or {}).get("videos"), dict) for t in types):
+        for t in types:
+            for v, c in t["per_video_count"]["videos"].items():
+                if str(v) in counts[t["type_id"]]:
+                    counts[t["type_id"]][str(v)] = int(c)
+        res["source"] = "sfx_catalog per_video_count.videos"
+    else:
+        from ..reference.sfx_events import sfx_events_path
+
+        for v in vids:
+            d = read_json(sfx_events_path(preset.name, v))
+            if not d or not d.get("catalog"):
+                res["problem"] = f"{v} 의 sfx_events.json 에 카탈로그 종류 배정이 없음"
+                return res
+            for e in d.get("events") or []:
+                if e.get("type_id") in counts:
+                    counts[e["type_id"]][v] += 1
+        res["source"] = "analysis/<video>/audio/sfx_events.json (ref sfx-catalog 가 배정한 type_id)"
+    from ..reference.sfx_catalog import video_formats
+    from ..util.stats import pstats_by_group
+
+    fmts = video_formats(preset.name)
+    for t in types:       # the per-video counts must reproduce the catalog's own statistics
+        rows = [{"format_id": fmts.get(v), "count": counts[t["type_id"]][v]} for v in vids]
+        mine = pstats_by_group(rows, "count")["overall"]
+        theirs = (t.get("per_video_count") or {}).get("overall") or {}
+        if theirs.get("n") and any(theirs.get(k) is None or abs(float(mine[k]) - float(theirs[k])) > 1e-3
+                                   for k in ("n", "p10", "p50", "p90")):
+            res["problem"] = (f"영상별 개수가 카탈로그 통계와 다름('{t['type_id']}': {mine} ≠ {theirs}) — "
+                              "카탈로그를 다시 만들어야 함")
+            return res
+    sel = [v for v in vids if format_id is None or fmts.get(v) == format_id]
+    res.update({"videos": sel, "types": {tid: {v: c[v] for v in sel} for tid, c in counts.items()},
+                "all_types": counts, "formats": fmts})
+    return res
+
+
+def _count_verdict(out: list[dict], what: str, cnt: int, st: dict | None, basis: str, per_video: dict | None,
+                   lower_bound: set, obs_basis_ok: bool, code: str, unmeasured_sev: str, where: str = "sfx") -> None:
+    if st is None or st.get("p10") is None or st.get("p90") is None:
+        out.append(issue(unmeasured_sev, code.replace("_range", "_unmeasured"),
+                         f"{what} 영상당 개수 분포 미측정(못 잼)", where))
+        return
+    lo, hi = allowed_count_range(st)
+    if lo <= cnt <= hi:
+        return
+    seen = {v: c for v, c in (per_video or {}).items() if c == cnt} if obs_basis_ok else {}
+    exact = sorted(v for v in seen if v not in lower_bound)
+    if exact:
+        return
+    rng = f"[floor(p10), ceil(p90)] = [{lo}, {hi}] (p10 {st['p10']}, p90 {st['p90']}, n={st.get('n')}, {basis})"
+    if seen:
+        out.append(issue("warn", code.replace("_range", "_lower_bound"),
+                         f"{what} {cnt}개는 {rng} 밖이고, 대사 구간 효과음을 못 잰(하한값) 영상 "
+                         f"{', '.join(sorted(seen))} 에서만 관측된 개수입니다", where))
+        return
+    obs = sorted(set((per_video or {}).values())) if obs_basis_ok else None
+    out.append(issue("error", code, f"{what} {cnt}개가 관측 범위 {rng} 밖"
+                     + (f"이고 레퍼런스 영상에서 관측된 개수({obs})도 아닙니다" if obs is not None else
+                        "(영상별 관측 개수 없음)"), where))
+
+
+def check_sfx_counts(plan: dict, ctx: ResolveContext, cat: dict, fid: str | None, by_type: dict,
+                     out: list[dict], strict: bool) -> None:
+    """Per-type counts and the total against the format's observed range (rule above)."""
+    types = {t.get("type_id"): t for t in cat.get("types") or []}
+    silences = list((plan.get("bgm") or {}).get("silences") or [])
+    counted = {COUNTED_SFX_CLASS} | ({SILENCE_CLASS} if silences else set())
+    for typ in by_type:
+        if typ not in types:
+            out.append(issue("error", "sfx_type_unknown", f"카탈로그에 없는 효과음 종류 '{typ}'", "sfx"))
+        elif types[typ].get("class") == ONSITE_CLASS:
+            out.append(issue("error", "sfx_type_onsite",
+                             f"'{typ}' 는 현장음(레퍼런스 원본 소리) 종류라 편집 효과음으로 넣을 수 없습니다", "sfx"))
+    obs = observed_sfx_counts(cat, ctx.preset, fid)
+    obs_ok = obs["problem"] is None
+    if not obs_ok:
+        out.append(issue("warn", "sfx_observed_counts_unavailable",
+                         f"영상별 관측 개수를 쓸 수 없어 [floor(p10), ceil(p90)] 범위만 검사: {obs['problem']}", "sfx"))
+    unmeasured_sev = "warn"
+    counted_types = [t for t, e in types.items() if e.get("class") in counted]
+    has_silence_type = any(types[t].get("class") == SILENCE_CLASS for t in counted_types)
+    if silences and not has_silence_type:
+        # a measured catalog without an intentional_silence type = no reference video showed one (count 0)
+        out.append(issue("error", "sfx_silence_unobserved",
+                         f"계획의 의도적 정적 {len(silences)}개: 측정된 카탈로그에 의도적 정적 종류가 없음"
+                         "(레퍼런스 영상 모두 0개) → 관측 범위 밖", "bgm.silences"))
+    for typ in counted_types:
+        ent = types[typ]
+        cnt = len(silences) if ent.get("class") == SILENCE_CLASS else len(by_type.get(typ, []))
+        st, basis = sfxmap.count_range(ent.get("per_video_count"), fid)
+        # observed counts of the same video set as the range (format videos only for a by_format range)
+        pv = (obs["types"] if basis.startswith("by_format") else obs["all_types"]).get(typ)
+        _count_verdict(out, f"'{typ}'", cnt, st, basis, pv, obs["lower_bound"], obs_ok,
+                       "sfx_count_range", unmeasured_sev)
+    # total of the counted classes: per-video totals from the same per-video counts (same classes)
+    n_all = sum(len(by_type.get(t, [])) for t in counted_types if types[t].get("class") == COUNTED_SFX_CLASS)
+    n_all += len(silences) if has_silence_type else 0
+    tot_st, tot_basis, per_video_tot = None, "none", None
+    if obs_ok:
+        from ..util.stats import pstats_by_group
+
+        allc = obs["all_types"]
+        rows = [{"format_id": obs["formats"].get(v), "count": sum(allc.get(t, {}).get(v, 0) for t in counted_types)}
+                for v in obs["all_videos"]]
+        tot_st, tot_basis = sfxmap.count_range(pstats_by_group(rows, "count"), fid)
+        vset = obs["videos"] if tot_basis.startswith("by_format") else obs["all_videos"]
+        per_video_tot = {v: sum(allc.get(t, {}).get(v, 0) for t in counted_types) for v in vset}
+        tot_basis = f"{tot_basis}, 영상별 개수에서 계산({'+'.join(sorted(counted))})"
+    elif cat.get("per_video_total"):
+        tot_st, tot_basis = sfxmap.count_range(cat.get("per_video_total"), fid)
+    _count_verdict(out, "효과음 총", n_all, tot_st, tot_basis, per_video_tot, obs["lower_bound"], obs_ok,
+                   "sfx_total_range", "error" if strict else "warn")
 
 
 # ----------------------------------------------------------------------------- audio

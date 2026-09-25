@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-pipeline-001.mlt",
-    "created_at": "2026-09-24T21:48:32+00:00",
+    "created_at": "2026-09-25T02:14:08+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -72,6 +72,9 @@
             7.45
           ]
         ],
+        "loop": {
+          "status": "없음"
+        },
         "note": "시작점은 프레임(1/fps) 단위로 맞춰짐; 덕킹/정적 envelope 는 volume level 키프레임"
       },
       "mono_upmix_compensation": {
@@ -184,6 +187,14 @@
       "master_limiter_max_reduction_db": 0.0,
       "note": "마스터의 정규화 이득 + 최종 트림을 타임라인 volume 필터로 적용"
     },
+    "start_ramp": {
+      "status": "있음",
+      "samples": 1024,
+      "duration_s": 0.021333,
+      "source": "episodes/test-pipeline-001/build/fg_gain.json",
+      "service": "avfilter.afade type=in start_sample=0 nb_samples=N curve=tri (선형)",
+      "why": "AAC 인코더가 첫 프레임의 급한 시작에서 true peak 를 넘기는 것을 막으려고 마스터가 전체 믹스 앞 N 샘플을 0→1 선형으로 올림 — volume 키프레임은 프레임 0 안에서 변할 수 없어 afade(샘플 단위)로 같은 곡선을 씀"
+    },
     "editable": [
       "클립 순서·길이·트림(V2 영상 트랙의 각 조각)",
       "클립별 위치/크기/줌(Size, Position & Rotate = affine 키프레임)",
@@ -199,15 +210,16 @@
     "baked": [
       "자막·장식 전체가 ASS 한 파일(captions.ass)로 한 레이어에 그려짐 → 텍스트는 captions.ass 를 Aegisub/텍스트 편집기로 고쳐야 하며 NLE 의 개별 텍스트 클립이 아님",
       "inpaint 로 지운 소스는 미리 렌더된 중간 파일(warehouse/cache/clean)을 소스로 사용",
-      "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
+      "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)",
+      "시작 램프(앞 1024 샘플 선형 페이드인)는 타임라인의 avfilter.afade 필터"
     ]
   },
-  "updated_at": "2026-09-24T21:48:35+00:00",
+  "updated_at": "2026-09-25T02:14:11+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-pipeline-001.fcpxml",
-    "created_at": "2026-09-24T21:48:32+00:00",
+    "created_at": "2026-09-25T02:14:09+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -288,7 +300,7 @@
   "otio": {
     "format": "otio",
     "file": "test-pipeline-001.otio",
-    "created_at": "2026-09-24T21:48:33+00:00",
+    "created_at": "2026-09-25T02:14:10+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",

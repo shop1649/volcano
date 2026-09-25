@@ -10,6 +10,8 @@ Lifecycle (every ``shortkit qa run`` does this automatically):
     open ─(qa defects fix --note)→ fix_submitted ─(re-run: row passes)→ fixed
                                             └──(re-run: row still fails)→ reopened
     fixed ─(later run fails again)→ reopened
+    active ─(re-run: row still 못 잼 but no longer required)→ superseded (NOT fixed: the gate-required
+            judgement moved to another row, e.g. per-caption font rows -> the per-role pooled font row)
 After each run, every defect that is open/reopened or was fixed in this run is re-checked on the
 OTHER episodes that have a render (same check_id, measured on their MP4) and the result is
 appended to ``recheck_same_cases``.  ``final_gate`` always holds the latest gate result.
@@ -95,6 +97,12 @@ def sync(ctx, report: dict, recheck_others: bool = True, quiet: bool = False) ->
                     stats["still_open"] += 1
                 d["last_seen_at"] = now
                 d["last_observed"] = r.get("observed")
+            elif r["status"] == "unmeasured" and not r.get("required"):
+                d["status"] = "superseded"
+                d["history"].append({"at": now, "event": "superseded", "status_now": r["status"],
+                                     "note": "행이 필수가 아니게 됨(필수 판정이 다른 행으로 옮겨짐) — 고쳐진 것이 아님: "
+                                             + (r.get("note") or "")[:200]})
+                stats["superseded"] = stats.get("superseded", 0) + 1
             else:
                 d["status"] = "fixed"
                 d["verified_at"] = now
@@ -102,7 +110,7 @@ def sync(ctx, report: dict, recheck_others: bool = True, quiet: bool = False) ->
                                      "observed": r.get("observed")})
                 stats["verified_now"] += 1
             touched.append(d)
-        elif d["status"] == "fixed" and failed:
+        elif d["status"] in ("fixed", "superseded") and failed:
             d["status"] = "reopened"
             d["history"].append({"at": now, "event": "regressed", "observed": r.get("observed")})
             stats["reopened"] += 1

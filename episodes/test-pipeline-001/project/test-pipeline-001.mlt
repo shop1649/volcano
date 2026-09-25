@@ -588,5 +588,13 @@
       <property name="shotcut:filter">audioGain</property>
       <property name="shortkit:role">loudness normalization gain (master render)</property>
     </filter>
+    <filter id="filter38">
+      <property name="mlt_service">avfilter.afade</property>
+      <property name="av.type">in</property>
+      <property name="av.start_sample">0</property>
+      <property name="av.nb_samples">1024</property>
+      <property name="av.curve">tri</property>
+      <property name="shortkit:role">master start ramp: 1024 samples linear fade-in (AAC abrupt-start overshoot guard, render.mix_audio)</property>
+    </filter>
   </tractor>
 </mlt>

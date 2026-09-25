@@ -21,7 +21,7 @@ done
 if [ "$WITH_APT" = 1 ]; then
   sudo apt-get update
   sudo apt-get install -y ffmpeg melt tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng fontconfig \
-    fonts-noto-cjk fonts-noto-cjk-extra fonts-nanum libchromaprint-tools espeak-ng python3-venv
+    fonts-noto-cjk fonts-noto-cjk-extra fonts-nanum libchromaprint-tools espeak-ng python3-venv xvfb
 fi
 if [ "$WITH_BREW" = 1 ]; then
   brew install ffmpeg mlt tesseract tesseract-lang chromaprint espeak-ng fontconfig
@@ -43,7 +43,10 @@ fi
 
 echo
 echo "== 후보 글꼴 받기(sha256 검증) =="
-python -m shortkit doctor --fetch-fonts >/dev/null || true
+python -m shortkit doctor --fetch-fonts 2>&1 | grep -E '"(status|file|error)"|fail|실패' || true
+echo
+echo "== 얼굴 검출 모델(Haar, sha256 고정) =="
+python -m shortkit clean fetch-models || echo "경고: 얼굴 검출 모델을 받지 못함 — QA 얼굴 가림 검사가 못 잼으로 남음"
 echo
 echo "== 점검 =="
 python -m shortkit doctor --network || true

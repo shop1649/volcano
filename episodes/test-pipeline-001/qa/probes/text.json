@@ -191,7 +191,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -204,11 +204,11 @@
           "ceiling": {
             "n": 12,
             "p10": 0.9797,
-            "p50": 0.9839,
-            "p90": 0.987,
+            "p50": 0.9836,
+            "p90": 0.9887,
             "n_failed": 0,
-            "noise_p90": 0.0111,
-            "glyph_p10": 0.9724,
+            "noise_p90": 0.0105,
+            "glyph_p10": 0.9714,
             "size_px": 84.0,
             "background": "color:#000000"
           },
@@ -263,6 +263,21 @@
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          0.1333,
+          0.4,
+          0.7,
+          1.0
+        ],
+        "skipped": []
       }
     },
     {
@@ -602,7 +617,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -614,12 +629,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.9587,
-            "p50": 0.9605,
-            "p90": 0.9672,
+            "p10": 0.9549,
+            "p50": 0.9591,
+            "p90": 0.9681,
             "n_failed": 0,
-            "noise_p90": 0.0385,
-            "glyph_p10": 0.9245,
+            "noise_p90": 0.0393,
+            "glyph_p10": 0.9216,
             "size_px": 46.0,
             "background": "color:#000000"
           },
@@ -668,12 +683,27 @@
           "iou_expected": 0.9511,
           "margin": 0.0573,
           "reasons": [
-            "IoU 0.951 < 천장 p10 0.959",
-            "차순위 대비 차이 +0.057 > 잡음 0.038",
+            "IoU 0.951 < 천장 p10 0.955",
+            "차순위 대비 차이 +0.057 > 잡음 0.039",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          0.3333,
+          0.6,
+          0.9,
+          1.2
+        ],
+        "skipped": []
       }
     },
     {
@@ -1037,7 +1067,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#585858",
             "scale_flags": "bicubic",
@@ -1049,12 +1079,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.951,
-            "p50": 0.9556,
-            "p90": 0.9684,
+            "p10": 0.9515,
+            "p50": 0.9604,
+            "p90": 0.9746,
             "n_failed": 0,
-            "noise_p90": 0.0315,
-            "glyph_p10": 0.9267,
+            "noise_p90": 0.0269,
+            "glyph_p10": 0.9368,
             "size_px": 40.0,
             "background": "color:#585858"
           },
@@ -1094,7 +1124,7 @@
           ],
           "top": "Noto Sans CJK KR Bold",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.959, 천장 p10 0.951, 차순위 대비 +0.053 > 잡음 0.032)",
+          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.959, 천장 p10 0.952, 차순위 대비 +0.053 > 잡음 0.027)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1103,12 +1133,27 @@
           "iou_expected": 0.9587,
           "margin": 0.0532,
           "reasons": [
-            "IoU 0.959 >= 천장 p10 0.951",
-            "차순위 대비 차이 +0.053 > 잡음 0.032",
+            "IoU 0.959 >= 천장 p10 0.952",
+            "차순위 대비 차이 +0.053 > 잡음 0.027",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          0.6,
+          0.8667,
+          1.1667,
+          1.4667
+        ],
+        "skipped": []
       }
     },
     {
@@ -1460,7 +1505,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -1472,12 +1517,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.9667,
-            "p50": 0.97,
-            "p90": 0.9761,
+            "p10": 0.9662,
+            "p50": 0.9709,
+            "p90": 0.9763,
             "n_failed": 0,
-            "noise_p90": 0.0118,
-            "glyph_p10": 0.9439,
+            "noise_p90": 0.0124,
+            "glyph_p10": 0.9406,
             "size_px": 66.0,
             "background": "color:#000000"
           },
@@ -1517,7 +1562,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.973, 천장 p10 0.967, 차순위 대비 +0.053 > 잡음 0.012)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.973, 천장 p10 0.966, 차순위 대비 +0.053 > 잡음 0.012)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1526,12 +1571,27 @@
           "iou_expected": 0.9729,
           "margin": 0.0531,
           "reasons": [
-            "IoU 0.973 >= 천장 p10 0.967",
+            "IoU 0.973 >= 천장 p10 0.966",
             "차순위 대비 차이 +0.053 > 잡음 0.012",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          1.5667,
+          1.8333,
+          2.1333,
+          2.4333
+        ],
+        "skipped": []
       }
     },
     {
@@ -1879,7 +1939,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -1891,12 +1951,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.968,
-            "p50": 0.9712,
-            "p90": 0.9808,
+            "p10": 0.9668,
+            "p50": 0.9727,
+            "p90": 0.9802,
             "n_failed": 0,
             "noise_p90": 0.0174,
-            "glyph_p10": 0.9399,
+            "glyph_p10": 0.9396,
             "size_px": 66.0,
             "background": "color:#000000"
           },
@@ -1936,7 +1996,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.970, 천장 p10 0.968, 차순위 대비 +0.062 > 잡음 0.017)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.970, 천장 p10 0.967, 차순위 대비 +0.062 > 잡음 0.017)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1945,12 +2005,27 @@
           "iou_expected": 0.9701,
           "margin": 0.0621,
           "reasons": [
-            "IoU 0.970 >= 천장 p10 0.968",
+            "IoU 0.970 >= 천장 p10 0.967",
             "차순위 대비 차이 +0.062 > 잡음 0.017",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          4.3667,
+          4.6333,
+          4.9333,
+          5.2333
+        ],
+        "skipped": []
       }
     },
     {
@@ -2298,7 +2373,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -2310,12 +2385,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.9578,
-            "p50": 0.9637,
-            "p90": 0.9757,
+            "p10": 0.9606,
+            "p50": 0.969,
+            "p90": 0.9733,
             "n_failed": 0,
-            "noise_p90": 0.0187,
-            "glyph_p10": 0.94,
+            "noise_p90": 0.0212,
+            "glyph_p10": 0.9401,
             "size_px": 66.0,
             "background": "color:#000000"
           },
@@ -2355,7 +2430,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.963, 천장 p10 0.958, 차순위 대비 +0.051 > 잡음 0.019)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.963, 천장 p10 0.961, 차순위 대비 +0.051 > 잡음 0.021)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -2364,12 +2439,27 @@
           "iou_expected": 0.9634,
           "margin": 0.0513,
           "reasons": [
-            "IoU 0.963 >= 천장 p10 0.958",
-            "차순위 대비 차이 +0.051 > 잡음 0.019",
+            "IoU 0.963 >= 천장 p10 0.961",
+            "차순위 대비 차이 +0.051 > 잡음 0.021",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          7.9667,
+          8.2333,
+          8.5333,
+          8.8333
+        ],
+        "skipped": []
       }
     },
     {
@@ -2666,7 +2756,7 @@
           {
             "font": "Noto Sans CJK KR Black",
             "iou": 0.9622,
-            "verdict": "similar"
+            "verdict": "identical"
           },
           {
             "font": "Noto Sans CJK KR Bold",
@@ -2709,7 +2799,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -2721,12 +2811,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.9644,
-            "p50": 0.9697,
-            "p90": 0.9752,
+            "p10": 0.962,
+            "p50": 0.9698,
+            "p90": 0.9748,
             "n_failed": 0,
-            "noise_p90": 0.0168,
-            "glyph_p10": 0.9345,
+            "noise_p90": 0.0177,
+            "glyph_p10": 0.9326,
             "size_px": 62.0,
             "background": "color:#000000"
           },
@@ -2736,7 +2826,7 @@
               "font": "Noto Sans CJK KR Black",
               "iou": 0.9622,
               "margin": 0.1321,
-              "verdict": "similar",
+              "verdict": "identical",
               "glyph_pass": true
             },
             {
@@ -2765,22 +2855,37 @@
             }
           ],
           "top": "Noto Sans CJK KR Black",
-          "top_verdict": "similar",
-          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Black 는 '유사' (동일 폰트라고 쓰지 않음)",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.962, 천장 p10 0.962, 차순위 대비 +0.132 > 잡음 0.018)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
-          "verdict": "similar",
-          "verdict_ko": "유사(동일 확정 불가)",
+          "verdict": "identical",
+          "verdict_ko": "동일",
           "iou_expected": 0.9622,
           "margin": 0.1321,
           "reasons": [
-            "IoU 0.962 < 천장 p10 0.964",
-            "차순위 대비 차이 +0.132 > 잡음 0.017",
+            "IoU 0.962 >= 천장 p10 0.962",
+            "차순위 대비 차이 +0.132 > 잡음 0.018",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          10.2333,
+          10.5,
+          10.8,
+          11.1
+        ],
+        "skipped": []
       }
     },
     {
@@ -3149,7 +3254,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "video",
             "scale_flags": "bicubic",
@@ -3161,12 +3266,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.9699,
-            "p50": 0.9762,
-            "p90": 0.9839,
+            "p10": 0.9728,
+            "p50": 0.9772,
+            "p90": 0.9794,
             "n_failed": 0,
-            "noise_p90": 0.0165,
-            "glyph_p10": 0.9584,
+            "noise_p90": 0.0092,
+            "glyph_p10": 0.9608,
             "size_px": 76.0,
             "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@8.38;assets/test/generated/classroom_voice.mp4@20.88"
           },
@@ -3206,7 +3311,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.980, 천장 p10 0.970, 차순위 대비 +0.084 > 잡음 0.017)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.980, 천장 p10 0.973, 차순위 대비 +0.084 > 잡음 0.009)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -3215,12 +3320,27 @@
           "iou_expected": 0.9802,
           "margin": 0.0842,
           "reasons": [
-            "IoU 0.980 >= 천장 p10 0.970",
-            "차순위 대비 차이 +0.084 > 잡음 0.017",
+            "IoU 0.980 >= 천장 p10 0.973",
+            "차순위 대비 차이 +0.084 > 잡음 0.009",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          15.3333,
+          15.6,
+          15.9,
+          16.2
+        ],
+        "skipped": []
       }
     },
     {
@@ -3581,7 +3701,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 6,
+            "frames_per_sample": 42,
             "fps": 30.0,
             "background": "color:#000000",
             "scale_flags": "bicubic",
@@ -3593,12 +3713,12 @@
           "ceiling_cached": true,
           "ceiling": {
             "n": 12,
-            "p10": 0.972,
-            "p50": 0.9739,
-            "p90": 0.9774,
+            "p10": 0.9707,
+            "p50": 0.9747,
+            "p90": 0.9773,
             "n_failed": 0,
-            "noise_p90": 0.0069,
-            "glyph_p10": 0.9471,
+            "noise_p90": 0.0087,
+            "glyph_p10": 0.9423,
             "size_px": 66.0,
             "background": "color:#000000"
           },
@@ -3647,15 +3767,998 @@
           "iou_expected": 0.9686,
           "margin": 0.0532,
           "reasons": [
-            "IoU 0.969 < 천장 p10 0.972",
-            "차순위 대비 차이 +0.053 > 잡음 0.007",
+            "IoU 0.969 < 천장 p10 0.971",
+            "차순위 대비 차이 +0.053 > 잡음 0.009",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
         }
+      },
+      "font_pool": {
+        "delays": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "t": [
+          15.3667,
+          15.6333,
+          15.9333,
+          16.2333
+        ],
+        "skipped": []
       }
     }
   ],
+  "font_roles": {
+    "title": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "title",
+      "expected": "Noto Sans CJK KR Black",
+      "expected_canonical": "Noto Sans CJK KR Black",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_title"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "color:#000000",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Black",
+        "Pretendard Black",
+        "Pretendard ExtraBold",
+        "Noto Sans CJK KR Bold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "identical",
+      "verdict_ko": "동일",
+      "reasons": [
+        "IoU 0.988 >= 천장 p10 0.980",
+        "차순위 대비 차이 +0.073 > 잡음 0.011",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 4,
+      "n_captions": 1,
+      "iou_expected": 0.9882,
+      "iou_stats": {
+        "n": 4,
+        "p10": 0.9882,
+        "p50": 0.9882,
+        "p90": 0.9882
+      },
+      "margin": 0.0726,
+      "runner_up": "Pretendard Black",
+      "top": "Noto Sans CJK KR Black",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Black",
+          "iou": 0.9882,
+          "n": 4
+        },
+        {
+          "font": "Pretendard Black",
+          "iou": 0.9156,
+          "n": 4
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.8986,
+          "n": 4
+        },
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.8451,
+          "n": 4
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 4,
+        "p10": 0.9796,
+        "p50": 0.9854,
+        "p90": 0.9888,
+        "noise_p90": 0.0108,
+        "noise_n": 12,
+        "placements_per_caption": [
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.875,
+        "n": 32,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_title@4",
+          "caption": "c_title",
+          "delay_frames": 4,
+          "t": 0.1333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9882
+        },
+        {
+          "id": "c_title@12",
+          "caption": "c_title",
+          "delay_frames": 12,
+          "t": 0.4,
+          "ceiling_cached": true,
+          "iou_expected": 0.9882
+        },
+        {
+          "id": "c_title@21",
+          "caption": "c_title",
+          "delay_frames": 21,
+          "t": 0.7,
+          "ceiling_cached": true,
+          "iou_expected": 0.9882
+        },
+        {
+          "id": "c_title@30",
+          "caption": "c_title",
+          "delay_frames": 30,
+          "t": 1.0,
+          "ceiling_cached": true,
+          "iou_expected": 0.9882
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    },
+    "description": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "description",
+      "expected": "Noto Sans CJK KR Bold",
+      "expected_canonical": "Noto Sans CJK KR Bold",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_desc"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "color:#000000",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Bold",
+        "Pretendard Bold",
+        "Pretendard ExtraBold",
+        "NanumSquare ExtraBold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "similar",
+      "verdict_ko": "유사(동일 확정 불가)",
+      "reasons": [
+        "IoU 0.951 < 천장 p10 0.955",
+        "차순위 대비 차이 +0.057 > 잡음 0.046",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 4,
+      "n_captions": 1,
+      "iou_expected": 0.9511,
+      "iou_stats": {
+        "n": 4,
+        "p10": 0.9511,
+        "p50": 0.9511,
+        "p90": 0.9511
+      },
+      "margin": 0.0573,
+      "runner_up": "Pretendard Bold",
+      "top": "Noto Sans CJK KR Bold",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.9511,
+          "n": 4
+        },
+        {
+          "font": "Pretendard Bold",
+          "iou": 0.8938,
+          "n": 4
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.8656,
+          "n": 4
+        },
+        {
+          "font": "NanumSquare ExtraBold",
+          "iou": 0.8187,
+          "n": 4
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 4,
+        "p10": 0.9548,
+        "p50": 0.9594,
+        "p90": 0.9684,
+        "noise_p90": 0.0457,
+        "noise_n": 12,
+        "placements_per_caption": [
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.917,
+        "n": 48,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_desc@4",
+          "caption": "c_desc",
+          "delay_frames": 4,
+          "t": 0.3333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9511
+        },
+        {
+          "id": "c_desc@12",
+          "caption": "c_desc",
+          "delay_frames": 12,
+          "t": 0.6,
+          "ceiling_cached": true,
+          "iou_expected": 0.9511
+        },
+        {
+          "id": "c_desc@21",
+          "caption": "c_desc",
+          "delay_frames": 21,
+          "t": 0.9,
+          "ceiling_cached": true,
+          "iou_expected": 0.9511
+        },
+        {
+          "id": "c_desc@30",
+          "caption": "c_desc",
+          "delay_frames": 30,
+          "t": 1.2,
+          "ceiling_cached": true,
+          "iou_expected": 0.9511
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    },
+    "speaker": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "speaker",
+      "expected": "Noto Sans CJK KR Bold",
+      "expected_canonical": "Noto Sans CJK KR Bold",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_spk"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "color:#585858",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Bold",
+        "Pretendard Bold",
+        "Pretendard ExtraBold",
+        "NanumSquare ExtraBold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "identical",
+      "verdict_ko": "동일",
+      "reasons": [
+        "IoU 0.959 >= 천장 p10 0.951",
+        "차순위 대비 차이 +0.053 > 잡음 0.027",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 4,
+      "n_captions": 1,
+      "iou_expected": 0.9587,
+      "iou_stats": {
+        "n": 4,
+        "p10": 0.9565,
+        "p50": 0.9587,
+        "p90": 0.9587
+      },
+      "margin": 0.0532,
+      "runner_up": "Pretendard Bold",
+      "top": "Noto Sans CJK KR Bold",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.9587,
+          "n": 4
+        },
+        {
+          "font": "Pretendard Bold",
+          "iou": 0.9055,
+          "n": 4
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.8472,
+          "n": 4
+        },
+        {
+          "font": "NanumSquare ExtraBold",
+          "iou": 0.8283,
+          "n": 4
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 4,
+        "p10": 0.9513,
+        "p50": 0.9596,
+        "p90": 0.9758,
+        "noise_p90": 0.0272,
+        "noise_n": 12,
+        "placements_per_caption": [
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.812,
+        "n": 16,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_spk@4",
+          "caption": "c_spk",
+          "delay_frames": 4,
+          "t": 0.6,
+          "ceiling_cached": true,
+          "iou_expected": 0.9587
+        },
+        {
+          "id": "c_spk@12",
+          "caption": "c_spk",
+          "delay_frames": 12,
+          "t": 0.8667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9587
+        },
+        {
+          "id": "c_spk@21",
+          "caption": "c_spk",
+          "delay_frames": 21,
+          "t": 1.1667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9587
+        },
+        {
+          "id": "c_spk@30",
+          "caption": "c_spk",
+          "delay_frames": 30,
+          "t": 1.4667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9556
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    },
+    "situation": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "situation",
+      "expected": "Noto Sans CJK KR Black",
+      "expected_canonical": "Noto Sans CJK KR Black",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_sit1",
+        "c_sit2",
+        "c_sit3",
+        "c_sit4"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "color:#000000",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Black",
+        "Pretendard Black",
+        "Pretendard ExtraBold",
+        "Noto Sans CJK KR Bold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "identical",
+      "verdict_ko": "동일",
+      "reasons": [
+        "IoU 0.969 >= 천장 p10 0.968",
+        "차순위 대비 차이 +0.057 > 잡음 0.020",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 16,
+      "n_captions": 4,
+      "iou_expected": 0.9694,
+      "iou_stats": {
+        "n": 16,
+        "p10": 0.9621,
+        "p50": 0.9694,
+        "p90": 0.9729
+      },
+      "margin": 0.0575,
+      "runner_up": "Pretendard Black",
+      "top": "Noto Sans CJK KR Black",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Black",
+          "iou": 0.9694,
+          "n": 16
+        },
+        {
+          "font": "Pretendard Black",
+          "iou": 0.912,
+          "n": 16
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.9014,
+          "n": 16
+        },
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.8506,
+          "n": 16
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 16,
+        "p10": 0.9682,
+        "p50": 0.9718,
+        "p90": 0.9747,
+        "noise_p90": 0.0199,
+        "noise_n": 48,
+        "placements_per_caption": [
+          12,
+          12,
+          12,
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.838,
+        "n": 148,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_sit1@4",
+          "caption": "c_sit1",
+          "delay_frames": 4,
+          "t": 1.5667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9729
+        },
+        {
+          "id": "c_sit1@12",
+          "caption": "c_sit1",
+          "delay_frames": 12,
+          "t": 1.8333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9729
+        },
+        {
+          "id": "c_sit1@21",
+          "caption": "c_sit1",
+          "delay_frames": 21,
+          "t": 2.1333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9729
+        },
+        {
+          "id": "c_sit1@30",
+          "caption": "c_sit1",
+          "delay_frames": 30,
+          "t": 2.4333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9729
+        },
+        {
+          "id": "c_sit2@4",
+          "caption": "c_sit2",
+          "delay_frames": 4,
+          "t": 4.3667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9701
+        },
+        {
+          "id": "c_sit2@12",
+          "caption": "c_sit2",
+          "delay_frames": 12,
+          "t": 4.6333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9701
+        },
+        {
+          "id": "c_sit2@21",
+          "caption": "c_sit2",
+          "delay_frames": 21,
+          "t": 4.9333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9701
+        },
+        {
+          "id": "c_sit2@30",
+          "caption": "c_sit2",
+          "delay_frames": 30,
+          "t": 5.2333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9701
+        },
+        {
+          "id": "c_sit3@4",
+          "caption": "c_sit3",
+          "delay_frames": 4,
+          "t": 7.9667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9634
+        },
+        {
+          "id": "c_sit3@12",
+          "caption": "c_sit3",
+          "delay_frames": 12,
+          "t": 8.2333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9634
+        },
+        {
+          "id": "c_sit3@21",
+          "caption": "c_sit3",
+          "delay_frames": 21,
+          "t": 8.5333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9608
+        },
+        {
+          "id": "c_sit3@30",
+          "caption": "c_sit3",
+          "delay_frames": 30,
+          "t": 8.8333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9608
+        },
+        {
+          "id": "c_sit4@4",
+          "caption": "c_sit4",
+          "delay_frames": 4,
+          "t": 15.3667,
+          "ceiling_cached": true,
+          "iou_expected": 0.9687
+        },
+        {
+          "id": "c_sit4@12",
+          "caption": "c_sit4",
+          "delay_frames": 12,
+          "t": 15.6333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9687
+        },
+        {
+          "id": "c_sit4@21",
+          "caption": "c_sit4",
+          "delay_frames": 21,
+          "t": 15.9333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9687
+        },
+        {
+          "id": "c_sit4@30",
+          "caption": "c_sit4",
+          "delay_frames": 30,
+          "t": 16.2333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9687
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    },
+    "dialogue": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "dialogue",
+      "expected": "Noto Sans CJK KR Black",
+      "expected_canonical": "Noto Sans CJK KR Black",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_dlg"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "color:#000000",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Black",
+        "Pretendard Black",
+        "Pretendard ExtraBold",
+        "Noto Sans CJK KR Bold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "identical",
+      "verdict_ko": "동일",
+      "reasons": [
+        "IoU 0.962 >= 천장 p10 0.961",
+        "차순위 대비 차이 +0.132 > 잡음 0.020",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 4,
+      "n_captions": 1,
+      "iou_expected": 0.9622,
+      "iou_stats": {
+        "n": 4,
+        "p10": 0.9622,
+        "p50": 0.9622,
+        "p90": 0.9622
+      },
+      "margin": 0.1321,
+      "runner_up": "Noto Sans CJK KR Bold",
+      "top": "Noto Sans CJK KR Black",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Black",
+          "iou": 0.9622,
+          "n": 4
+        },
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.8301,
+          "n": 4
+        },
+        {
+          "font": "Pretendard Black",
+          "iou": 0.7556,
+          "n": 4
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.7517,
+          "n": 4
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 4,
+        "p10": 0.9614,
+        "p50": 0.9699,
+        "p90": 0.975,
+        "noise_p90": 0.0204,
+        "noise_n": 12,
+        "placements_per_caption": [
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.727,
+        "n": 44,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_dlg@4",
+          "caption": "c_dlg",
+          "delay_frames": 4,
+          "t": 10.2333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9622
+        },
+        {
+          "id": "c_dlg@12",
+          "caption": "c_dlg",
+          "delay_frames": 12,
+          "t": 10.5,
+          "ceiling_cached": true,
+          "iou_expected": 0.9622
+        },
+        {
+          "id": "c_dlg@21",
+          "caption": "c_dlg",
+          "delay_frames": 21,
+          "t": 10.8,
+          "ceiling_cached": true,
+          "iou_expected": 0.9622
+        },
+        {
+          "id": "c_dlg@30",
+          "caption": "c_dlg",
+          "delay_frames": 30,
+          "t": 11.1,
+          "ceiling_cached": true,
+          "iou_expected": 0.9622
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    },
+    "reaction": {
+      "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
+      "role": "reaction",
+      "expected": "Noto Sans CJK KR Black",
+      "expected_canonical": "Noto Sans CJK KR Black",
+      "delays_frames": [
+        4,
+        12,
+        21,
+        30
+      ],
+      "captions": [
+        "c_rx"
+      ],
+      "conditions": {
+        "canvas": [
+          1080,
+          1920
+        ],
+        "ref_resolution": [
+          1080,
+          1920
+        ],
+        "codec": "h264",
+        "crf": 18.0,
+        "bitrate_kbps": null,
+        "qp": null,
+        "x264_preset": "veryfast",
+        "gop": 60,
+        "frames_per_sample": 42,
+        "fps": 30.0,
+        "background": "video",
+        "scale_flags": "bicubic",
+        "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+        "assumed": false,
+        "source": "output MP4 x264 SEI",
+        "label": "h264_crf18_1080x1920"
+      },
+      "candidates": [
+        "Noto Sans CJK KR Black",
+        "Pretendard Black",
+        "Pretendard ExtraBold",
+        "Noto Sans CJK KR Bold"
+      ],
+      "missing_candidates": [],
+      "failed_crops": [],
+      "status": "measured",
+      "verdict": "identical",
+      "verdict_ko": "동일",
+      "reasons": [
+        "IoU 0.981 >= 천장 p10 0.972",
+        "차순위 대비 차이 +0.084 > 잡음 0.015",
+        "글자별 검사 통과"
+      ],
+      "n_crops": 4,
+      "n_captions": 1,
+      "iou_expected": 0.981,
+      "iou_stats": {
+        "n": 4,
+        "p10": 0.9796,
+        "p50": 0.981,
+        "p90": 0.9812
+      },
+      "margin": 0.0843,
+      "runner_up": "Pretendard Black",
+      "top": "Noto Sans CJK KR Black",
+      "ranked": [
+        {
+          "font": "Noto Sans CJK KR Black",
+          "iou": 0.981,
+          "n": 4
+        },
+        {
+          "font": "Pretendard Black",
+          "iou": 0.8967,
+          "n": 4
+        },
+        {
+          "font": "Pretendard ExtraBold",
+          "iou": 0.8729,
+          "n": 4
+        },
+        {
+          "font": "Noto Sans CJK KR Bold",
+          "iou": 0.8596,
+          "n": 4
+        }
+      ],
+      "ceiling": {
+        "method": "중앙값 부트스트랩 4000회(자막마다 같은 문구·크기·배경의 천장 배치 1개를 뽑아 그 자막 crop 과 같은 지연에서 읽음)",
+        "n_crops": 4,
+        "p10": 0.9716,
+        "p50": 0.9771,
+        "p90": 0.982,
+        "noise_p90": 0.0152,
+        "noise_n": 12,
+        "placements_per_caption": [
+          12
+        ],
+        "unit": "자막 1개 = 배치 1개(여러 지연 프레임은 같은 배치)"
+      },
+      "glyph": {
+        "share_ge_own_p10": 0.75,
+        "n": 16,
+        "pass": true,
+        "below_fence": []
+      },
+      "crops": [
+        {
+          "id": "c_rx@4",
+          "caption": "c_rx",
+          "delay_frames": 4,
+          "t": 15.3333,
+          "ceiling_cached": true,
+          "iou_expected": 0.9791
+        },
+        {
+          "id": "c_rx@12",
+          "caption": "c_rx",
+          "delay_frames": 12,
+          "t": 15.6,
+          "ceiling_cached": true,
+          "iou_expected": 0.9812
+        },
+        {
+          "id": "c_rx@21",
+          "caption": "c_rx",
+          "delay_frames": 21,
+          "t": 15.9,
+          "ceiling_cached": true,
+          "iou_expected": 0.9812
+        },
+        {
+          "id": "c_rx@30",
+          "caption": "c_rx",
+          "delay_frames": 30,
+          "t": 16.2,
+          "ceiling_cached": true,
+          "iou_expected": 0.9808
+        }
+      ],
+      "other_font": null,
+      "captions_without_crops": []
+    }
+  },
   "identity": {
     "forbidden_terms": [
       "조슈아매거진",

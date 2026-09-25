@@ -14,6 +14,7 @@ screen; see ``src_to_region``.
 """
 from __future__ import annotations
 
+import dataclasses
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -549,8 +550,34 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
             grounding=c.get("grounding"), line_spacing=float(st["line_spacing"]), shadow_color=st["shadow_color"],
             weight=int(font.face.weight), lines_pos=[(round(lb.center[0], 3), round(lb.center[1], 3))
                                                      for lb in lay.lines]))
+    select_libass_names(ctx)
     place_boxes(ctx, caps, canvas)
     return caps
+
+
+def select_libass_names(ctx: ResolveContext) -> None:
+    """Fix the name each caption style gives libass by asking libass itself (``captions.probe_ass_names``
+    with the same font files build/fonts will hold): PostScript name for CFF faces, Windows full name
+    for TrueType faces, another name of the SAME face only if libass proves it.  A face libass does not
+    select under any of its names is an error -- never a fallback."""
+    if not ctx.fonts:
+        return
+    try:
+        probe = cap_mod.probe_ass_names([f.face for f in ctx.fonts.values()])
+    except Exception as e:
+        for role in ctx.fonts:
+            ctx.issues.append(issue("error", "font_libass_probe", f"{role}: libass 글꼴 이름 확인 실패: "
+                                    f"{type(e).__name__}: {str(e)[:300]}", f"text.roles.{role}.font_name"))
+        return
+    for role, f in list(ctx.fonts.items()):
+        r = probe.get((str(f.face.path), int(f.face.index))) or {"name": None, "tried": []}
+        if r["name"] is None:
+            tried = ", ".join(f"{t['name']}→{'/'.join(t['selected']) or '없음'}" for t in r["tried"]) or "후보 이름 없음"
+            ctx.issues.append(issue("error", "font_libass_unmatched",
+                                    f"{role}: libass 가 글꼴 '{f.name}' 을 어떤 이름으로도 정확히 고르지 않습니다"
+                                    f"(대체 글꼴 사용 금지; 시도: {tried})", f"text.roles.{role}.font_name"))
+            continue
+        ctx.fonts[role] = dataclasses.replace(f, libass_name=r["name"])
 
 
 def place_boxes(ctx: ResolveContext, caps: list[CaptionBox], canvas: dict) -> None:
@@ -677,8 +704,15 @@ def resolve(plan: dict, preset: config.Preset) -> ResolvedEdit:
 
 
 def link_fonts(ctx: ResolveContext, build: Path) -> None:
+    """build/fonts = exactly the resolved caption faces' files (libass loads every font in the directory,
+    so stale files from an earlier resolve are removed: the render then sees the set the libass name
+    probe saw)."""
     fdir = build / "fonts"
     fdir.mkdir(parents=True, exist_ok=True)
+    want = {Path(f.face.path).name for f in ctx.fonts.values()}
+    for old in fdir.iterdir():
+        if old.name not in want and (old.is_symlink() or old.is_file()):
+            old.unlink()
     for f in ctx.fonts.values():
         src = Path(f.face.path)
         dst = fdir / src.name
@@ -705,6 +739,8 @@ def layout_record(ctx: ResolveContext) -> dict:
         f = ctx.fonts[c.role]
         caps[c.id] = {
             "role": c.role, "font": {"name": st["font_name"], "file_name": Path(f.face.path).name, "face_index": f.face.index,
+                                     "postscript": f.face.postscript, "outlines": "cff" if f.face.cff else "truetype",
+                                     "ass_name": f.ass_name, "ass_bold": cap_mod.ass_bold_flag(f.face.weight),
                                      "weight": f.face.weight, "resolved_by": f.how, "units_per_em": f.face.units_per_em,
                                      "win_ascent": f.face.win_ascent, "win_descent": f.face.win_descent},
             "ass_fontsize": round(lay.ass_fontsize, 3), "line_spacing": st["line_spacing"],

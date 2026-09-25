@@ -347,8 +347,73 @@ def quote_marks_item(videos: dict[str, dict], blocker: str) -> dict:
 
 
 # ============================================================================= tone
+# 음슴체 = a predicate nominalised with -(으)ㅁ (했음, 들킴, 발견됨, 당황함, 실화임).  The same -ㅁ also ends
+# ordinary nouns -- many of them lexicalised nominalisations (모음 'collection', 싸움, 웃음, 느낌, 모임) or
+# Sino-Korean nouns (긴장감, 관심, 작품, 책임) -- and a noun phrase is register-NEUTRAL.  A wrong 음슴체 shifts
+# the measured register of the reference (and what validate / QA enforce); a missed one only drops a sample,
+# so an ambiguous word is classified 명사형/기타.  A word equal to, or ending in, one of these nouns is a noun.
+_M_NOUNS = frozenset("""
+모음 마음 처음 다음 소음 싸움 도움 배움 어려움 웃음 울음 걸음 믿음 얼음 죽음 젊음 묶음 볶음 졸음 물음 잡음 녹음 발음
+복음 굉음 방음 폭음 그림 느낌 기쁨 슬픔 아픔 외침 떨림 울림 흐름 소름 다짐 만남 어둠 오줌 아침 기침 점심
+사람 이름 요즘 지금 조금 소금 가슴 여름 구름 기름 보름 바람 알람 새봄 올봄 늦봄
+아이템 시스템 프로그램 크림 드림 볼륨 앨범 게임 모임 움직임 타임 라임
+고함 포함 결함 전함 군함 잠수함 책임 담임 신임 후임 전임 선임 주임 취임 사임 부임 해임 방임
+체험 시험 실험 경험 모험 보험 위험 관심 진심 욕심 결심 중심 조심 양심 의심 호기심 작품 제품 상품 명품 농담 상담
+장점 단점 약점 강점 요점 시점 지점 관점 초점 만점 정점 허점 결점 문제점 공통점 차이점
+공감 호감 반감 쾌감 영감 예감 실감 직감 식감 촉감 질감 색감 동감 유감 긴장감 존재감 자신감 책임감 만족감 안도감
+배신감 위기감 불안감 기대감 거리감 속도감 무게감 현장감 소속감 박탈감 죄책감 열등감 우월감 해방감 친근감 이질감
+입체감 몰입감 성취감 절망감 좌절감 허탈감 상실감 압박감 부담감
+""".split())
+# 2+-syllable Sino-Korean nouns ending in 의 (not the genitive particle -의)
+_UI_NOUNS = frozenset("거의 회의 주의 동의 합의 강의 논의 문의 정의 예의 의의 협의 건의 결의 제의 호의 편의 성의 고의 모의".split())
+_JONG_SS, _JONG_BS, _JONG_M = 20, 18, 16          # ㅆ, ㅄ, ㅁ final-consonant indices of a Hangul syllable
+
+
+def _jong(ch: str) -> int | None:
+    o = ord(ch) - 0xAC00
+    return o % 28 if 0 <= o < 11172 else None
+
+
+def _is_eumseum(w: str, prev: str | None = None) -> bool:
+    """Is the (Hangul-final) word ``w`` a predicate nominalised with -(으)ㅁ?  ``prev`` = the word before it.
+
+    0. not closed by ㅁ -> no; a known noun (``_M_NOUNS``: the word or its ending) -> no
+    1. ``됨`` (only ever 되- + ㅁ): 됨, 안됨, 발견됨 -> yes
+    2. ``함`` (하- + ㅁ): 함, 당황함, 도착함 -> yes
+    3. ``임`` after a noun (이- + ㅁ): 실화임, 레전드임, 보임 -> yes; a bare 임 -> no
+    4. ``음`` after a syllable closed by ㅆ/ㅄ (past / future / existence stem): 했음, 있음, 없음, 갔음, 겠음 -> yes
+    ---- below: the word could also be a noun; a genitive ``prev`` (X의 + word = noun phrase) -> no
+    5. ``음`` after any other closed syllable (consonant stem + 음): 좋음, 같음, 먹음, 괜찮음 -> yes
+    6. ``음`` right after an open syllable: a vowel stem takes -ㅁ, not -음, so this is a 으-stem nominal that reads
+       as a noun in practice (모음, 마음, 처음, 다음, 소음) -> no
+    7. the honorific suffix ``님`` (사장님, 선생님) -> no, except 아님 (아니- + ㅁ)
+    8. another syllable closed by ㅁ after an open verb stem (들키- 들킴, 모르- 모름, 사라지- 사라짐, 끝나- 끝남): yes
+       when the word has >= 2 syllables; a one-syllable word (감, 봄, 옴, 잠, 참, 꿈, 밤 ...) -> no
+    """
+    if not w or _jong(w[-1]) != _JONG_M:
+        return False
+    if any(w == n or w.endswith(n) for n in _M_NOUNS):
+        return False
+    last = w[-1]
+    if last in ("됨", "함"):
+        return True
+    if last == "임":
+        return len(w) >= 2
+    if last == "음" and len(w) >= 2 and _jong(w[-2]) in (_JONG_SS, _JONG_BS):
+        return True
+    if prev and len(prev) >= 2 and prev.endswith("의") and prev not in _UI_NOUNS:
+        return False                      # genitive: "고양이의 귀여움" is a noun phrase
+    if last == "음":
+        return len(w) >= 2 and bool(_jong(w[-2]))         # rules 5 / 6
+    if last == "님":
+        return w.endswith("아님")
+    return len(w) >= 2                    # rule 8
+
+
 def ending_class(text: str) -> tuple[str, str] | None:
-    """(class, last word) of a caption line by its sentence ending."""
+    """(class, last word) of a caption line by its sentence ending.  Shared by the reference analyzer
+    (``tone_items``), ``shortkit.edit.validate.check_tone`` and QA (``shortkit.qa.probes_text.classify_register``);
+    음슴체 rules: ``_is_eumseum``."""
     t = re.sub(r"[\s\"'“”‘’「」『』.,!?~…·ㅋㅎ\U0001F300-\U0001FAFF]+$", "", (text or "").strip())
     if not t:
         return None
@@ -359,10 +424,11 @@ def ending_class(text: str) -> tuple[str, str] | None:
         return "합쇼체", w
     if re.search(r"(요|죠)$", w):
         return "해요체", w
-    last = w[-1]
-    jong = (ord(last) - 0xAC00) % 28
-    if jong == 16 and len(w) >= 2 and not re.search(r"(사람|마음|처음|다음|이름|요즘|지금|아이템)$", w):
-        return "음슴체", w          # -(으)ㅁ nominal ending: 있음, 했음, 없음
+    words = t.split()
+    if _is_eumseum(w, words[-2] if len(words) >= 2 else None):
+        return "음슴체", w          # -(으)ㅁ nominalised predicate: 있음, 했음, 들킴, 발견됨, 당황함, 실화임
+    if _jong(w[-1]) == _JONG_M:
+        return "명사형/기타", w      # ㅁ-final noun (모음, 사람, 게임 ...): register-neutral
     if re.search(r"(다|냐|니|야|어|아|지|네|자|래|걸|군|나|까|게|대|더라|거든|잖아)$", w):
         return "반말", w
     return "명사형/기타", w

@@ -16,6 +16,14 @@ cannot drift):
              fallback: build/stems vs render.pre_norm_stems(r)
   mono audio files: melt 7.22 upmixes mono to stereo at -3.01 dB per channel (measured), the master
              (shortkit.util.media.read_audio) at unity -> +3.01 dB compensation filter on mono files
+  BGM loop:  bgm.loop with music shorter than the episode -> the master's own ``render.loop_fill``
+             (copies of the music from section_start, equal-power cos/sin crossfade of
+             audio.bgm.loop_xfade_s at every loop point) pre-rendered to media/bgm_loop_*.wav: the loop
+             points are not on the frame grid, so playlist clips could not place them sample-exactly;
+             gain / fades / ducking envelope stay editable volume filters on that clip
+  start ramp: the master's 1024-sample (AAC frame) fade-in against the encoder's abrupt-start overshoot
+             (build/fg_gain.json start_ramp_samples) -> tractor ``avfilter.afade`` (linear, in samples;
+             melt's volume keyframes cannot ramp inside frame 0)
   captions + decorations: the ONE ASS file drawn over everything by libass
 
 Track layout (tractor, bottom -> top)::
@@ -25,10 +33,12 @@ Track layout (tractor, bottom -> top)::
     V2 영상            one producer per clip piece (crop -> delogo -> affine -> qtcrop); crossfades
                        are Shotcut transition tractors (luma + mix)
     V3 플래시          colour producers with keyframed opacity (only if a flash exists)
-    A1 BGM             clean music file (tempo pre-render if tempo_ratio != 1), volume keyframes
+    A1 BGM             clean music file (tempo pre-render if tempo_ratio != 1, loop pre-render if the
+                       master looped it), volume keyframes
     A2.. 효과음        one clip per SFX at t (extra tracks only when SFX overlap)
     A3.. 원본 소리      kept original audio / vocals stem with gain + fades
-    tractor filters    avfilter.subtitles (captions.ass next to the project), volume (loudness gain)
+    tractor filters    avfilter.subtitles (captions.ass next to the project), volume (loudness gain),
+                       [alimiter], [avfilter.afade start ramp]
 
 MLT facts this module relies on (checked with melt 7.22 on the build machine, see
 tests/export): filter keyframes are relative to the filter's ``in`` which must equal the playlist
@@ -506,6 +516,31 @@ class Media:
             "method": method, "source": src_rel,
             "why": f"BGM 속도 {ratio:g}배: 원곡 대비 속도 변경을 마스터와 같은 방법(render.tempo_stretch)으로 미리 렌더"})
         return paths.relp(out)
+
+    def loop_bgm(self, src_rel: str, offset: float, n: int, nx: int, sr: int) -> tuple[str, dict]:
+        """The master's looped BGM (``render.pre_norm_stems``: ``read_audio`` stereo from ``offset`` for the
+        episode length, then ``render.loop_fill(seg, n, nx)``) BEFORE gain / fades / envelope, as a wav:
+        every loop start and equal-power crossfade lands on the master's exact sample."""
+        from ..util.media import read_audio, write_wav
+        from .render import loop_fill
+
+        x = read_audio(paths.absp(src_rel), sr=sr, mono=False, start=offset, duration=n / sr)
+        y, starts = loop_fill(x, n, nx)
+        key = sha256_text(repr((src_rel, round(offset, 9), n, nx, sr, len(x), "loop_fill/equal-power")))[:12]
+        self.media_dir.mkdir(parents=True, exist_ok=True)
+        out = self.media_dir / f"bgm_loop_{key}.wav"
+        if not out.is_file():
+            write_wav(out, y, sr)
+        info = {"segment_s": round(len(x) / sr, 4), "segment_samples": len(x), "xfade_samples": nx,
+                "repeats": len(starts), "loop_starts_out_s": [round(v / sr, 4) for v in starts],
+                "loop_start_samples": starts}
+        self._record({
+            "kind": "bgm_loop", "file": Path(os.path.relpath(out, self.out_dir)).as_posix(), "source": src_rel,
+            "section_offset_s": round(offset, 6), **{k: v for k, v in info.items() if k != "loop_start_samples"},
+            "law": "equal-power (cos/sin, render.loop_fill)",
+            "why": "BGM 반복: 원곡의 section_start 부터 파일 끝까지를 마스터와 같은 함수(render.loop_fill)로 이어 붙임. "
+                   "반복 지점이 프레임 격자 위에 있지 않아 클립 여러 개로는 샘플 단위로 맞출 수 없어 미리 렌더"})
+        return paths.relp(out), info
 
     def tempo_original(self, o, sr: int) -> str:
         """Speed-changed kept original, made with the master's exact steps (render.pre_norm_stems):
@@ -993,6 +1028,9 @@ class MltBuilder:
         if abs(b.tempo_ratio - 1.0) > 1e-9:
             src = self.media.tempo_bgm(b.path, b.tempo_ratio, self.r.audio.sample_rate)
             offset = b.section_start_s / b.tempo_ratio
+        loop = self._bgm_loop(src, offset) if b.loop else None
+        if loop is not None:
+            src, offset = loop["file_root_rel"], 0.0
         length = self.src_length(src)
         e_in = int(round(offset * self.fps))
         n = self.N
@@ -1000,7 +1038,8 @@ class MltBuilder:
             n = max(1, length - e_in)
             self.dec["warnings"].append(f"BGM 파일이 짧아 {n}프레임만 배치(마스터는 남은 부분 무음)")
         e_out = e_in + n - 1
-        pid = self._audio_producer(src, f"BGM {Path(b.path).name}", max(length, e_out + 1), False)
+        pid = self._audio_producer(src, f"BGM {Path(b.path).name}" + (" (반복)" if loop else ""),
+                                   max(length, e_out + 1), False)
         p = self.root.find(f"producer[@id='{pid}']")
         from .audio import envelope_db_at
 
@@ -1011,6 +1050,8 @@ class MltBuilder:
         self._gain_filters(p, e_in, e_out, b.gain_db, b.fade_in_s, min(b.fade_out_s, self.r.duration), env_fn,
                            mono_comp=mono)
         pl = self.playlist("A1 BGM", "audio")
+        if loop is not None:
+            self.prop(p, "shortkit:loop_starts_s", ",".join(f"{v:.4f}" for v in loop["loop_starts_out_s"]))
         self._entry(pl, pid, e_in, e_out)
         self.track_names.append({"track": "A1 BGM", "kind": "audio", "items": 1})
         self.dec["audio"]["bgm"] = {
@@ -1018,7 +1059,47 @@ class MltBuilder:
             "entry_in_frame": e_in, "quantization_s": round(abs(e_in / self.fps - offset), 4),
             "gain_db": b.gain_db, "fade_in_s": b.fade_in_s, "fade_out_s": b.fade_out_s,
             "envelope_points": len(b.envelope), "duck_ranges": b.duck_ranges, "silences": b.silences,
-            "note": "시작점은 프레임(1/fps) 단위로 맞춰짐; 덕킹/정적 envelope 는 volume level 키프레임"}
+            "loop": self.dec["audio"].get("bgm_loop", {"status": "없음" if not b.loop else "필요 없음"}),
+            "note": ("반복 BGM 은 section_start 부터 샘플 단위로 미리 렌더된 파일(시작 양자화 없음)" if loop else
+                     "시작점은 프레임(1/fps) 단위로 맞춰짐") + "; 덕킹/정적 envelope 는 volume level 키프레임"}
+
+    def _bgm_loop(self, src: str, offset: float) -> dict | None:
+        """The master's BGM loop for this IR, or None when the music covers the episode.  The crossfade
+        length is the master's (render_report.json audio.bgm.loop_applied.xfade_s, same render as the
+        stems); without a render report it is read through the preset (``render.bgm_loop_xfade``: the
+        rule key audio.bgm.loop_xfade_s, never a default)."""
+        from ..util.media import read_audio
+        from .render import RenderError, bgm_loop_xfade
+
+        sr = int(self.r.audio.sample_rate)
+        n = int(round(self.r.duration * sr))
+        seg = len(read_audio(paths.absp(src), sr=sr, mono=False, start=offset, duration=n / sr))
+        if seg >= n:
+            self.dec["audio"]["bgm_loop"] = {"status": "필요 없음", "why": "음원이 영상 길이보다 길어 반복하지 않음(마스터와 같음)"}
+            return None
+        rep_loop = ((((load_render_report(self.r) or {}).get("audio") or {}).get("bgm") or {}).get("loop_applied")
+                    or None)
+        if rep_loop and rep_loop.get("xfade_s") is not None:
+            xf, source = float(rep_loop["xfade_s"]), f"episodes/{self.r.episode_id}/build/render_report.json"
+        else:
+            try:
+                xf, source = bgm_loop_xfade(self.r, None), "preset audio.bgm.loop_xfade_s"
+            except RenderError as e:
+                self.dec["audio"]["bgm_loop"] = {"status": "못 잼", "why": str(e)}
+                self.dec["warnings"].append("BGM 반복 크로스페이드 길이를 읽지 못해 반복하지 않음(마스터 렌더도 거부됨): " + str(e)[:160])
+                return None
+        rel, info = self.media.loop_bgm(src, offset, n, int(round(xf * sr)), sr)
+        d = {"status": "있음", "source": source, "xfade_s": xf, "file": self.rel(rel),
+             **{k: v for k, v in info.items() if k != "loop_start_samples"}, "law": "equal-power cos/sin (render.loop_fill)"}
+        if rep_loop and rep_loop.get("loop_starts_out_s") is not None:
+            ms = [float(v) for v in rep_loop["loop_starts_out_s"]]
+            ok = len(ms) == len(info["loop_starts_out_s"]) and all(
+                abs(a - b) <= 1.5e-4 for a, b in zip(ms, info["loop_starts_out_s"]))
+            d["matches_master_loop_starts"] = ok
+            if not ok:
+                self.dec["warnings"].append(f"BGM 반복 지점이 마스터 기록과 다름: 마스터 {ms} / MLT {info['loop_starts_out_s']}")
+        self.dec["audio"]["bgm_loop"] = d
+        return {**d, "file_root_rel": rel}
 
     def _lanes(self, items: list[tuple[int, int, object]]) -> list[list[tuple[int, int, object]]]:
         lanes: list[list] = []
@@ -1111,7 +1192,8 @@ class MltBuilder:
                                           "stems": sorted({o.stem for _, _, o in items})}
 
     # ---------------------------------------------------------------- tractor
-    def tractor(self, caption_file: str | None, gain_db: float | None, limiter_db: float | None = None) -> None:
+    def tractor(self, caption_file: str | None, gain_db: float | None, limiter_db: float | None = None,
+                start_ramp_samples: int = 0) -> None:
         tr = ET.SubElement(self.root, "tractor", {"id": "tractor0", "title": f"shortkit {self.r.episode_id}",
                                                    "in": "0", "out": str(self.N - 1)})
         self.prop(tr, "shotcut", 1)
@@ -1154,6 +1236,15 @@ class MltBuilder:
                          ("av.attack", 5), ("av.release", 50), ("av.level", 0), ("av.level_in", 1),
                          ("av.level_out", 1),
                          ("shortkit:role", "peak limiter standing in for the master's true-peak limiter")):
+                self.prop(f, k, v)
+        if start_ramp_samples > 0:
+            # after every gain stage, like the master (ramp applied to the normalised, limited mix);
+            # 'tri' = linear gain i / nb_samples for sample i = numpy linspace(0, 1, nb, endpoint=False)
+            f = ET.SubElement(tr, "filter", {"id": self.uid("filter")})
+            for k, v in (("mlt_service", "avfilter.afade"), ("av.type", "in"), ("av.start_sample", 0),
+                         ("av.nb_samples", int(start_ramp_samples)), ("av.curve", "tri"),
+                         ("shortkit:role", f"master start ramp: {int(start_ramp_samples)} samples linear fade-in "
+                                           "(AAC abrupt-start overshoot guard, render.mix_audio)")):
                 self.prop(f, k, v)
 
     def tostring(self) -> str:
@@ -1308,6 +1399,33 @@ def fg_gain_db_at_frame_start(k: list[float] | None, n: int) -> float:
     return db((a + b) / 2)
 
 
+def master_start_ramp(r: ResolvedEdit, decisions: dict) -> int:
+    """Samples of the master's start ramp (render.mix_audio: linear 0 -> 1 fade-in over one AAC frame when
+    the trial AAC encode overshoots inside the first frame): build/fg_gain.json ``start_ramp_samples``
+    (same run as the stems), else render_report.json ``audio.start_ramp_samples``.  A render made before
+    the ramp existed records neither and had none (0)."""
+    rep_audio = ((load_render_report(r) or {}).get("audio") or {})
+    fg, bad = _fg_gain_file(r, rep_audio)
+    sr = int(r.audio.sample_rate)
+    if fg is not None and not bad and fg.get("start_ramp_samples") is not None:
+        n, src = int(fg["start_ramp_samples"] or 0), fg_gain_path(r)
+    elif rep_audio.get("start_ramp_samples") is not None:
+        n, src = int(rep_audio["start_ramp_samples"] or 0), f"episodes/{r.episode_id}/build/render_report.json"
+    elif rep_audio.get("encoded_true_peak") is not None:
+        n, src = 0, f"episodes/{r.episode_id}/build/render_report.json (encoded_true_peak: 램프 없이 목표 이하)"
+    else:
+        decisions["start_ramp"] = {"status": "없음", "samples": 0,
+                                   "why": "마스터 기록에 시작 램프가 없음(시작 램프 도입 전 렌더이거나 렌더 보고서 없음)"}
+        return 0
+    decisions["start_ramp"] = ({"status": "있음", "samples": n, "duration_s": round(n / sr, 6), "source": src,
+                                "service": "avfilter.afade type=in start_sample=0 nb_samples=N curve=tri (선형)",
+                                "why": "AAC 인코더가 첫 프레임의 급한 시작에서 true peak 를 넘기는 것을 막으려고 마스터가 "
+                                       "전체 믹스 앞 N 샘플을 0→1 선형으로 올림 — volume 키프레임은 프레임 0 안에서 "
+                                       "변할 수 없어 afade(샘플 단위)로 같은 곡선을 씀"}
+                               if n > 0 else {"status": "없음", "samples": 0, "source": src})
+    return n
+
+
 def loudness_gain(r: ResolvedEdit, project_file: Path, decisions: dict, compute: bool = True) -> float | None:
     """Master normalization gain: render_report.json if present, else melt pre-pass (no gain)."""
     rep = load_render_report(r)
@@ -1408,7 +1526,8 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path, *, compute_loud
     gain = loudness_gain(r, out, dec, compute=compute_loudness)
     b.root.remove(b.root.find("tractor[@id='tractor0']"))
     lim = dec.get("limiter")
-    b.tractor(caps["ass"], gain, lim["ceiling_dbfs"] if lim else None)
+    ramp = master_start_ramp(r, dec)
+    b.tractor(caps["ass"], gain, lim["ceiling_dbfs"] if lim else None, ramp)
     out.write_text(b.tostring(), encoding="utf-8")
     dec["editable"] = [
         "클립 순서·길이·트림(V2 영상 트랙의 각 조각)", "클립별 위치/크기/줌(Size, Position & Rotate = affine 키프레임)",
@@ -1423,6 +1542,10 @@ def export_with_decisions(resolved: ResolvedEdit, out_dir: Path, *, compute_loud
         "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)",
         *(["BGM 속도 변경은 미리 렌더된 wav(media/bgm_tempo_*.wav)"] if r.audio.bgm and r.audio.bgm.path
           and abs(r.audio.bgm.tempo_ratio - 1) > 1e-9 else []),
+        *(["BGM 반복(section_start 부터 이어 붙인 반복과 반복 지점의 등전력 크로스페이드)은 미리 렌더된 wav"
+           "(media/bgm_loop_*.wav) — 반복 지점을 바꾸려면 다시 내보내야 함"]
+          if (dec["audio"].get("bgm_loop") or {}).get("status") == "있음" else []),
+        *([f"시작 램프(앞 {ramp} 샘플 선형 페이드인)는 타임라인의 avfilter.afade 필터"] if ramp else []),
         *(["영역 흐림(blur)은 미리 렌더된 중간 영상(media/*_blur_*.mp4)"] if any(c.blur for c in r.clips) else [])]
     merge_decisions(out_dir, "mlt", dec)
     return out, dec

@@ -1743,7 +1743,9 @@
             "moving_frac": 0.08,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9795,
+            "overlay_masked_frac": 0.026
           },
           {
             "t": 2.0,
@@ -1756,7 +1758,9 @@
             "moving_frac": 0.149,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9845,
+            "overlay_masked_frac": 0.026
           },
           {
             "t": 3.16,
@@ -1769,7 +1773,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9846,
+            "overlay_masked_frac": 0.026
           }
         ],
         "src_fps": 30.0,
@@ -1799,7 +1805,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.978,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 5.417,
@@ -1812,7 +1820,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9785,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 6.227,
@@ -1825,7 +1835,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9791,
+            "overlay_masked_frac": 0.0
           }
         ],
         "src_fps": 30.0,
@@ -1855,7 +1867,9 @@
             "moving_frac": 0.085,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9807,
+            "overlay_masked_frac": 0.113
           },
           {
             "t": 10.185,
@@ -1868,7 +1882,9 @@
             "moving_frac": 0.094,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9789,
+            "overlay_masked_frac": 0.113
           },
           {
             "t": 11.684,
@@ -1881,7 +1897,9 @@
             "moving_frac": 0.093,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9803,
+            "overlay_masked_frac": 0.111
           }
         ],
         "src_fps": 30.0,
@@ -1911,7 +1929,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9981,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 16.125,
@@ -1924,7 +1944,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9976,
+            "overlay_masked_frac": 0.103
           },
           {
             "t": 17.96,
@@ -1937,7 +1959,9 @@
             "moving_frac": 0.052,
             "at_window_edge": false,
             "stage": 1,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9974,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 13.373,
@@ -1950,7 +1974,9 @@
             "moving_frac": 0.071,
             "at_window_edge": true,
             "stage": 2,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9975,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 13.678,
@@ -1963,7 +1989,9 @@
             "moving_frac": 0.136,
             "at_window_edge": false,
             "stage": 2,
-            "decisive": false
+            "decisive": false,
+            "ncc_planned": 0.9979,
+            "overlay_masked_frac": 0.0
           },
           {
             "t": 14.902,
@@ -1976,7 +2004,9 @@
             "moving_frac": 0.15,
             "at_window_edge": false,
             "stage": 2,
-            "decisive": true
+            "decisive": true,
+            "ncc_planned": 0.9978,
+            "overlay_masked_frac": 0.0
           }
         ],
         "src_fps": 12.0,

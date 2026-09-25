@@ -29,11 +29,115 @@ from .util.jsonio import now_iso
 BEGIN = "<!-- SHORTKIT-PAYLOAD-BEGIN (base64 tar.gz; do not read — restore with the command above) -->"
 END = "<!-- SHORTKIT-PAYLOAD-END -->"
 
-# Media and heavy/generated files never go into the bundle; they are re-created or fetched.
-EXCLUDE_SUFFIXES = {".mp4", ".mov", ".mkv", ".webm", ".wav", ".mp3", ".m4a", ".aac", ".flac", ".png", ".jpg", ".jpeg",
-                    ".npy", ".otf", ".ttf", ".ttc", ".woff", ".woff2", ".pyc"}
-EXCLUDE_PREFIXES = ("PRESET_BUNDLE.md", ".git/", "warehouse/sources/", "warehouse/cache/")
-MAX_FILE_BYTES = 400_000
+# ----------------------------------------------------------------------------- selection policy
+# Secrets / machine-local files: NEVER packed, whatever git says.
+HARD_EXCLUDE = ["local.yaml", "cookies/**", "*cookies*", ".venv/**", "venv/**", ".git/**", "**/__pycache__/**", "*.pyc",
+                "*.log", "PRESET_BUNDLE.md", ".pytest_cache/**"]
+# Media / regenerable / third-party footage: excluded BY PATH (re-created or fetched after restore).
+MEDIA_EXCLUDE = ["warehouse/sources/**", "warehouse/cache/**", "warehouse/overlays/*/**",
+                 "presets/*/reference/videos/**", "presets/*/analysis/*/stems/**", "presets/*/analysis/*/frames/**",
+                 "presets/*/analysis/*/review/**", "presets/*/analysis/*/lens/**", "presets/*/analysis/*/audio/sfx_fp/**",
+                 "episodes/*/build/**", "episodes/*/output/**", "episodes/*/project/media/**", "episodes/*/qa/frames/**",
+                 "episodes/*/qa/*.png", "assets/test/generated/**", "assets/fonts/*.ttf", "assets/fonts/*.otf",
+                 "assets/fonts/*.ttc", "assets/library/music/**", "assets/library/sfx/**", "docs/validation/mockloop/**", "docs/**/*.png"]
+# Always packed even when binary: small preset assets production needs (SFX catalog fingerprints, logo templates).
+ALWAYS_INCLUDE = ["presets/*/sfx_fp/*", "presets/*/reference/identity_templates/*",
+                  "assets/library/music/README.md", "assets/library/music/index.yaml", "assets/library/sfx/README.md"]
+BINARY_MAX_BYTES = 2_000_000
+TEXT_SUFFIXES = {".py", ".md", ".yaml", ".yml", ".json", ".jsonl", ".csv", ".txt", ".toml", ".sh", ".ps1", ".ass", ".srt",
+                 ".mlt", ".fcpxml", ".otio", ".root", ""}
+# Losing any of these would silently change the preset: the build fails instead.
+MUST_KEEP = ["presets/**", "warehouse/*.json", "warehouse/*.jsonl", "warehouse/*.yaml", "episodes/*/plan.yaml"]
+
+
+def _glob_re(pat: str) -> re.Pattern:
+    """gitignore-like glob -> regex (supports **, *, ?; a pattern without '/' matches any path component)."""
+    anchored = "/" in pat.rstrip("/")
+    p = pat.rstrip("/")
+    out, i = "", 0
+    while i < len(p):
+        c = p[i]
+        if p.startswith("**/", i):
+            out += "(?:.*/)?"
+            i += 3
+            continue
+        if p.startswith("**", i):
+            out += ".*"
+            i += 2
+            continue
+        out += "[^/]*" if c == "*" else "[^/]" if c == "?" else re.escape(c)
+        i += 1
+    if anchored:
+        return re.compile("^" + out.lstrip("/") + "(?:/.*)?$")
+    return re.compile("(?:^|.*/)" + out + "(?:/.*)?$")
+
+
+def _matches(path: str, patterns) -> bool:
+    return any(_glob_re(p).match(path) for p in patterns)
+
+
+def _gitignore_patterns(root: Path) -> list[tuple[bool, re.Pattern]]:
+    gi = root / ".gitignore"
+    pats = []
+    if gi.exists():
+        for line in gi.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            neg = line.startswith("!")
+            pats.append((neg, _glob_re(line[1:] if neg else line)))
+    return pats
+
+
+def _gitignored(path: str, pats) -> bool:
+    ignored = False
+    for neg, rx in pats:
+        if rx.match(path):
+            ignored = not neg
+    return ignored
+
+
+def _local_cookie_paths(root: Path) -> list[str]:
+    try:
+        import yaml
+
+        d = yaml.safe_load((root / "local.yaml").read_text(encoding="utf-8")) or {}
+    except Exception:
+        return []
+    ck = ((d.get("sourcing") or {}).get("cookies") or {}) if isinstance(d, dict) else {}
+    return [str(v).replace("\\", "/") for v in ck.values() if v]
+
+
+def select_files(root: Path) -> tuple[list[str], list[tuple[str, str]]]:
+    """(files to pack, [(skipped path, reason)]).  Uses git when available, else the project's .gitignore."""
+    try:
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-co", "--exclude-standard"], capture_output=True,
+                             text=True, check=True).stdout
+        files = [f for f in out.splitlines() if f]
+    except Exception:
+        pats = _gitignore_patterns(root)
+        files = [p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()]
+        files = [f for f in files if not _gitignored(f, pats)]
+    secrets = HARD_EXCLUDE + _local_cookie_paths(root)
+    keep, skipped = [], []
+    for f in sorted(set(files)):
+        p = root / f
+        if not p.is_file():
+            continue
+        if _matches(f, secrets):
+            skipped.append((f, "secret/machine-local"))
+            continue
+        always = _matches(f, ALWAYS_INCLUDE)
+        if not always and _matches(f, MEDIA_EXCLUDE):
+            skipped.append((f, "media/regenerable"))
+            continue
+        is_text = Path(f).suffix.lower() in TEXT_SUFFIXES
+        if not is_text and not always and p.stat().st_size > BINARY_MAX_BYTES:
+            skipped.append((f, f"binary > {BINARY_MAX_BYTES} bytes"))
+            continue
+        keep.append(f)
+    return keep, skipped
+
 
 RESTORE_SNIPPET = r'''python3 - "PRESET_BUNDLE.md" "shortkit-preset" <<'PY'
 import base64, hashlib, io, re, sys, tarfile, pathlib
@@ -48,35 +152,20 @@ assert got == want, f"sha256 mismatch {got} != {want}"
 dest.mkdir(parents=True, exist_ok=True)
 assert not any(dest.iterdir()), f"{dest} is not empty"
 with tarfile.open(fileobj=io.BytesIO(raw), mode="r:gz") as t:
-    for m in t.getmembers():
+    members = t.getmembers()
+    for m in members:
         assert not m.name.startswith(("/", "..")) and ".." not in pathlib.PurePosixPath(m.name).parts, m.name
     t.extractall(dest)
-print(f"restored {len(t.getmembers())} files into {dest} (sha256 ok)")
+print(f"restored {len(members)} files into {dest} (sha256 ok)")
 PY'''
 
 
-def _tracked_files(root: Path) -> list[str]:
-    try:
-        out = subprocess.run(["git", "-C", str(root), "ls-files", "-co", "--exclude-standard"], capture_output=True,
-                             text=True, check=True).stdout
-        files = [f for f in out.splitlines() if f]
-    except Exception:
-        files = [p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()]
-    keep = []
-    for f in sorted(set(files)):
-        p = root / f
-        if not p.is_file():
-            continue
-        if f.startswith(EXCLUDE_PREFIXES) or Path(f).suffix.lower() in EXCLUDE_SUFFIXES:
-            continue
-        if p.stat().st_size > MAX_FILE_BYTES:
-            continue
-        keep.append(f)
-    return keep
-
-
 def build_payload(root: Path) -> tuple[bytes, list[str]]:
-    files = _tracked_files(root)
+    files, skipped = select_files(root)
+    # media under presets/ (reference videos, stems, frames) is excluded on purpose; anything else lost is an error
+    lost = [(f, why) for f, why in skipped if why.startswith("binary") and _matches(f, MUST_KEEP)]
+    if lost:
+        raise ValueError("preset files would be dropped from the bundle: " + ", ".join(f"{f} ({w})" for f, w in lost))
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz", compresslevel=9) as t:
         for f in files:
@@ -94,15 +183,19 @@ def render_md(payload: bytes, files: list[str], header_md: str) -> str:
     b64 = base64.b64encode(payload).decode("ascii")
     body = "\n".join(textwrap.wrap(b64, 120))
     manifest = "\n".join(f"- `{f}`" for f in files)
-    return (f"{header_md.rstrip()}\n\n"
-            f"## 번들 정보\n\n- shortkit {__version__}, built_at: {now_iso()}\n- files: {len(files)}\n"
-            f"- payload_sha256: {sha} \n- payload_bytes: {len(payload)}\n\n"
-            f"## 복원 명령 (에이전트는 아래 payload 본문을 읽지 말고 이 명령만 실행)\n\n"
-            f"새 빈 폴더에서, 이 MD 파일이 있는 위치를 기준으로:\n\n```bash\n{RESTORE_SNIPPET}\n```\n\n"
-            f"Windows PowerShell 등 heredoc 이 없는 환경: 위 python 코드 부분을 restore.py 로 저장한 뒤 "
-            f"`python restore.py PRESET_BUNDLE.md shortkit-preset`.\n\n"
-            f"<details><summary>포함 파일 목록</summary>\n\n{manifest}\n\n</details>\n\n"
-            f"{BEGIN}\n{body}\n{END}\n")
+    top = (f"> **에이전트: 이 파일은 1–@@READ@@ 줄만 읽는다.** @@NEXT@@ 줄부터는 base64 payload 이며 읽지 말고 아래 복원 명령으로 푼다.\n\n"
+           f"{header_md.rstrip()}\n\n"
+           f"## 복원 명령 (payload 본문을 읽지 말고 이 명령만 실행)\n\n"
+           f"새 빈 폴더에서, 이 MD 파일이 있는 위치를 기준으로:\n\n```bash\n{RESTORE_SNIPPET}\n```\n\n"
+           f"Windows PowerShell 등 heredoc 이 없는 환경: 위 python 코드 부분(PY 사이)을 restore.py 로 저장한 뒤 "
+           f"`python restore.py PRESET_BUNDLE.md shortkit-preset`. shortkit 이 설치된 환경이면 "
+           f"`python -m shortkit bundle restore --md PRESET_BUNDLE.md --dest shortkit-preset` 도 같다.\n\n"
+           f"## 번들 정보\n\n- shortkit {__version__}, built_at: {now_iso()}\n- files: {len(files)}\n"
+           f"- payload_sha256: {sha} \n- payload_bytes: {len(payload)}\n\n"
+           f"<details><summary>포함 파일 목록</summary>\n\n{manifest}\n\n</details>\n\n")
+    n_read = top.count("\n")          # lines before the BEGIN marker line
+    top = top.replace("@@READ@@", str(n_read), 1).replace("@@NEXT@@", str(n_read + 2), 1)
+    return f"{top}{BEGIN}\n{body}\n{END}\n"
 
 
 def header_text(root: Path) -> str:
@@ -114,6 +207,12 @@ def header_text(root: Path) -> str:
 
 def cmd_build(args) -> int:
     root = paths.project_root()
+    _, skipped = select_files(root)
+    by_reason: dict[str, list[str]] = {}
+    for f, why in skipped:
+        by_reason.setdefault(why, []).append(f)
+    for why, fs in sorted(by_reason.items()):
+        print(f"제외({why}): {len(fs)}개" + ("" if why == "media/regenerable" else " — " + ", ".join(fs[:20])))
     payload, files = build_payload(root)
     md = render_md(payload, files, header_text(root))
     out = Path(args.out) if args.out else root / "PRESET_BUNDLE.md"

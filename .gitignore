@@ -45,3 +45,6 @@ episodes/test-qa-*/
 warehouse/overlays/*/
 presets/*/analysis/*/lens/*.jpg
 presets/*/analysis/*/review/*.jpg
+
+# login cookies (never commit or bundle)
+cookies/

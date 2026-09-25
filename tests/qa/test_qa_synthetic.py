@@ -168,22 +168,15 @@ def test_good_gate_blockers_are_only_honest_unmeasured_items(reports):
     fail on items that genuinely cannot be measured here -- never on a false 'different'."""
     rep = reports["test-qa-good"]
     diff = [r["row_id"] for r in rep["rows"] if r["status"] == "different"]
-    # KNOWN shared-classifier false positive (requested fix in shortkit.reference.aggregate.ending_class): the noun
-    # title "실험 영상 모음" ends in -음 and is classified 음슴체, exactly as validate.check_tone would.  Allowed only
-    # for that precise cause -- any other tone difference still fails here.
-    if "caption.tone:register" in diff:
-        items = (rows(rep, row_id="caption.tone:register")["observed"] or {}).get("items") or []
-        assert any(it["ending"].endswith("모음") and it["class"] == "음슴체" for it in items), items
-        assert [it for it in items if it["class"] not in ("음슴체", "명사형/기타")] and \
-            all(it["register"] in (None, "반말_구어체") for it in items if not it["ending"].endswith("모음")), items
-        diff.remove("caption.tone:register")
+    # the noun title "실험 영상 모음" ('collection') is register-neutral (aggregate.ending_class, fix-qa2): it used to be
+    # classified 음슴체 and made caption.tone:register a false 'different'
+    tone = rows(rep, row_id="caption.tone:register")
+    assert tone["status"] == "same", tone["observed"]
+    assert any(it["ending"] == "모음" and it["class"] == "명사형/기타" for it in tone["observed"]["items"]), tone["observed"]
     assert diff == []
     g = rep["gate"]
     assert not g["complete"]
     for f in g["failures"]:
-        if f["rule"] == "G1":                          # only the documented tone false positive above
-            assert f["rows"] == ["caption.tone:register"], f
-            continue
         assert f["rule"] == "G2", f
 
 
@@ -268,10 +261,19 @@ def test_bad_gate_fails_and_defects_recorded(reports):
 
 def test_font_rows_same_only_for_identical_verdict(reports):
     """caption.font: typography.identify_many against a ceiling measured for THIS output's encode
-    settings (x264 SEI: crf 18, veryfast); 'same' only for the verdict identical."""
+    settings (x264 SEI: crf 18, veryfast); 'same' only for the verdict identical.  The REQUIRED rows are per role
+    (pooled over every rest-frame crop of the role); per-caption rows are informational (not gate-required)."""
     for ep, rep in reports.items():
-        fr = [r for r in rows(rep, "caption.font") if not r["row_id"].endswith("_ref")]
+        fr = [r for r in rows(rep, "caption.font") if not r["row_id"].endswith("_ref")
+              and not r["row_id"].startswith("caption.font:role_")]
         assert len(fr) == 5, ep
+        assert all(r["required"] is False for r in fr), ep
+        roles = {r["row_id"]: r for r in rows(rep, "caption.font") if r["row_id"].startswith("caption.font:role_")}
+        assert set(roles) == {f"caption.font:role_{x}" for x in ("title", "situation", "speaker", "dialogue", "reaction")}
+        for r in roles.values():
+            assert r["required"] is True
+            v = (r["observed"] or {}).get("verdict")
+            assert (r["status"] == "same") == (v == "identical"), (ep, r["row_id"], r["status"], v, r["note"])
         for r in fr:
             v = (r["observed"] or {}).get("verdict")
             assert (r["status"] == "same") == (v == "identical"), (ep, r["row_id"], r["status"], v)
@@ -279,8 +281,11 @@ def test_font_rows_same_only_for_identical_verdict(reports):
                 cond = r["observed"]["conditions"]
                 assert cond["crf"] == 18 and cond["x264_preset"] == "veryfast", cond
                 assert cond["assumed"] is False
-    # the synthetic renders use exactly the planned faces (production libass path) -> identical
+    # the synthetic renders use exactly the planned faces (production libass path) -> identical, per role
     good = reports["test-qa-good"]
+    for role in ("title", "situation", "speaker", "dialogue", "reaction"):
+        r = rows(good, row_id=f"caption.font:role_{role}")
+        assert r["status"] == "same", (role, r["observed"], r["note"])
     for cid in ("t1", "s1", "k1", "d1", "r1"):
         r = rows(good, row_id=f"caption.font:{cid}")
         assert r["status"] == "same" and r["observed"]["verdict"] == "identical", (cid, r["observed"], r["note"])

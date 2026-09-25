@@ -4,17 +4,17 @@
 - 원칙: 최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스: 없음(못 잼)
-- 측정 시각: 2026-09-24T22:28:39+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
+- 측정 시각: 2026-09-25T02:24:46+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
 ## 최종 관문: **불합격**
-- ✗ G2: 필수 항목 못 잼 2건 — 못 잼은 완료가 아님 — caption.font:c_rx, video.mapping:s3
+- ✗ G2: 필수 항목 못 잼 1건 — 못 잼은 완료가 아님 — caption.font:role_reaction
 - △ P1: 프리셋 미측정(임시값) 키 255개
 - △ P2: 레퍼런스 대비 못 잼 42건
 - △ P3: 테스트 모드 출력(파이프라인 검증용) — 게시 불가
 
 ## 요약
-- 전체 176행: 같다 127 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 49
-- 계획 대비(출력이 계획대로인가): {'same': 127, 'unmeasured': 7}
+- 전체 180행: 같다 130 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 50
+- 계획 대비(출력이 계획대로인가): {'same': 130, 'unmeasured': 8}
 - 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 42}
 - 프리셋 미측정(임시값) 키: 255개
 
@@ -24,10 +24,10 @@
 | 글자 위치 | 14 | 0 | 8 |
 | 자막 내용·말투 | 8 | 0 | 2 |
 | 자막 스타일 | 7 | 0 | 4 |
-| 폰트 | 6 | 0 | 5 |
+| 폰트 | 8 | 0 | 7 |
 | 자막 타이밍 | 7 | 0 | 4 |
 | 자막 등장·퇴장 모션 | 7 | 0 | 4 |
-| 컷 | 9 | 0 | 1 |
+| 컷 | 10 | 0 | 0 |
 | 모션(확대·정지·전환) | 14 | 0 | 4 |
 | 움직이는 장식(위치/밝기 각각) | 4 | 0 | 2 |
 | 식별 요소 | 1 | 0 | 2 |
@@ -52,7 +52,7 @@
 | 영상 영역 위치·크기 | 못 잼 | {"rect":[0.0,656.0,1080.0,608.0],"resolution":[1080,1920]} | {"rect":[0.0,656.0,1080.0,608.0],"resolution":[1080,1920]} | 같다 (참고) | 아니오 | 움직이는 화소·배경색 차이로 측정(휴리스틱) |
 | 영상 영역 (레퍼런스 대비) | 못 잼 | {"canvas.video_region.x":0,"canvas.video_region.y":656,"canvas.video_region.w":1080,"canv… | {"rect":[0.0,656.0,1080.0,608.0]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: canvas.video_region.x, canvas.video_region.y, can… |
 | 배경(색/소스 블러) | 못 잼 | {"type":"color","color":"#000000"} | {"type":"color","color":"#000000","temporal_std":0.01} | 같다 (참고) | 아니오 | blur_sigma 는 측정하지 않음 |
-| 배경 (레퍼런스 대비) | 못 잼 | {"canvas.background.type":"color","canvas.background.color":"#000000","canvas.background.… | {"type":"color","color":"#000000","temporal_std":0.01} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: canvas.background.type, canvas.background.color, … |
+| 배경 (레퍼런스 대비) | 못 잼 | {"canvas.background.type":"color","canvas.background.color":"#000000"} | {"type":"color","color":"#000000","temporal_std":0.01} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color —… |
 | 자막이 안전 여백 안에 있음 | 못 잼 | {"left":54,"right":54,"top":110,"bottom":250} | {"min_margin_px":{"left":81,"top":297,"right":79,"bottom":455}} | 같다 (참고) | 아니오 | — |
 
 ### 글자 위치
@@ -74,9 +74,9 @@
 | 자막 위치 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"center":[540.0,1433.8],"bbox":[268.5,1395.8,543.0,76.0],"resolution":[1080,1920]} | {"center":[541.0,1434.0],"bbox":[278,1403,526,62],"resolution":[1080,1920],"dx":1.0,"dy":… | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) |
 | 자막 크기·줄 수 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"fill_h":64.0,"lines":1,"max_width_px":960.0,"max_lines":2,"size_px":66.0} | {"fill_h":62,"fill_w":526,"lines":1,"size_px_est":63.9} | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 채움색 화소 높이 vs (기대 bbox 높이 − 2×외곽선) |
 | 자막 위치 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.anchor.x":540,"text.roles.description.anchor.y":500,"text.roles.… | {"x":539.5,"y":503.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.description.anchor.x, text.roles.descr… |
-| 자막 크기 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.size_px":46,"text.roles.description.line_spacing":1.15,"text.rol… | {"size_px_est":42.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.description.size_px, text.roles.descri… |
+| 자막 크기 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.size_px":46,"text.roles.description.max_lines":1,"text.roles.des… | {"size_px_est":42.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.description.size_px, text.roles.descri… |
 | 자막 위치 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.anchor.x":540,"text.roles.reaction.anchor.y":1140,"text.roles.react… | {"x":538.0,"y":1145.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.reaction.anchor.x, text.roles.reaction… |
-| 자막 크기 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.size_px":76,"text.roles.reaction.line_spacing":1.1,"text.roles.reac… | {"size_px_est":71.8} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.size_px, text.roles.reaction.… |
+| 자막 크기 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.size_px":76,"text.roles.reaction.max_lines":1,"text.roles.reaction.… | {"size_px_est":71.8} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.reaction.size_px, text.roles.reaction.… |
 | 자막 위치 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.anchor.x":540,"text.roles.situation.anchor.y":1430,"text.roles.sit… | {"x":541.0,"y":1434.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.situation.anchor.x, text.roles.situati… |
 | 자막 크기 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.size_px":66,"text.roles.situation.line_spacing":1.15,"text.roles.s… | {"size_px_est":63.9} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.size_px, text.roles.situatio… |
 | 자막 위치 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.anchor.x":540,"text.roles.title.anchor.y":330,"text.roles.title.anchor… | {"x":542.5,"y":335.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.title.anchor.x, text.roles.title.ancho… |
@@ -108,22 +108,26 @@
 | 자막 색·외곽선·박스 [c_rx·reaction] "빤히" | 못 잼 | {"color":"#FFE400","outline_px":7.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FEE300","outline_px":7,"outline_color":"#040000","box_alpha":0.024,"highl… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) |
 | 자막 색·외곽선·박스 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
 | 자막 색·외곽선·박스 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 배경이 외곽선 색과 같아 외곽선 두께는 못 잼 |
-| 자막 색·외곽선·박스 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.color":"#E6E6E6","text.roles.description.highlight_color":"#FFE4… | {"fill_color":"#E5E5E5"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 11개: text.roles.description.color, text.roles.descrip… |
-| 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.color":"#FFE400","text.roles.reaction.highlight_color":"#FFFFFF","t… | {"fill_color":"#FEE300"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 11개: text.roles.reaction.color, text.roles.reaction.h… |
-| 자막 색·외곽선·박스 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.color":"#FFFFFF","text.roles.situation.highlight_color":"#FFE400",… | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 11개: text.roles.situation.color, text.roles.situation… |
-| 자막 색·외곽선·박스 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.color":"#FFFFFF","text.roles.title.highlight_color":"#FFE400","text.ro… | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 11개: text.roles.title.color, text.roles.title.highlig… |
+| 자막 색·외곽선·박스 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.color":"#E6E6E6","text.roles.description.outline_px":4,"text.rol… | {"fill_color":"#E5E5E5"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.description.color, text.roles.descript… |
+| 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.color":"#FFE400","text.roles.reaction.outline_px":7,"text.roles.rea… | {"fill_color":"#FEE300"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.reaction.color, text.roles.reaction.ou… |
+| 자막 색·외곽선·박스 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.color":"#FFFFFF","text.roles.situation.outline_px":6,"text.roles.s… | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.situation.color, text.roles.situation.… |
+| 자막 색·외곽선·박스 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.color":"#FFFFFF","text.roles.title.outline_px":6,"text.roles.title.out… | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 5개: text.roles.title.color, text.roles.title.outline_… |
 
 ### 폰트
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 자막 글꼴 [c_title·title] "빈 방에 들어온 사람들" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.986,"margin":0.0708,"top":"Noto… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 판정: 동일(identical) — IoU 0.986 >= 천장 p10 0.975; 차순위 대비 차이 +0.071 > 잡음 … |
-| 자막 글꼴 [c_desc·description] "설정 연결 검증 테스트 2편" | 못 잼 | Noto Sans CJK KR Bold | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9433,"margin":0.0713,"top":"Not… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 판정: 동일(identical) — IoU 0.943 >= 천장 p10 0.933; 차순위 대비 차이 +0.071 > 잡음 … |
-| 자막 글꼴 [c_sit1·situation] "한 사람이 빈 방을 가로질러 나간" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9661,"margin":0.0586,"top":"Not… | 같다 | 아니오 | t=0.54s [프레임](frames/cap_c_sit1_0000540.png) 판정: 동일(identical) — IoU 0.966 >= 천장 p10 0.962; 차순위 대비 차이 +0.059 > 잡음 … |
-| 자막 글꼴 [c_sit2·situation] "한 남성이 카메라 앞까지 걸어온다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9678,"margin":0.0643,"top":"Not… | 같다 | 아니오 | t=5.24s [프레임](frames/cap_c_sit2_0005240.png) 판정: 동일(identical) — IoU 0.968 >= 천장 p10 0.965; 차순위 대비 차이 +0.064 > 잡음 … |
-| 자막 글꼴 [c_rx·reaction] "빤히" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"similar","verdict_ko":"유사(동일 확정 불가)","iou_expected":0.9757,"margin":0.0417,"t… | 못 잼 | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.976 < 천장 p10 0.979; 차순위 … |
-| 자막 글꼴 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9658,"margin":0.0626,"top":"Not… | 같다 | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 판정: 동일(identical) — IoU 0.966 >= 천장 p10 0.966; 차순위 대비 차이 +0.063 > 잡음 … |
-| 자막 글꼴 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9754,"margin":0.0635,"top":"Not… | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 판정: 동일(identical) — IoU 0.975 >= 천장 p10 0.970; 차순위 대비 차이 +0.064 > 잡음 … |
+| 자막 글꼴 [c_title·title] "빈 방에 들어온 사람들" (자막 1개·정지 프레임 1장, 참고) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.986,"margin":0.0708,"top":"Noto… | 같다 (참고) | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_desc·description] "설정 연결 검증 테스트 2편" (자막 1개·정지 프레임 … | 못 잼 | Noto Sans CJK KR Bold | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9433,"margin":0.0713,"top":"Not… | 같다 (참고) | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_sit1·situation] "한 사람이 빈 방을 가로질러 나간" (자막 1개·정지 프레임… | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9661,"margin":0.0586,"top":"Not… | 같다 (참고) | 아니오 | t=0.54s [프레임](frames/cap_c_sit1_0000540.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_sit2·situation] "한 남성이 카메라 앞까지 걸어온다" (자막 1개·정지 프레임… | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9678,"margin":0.0643,"top":"Not… | 같다 (참고) | 아니오 | t=5.24s [프레임](frames/cap_c_sit2_0005240.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_rx·reaction] "빤히" (자막 1개·정지 프레임 1장, 참고) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"similar","verdict_ko":"유사(동일 확정 불가)","iou_expected":0.9757,"margin":0.0417,"t… | 못 잼 (참고) | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_sit3·situation] "두 사람이 나란히 와서 선다" (자막 1개·정지 프레임 1장… | 못 잼 | Noto Sans CJK KR Black | {"verdict":"similar","verdict_ko":"유사(동일 확정 불가)","iou_expected":0.9658,"margin":0.0626,"t… | 못 잼 (참고) | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [c_sit4·situation] "그리고 둘 다 떠난다" (자막 1개·정지 프레임 1장, 참고) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected":0.9754,"margin":0.0635,"top":"Not… | 같다 (참고) | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_… |
+| 자막 글꼴 [description] (역할 단위: 자막 1개의 정지 프레임 합동) | 못 잼 | Noto Sans CJK KR Bold | {"verdict":"identical","verdict_ko":"동일","iou_expected_median":0.9506,"iou_stats":{"n":4,… | 같다 | 아니오 | t=0.33s 판정: 동일(identical) — IoU 0.951 >= 천장 p10 0.938; 차순위 대비 차이 +0.076 > 잡음 … |
+| 자막 글꼴 [reaction] (역할 단위: 자막 1개의 정지 프레임 합동) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"similar","verdict_ko":"유사(동일 확정 불가)","iou_expected_median":0.9759,"iou_stats"… | 못 잼 | 아니오 | t=10.23s 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.976 < 천장 p10 0.978; 차순위 … |
+| 자막 글꼴 [situation] (역할 단위: 자막 4개의 정지 프레임 합동) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected_median":0.967,"iou_stats":{"n":16,… | 같다 | 아니오 | t=0.57s 판정: 동일(identical) — IoU 0.967 >= 천장 p10 0.967; 차순위 대비 차이 +0.061 > 잡음 … |
+| 자막 글꼴 [title] (역할 단위: 자막 1개의 정지 프레임 합동) | 못 잼 | Noto Sans CJK KR Black | {"verdict":"identical","verdict_ko":"동일","iou_expected_median":0.9855,"iou_stats":{"n":4,… | 같다 | 아니오 | t=0.13s 판정: 동일(identical) — IoU 0.986 >= 천장 p10 0.975; 차순위 대비 차이 +0.071 > 잡음 … |
 | 자막 글꼴 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.font_name":"Noto Sans CJK KR Bold","text.roles.description.bold"… | {"best":"Noto Sans CJK KR Bold"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.description.font_name, text.roles.desc… |
 | 자막 글꼴 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.font_name":"Noto Sans CJK KR Black","text.roles.reaction.bold":true} | — | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.font_name, text.roles.reactio… |
 | 자막 글꼴 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.font_name":"Noto Sans CJK KR Black","text.roles.situation.bold":tr… | {"best":"Noto Sans CJK KR Black"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.font_name, text.roles.situat… |
@@ -140,10 +144,10 @@
 | 자막 등장·퇴장 시각 [c_rx·reaction] "빤히" | 못 잼 | {"start":10.0,"end":12.6} | {"onset":9.9667,"offset":12.6} | 같다 | 아니오 | t=9.97s [프레임](frames/cap_c_rx_0010219.png) |
 | 자막 등장·퇴장 시각 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | {"start":13.7,"end":18.5} | {"onset":13.6667,"offset":18.5} | 같다 | 아니오 | t=13.67s [프레임](frames/cap_c_sit3_0013939.png) |
 | 자막 등장·퇴장 시각 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"start":18.7,"end":22.3} | {"onset":18.6667,"offset":22.3} | 같다 | 아니오 | t=18.67s [프레임](frames/cap_c_sit4_0018940.png) |
-| 자막 표시 시간 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.timing.lead_s":0.0,"text.roles.description.timing.min_dur_s":1.0… | {"min_dur_s":4.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.description.timing.lead_s, text.roles.… |
-| 자막 표시 시간 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.timing.lead_s":0.0,"text.roles.reaction.timing.min_dur_s":0.6,"text… | {"min_dur_s":2.633} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.reaction.timing.lead_s, text.roles.rea… |
-| 자막 표시 시간 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.timing.lead_s":0.0,"text.roles.situation.timing.min_dur_s":0.9,"te… | {"min_dur_s":3.633} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.situation.timing.lead_s, text.roles.si… |
-| 자막 표시 시간 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.timing.lead_s":0.0,"text.roles.title.timing.min_dur_s":1.0,"text.roles… | {"min_dur_s":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.title.timing.lead_s, text.roles.title.… |
+| 자막 표시 시간 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.timing.min_dur_s":1.0,"text.roles.description.persist":"timed"} | {"min_dur_s":4.0,"first_onset":0.0,"last_offset":4.0,"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.rol… |
+| 자막 표시 시간 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.timing.min_dur_s":0.6,"text.roles.reaction.persist":"timed"} | {"min_dur_s":2.633,"first_onset":9.967,"last_offset":12.6,"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.… |
+| 자막 표시 시간 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.timing.min_dur_s":0.9,"text.roles.situation.persist":"timed"} | {"min_dur_s":3.633,"first_onset":0.267,"last_offset":22.3,"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles… |
+| 자막 표시 시간 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.persist":"whole_video"} | {"min_dur_s":22.5,"first_onset":0.0,"last_offset":22.5,"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고… |
 
 ### 자막 등장·퇴장 모션
 
@@ -156,10 +160,10 @@
 | 자막 등장 모션 [c_rx·reaction] "빤히" | 못 잼 | {"type":"pop","dur_s":0.1,"scale_from":1.35} | {"type":"pop","scale_first":1.37,"presence_first":0.815,"dur_s":0.1,"scales":[1.37,1.244,… | 같다 | 아니오 | t=9.97s [프레임](frames/cap_c_rx_0010219.png) |
 | 자막 등장 모션 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | {"type":"pop","dur_s":0.12,"scale_from":0.85} | {"type":"pop","scale_first":0.852,"presence_first":0.477,"dur_s":0.133,"scales":[0.852,0.… | 같다 | 아니오 | t=13.67s [프레임](frames/cap_c_sit3_0013939.png) |
 | 자막 등장 모션 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"type":"pop","dur_s":0.12,"scale_from":0.85} | {"type":"pop","scale_first":0.851,"presence_first":0.553,"dur_s":0.1,"scales":[0.851,0.89… | 같다 | 아니오 | t=18.67s [프레임](frames/cap_c_sit4_0018940.png) |
-| 자막 등장·퇴장 모션 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.motion_in.type":"fade","text.roles.description.motion_in.dur_s":… | {"type":"fade"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 6개: text.roles.description.motion_in.type, text.roles… |
-| 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.motion_in.type":"pop","text.roles.reaction.motion_in.dur_s":0.1,"te… | {"type":"pop"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 6개: text.roles.reaction.motion_in.type, text.roles.re… |
-| 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.motion_in.type":"pop","text.roles.situation.motion_in.dur_s":0.12,… | {"type":"pop"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 6개: text.roles.situation.motion_in.type, text.roles.s… |
-| 자막 등장·퇴장 모션 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.motion_in.type":"none","text.roles.title.motion_in.dur_s":0.0,"text.ro… | {"type":"none"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 6개: text.roles.title.motion_in.type, text.roles.title… |
+| 자막 등장·퇴장 모션 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.motion_in.type":"fade","text.roles.description.motion_in.dur_s":… | {"type":"fade"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles… |
+| 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.motion_in.type":"pop","text.roles.reaction.motion_in.dur_s":0.1,"te… | {"type":"pop"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.re… |
+| 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.motion_in.type":"pop","text.roles.situation.motion_in.dur_s":0.12,… | {"type":"pop"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.s… |
+| 자막 등장·퇴장 모션 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.motion_in.type":"none","text.roles.title.motion_out.type":"none"} | {"type":"none"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: text.roles.title.motion_in.type, text.roles.title… |
 
 ### 컷
 
@@ -172,7 +176,7 @@
 | 계획에 없는 컷·플래시 | — | [] | [] | 같다 | 아니오 | — |
 | 소스 구간 [s1] | — | {"src_in":2.0,"src_out":6.8,"source":"assets/test/generated/video/people-detection.mp4"} | {"offset_s":-0.05,"samples":[{"t":1.0,"expected_src_t":3.0,"matched_src_t":3.0,"ncc":0.98… | 같다 | 아니오 | t=1.00s |
 | 소스 구간 [s2] | — | {"src_in":5.0,"src_out":10.0,"source":"assets/test/generated/video/face-demographics-walk… | {"offset_s":-0.04,"samples":[{"t":5.84,"expected_src_t":6.04,"matched_src_t":6.0,"ncc":0.… | 같다 | 아니오 | t=5.84s |
-| 소스 구간 [s3] | — | {"src_in":10.0,"src_out":13.0} | — | 못 잼 | 아니오 | 장면이 거의 정지해 있어 어느 소스 시각인지 구별되지 않음(NCC 곡선이 평평함) |
+| 소스 구간 [s3] | — | {"src_in":10.0,"src_out":13.0,"source":"assets/test/generated/video/face-demographics-wal… | {"mode":"still_match","ncc_planned_min":0.9945,"ncc_planned":[0.9955,0.9946,0.996,0.9968,… | 같다 | 아니오 | t=10.05s 정지 장면: 계획 구간과 시각적으로 동일 (시점 특정 불가) |
 | 소스 구간 [s4] | — | {"src_in":32.0,"src_out":37.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.056,"samples":[{"t":14.636,"expected_src_t":33.136,"matched_src_t":33.083,… | 같다 | 아니오 | t=14.64s |
 | 소스 구간 [s5] | — | {"src_in":42.0,"src_out":44.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.037,"samples":[{"t":19.34,"expected_src_t":42.42,"matched_src_t":42.417,"n… | 같다 | 아니오 | t=19.34s |
 
@@ -315,7 +319,7 @@
 |---|---|---|---|---|---|---|
 | 영상 길이 | — | 22.5 | 22.5 | 같다 | 아니오 | — |
 | 영상 길이 (레퍼런스 분포 대비) | 못 잼 | {"structure.duration_s.p10":null,"structure.duration_s.p50":null,"structure.duration_s.p9… | {"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: structure.duration_s.p10, structure.duration_s.p5… |
-| 첫 자막 시각 (레퍼런스 대비) | 못 잼 | {"structure.first_caption_at_s":0.0} | {"first_caption_at_s":0.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와… |
+| 첫 시간제 자막 시각 (레퍼런스 대비) | 못 잼 | {"structure.first_caption_at_s":0.0} | {"first_caption_at_s":0.267,"caption":"c_sit1","role":"situation"} | 못 잼 (참고) | 아니오 | t=0.27s 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와… |
 | 표지 프레임에 제목 문구 표시 | 못 잼 | {"t":0.0,"text":"빈 방에 들어온 사람들","role":"title"} | {"ocr":"빈 방 에 들어온 사람들","similarity":1.0,"role_caption_visible":true} | 같다 (참고) | 아니오 | t=0.00s |
 | 표지 구성 (레퍼런스 대비) | 못 잼 | {"cover.source":"first_frame","cover.text_role":"title"} | {"text_role_visible":true} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스… |
 
@@ -323,35 +327,36 @@
 
 - 화면 해상도·프레임레이트 (레퍼런스 대비) (`canvas.format:format_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.width, canvas.height, canvas.fps — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 영상 영역 (레퍼런스 대비) (`canvas.video_region:region_ref`): 레퍼런스 미측정(임시값) 키 5개: canvas.video_region.x, canvas.video_region.y, canvas.video_region.w, canvas.video_region.h, canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
-- 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.background.type, canvas.background.color, canvas.background.blur_sigma — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
-- **필수** 자막 글꼴 [c_rx·reaction] "빤히" (`caption.font:c_rx`): 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.976 < 천장 p10 0.979; 차순위 대비 차이 +0.042 > 잡음 0.013; 글자별 검사 통과 — 제작 영향: 글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음
+- 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: canvas.background.blur_sigma — background.type=color(단색 배경에는 블러 없음). — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+- 자막 글꼴 [c_rx·reaction] "빤히" (자막 1개·정지 프레임 1장, 참고) (`caption.font:c_rx`): 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_reaction 이 한다 — 이 행의 못 잼은 관문을 막지 않지만 '다르다'는 그대로 관문(G1)에 걸린다(한 자막만 다른 글꼴일 수 있음). 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.976 < 천장 p10 0.978; 차순위 대비 차이 +0.042 > 잡음 0.014; 글자별 검사 통과 — 제작 영향: 글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음
+- 자막 글꼴 [c_sit3·situation] "두 사람이 나란히 와서 선다" (자막 1개·정지 프레임 1장, 참고) (`caption.font:c_sit3`): 참고 행(필수 아님): 한 crop 의 판정은 잡음이 커서 필수 판정은 역할 단위 합동 행 caption.font:role_situation 이 한다 — 이 행의 못 잼은 관문을 막지 않지만 '다르다'는 그대로 관문(G1)에 걸린다(한 자막만 다른 글꼴일 수 있음). 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.966 < 천장 p10 0.967; 차순위 대비 차이 +0.063 > 잡음 0.007; 글자별 검사 통과 — 제작 영향: 글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음
+- **필수** 자막 글꼴 [reaction] (역할 단위: 자막 1개의 정지 프레임 합동) (`caption.font:role_reaction`): 판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.976 < 천장 p10 0.978; 차순위 대비 차이 +0.042 > 잡음 0.015; 글자별 검사 통과 — 제작 영향: 글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음
 - 자막 이모지 사용 (`caption.tone:emoji`): 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 제작 영향: 자막 문구·말투를 확인하지 못함
 - 자막 위치 [description] (레퍼런스 대비) (`caption.position:description_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.description.anchor.x, text.roles.description.anchor.y, text.roles.description.anchor.align, text.roles.description.anchor.valign, text.roles.description.max_width_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
-- 자막 크기 [description] (레퍼런스 대비) (`caption.size:description_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.description.size_px, text.roles.description.line_spacing, text.roles.description.max_lines, text.roles.description.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [description] (레퍼런스 대비) (`caption.style:description_ref`): 레퍼런스 미측정(임시값) 키 11개: text.roles.description.color, text.roles.description.highlight_color, text.roles.description.outline_px, text.roles.description.outline_color, text.roles.description.shadow_px, text.roles.description.shadow_color … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 색 불일치
+- 자막 크기 [description] (레퍼런스 대비) (`caption.size:description_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.description.size_px, text.roles.description.max_lines, text.roles.description.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: line_spacing — max_lines=1 이고 이 편의 자막도 한 줄(줄 간격이 없음). — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
+- 자막 색·외곽선·박스 [description] (레퍼런스 대비) (`caption.style:description_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.description.color, text.roles.description.outline_px, text.roles.description.outline_color, text.roles.description.shadow_px, text.roles.description.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: box.color — box.enabled=false(박스 없음); box.alpha — box.enabled=false(박스 없음); box.pad_x — box.enabled=false(박스 없음); box.pad_y — box.enabled=false(박스 없음); shadow_color — shadow_px=0(그림자 없음); highlight_color — 이 편의 이 역할 자막에 강조 단어 없음(계획). — 제작 영향: 글자 색 불일치
 - 자막 글꼴 [description] (레퍼런스 대비) (`caption.font:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.font_name, text.roles.description.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [description] (레퍼런스 대비) (`caption.timing:description_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.description.timing.lead_s, text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [description] (레퍼런스 대비) (`caption.motion:description_ref`): 레퍼런스 미측정(임시값) 키 6개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_in.scale_from, text.roles.description.motion_in.offset_px, text.roles.description.motion_out.type, text.roles.description.motion_out.dur_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [description] (레퍼런스 대비) (`caption.timing:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — lead_s 는 대사(말소리 대비) 자막에만 적용. 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [description] (레퍼런스 대비) (`caption.motion:description_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: motion_in.scale_from — motion_in.type=fade(pop 아님); motion_in.offset_px — motion_in.type=fade(slide 아님); motion_out.dur_s — motion_out.type=none. — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [reaction] (레퍼런스 대비) (`caption.position:reaction_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.reaction.anchor.x, text.roles.reaction.anchor.y, text.roles.reaction.anchor.align, text.roles.reaction.anchor.valign, text.roles.reaction.max_width_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
-- 자막 크기 [reaction] (레퍼런스 대비) (`caption.size:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.size_px, text.roles.reaction.line_spacing, text.roles.reaction.max_lines, text.roles.reaction.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) (`caption.style:reaction_ref`): 레퍼런스 미측정(임시값) 키 11개: text.roles.reaction.color, text.roles.reaction.highlight_color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.shadow_px, text.roles.reaction.shadow_color … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 색 불일치
+- 자막 크기 [reaction] (레퍼런스 대비) (`caption.size:reaction_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.reaction.size_px, text.roles.reaction.max_lines, text.roles.reaction.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: line_spacing — max_lines=1 이고 이 편의 자막도 한 줄(줄 간격이 없음). — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
+- 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) (`caption.style:reaction_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.shadow_px, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: box.color — box.enabled=false(박스 없음); box.alpha — box.enabled=false(박스 없음); box.pad_x — box.enabled=false(박스 없음); box.pad_y — box.enabled=false(박스 없음); shadow_color — shadow_px=0(그림자 없음); highlight_color — 이 편의 이 역할 자막에 강조 단어 없음(계획). — 제작 영향: 글자 색 불일치
 - 자막 글꼴 [reaction] (레퍼런스 대비) (`caption.font:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.font_name, text.roles.reaction.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [reaction] (레퍼런스 대비) (`caption.timing:reaction_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.reaction.timing.lead_s, text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) (`caption.motion:reaction_ref`): 레퍼런스 미측정(임시값) 키 6개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_in.offset_px, text.roles.reaction.motion_out.type, text.roles.reaction.motion_out.dur_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [reaction] (레퍼런스 대비) (`caption.timing:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — lead_s 는 대사(말소리 대비) 자막에만 적용. 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) (`caption.motion:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: motion_in.offset_px — motion_in.type=pop(slide 아님); motion_out.dur_s — motion_out.type=none. — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [situation] (레퍼런스 대비) (`caption.position:situation_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.situation.anchor.x, text.roles.situation.anchor.y, text.roles.situation.anchor.align, text.roles.situation.anchor.valign, text.roles.situation.max_width_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [situation] (레퍼런스 대비) (`caption.size:situation_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.size_px, text.roles.situation.line_spacing, text.roles.situation.max_lines, text.roles.situation.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [situation] (레퍼런스 대비) (`caption.style:situation_ref`): 레퍼런스 미측정(임시값) 키 11개: text.roles.situation.color, text.roles.situation.highlight_color, text.roles.situation.outline_px, text.roles.situation.outline_color, text.roles.situation.shadow_px, text.roles.situation.shadow_color … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·박스 [situation] (레퍼런스 대비) (`caption.style:situation_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.situation.color, text.roles.situation.outline_px, text.roles.situation.outline_color, text.roles.situation.shadow_px, text.roles.situation.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: box.color — box.enabled=false(박스 없음); box.alpha — box.enabled=false(박스 없음); box.pad_x — box.enabled=false(박스 없음); box.pad_y — box.enabled=false(박스 없음); shadow_color — shadow_px=0(그림자 없음); highlight_color — 이 편의 이 역할 자막에 강조 단어 없음(계획). — 제작 영향: 글자 색 불일치
 - 자막 글꼴 [situation] (레퍼런스 대비) (`caption.font:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.font_name, text.roles.situation.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [situation] (레퍼런스 대비) (`caption.timing:situation_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.situation.timing.lead_s, text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) (`caption.motion:situation_ref`): 레퍼런스 미측정(임시값) 키 6개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_in.offset_px, text.roles.situation.motion_out.type, text.roles.situation.motion_out.dur_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [situation] (레퍼런스 대비) (`caption.timing:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — lead_s 는 대사(말소리 대비) 자막에만 적용. 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) (`caption.motion:situation_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: motion_in.offset_px — motion_in.type=pop(slide 아님); motion_out.dur_s — motion_out.type=none. — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [title] (레퍼런스 대비) (`caption.position:title_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.title.anchor.x, text.roles.title.anchor.y, text.roles.title.anchor.align, text.roles.title.anchor.valign, text.roles.title.max_width_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [title] (레퍼런스 대비) (`caption.size:title_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.title.size_px, text.roles.title.line_spacing, text.roles.title.max_lines, text.roles.title.max_chars_per_line — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [title] (레퍼런스 대비) (`caption.style:title_ref`): 레퍼런스 미측정(임시값) 키 11개: text.roles.title.color, text.roles.title.highlight_color, text.roles.title.outline_px, text.roles.title.outline_color, text.roles.title.shadow_px, text.roles.title.shadow_color … — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·박스 [title] (레퍼런스 대비) (`caption.style:title_ref`): 레퍼런스 미측정(임시값) 키 5개: text.roles.title.color, text.roles.title.outline_px, text.roles.title.outline_color, text.roles.title.shadow_px, text.roles.title.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: box.color — box.enabled=false(박스 없음); box.alpha — box.enabled=false(박스 없음); box.pad_x — box.enabled=false(박스 없음); box.pad_y — box.enabled=false(박스 없음); shadow_color — shadow_px=0(그림자 없음); highlight_color — 이 편의 이 역할 자막에 강조 단어 없음(계획). — 제작 영향: 글자 색 불일치
 - 자막 글꼴 [title] (레퍼런스 대비) (`caption.font:title_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.title.font_name, text.roles.title.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [title] (레퍼런스 대비) (`caption.timing:title_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.title.timing.lead_s, text.roles.title.timing.min_dur_s, text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [title] (레퍼런스 대비) (`caption.motion:title_ref`): 레퍼런스 미측정(임시값) 키 6개: text.roles.title.motion_in.type, text.roles.title.motion_in.dur_s, text.roles.title.motion_in.scale_from, text.roles.title.motion_in.offset_px, text.roles.title.motion_out.type, text.roles.title.motion_out.dur_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [title] (레퍼런스 대비) (`caption.timing:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — lead_s 는 대사(말소리 대비) 자막에만 적용; timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist=whole_video: 첫 프레임부터 끝 프레임까지 표시되는지 확인 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
+- 자막 등장·퇴장 모션 [title] (레퍼런스 대비) (`caption.motion:title_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.title.motion_in.type, text.roles.title.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: motion_in.dur_s — motion_in.type=none; motion_in.scale_from — motion_in.type=none(pop 아님); motion_in.offset_px — motion_in.type=none(slide 아님); motion_out.dur_s — motion_out.type=none. — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 말투 (레퍼런스 대비) (`caption.tone:tone_ref`): 레퍼런스 미측정(임시값) 키 3개: text.tone.register, text.tone.sentence_end_examples, text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음
-- **필수** 소스 구간 [s3] (`video.mapping:s3`): 장면이 거의 정지해 있어 어느 소스 시각인지 구별되지 않음(NCC 곡선이 평평함) — 제작 영향: 컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음
 - 줌 배율·길이 (레퍼런스 대비) (`video.zoom:zoom_ref`): 레퍼런스 미측정(임시값) 키 3개: motion.zoom.scale_to, motion.zoom.dur_s, motion.zoom.ease — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 확대·정지·전환의 크기/길이 불일치
 - 정지 길이 (레퍼런스 대비) (`video.freeze:freeze_ref`): 레퍼런스 미측정(임시값) 키 1개: motion.freeze.hold_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 확대·정지·전환의 크기/길이 불일치
 - 전환 종류·길이 (레퍼런스 대비) (`video.transitions:transitions_ref`): 레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color, motion.transitions.crossfade.dur_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 확대·정지·전환의 크기/길이 불일치
@@ -368,7 +373,7 @@
 - 효과음 크기 (레퍼런스 대비) (`audio.sfx.placement:sfx_gain_ref`): 레퍼런스 미측정(임시값) 키 1개: audio.sfx.gain_db_default — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 효과음 크기 불일치
 - 음량 (레퍼런스 대비) (`audio.loudness:loudness_ref`): 레퍼런스 미측정(임시값) 키 2개: audio.loudness.integrated_lufs, audio.loudness.true_peak_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 최종 음량 불일치
 - 영상 길이 (레퍼런스 분포 대비) (`structure.duration:duration_ref`): 레퍼런스 미측정(임시값) 키 4개: structure.duration_s.p10, structure.duration_s.p50, structure.duration_s.p90, structure.duration_s.n — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
-- 첫 자막 시각 (레퍼런스 대비) (`structure.duration:first_caption_ref`): 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 영상 길이·전개 구조 불일치
+- 첫 시간제 자막 시각 (레퍼런스 대비) (`structure.duration:first_caption_ref`): 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 정의: 제목·설명을 뺀 첫 시간제 자막의 출력 등장 시각(레퍼런스 분석기 structure.first_caption_at_s 와 같음) — 제작 영향: 영상 길이·전개 구조 불일치
 - 표지 구성 (레퍼런스 대비) (`cover.frame:cover_ref`): 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 표지 구성 불일치
 
 ## 비교 시트
@@ -376,10 +381,10 @@
 - `episodes/test-coverage-001/qa/compare_sheet_p02.png`
 
 ## 결함 기록 (defects.jsonl)
-- 열림 2 / 이번에 해결 확인 0 / 재발 0 / 새로 등록 0
-- 같은 검사 재확인: test-pipeline-001: caption.font=problem, video.mapping=ok
-- 같은 검사 재확인: test-qa-bad: caption.font=problem, video.mapping=problem
-- 같은 검사 재확인: test-qa-good: caption.font=ok, video.mapping=problem
+- 열림 1 / 이번에 해결 확인 1 / 재발 0 / 새로 등록 0
+- 같은 검사 재확인: test-pipeline-001: caption.font=problem
+- 같은 검사 재확인: test-qa-bad: caption.font=ok
+- 같은 검사 재확인: test-qa-good: caption.font=ok
 
 ---
 판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음). 레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.

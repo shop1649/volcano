@@ -143,14 +143,16 @@ def test_ceiling_uses_exact_size_own_text_flat_background_and_12_samples(temp_ro
     seen = {}
 
     def fake_samples(ctx, font, size, fill, outline, outline_px, box, strings, crf, preset, fps, seed=7,
-                     font_file=None, bg=None):
-        seen.update(size=size, strings=list(strings), bg=bg, box=box, outline_px=outline_px)
-        return [object()] * (len(strings) * font_id.CEIL_REPEATS), "color:#000000"
+                     font_file=None, bg=None, delays=None, threads=None, motion_in=None):
+        seen.update(size=size, strings=list(strings), bg=bg, box=box, outline_px=outline_px, delays=list(delays))
+        return ([SimpleNamespace(group=f"{i % 3}:s|66|d{d}", spec=i) for i in range(len(strings) * font_id.CEIL_REPEATS)
+                 for d in delays], "color:#000000")
 
     def fake_ceiling(fr, cond, samples, color_mode, keep_rows):
-        seen["n_samples"] = len(samples)
+        seen.setdefault("n_samples", []).append(len(samples))
         seen["background"] = cond.background
-        return {"n": len(samples), "p10": 0.96, "p50": 0.97, "p90": 0.98, "noise": {"p90": 0.01}, "glyph": {}}
+        return {"n": len(samples), "p10": 0.96, "p50": 0.97, "p90": 0.98, "noise": {"p90": 0.01}, "glyph": {},
+                "rows": [{"iou": 0.97, "group": s.group} for s in samples]}
 
     import shortkit.reference.typography as ty
 
@@ -159,13 +161,18 @@ def test_ceiling_uses_exact_size_own_text_flat_background_and_12_samples(temp_ro
     ctx = SimpleNamespace(options={"_font_id": {"encode": {"crf": 18.0, "preset": "veryfast", "source": "test"}}},
                           canvas_w=1080, canvas_h=1920, fps=30.0)
     text = "뒷줄 남성이 손을 든다"
-    font_id.ceiling_for(ctx, "Noto Sans CJK KR Black", 66.0, (255, 255, 255), (0, 0, 0), 6.0, None,
-                        bg=(1, 0, 2), strings=font_id.ceiling_strings(text))
+    ceil, _cond, cached = font_id.ceiling_for(ctx, "Noto Sans CJK KR Black", 66.0, (255, 255, 255), (0, 0, 0), 6.0,
+                                              None, bg=(1, 0, 2), strings=font_id.ceiling_strings(text))
+    # every string cropped at each pooled rest delay; the returned ceiling is the per-caption (first) delay
+    dl = font_id.delay_frames(30.0)
+    assert seen["delays"] == dl and dl[0] == 4 and len(dl) == 4 and not cached
+    assert set(ceil["by_delay"]) == {str(d) for d in dl} and ceil["delay_frames"] == dl[0]
+    assert ceil["by_delay"][str(dl[1])]["row_spec"] == list(range(12))
     assert seen["size"] == 66.0 and font_id.size_bucket(66.0) != 66          # not the 63 px bucket
     assert seen["strings"] == [text] * 3
     assert seen["bg"] == (0, 0, 0) and seen["box"] is None                    # measured flat colour (quantised)
     assert seen["outline_px"] == pytest.approx(6.0, abs=0.01)          # outline/size ratio kept (3 decimals)
-    assert seen["n_samples"] == 12 and seen["background"] == "color:#000000"
+    assert seen["n_samples"] == [12] * len(dl) and seen["background"] == "color:#000000"
     # over footage: no flat colour; multi-line captions give every line a slot
     assert font_id.ceiling_strings("첫 줄\n둘째 줄") == ["첫 줄", "둘째 줄", "첫 줄"]
     from shortkit.qa.probes_text import _flat_bg

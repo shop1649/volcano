@@ -15,5 +15,6 @@ if (-not (Test-Path .venv)) { & $py -m venv .venv }
 & .\.venv\Scripts\python.exe -m pip install -U yt-dlp
 if (-not (Test-Path local.yaml)) { Copy-Item local.example.yaml local.yaml }
 & .\.venv\Scripts\python.exe -m shortkit doctor --fetch-fonts
+& .\.venv\Scripts\python.exe -m shortkit clean fetch-models
 & .\.venv\Scripts\python.exe -m shortkit doctor --network
 Write-Host "다음: .\.venv\Scripts\Activate.ps1 후 AGENTS.md 의 '실행 순서'를 따르세요."

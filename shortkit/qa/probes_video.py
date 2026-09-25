@@ -1159,6 +1159,61 @@ def analyze_layout(ctx: QAContext, sc: dict, caption_boxes: list | None = None) 
 
 
 # ----------------------------------------------------------------------------- source mapping
+STILL_NCC_MIN = GEO_NCC_MIN   # still scene: every sampled output frame == the planned source frame (same criterion as
+#                              the zoom-geometry check: output region vs planned source frame under the planned geometry)
+FLAT_STD = 2.0                # grey-level std below which a (masked) frame has no texture -> NCC undefined
+
+
+def overlay_keep_mask(ctx: QAContext, c, t: float, rx: float, ry: float, k: float, shape: tuple[int, int]) -> np.ndarray:
+    """True where the output region at output time ``t`` shows only the clip's footage: captions on screen (ink box
+    incl. outline / label box, with room for entrance scaling), decorations and the clip's clean-op rects
+    (delogo / blur / inpaint, mapped with the zoom) are masked out.  Work grid: canvas (x, y) -> ((x-rx)k, (y-ry)k)."""
+    h, w = shape
+    keep = np.ones((h, w), bool)
+
+    def cut(x, y, ww, hh, pad):
+        x0, y0 = int(math.floor((x - pad - rx) * k)), int(math.floor((y - pad - ry) * k))
+        x1, y1 = int(math.ceil((x + ww + pad - rx) * k)), int(math.ceil((y + hh + pad - ry) * k))
+        x0, y0, x1, y1 = max(0, x0), max(0, y0), min(w, x1), min(h, y1)
+        if x1 > x0 and y1 > y0:
+            keep[y0:y1, x0:x1] = False
+
+    res = getattr(ctx, "resolved", None)
+    for cap in getattr(res, "captions", None) or []:
+        mo = getattr(cap, "motion_out", None) or {}
+        t_end = float(cap.end) + float(mo.get("dur_s") or 0.0)
+        if not (float(cap.start) - 0.05 <= t <= t_end + 0.05):
+            continue
+        box = getattr(cap, "box", None) or {}
+        rect = box.get("rect") if box.get("enabled") else None
+        bx, by, bw, bh = (float(v) for v in rect) if rect else rect_xywh(cap.bbox)
+        mi = getattr(cap, "motion_in", None) or {}
+        grow = max(1.0, float(mi.get("scale_from") or 1.0)) if mi.get("type") == "pop" else 1.0
+        cut(bx - bw * (grow - 1) / 2, by - bh * (grow - 1) / 2, bw * grow, bh * grow, max(8.0, 0.25 * bh))
+    for d in getattr(res, "decorations", None) or []:
+        if not (float(d.start) - 0.05 <= t <= float(d.end) + 0.05):
+            continue
+        kf = _deco_expected_kf(d, t)
+        dw, dh = float(kf.get("w") or 120.0), float(kf.get("h") or 120.0)
+        stroke = float((d.style or {}).get("stroke_px") or 8.0)
+        if d.kind == "arrow":        # tip at (x, y), any rotation
+            r_ = max(dw, dh) + stroke
+            cut(float(kf["x"]) - r_, float(kf["y"]) - r_, 2 * r_, 2 * r_, 6.0)
+        else:                        # circle / box centred at (x, y)
+            cut(float(kf["x"]) - dw / 2, float(kf["y"]) - dh / 2, dw, dh, stroke + 6.0)
+    st = src_time(c, t)
+    for r in list(getattr(c, "delogo", None) or []) + list(getattr(c, "inpaint", None) or []) + \
+            list(getattr(c, "blur", None) or []):
+        if getattr(r, "start", None) is not None and st < float(r.start) - 0.05:
+            continue
+        if getattr(r, "end", None) is not None and st > float(r.end) + 0.05:
+            continue
+        mr = map_src_rect(c, r, t)
+        if mr is not None:
+            cut(*mr, 6.0)
+    return keep
+
+
 def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
     """For each clip, which source time does the output actually show?  (NCC of the output
     video region against the geometrically fitted source frames around the planned time)."""
@@ -1174,6 +1229,7 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
             item.update(status="unmeasured", reason=f"소스 파일 없음: {c.source_path}")
             out.append(item)
             continue
+        src_rate = float(_info(p).fps or 30.0)
         t_lo = c.out_start + (float(c.transition_in.dur or 0) if ci else 0.0) + 2 * fr
         nxt = ctx.resolved.clips[ci + 1] if ci + 1 < len(ctx.resolved.clips) else None
         t_hi = (nxt.out_start if nxt else c.out_end) - 2 * fr
@@ -1240,6 +1296,16 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
                 vals.append(v)
                 if v > best[0]:
                     best = (v, st)
+            # the planned source frame itself (+-1.5 source frames of the planned time), overlays masked: for a
+            # still scene, where no time stands out, this says whether the output shows the planned picture at all
+            keep = overlay_keep_mask(ctx, c, t, rx, ry, k, og.shape)
+            near = [g for st, g in zip(ts, warped) if abs(st - exp_s) <= 1.5 / src_rate]
+            planned = None
+            if near and keep.mean() >= 0.2:
+                if float(og[keep].std()) < FLAT_STD or max(float(g[keep].std()) for g in near) < FLAT_STD:
+                    planned = "flat"
+                else:
+                    planned = max(ncc(g[keep], og[keep]) for g in near)
             if best[1] is not None:
                 # does the best source time stand out?  prominence = best minus the best match at least
                 # 0.25 s away (a still scene matches every time); a best at the window edge may lie outside
@@ -1251,16 +1317,35 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
                                 "ncc": rnd(full_ncc, 3), "ncc_moving": rnd(best[0], 3), "offset": rnd(best[1] - exp_s, 3),
                                 "prominence": rnd(prominence, 4), "moving_frac": rnd(float(mmask.mean()), 3),
                                 "at_window_edge": bool(at_edge), "stage": stage,
-                                "decisive": bool(use_mask and prominence >= 0.03 and not at_edge)})
+                                "decisive": bool(use_mask and prominence >= 0.03 and not at_edge),
+                                "ncc_planned": planned if planned in (None, "flat") else rnd(planned, 4),
+                                "overlay_masked_frac": rnd(1.0 - float(keep.mean()), 3)})
         item["samples"] = samples
         item["src_fps"] = rnd(_info(p).fps, 3)
         good = [s for s in samples if s["ncc"] >= 0.6 and s["decisive"]]
         if not good:
-            if any(s["ncc"] >= 0.6 for s in samples):
-                item.update(status="unmeasured", reason="장면이 거의 정지해 있어 어느 소스 시각인지 구별되지 않음(NCC 곡선이 평평함)",
+            # no sample tells the source time -> still-scene rule on the planned frames themselves
+            pl = [s["ncc_planned"] for s in samples if isinstance(s.get("ncc_planned"), (int, float))]
+            n_flat = sum(1 for s in samples if s.get("ncc_planned") == "flat")
+            item["still"] = {"threshold": STILL_NCC_MIN, "n_samples": len(samples), "n_compared": len(pl),
+                             "n_flat": n_flat, "ncc_planned_min": rnd(min(pl), 4) if pl else None,
+                             "ncc_planned": pl}
+            if len(pl) >= 2 and len(pl) == len(samples) and min(pl) >= STILL_NCC_MIN:
+                item.update(status="measured", mode="still_match", offset_p50=None,
+                            reason="정지 장면: 계획 구간과 시각적으로 동일 (시점 특정 불가)")
+            elif pl and min(pl) < STILL_NCC_MIN:
+                bad = [s for s in samples if isinstance(s.get("ncc_planned"), (int, float)) and s["ncc_planned"] < STILL_NCC_MIN]
+                item.update(status="measured", mode="still_mismatch", offset_p50=None,
+                            reason=(f"출력 화면이 계획한 소스 프레임과 다름: {len(bad)}/{len(samples)} 시각에서 계획 프레임 NCC < "
+                                    f"{STILL_NCC_MIN} (최저 {min(pl):.3f} @ {bad[0]['t'] if bad else '?'}s; 자막·장식·가림 영역 제외)"),
+                            mismatch_times=[s["t"] for s in bad])
+            elif any(s["ncc"] >= 0.6 for s in samples):
+                item.update(status="unmeasured", reason="장면이 거의 정지해 있어 어느 소스 시각인지 구별되지 않음(NCC 곡선이 평평함)"
+                            + (f"; 평평한(무늬 없는) 화면 {n_flat}개라 계획 프레임 대조도 못 함" if n_flat else ""),
                             ncc_max=max(s["ncc"] for s in samples))
             else:
-                item.update(status="unmeasured", reason="출력 화면과 소스 프레임이 충분히 일치하지 않음(NCC<0.6)")
+                item.update(status="unmeasured", reason="출력 화면과 소스 프레임이 충분히 일치하지 않음(NCC<0.6)"
+                            + (f"; 평평한(무늬 없는) 화면 {n_flat}개" if n_flat else ""))
         else:
             item["status"] = "measured"
             item["offset_p50"] = rnd(float(np.median([s["offset"] for s in good])), 3)

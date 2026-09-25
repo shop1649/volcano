@@ -18,4 +18,8 @@ Claude Code 와 Codex 모두 이 파일의 **이 윗부분만** 읽고, 맨 아�
 - 영상·음원·이미지·글꼴 파일(용량): 후보 글꼴은 `python -m shortkit doctor --fetch-fonts`(sha256 고정),
   테스트 자산은 `python -m shortkit testassets synth` / `fetch-video` / `dirty-source`.
 - 레퍼런스 영상(`ref download`), 소재 원본(`source download`), 사용자 효과음·음악 창고(`assets/library/`).
+- 얼굴 검출 모델(QA 필수): `python -m shortkit clean fetch-models` (setup.sh 가 실행).
+- 캐시(`warehouse/cache/`), 레퍼런스 분석 중간 파일(프레임·stem·렌즈 키프레임), 로그인 쿠키·local.yaml(보안상 번들 제외).
 - 렌더 결과 MP4 와 편집 프로젝트의 미디어 폴더는 `python -m shortkit episode all <id>` 로 다시 만든다.
+- 테스트(`pytest`) 전에 테스트 자산을 만든다: `python -m shortkit testassets synth && python -m shortkit testassets fetch-video
+  && python -m shortkit episode test-source && python -m shortkit testassets dirty-source`.

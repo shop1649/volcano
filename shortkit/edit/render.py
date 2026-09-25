@@ -11,11 +11,12 @@ Audio: mixed in numpy (sample exact, deterministic): BGM (tempo pre-step + secti
   fades, per-sample envelope = ducking under kept dialogue + intentional silences only),
   kept originals, SFX at t (``pre_norm_stems``, side-effect free).
 
-  Gain semantics: audio.bgm.gain_db, audio.sfx.gain_db_default / plan sfx gain_db and
-  audio.original.keep_gain_db are levels AT THE FINAL PROGRAM LOUDNESS (``ref audio-measure`` writes
-  audio.bgm.gain_db that way: clean-file LS gain + target_lufs - reference mix LUFS).  So the stems
-  are summed at those levels and the loudness normalisation (one global gain g, integrated LUFS ->
-  target) is expected to be a small trim.
+  Gain semantics: audio.bgm.gain_db, audio.sfx.gain_db_default / plan sfx gain_db are levels AT THE
+  FINAL PROGRAM LOUDNESS (``ref audio-measure`` writes audio.bgm.gain_db that way: clean-file LS gain +
+  target_lufs - reference mix LUFS); audio.original.keep_gain_db is the kept speech loudness in LU
+  relative to the programme loudness (applied gain T + keep_gain_db - L_src, ``shortkit.edit.audio``).
+  So the stems are summed at those levels and the loudness normalisation (one global gain g,
+  integrated LUFS -> target) is expected to be a small trim.
 
   True-peak safety: the BGM is NEVER limited (no SFX- or cut-caused ducking).  Only the foreground
   (kept originals + SFX) gets a per-sample gain k <= 1 so that the 4x-oversampled peak of
@@ -877,18 +878,41 @@ def render_video(r: ResolvedEdit, mix_wav: Path, out: Path) -> None:
 
 
 def check_output_fonts(r: ResolvedEdit) -> dict:
-    """Ask libass itself which face it selects for every caption style (no fallback allowed)."""
+    """Ask libass itself which face it selects for every caption style (no fallback allowed).
+
+    The expected face of a role is the one the resolver chose from the preset's font_name
+    (build/caption_layout.json: file + face index inside build/fonts); without that record the
+    style's own font name must identify exactly one face of the fonts directory.  Every style is
+    checked with the characters its captions really use, and synthetic emboldening is refused."""
+    from ..util.jsonio import read_json
     from . import captions as cap_mod
 
-    ass_txt = paths.absp(r.ass_path).read_text(encoding="utf-8")
+    ass_p = paths.absp(r.ass_path)
+    fdir = paths.absp(r.fonts_dir)
+    ass_txt = ass_p.read_text(encoding="utf-8")
     head = ass_txt.partition("[Events]")[0]
-    expected = {}
+    role_face: dict[str, tuple[str, int]] = {}
+    lay = read_json(ass_p.parent / "caption_layout.json") or {}
+    for c in (lay.get("captions") or {}).values():
+        fnt = c.get("font") or {}
+        if fnt.get("file_name") is not None:
+            role_face.setdefault(c["role"], (fnt["file_name"], int(fnt.get("face_index") or 0)))
+    expected: dict = {}
     for ln in head.splitlines():
         if ln.startswith("Style:"):
             parts = ln.split(":", 1)[1].split(",")
-            if parts[0].strip() != "deco":
-                expected[parts[0].strip()] = parts[1].strip()
-    return cap_mod.verify_libass_fonts(ass_txt, paths.absp(r.fonts_dir), expected)
+            st = parts[0].strip()
+            if st == "deco":
+                continue
+            expected[st] = parts[1].strip()
+            if st in role_face:
+                fn, idx = role_face[st]
+                fp = fdir / fn
+                faces = [f for f in (cap_mod.read_faces(str(fp)) if fp.is_file() else ()) if f.index == idx]
+                if not faces:
+                    raise RenderError(f"자막 역할 {st}: 해석된 글꼴 파일 {r.fonts_dir}/{fn}#{idx} 이 없습니다(resolve 다시)")
+                expected[st] = faces[0]
+    return cap_mod.verify_libass_fonts(ass_txt, fdir, expected)
 
 
 def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False, preset: config.Preset | None = None) -> Path:

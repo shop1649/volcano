@@ -683,6 +683,78 @@ def _flat_bg(loc: dict | None, boxed: bool) -> tuple | None:
     return hex_rgb(loc["box_region_color"]) if float(loc["box_region_std"]) <= FLAT_BG_STD else None
 
 
+def font_inputs(frame: np.ndarray, cap, bbox, loc: dict | None = None) -> dict:
+    """The font-check crop of one caption in ``frame`` (``bbox`` = its fill-ink box in that frame's coordinates) and
+    the colours the comparison is made with: {crop, text, fill, around, boxed, bg}."""
+    x, y, w, h = (int(v) for v in bbox)
+    boxed = bool((cap.box or {}).get("enabled"))
+    pad = 3 if boxed else int(float(cap.outline_px or 0) + 6)     # stay inside a label box
+    crop = frame[max(0, y - pad):y + h + pad, max(0, x - pad):x + w + pad]
+    text = "\n".join(expected_lines(cap))
+    # the colour around the glyphs: outline colour, or the (measured) box colour for label boxes
+    around = hex_rgb(cap.outline_color) if cap.outline_px else None
+    if boxed and loc and loc.get("box_region_color"):
+        around = hex_rgb(loc["box_region_color"])
+    # highlighted words use another fill colour: paint them in the main fill colour so the font
+    # comparison sees the whole line (luma coverage, see recolor_highlight)
+    if cap.highlight and hex_rgb(cap.highlight_color):
+        crop = recolor_highlight(crop, hex_rgb(cap.highlight_color), hex_rgb(cap.color, (255, 255, 255)),
+                                 around if around is not None else hex_rgb(cap.outline_color, (0, 0, 0)))
+    return {"crop": crop, "text": text, "fill": hex_rgb(cap.color, (255, 255, 255)), "around": around,
+            "boxed": boxed, "bg": _flat_bg(loc, boxed)}
+
+
+POOL_INK_MATCH = 0.85   # a pooled rest frame is used only if its caption ink overlaps the rest frame's this much (IoU)
+
+
+def rest_pool_crops(ctx: QAContext, cap, loc: dict, rest_frame: np.ndarray) -> dict:
+    """Font crops of one caption at the pooled rest delays (``font_id.delay_frames``: frames after the caption comes
+    to rest = ASS start (centiseconds, as rendered) + entrance motion).  Only delays that end >= 2 frames before the
+    caption's exit motion / end are used, and a frame is dropped when its caption ink no longer matches the rest
+    frame's (covered by a flash, a decoration, a fade...).  -> {crops: [{crop, delay, t}], skipped: [...]}"""
+    from .font_id import delay_frames
+    from .probes_video import crop_ints
+
+    fps = float(ctx.fps)
+    start_cs = round(float(cap.start) * 100) / 100.0
+    dur_in = float((cap.motion_in or {}).get("dur_s") or 0.0) if (cap.motion_in or {}).get("type") not in (None, "none") else 0.0
+    mo = cap.motion_out or {}
+    dur_out = float(mo.get("dur_s") or 0.0) if mo.get("type") not in (None, "none") else 0.0
+    k_rest = int(math.ceil((start_cs + dur_in) * fps - 1e-6))
+    k_last = int(math.ceil((round(float(cap.end) * 100) / 100.0 - dur_out) * fps - 1e-6)) - 3
+    k_last = min(k_last, int(math.floor(float(ctx.info.duration) * fps)) - 2)
+    want = [(d, k_rest + d) for d in delay_frames(fps) if k_rest + d <= k_last]
+    out: dict = {"crops": [], "skipped": [], "rest_frame_index": k_rest}
+    if not want:
+        out["skipped"].append("정지 구간이 짧아 합동 판정용 지연 프레임이 없음")
+        return out
+    x, y, w, h = (int(v) for v in loc["bbox"])
+    H, W = rest_frame.shape[:2]
+    m = 16 + int(float(cap.outline_px or 0))
+    cx, cy, cw, ch = crop_ints([x - m, y - m, w + 2 * m, h + 2 * m], W, H)
+    k0, k1 = want[0][1], want[-1][1]
+    try:
+        ts, frs = grab_window(ctx.mp4, k0 / fps, (k1 - k0 + 0.5) / fps, crop=[cx, cy, cw, ch])
+    except Exception as e:
+        out["skipped"].append(f"프레임 디코드 실패: {type(e).__name__}: {e}"[:200])
+        return out
+    by_k = {int(round(t * fps)): f for t, f in zip(ts, frs)}
+    bb = [x - cx, y - cy, w, h]
+    ref_ink = ink_mask(rest_frame[cy:cy + ch, cx:cx + cw], cap)
+    for d, kk in want:
+        f = by_k.get(kk)
+        if f is None or f.shape[:2] != (ch, cw):
+            out["skipped"].append(f"지연 {d}프레임: 프레임 없음")
+            continue
+        ink = ink_mask(f, cap)
+        inter, union = float((ink & ref_ink).sum()), float((ink | ref_ink).sum())
+        if union <= 0 or inter / union < POOL_INK_MATCH:
+            out["skipped"].append(f"지연 {d}프레임: 자막 잉크가 정지 프레임과 다름(IoU {inter / union if union else 0:.2f})")
+            continue
+        out["crops"].append({"crop": font_inputs(f, cap, bb, loc)["crop"], "delay": d, "t": round(kk / fps, 4)})
+    return out
+
+
 def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None, ctx: QAContext | None = None) -> dict:
     """Font of one caption in the output frame.
 
@@ -700,27 +772,14 @@ def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None, ctx: QAC
     exp_path = paths.absp(cap.font_file) if cap.font_file else (find_font(cap.font_name) if find_font else None)
     if exp_path is None or not exp_path.exists():
         return {"status": "unmeasured", "reason": f"기대 글꼴 파일을 찾지 못함: {cap.font_name}"}
-    x, y, w, h = bbox
-    boxed = bool((cap.box or {}).get("enabled"))
-    pad = 3 if boxed else int(float(cap.outline_px or 0) + 6)     # stay inside a label box
-    crop = frame[max(0, y - pad):y + h + pad, max(0, x - pad):x + w + pad]
-    text = "\n".join(expected_lines(cap))
-    # the colour around the glyphs: outline colour, or the (measured) box colour for label boxes
-    around = hex_rgb(cap.outline_color) if cap.outline_px else None
-    if boxed and loc and loc.get("box_region_color"):
-        around = hex_rgb(loc["box_region_color"])
-    # highlighted words use another fill colour: paint them in the main fill colour so the font
-    # comparison sees the whole line (luma coverage, see recolor_highlight)
-    if cap.highlight and hex_rgb(cap.highlight_color):
-        crop = recolor_highlight(crop, hex_rgb(cap.highlight_color), hex_rgb(cap.color, (255, 255, 255)),
-                                 around if around is not None else hex_rgb(cap.outline_color, (0, 0, 0)))
-    fill = hex_rgb(cap.color, (255, 255, 255))
+    fi = font_inputs(frame, cap, bbox, loc)
+    crop, text, fill, around, boxed = fi["crop"], fi["text"], fi["fill"], fi["around"], fi["boxed"]
     ident = None
     if ctx is not None:
         try:
             from .font_id import identify_caption_font
 
-            ident = identify_caption_font(ctx, cap, crop, text, fill, around, boxed, bg=_flat_bg(loc, boxed))
+            ident = identify_caption_font(ctx, cap, crop, text, fill, around, boxed, bg=fi["bg"])
         except Exception as e:
             ident = {"status": "unmeasured", "verdict": "unmeasured",
                      "reason": f"글꼴 판별(identify) 실패: {type(e).__name__}: {e}"[:300]}
@@ -968,11 +1027,63 @@ def probe_captions(ctx: QAContext) -> list[dict]:
                 except Exception as e:
                     item["timing_error"] = f"{type(e).__name__}: {e}"[:300]
                 item["font"] = measure_font(frame, cap, loc["bbox"], loc, ctx)
+                try:
+                    pool = rest_pool_crops(ctx, cap, loc, frame)
+                except Exception as e:
+                    pool = {"crops": [], "skipped": [f"{type(e).__name__}: {e}"[:200]]}
+                ctx.options.setdefault("_font_pool", {})[cap.id] = {"pool": pool, "loc": loc, "frame": frame}
+                item["font_pool"] = {"delays": [c["delay"] for c in pool["crops"]], "t": [c["t"] for c in pool["crops"]],
+                                     "skipped": pool.get("skipped") or []}
         except Exception as e:
             item["found"] = False
             item["error"] = f"{type(e).__name__}: {e}"[:300]
         out.append(item)
     return out
+
+
+def font_role_key(cap) -> str:
+    return f"{cap.role}|{cap.font_name}|{getattr(cap, 'font_file', None) or ''}"
+
+
+def probe_font_roles(ctx: QAContext, captions: list[dict]) -> dict:
+    """Per-ROLE pooled font verdicts (``font_id.identify_role_font``) from the rest-frame crops collected by
+    ``probe_captions`` for every found caption.  -> {subject: result}; subject = the role, or ``role:font``
+    when one role uses several planned fonts."""
+    from .font_id import identify_role_font
+
+    stash = ctx.options.get("_font_pool") or {}
+    found = {c["id"] for c in captions if c.get("found")}
+    groups: dict[str, list] = {}
+    for cap in ctx.resolved.captions:
+        groups.setdefault(font_role_key(cap), []).append(cap)
+    roles = {}
+    for key, caps in groups.items():
+        role = caps[0].role
+        n_fonts = len({font_role_key(c) for c in ctx.resolved.captions if c.role == role})
+        subject = role if n_fonts == 1 else f"{role}:{caps[0].font_name}"
+        entries, missing = [], []
+        for cap in caps:
+            st = stash.get(cap.id)
+            if cap.id not in found or st is None or not st["pool"]["crops"]:
+                missing.append(cap.id)
+                continue
+            fi = font_inputs(st["frame"], cap, st["loc"]["bbox"], st["loc"])
+            entries.append({"cap": cap, "text": fi["text"], "fill": fi["fill"], "around": fi["around"],
+                            "boxed": fi["boxed"], "bg": fi["bg"], "crops": st["pool"]["crops"]})
+        if not entries:
+            roles[subject] = {"status": "unmeasured", "verdict": "unmeasured", "role": role,
+                              "expected": caps[0].font_name, "captions_without_crops": missing,
+                              "reason": "이 역할의 어느 자막에서도 정지 프레임 crop 을 얻지 못함"}
+            continue
+        try:
+            r = identify_role_font(ctx, role, entries)
+        except Exception as e:
+            r = {"status": "unmeasured", "verdict": "unmeasured", "role": role, "expected": caps[0].font_name,
+                 "reason": f"합동 글꼴 판정 실패: {type(e).__name__}: {e}"[:300]}
+        r["captions_without_crops"] = missing
+        roles[subject] = r
+    ctx.options.pop("_font_pool", None)
+    return roles
 
 
 def probe_cover(ctx: QAContext, captions: list[dict]) -> dict:
@@ -1016,6 +1127,10 @@ def probe_text(ctx: QAContext) -> dict:
     except Exception as e:
         res["errors"]["captions"] = f"{type(e).__name__}: {e}"
         res["captions"] = []
+    try:
+        res["font_roles"] = probe_font_roles(ctx, res["captions"])
+    except Exception as e:
+        res["errors"]["font_roles"] = f"{type(e).__name__}: {e}"
     try:
         res["identity"] = probe_identity(ctx, res["captions"])
     except Exception as e:

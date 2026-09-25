@@ -225,9 +225,10 @@ render:
 
 audio:
   sample_rate: 48000
-  # 레벨 규칙: 아래 gain_db 값(bgm.gain_db, sfx.gain_db_default, plan 의 sfx gain_db, original.keep_gain_db)은 모두
-  # "최종 프로그램 음량(integrated_lufs)에서의 레벨"이다(깨끗한 음원/효과음 파일/원본 소리 대비 dB). `ref audio-measure` 가
+  # 레벨 규칙: 아래 gain_db 값(bgm.gain_db, sfx.gain_db_default, plan 의 sfx gain_db)은 모두
+  # "최종 프로그램 음량(integrated_lufs)에서의 레벨"이다(깨끗한 음원/효과음 파일 대비 dB). `ref audio-measure` 가
   # audio.bgm.gain_db 를 그렇게 잰다(깨끗한 음원 LS 이득 + 목표 LUFS - 레퍼런스 믹스 LUFS). 그래서 마지막 음량 정규화는 작은
+  # (original.keep_gain_db 는 단위가 다르다: 원본 소리 대비 dB 가 아니라 프로그램 음량 대비 LU — 아래 original 참고.)
   # 보정이어야 한다. BGM 에는 어떤 리미터도 걸지 않는다. 전경(효과음+살린 원음)만 max_limiter_db 까지 줄일 수 있고, 그보다
   # 더 필요하면 전체 이득을 낮추고 목표 음량 부족분을 render_report.json 에 적는다(test 경고 / production 오류).
   loudness: {integrated_lufs: -14.0, true_peak_db: -1.5, tolerance_lu: 1.0,
@@ -246,7 +247,10 @@ audio:
     loop_xfade_s: 0.05  # 규칙(측정 대상 아님): loop=true 일 때 되감기 지점 등전력 크로스페이드 길이
   original:
     default: off           # 원본 소리는 기본 OFF. 중요 대사/말하는 구간만 plan 에서 keep
-    keep_gain_db: 0.0      # 임시값(못 잼). 최종 프로그램 음량에서 살린 원음 레벨(녹음된 원본 소리 대비 dB)
+    keep_gain_db: 0.0      # 임시값(못 잼). 살린 원음(대사)의 음량 = 프로그램 음량 대비 LU(살린 구간 integrated LUFS
+                           #   − 믹스 integrated LUFS, `ref audio-measure` 가 이 단위로 잼). 렌더러 이득 = T + keep_gain_db − L_src
+                           #   (T = loudness.integrated_lufs, L_src = 그 클립에서 살린 원본 소리의 실측 integrated LUFS).
+                           #   plan 의 timeline[].original_audio.gain_db 도 같은 단위. 원본 소리 대비 dB 가 아님.
     fade_s: 0.04
     remove_embedded_music: true   # 원본에 붙은 음악은 분리(demucs vocals)해서 제거
   ducking:
