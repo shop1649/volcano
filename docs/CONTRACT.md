@@ -301,6 +301,31 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   unmeasured files were still written.
 
 
+### 12.2 Review-fix additions (wave 1)
+- **Production basis**: every production output (measurements/*, formats.yaml, font identity, SFX catalog) uses only members of
+  the fixed latest-100 snapshot (`reference.common.production_basis`); excluded video ids are recorded in each output.
+- **Snapshot**: `latest100.json` records `missing_members`, `failures`, `completions`; a partial snapshot is fixed like an ok one
+  and completed later as of its original capture time; replaced snapshots are archived. `all_videos.json` view counts are the
+  freshest; `view_count_at_snapshot` keeps the snapshot-time count. Set names: `latest100`, `high_views`, `high_views_outside`,
+  `all_videos`, `downloaded`, `analyzed`, `reference`.
+- **High views**: `reference/high_views.json` holds exact counts (candidates ≥ 90 % of the threshold or unknown are fetched);
+  unconfirmed ones are `unverified` (status partial). `ref high-views-report` → `reference/high_views_report.{json,md}`
+  (reference-only; stage measured only when every ≥800k video is downloaded and analysed: visual, audio, trace).
+- **Measurement group** `visual_presence` (keys `presence.*`: present | absent, never absent for speed_change/decorations);
+  `motion.freeze.max_per_video` and `motion.zoom.max_consecutive` are measured p90s. Pixel items keep native per-video values +
+  `scaled_to` (measured canvas if measured, else preset canvas).
+- **Exclusions** kind `account` (the reference channel itself: platform, handle, channel_url, channel_ids); every upload of the
+  reference channel is a URL exclusion; every non-own URL in a description is excluded (credit-line or not is recorded).
+- **source_accounts.json** has a `stage` block with per-route coverage (description, script=captions/transcript, on-screen OCR over
+  the whole frame, Lens, fingerprint); the stage is measured only when every route covers every target video.
+- **sfx_events.json** status `partial` when speech intervals could not be checked (no Demucs); the catalog is then unmeasured.
+- **candidates.jsonl** also: authorship_base, repost_evidence[], reviews[].original_upload / watermark_handle, alternates[]
+  {id, linked_by, linked_at, note, basis}, alternate_of[], manual_provenance[], views_manual, original_author_hint, provenance_log,
+  scores.upload_age_days / originality. 'recent' needs a reviewer original_upload=yes; a repost is judged by original_published_at.
+- **Overlay detector** algo `shortkit.clean.detect/2` (older /1 records are `record_stale`). `shortkit.clean.coverage(source_path,
+  clean_block, *, sha256, used_ranges, visible, tol_px) -> list` (blocking codes: uncovered, no_record, source_missing,
+  record_stale). `residual_score` also reports `max_tile_ncc`, `ocr_partial_hits` (thresholds tile_ncc 0.6, partial OCR conf).
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
