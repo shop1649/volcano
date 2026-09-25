@@ -181,6 +181,23 @@ def test_qa_identity_check_reads_the_folder(refset, tmp_path):
     assert hit["status"] == "different" and hit["observed"]["hits"]
     assert {h["template"] for h in hit["observed"]["hits"]} == {Path(t["file"]).name for t in manifest(root)["templates"]
                                                                 if t["basis"] == "recurrence"}
+    # while a review candidate is pending the template set is incomplete: no hit is 못 잼, never 'same'
+    pending = _logo_template_check(ctx(clean), TDIR)
+    assert manifest(root)["status"] == "partial" and manifest(root)["review"]
+    assert pending["status"] == "unmeasured" and pending["required"] and not pending["observed"]["hits"]
+    # the person who looked at the review crop rejects it (a style plate, not an identity mark) -> complete set
+    for rv in manifest(root)["review"]:
+        IT.decide("joshuamagazine", rv["id"], "reject", by="SYNTHETIC reviewer", note="자막 박스(스타일), 식별 표시 아님")
+    # the fixture also leaves one snapshot video undownloaded (another reason for 'partial'): take it out of the
+    # (synthetic) snapshot so every member is scanned
+    import json as _json
+    snap_p = root / P / "reference" / "latest100.json"
+    snap = _json.loads(snap_p.read_text("utf-8"))
+    snap["videos"] = [v for v in snap["videos"] if (root / P / "reference" / "videos" / f"{v['video_id']}.mp4").exists()]
+    snap_p.write_text(_json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+    IT.extract("joshuamagazine", detector=det)
+    m2 = manifest(root)
+    assert m2["status"] == "measured", (m2.get("partial_reasons"), m2.get("review"), m2.get("blocker"))
     ok = _logo_template_check(ctx(clean), TDIR)
     assert ok["status"] == "same" and not ok["observed"]["hits"]
     assert all(not n.startswith("rev") for n in ok["expected"]["templates"])

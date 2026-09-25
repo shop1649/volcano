@@ -83,6 +83,10 @@ NON_MEASURED: dict[str, str] = {
     "text.tone.sentence_end_examples": "meta",
 }
 
+# Meta keys that ARE written by measurement emitters (measured data that is not a style setting): distribution
+# sample sizes and the measured example sentence endings.  Emitters may write only these among meta/infra/rule keys.
+MEASURED_META: tuple[str, ...] = ("structure.*.n", "text.tone.sentence_end_examples")
+
 # Keys read only on a conditional code path that no tracked episode run exercises (e.g. the BGM loop crossfade is
 # read only when audio.bgm.loop is true AND the music is shorter than the episode).  The link is NOT taken on trust:
 # tests/core/test_conditional_readers.py drives each reader and asserts, through the Preset access log, that the
@@ -140,6 +144,10 @@ IMPACT: dict[str, str] = {
 
 def _match(key: str, pattern: str) -> bool:
     return key == pattern or fnmatch.fnmatchcase(key, pattern)
+
+
+def _match_any(key: str, patterns) -> bool:
+    return any(_match(key, p) for p in patterns)
 
 
 def classify_key(key: str) -> str | None:

@@ -53,7 +53,8 @@ def test_every_emitted_key_is_a_preset_style_key(proj):
     # no tolerated gaps any more (wave 2 added presence.* and reclassified the two per-video count limits)
     missing = [k for k in keys if k not in base]
     assert not missing, f"measurement keys with no preset key: {missing}"
-    non_style = [k for k in keys if config.classify_key(k)]
+    # only the documented measured-metadata keys (sample sizes, example sentence endings) may be non-style
+    non_style = [k for k in keys if config.classify_key(k) and not config._match_any(k, config.MEASURED_META)]
     assert not non_style, f"measurement keys that are meta/infra/rule keys: {non_style}"
     assert set(A.PRESENCE_VISUAL_KEYS) <= set(keys)
     assert {"motion.zoom.max_consecutive", "motion.freeze.max_per_video"} <= set(keys)
@@ -63,6 +64,9 @@ def test_every_emitted_key_is_a_preset_style_key(proj):
     na = []
     for k in keys:
         e = reg["entries"][k]
+        if config._match_any(k, config.MEASURED_META):
+            assert e["status"] == "not_applicable", (k, e["status"])   # measured metadata, not a style value
+            continue
         if e["status"] == "not_applicable_given":
             assert (e.get("not_applicable") or {}).get("given") == "정의", (k, e.get("not_applicable"))
             na.append(k)
