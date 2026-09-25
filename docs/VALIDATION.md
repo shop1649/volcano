@@ -75,7 +75,32 @@
 
 (기록: `docs/validation/final_restore_log.md` — 명령·종료 코드·출력 원문)
 
-_복원 결과를 채우는 중_
+### 1차 (커밋 17e4e0a 의 번들)
+
+- 복원: 빈 폴더에 MD 하나만 두고, MD 가 읽으라는 1–391 행 안의 bash 블록을 수정 없이 실행했다.
+  - 파일 323개가 sha256 일치로 풀렸다. 저장소 파일과 바이트 단위로 같다.
+- `setup.sh` 종료 0. `doctor --network` 필수 미충족 0.
+- 테스트 자산: `fetch-video` 가 GitHub 파일 직접 받기에서 403 이었다. git clone 폴더(`--local-dir`)로 받았다.
+- 새 에피소드 test-restore-001: 소스는 예제가 쓰지 않은 파일이다.
+  - 로고·출처 표시·영어 자막·음악·말소리를 합성한 `dirty_source_facewalk`.
+  - people-detection 의 다른 구간.
+- 흐름: clean detect → clean plan(inpaint 3건) → plan v1–v4 → render → export → melt 대조 → QA.
+- 결과:
+  - 렌더 −14.4 LUFS / −1.7 dBTP.
+  - MLT melt 대조 통과: SSIM 0.9942, 소리 상관 0.9998, 프레임 555/555.
+  - 원본 워터마크·영어 자막 잔류 0.
+- 이 실행이 찾은 문제 7가지는 모두 고쳤다(`docs/validation/final_restore_log.md` 6절).
+  - QA 오탐 2: 걸어오는 사람 때문에 줌을 잘못 잼, 정지 구간 때문에 속도를 잘못 잼.
+  - 깨끗한 복원에서 실패하던 테스트 7개.
+  - **국소 복원이 보호 영역(손)을 덮는 것을 잡는 검사가 없었음**: 출력에서 손이 번졌다.
+  - validate 오경고 1.
+  - `dirty-source` 출력 이름 고정.
+  - mockloop 스크립트가 번들에서 빠짐.
+- 같은 MP4 를 고친 코드로 다시 QA 한 결과는 2절 표에 있다.
+
+### 2차 (고친 번들)
+
+(2차 복원 결과 — 아래에 기록)
 
 ## 5. 프리셋 연결 감사
 

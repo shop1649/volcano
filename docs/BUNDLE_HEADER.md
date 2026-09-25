@@ -23,3 +23,7 @@ Claude Code 와 Codex 모두 이 파일의 **이 윗부분만** 읽고, 맨 아�
 - 렌더 결과 MP4 와 편집 프로젝트의 미디어 폴더는 `python -m shortkit episode all <id>` 로 다시 만든다.
 - 테스트(`pytest`) 전에 테스트 자산을 만든다: `python -m shortkit testassets synth && python -m shortkit testassets fetch-video
   && python -m shortkit episode test-source && python -m shortkit testassets dirty-source`.
+  GitHub 파일 직접 받기가 막힌 곳이면 `git clone https://github.com/intel-iot-devkit/sample-videos` 뒤
+  `fetch-video --local-dir <그 폴더>`(2026-09-25 검증 컴퓨터가 이 경우).
+- 예제 에피소드 test-restore-001 을 다시 렌더하려면 그 소스도 만든다:
+  `python -m shortkit testassets dirty-source --video face-demographics-walking-and-pause.mp4 --out dirty_source_facewalk`.

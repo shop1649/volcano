@@ -402,6 +402,28 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   max(3 px, 10 %) + 1 frame, dialogue lead 0.1 s + 1 frame, ramps ±(0.01 s + 15 %), BGM level tolerance_lu + 0.3 dB, blur
   ±max(2, 15 %), recenter 5 %/10 % of the region's short side). Re-check them against reference noise once references exist.
 
+### 12.7 Clean-folder restore findings (docs/validation/final_restore_log.md)
+- `probes_video.planned_frame_match` computes the planned geometry at the DISPLAYED frame's time (k / fps, the renderer's frame
+  time); `geometry_check(masked=True)` leaves captions / decorations / clean rects out (`overlay_keep_mask`) and accepts several
+  scale alternatives and extra instants.
+- video.zoom: a planned zoom also gets `geometry` = `geometry_check` with the instants at 25/50/75 % of the ramp and ±4 %
+  alternatives. When the feature scale curve disagrees (a subject walking to the camera) but that check is confirmed with >= 2
+  in-ramp instants (`checks._zoom_geometry_confirmed`), the row is `same` and the reference comparison uses the plan's zoom values
+  as the verified observation (`_zoom_effective`).
+- video.speed: the slope of matched source time is taken over the footage's playback clock (`probes_video.play_time`: output time
+  minus the freeze hold already shown). The row is written whenever the speed was measured (a 1x clip: "no speed change" within
+  10 %, `SPEED_UNCHANGED_FRAC`), so a defect on it can be re-checked.
+- Clean ops over protected regions: `clean.strategy.cleanup_protected_overlaps(clip, protected)` (inpaint / delogo / blur rect
+  covering > 5 % of a protected rect while both are in the clip's source range). validate: warning `clean_overlaps_protected`. QA: one
+  required row `clean.protected_overlap:<clip>#k` per overlap, 못 잼 until a person records the verdict with `qa human-check --kind
+  watch`; no overlap -> `clean.protected_overlap:all` same. Remedy order stays rule 12: clean original -> not using that span.
+- validate `zoom_cuts_protected` skips a protected region that ends before the zoom starts (source time of `zoom.start`).
+- `testassets dirty-source --out <name>` writes `assets/test/generated/<name>.mp4` (+ `.truth.json`); the default name
+  `dirty_source` stays the pytest fixture. test-restore-001 uses `--video face-demographics-walking-and-pause.mp4 --out
+  dirty_source_facewalk`.
+- Tests never read gitignored build products: the synthetic QA IR is built in memory (`tests/qa/test_qa_review_d.synthetic_resolved`),
+  saved-probe tests re-derive `build/resolved.json` with `episode resolve`. The bundle packs `docs/validation/mockloop/*`.
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
