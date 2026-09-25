@@ -1,9 +1,9 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-25T14:10:33+00:00",
+  "saved_at": "2026-09-25T14:27:09+00:00",
   "reads": {
-    "approval.later_episodes_require_approval": [
+    "approval.first_episode_requires_approval": [
       "shortkit/edit/plan.py:approval_state_for"
     ],
     "audio.bgm.gain_db": [
@@ -108,24 +108,6 @@
       "shortkit/qa/checks.py:pget",
       "shortkit/qa/probes_text.py:probe_cover"
     ],
-    "decorations.box.blink_hz": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.box.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.box.stroke_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.circle.blink_hz": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.circle.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.circle.stroke_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "identity_exclusions.forbidden_text": [
       "shortkit/qa/probes_text.py:probe_identity"
     ],
@@ -138,9 +120,6 @@
     "motion.freeze.max_per_video": [
       "shortkit/qa/checks.py:pget"
     ],
-    "motion.speed.slowmo_factor": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "motion.transitions.default": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -151,6 +130,12 @@
       "shortkit/qa/checks.py:pget"
     ],
     "motion.transitions.flash.scope": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "motion.zoom.dur_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "motion.zoom.ease": [
       "shortkit/qa/checks.py:pget"
     ],
     "motion.zoom.max_consecutive": [
@@ -392,6 +377,75 @@
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.situation.timing.min_dur_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.anchor.x": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.anchor.y": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.bold": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.alpha": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.color": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.enabled": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_x": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_y": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.color": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.font_name": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.max_chars_per_line": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.max_lines": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.max_width_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.motion_in.dur_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.motion_in.type": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.motion_out.dur_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.motion_out.type": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.outline_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.persist": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.shadow_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.size_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.timing.lead_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.title.anchor.x": [

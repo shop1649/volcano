@@ -657,6 +657,94 @@
         "tolerance": {
           "ratio": 0.04,
           "t50_s": 0.1
+        },
+        "geometry": {
+          "status": "measured",
+          "confirmed": true,
+          "ncc_median": 0.9831,
+          "ncc_min": 0.9794,
+          "zoom_alt": [
+            1.04,
+            0.9615
+          ],
+          "alt_gap_median": 0.0603,
+          "n_extra": 3,
+          "masked": true,
+          "samples": [
+            {
+              "t": 0.433,
+              "expected_src_t": 1.933,
+              "src_t": 1.933,
+              "ncc": 0.9794,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.8949
+            },
+            {
+              "t": 1.2,
+              "expected_src_t": 2.7,
+              "src_t": 2.667,
+              "ncc": 0.9794,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.895
+            },
+            {
+              "t": 2.0,
+              "expected_src_t": 3.5,
+              "src_t": 3.533,
+              "ncc": 0.9845,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.9257
+            },
+            {
+              "t": 2.767,
+              "expected_src_t": 4.267,
+              "src_t": 4.267,
+              "ncc": 0.9848,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.9286
+            },
+            {
+              "t": 3.533,
+              "expected_src_t": 5.033,
+              "src_t": 5.033,
+              "ncc": 0.9831,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.9213
+            },
+            {
+              "t": 1.367,
+              "expected_src_t": 2.867,
+              "src_t": 2.833,
+              "ncc": 0.9825,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.914,
+              "extra": true
+            },
+            {
+              "t": 1.467,
+              "expected_src_t": 2.967,
+              "src_t": 2.967,
+              "ncc": 0.9832,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.9247,
+              "extra": true
+            },
+            {
+              "t": 1.533,
+              "expected_src_t": 3.033,
+              "src_t": 3.067,
+              "ncc": 0.9842,
+              "masked_frac": 0.026,
+              "ncc_alt": 0.9265,
+              "extra": true
+            }
+          ],
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040/0.962 대안과 비교",
+          "ramp_times": [
+            1.387,
+            1.475,
+            1.562
+          ]
         }
       },
       {
@@ -1308,52 +1396,59 @@
         "geometry": {
           "status": "measured",
           "confirmed": true,
-          "ncc_median": 0.9974,
-          "ncc_min": 0.9529,
+          "ncc_median": 0.9976,
+          "ncc_min": 0.9974,
           "zoom_alt": 1.04,
-          "alt_gap_median": 0.0357,
+          "alt_gap_median": 0.0395,
+          "n_extra": 0,
+          "masked": true,
           "samples": [
             {
-              "t": 13.678,
-              "expected_src_t": 3.928,
+              "t": 13.667,
+              "expected_src_t": 3.917,
               "src_t": 3.833,
               "ncc": 0.9979,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9718
             },
             {
-              "t": 14.902,
-              "expected_src_t": 5.152,
+              "t": 14.9,
+              "expected_src_t": 5.15,
               "src_t": 5.083,
               "ncc": 0.9978,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9727
             },
             {
-              "t": 16.125,
-              "expected_src_t": 6.375,
+              "t": 16.1,
+              "expected_src_t": 6.35,
               "src_t": 6.417,
-              "ncc": 0.9529,
-              "ncc_alt": 0.9172
+              "ncc": 0.9976,
+              "masked_frac": 0.103,
+              "ncc_alt": 0.9557
             },
             {
-              "t": 17.348,
-              "expected_src_t": 7.598,
-              "src_t": 7.667,
-              "ncc": 0.9531,
-              "ncc_alt": 0.9165
+              "t": 17.333,
+              "expected_src_t": 7.583,
+              "src_t": 7.75,
+              "ncc": 0.9976,
+              "masked_frac": 0.103,
+              "ncc_alt": 0.9542
             },
             {
-              "t": 18.572,
-              "expected_src_t": 8.822,
+              "t": 18.567,
+              "expected_src_t": 8.817,
               "src_t": 8.917,
               "ncc": 0.9974,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9579
             }
           ],
-          "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040 대안과 비교"
         }
       }
     ],
-    "max_consecutive_measured": 1
+    "max_consecutive_measured": 0
   },
   "decorations": {
     "items": [

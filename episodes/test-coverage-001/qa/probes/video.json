@@ -574,23 +574,27 @@
         "geometry": {
           "status": "measured",
           "confirmed": true,
-          "ncc_median": 0.9951,
-          "ncc_min": 0.9892,
+          "ncc_median": 0.9956,
+          "ncc_min": 0.9945,
           "zoom_alt": 1.04,
           "alt_gap_median": 0.0623,
+          "n_extra": 0,
+          "masked": true,
           "samples": [
             {
-              "t": 5.353,
-              "expected_src_t": 5.553,
+              "t": 5.333,
+              "expected_src_t": 5.533,
               "src_t": 5.5,
               "ncc": 0.9945,
+              "masked_frac": 0.0,
               "ncc_alt": 0.917
             },
             {
-              "t": 6.327,
-              "expected_src_t": 6.527,
+              "t": 6.3,
+              "expected_src_t": 6.5,
               "src_t": 6.5,
               "ncc": 0.9951,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9266
             },
             {
@@ -598,24 +602,27 @@
               "expected_src_t": 7.5,
               "src_t": 7.5,
               "ncc": 0.9956,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9333
             },
             {
-              "t": 8.273,
-              "expected_src_t": 8.473,
+              "t": 8.267,
+              "expected_src_t": 8.467,
               "src_t": 8.417,
               "ncc": 0.9958,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9369
             },
             {
-              "t": 9.247,
-              "expected_src_t": 9.447,
+              "t": 9.233,
+              "expected_src_t": 9.433,
               "src_t": 9.5,
-              "ncc": 0.9892,
-              "ncc_alt": 0.9323
+              "ncc": 0.9969,
+              "masked_frac": 0.189,
+              "ncc_alt": 0.9365
             }
           ],
-          "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040 대안과 비교"
         }
       },
       {
@@ -1064,48 +1071,55 @@
         "geometry": {
           "status": "measured",
           "confirmed": true,
-          "ncc_median": 0.9932,
-          "ncc_min": 0.9892,
+          "ncc_median": 0.9938,
+          "ncc_min": 0.9932,
           "zoom_alt": 1.04,
-          "alt_gap_median": 0.0838,
+          "alt_gap_median": 0.08,
+          "n_extra": 0,
+          "masked": true,
           "samples": [
             {
-              "t": 14.161,
-              "expected_src_t": 32.661,
+              "t": 14.133,
+              "expected_src_t": 32.633,
               "src_t": 32.583,
               "ncc": 0.9932,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9142
             },
             {
-              "t": 15.111,
-              "expected_src_t": 33.611,
+              "t": 15.1,
+              "expected_src_t": 33.6,
               "src_t": 33.583,
               "ncc": 0.994,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9142
             },
             {
-              "t": 16.06,
-              "expected_src_t": 34.56,
+              "t": 16.033,
+              "expected_src_t": 34.533,
               "src_t": 34.5,
               "ncc": 0.9934,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9057
             },
             {
-              "t": 17.009,
-              "expected_src_t": 35.509,
+              "t": 17.0,
+              "expected_src_t": 35.5,
               "src_t": 35.417,
-              "ncc": 0.99,
-              "ncc_alt": 0.9053
+              "ncc": 0.9943,
+              "masked_frac": 0.134,
+              "ncc_alt": 0.9129
             },
             {
-              "t": 17.959,
-              "expected_src_t": 36.459,
-              "src_t": 36.417,
-              "ncc": 0.9892,
-              "ncc_alt": 0.9054
+              "t": 17.933,
+              "expected_src_t": 36.433,
+              "src_t": 36.333,
+              "ncc": 0.9938,
+              "masked_frac": 0.134,
+              "ncc_alt": 0.9138
             }
           ],
-          "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040 대안과 비교"
         }
       },
       {
@@ -1366,19 +1380,23 @@
           "ncc_min": 0.9936,
           "zoom_alt": 1.04,
           "alt_gap_median": 0.0575,
+          "n_extra": 0,
+          "masked": true,
           "samples": [
             {
-              "t": 18.953,
-              "expected_src_t": 42.227,
+              "t": 18.933,
+              "expected_src_t": 42.217,
               "src_t": 42.167,
               "ncc": 0.9936,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9163
             },
             {
-              "t": 19.727,
-              "expected_src_t": 42.613,
+              "t": 19.7,
+              "expected_src_t": 42.6,
               "src_t": 42.583,
               "ncc": 0.994,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9206
             },
             {
@@ -1386,24 +1404,27 @@
               "expected_src_t": 43.0,
               "src_t": 43.0,
               "ncc": 0.9961,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9386
             },
             {
-              "t": 21.273,
-              "expected_src_t": 43.387,
+              "t": 21.267,
+              "expected_src_t": 43.383,
               "src_t": 43.333,
               "ncc": 0.9968,
+              "masked_frac": 0.0,
               "ncc_alt": 0.9425
             },
             {
-              "t": 22.047,
-              "expected_src_t": 43.773,
+              "t": 22.033,
+              "expected_src_t": 43.767,
               "src_t": 43.75,
               "ncc": 0.9963,
+              "masked_frac": 0.0,
               "ncc_alt": 0.94
             }
           ],
-          "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040 대안과 비교"
         }
       }
     ],
@@ -3571,9 +3592,118 @@
         "sha256": "18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693",
         "sha256_from": "plan sources[].sha256",
         "items": [],
-        "record": null,
-        "status": "no_record",
-        "reason": "출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4`"
+        "record": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693.json",
+        "status": "measured",
+        "used_src_ranges": [
+          [
+            2.0,
+            6.8
+          ]
+        ],
+        "carried_unmeasured": [
+          {
+            "check": "static_graphics",
+            "status": "unmeasured",
+            "doc_status": "unmeasured",
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함",
+            "impact": "원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요",
+            "shots": [
+              {
+                "id": 0,
+                "start": 0.0,
+                "end": 49.667
+              }
+            ]
+          },
+          {
+            "check": "corner:top_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 0,
+              "w": 230,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png",
+            "visible_in_clips": [
+              "s1"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:top_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 0,
+              "w": 231,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png",
+            "visible_in_clips": [
+              "s1"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 345,
+              "w": 230,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png",
+            "visible_in_clips": [
+              "s1"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 345,
+              "w": 231,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png",
+            "visible_in_clips": [
+              "s1"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          }
+        ]
       },
       {
         "source_id": "v_face",

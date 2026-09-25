@@ -1,0 +1,3245 @@
+{
+  "resolution": [
+    1080,
+    1920
+  ],
+  "fps": 30.0,
+  "duration": 18.5,
+  "errors": {},
+  "n_frames": 555,
+  "transitions": {
+    "boundaries": [
+      {
+        "clip_id": "s2",
+        "expected": {
+          "type": "cut",
+          "t": 9.5,
+          "dur": 0.0,
+          "color": null
+        },
+        "observed": {
+          "type": "cut",
+          "t": 9.5,
+          "dur": 0.0,
+          "score": 23.54,
+          "diff": 21.7
+        },
+        "type_ok": true,
+        "timing_ok": true
+      },
+      {
+        "clip_id": "s3",
+        "expected": {
+          "type": "flash",
+          "t": 11.2,
+          "dur": 0.12,
+          "color": "#FFFFFF",
+          "scope": "region"
+        },
+        "observed": {
+          "type": "flash",
+          "t": 11.1667,
+          "peak_t": 11.2,
+          "dur": 0.1,
+          "color": "#FDFDFD",
+          "score": 135.3,
+          "scope_obs": {
+            "t_peak": 11.2,
+            "t_before": 11.0667,
+            "outside_share": 0.6059,
+            "progress_inside": 1.008,
+            "progress_outside": 0.0,
+            "outside_contrast": 441.7,
+            "status": "measured",
+            "scope": "region"
+          }
+        },
+        "type_ok": true,
+        "timing_ok": true
+      }
+    ],
+    "unexpected": [],
+    "flashes": [
+      {
+        "start": 11.166666666666666,
+        "end": 11.266666666666666,
+        "peak_t": 11.2,
+        "peak_excess": 135.3,
+        "color": "#FDFDFD",
+        "frames": 3
+      }
+    ],
+    "diff_stats": {
+      "p50": 0.1,
+      "p90": 2.286
+    }
+  },
+  "freezes": {
+    "threshold": 0.045,
+    "min_frames": 6,
+    "runs": [
+      {
+        "start": 14.2333,
+        "end": 15.0,
+        "frames": 23,
+        "mean_diff": 0.0106
+      }
+    ],
+    "expected": [
+      {
+        "clip_id": "s3",
+        "start": 14.2,
+        "end": 14.9,
+        "hold": 0.7,
+        "observed": {
+          "start": 14.2333,
+          "end": 15.0,
+          "frames": 23,
+          "mean_diff": 0.0106
+        },
+        "start_ok": true,
+        "hold_ok": true,
+        "source_moving_before": 2.626398533950617,
+        "distinguishable": true
+      }
+    ],
+    "unexpected": []
+  },
+  "zoom": {
+    "clips": [
+      {
+        "clip_id": "s1",
+        "n_samples": 284,
+        "n_rejected_low_inliers": 0,
+        "median_inliers": 45.0,
+        "expected": {
+          "scale_from": 1.0,
+          "scale_to": 1.25,
+          "start": 5.8,
+          "dur": 0.35,
+          "ease": "out",
+          "center_canvas": [
+            534.4,
+            912.1
+          ]
+        },
+        "curve": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.233,
+            1.0
+          ],
+          [
+            0.467,
+            1.0
+          ],
+          [
+            0.7,
+            1.0003
+          ],
+          [
+            0.933,
+            1.0003
+          ],
+          [
+            1.167,
+            1.0004
+          ],
+          [
+            1.4,
+            1.0004
+          ],
+          [
+            1.633,
+            1.0002
+          ],
+          [
+            1.867,
+            1.0005
+          ],
+          [
+            2.1,
+            1.0016
+          ],
+          [
+            2.333,
+            1.0008
+          ],
+          [
+            2.567,
+            1.0006
+          ],
+          [
+            2.8,
+            1.0
+          ],
+          [
+            3.033,
+            1.0231
+          ],
+          [
+            3.267,
+            1.0283
+          ],
+          [
+            3.5,
+            1.0001
+          ],
+          [
+            3.733,
+            1.0666
+          ],
+          [
+            3.967,
+            1.208
+          ],
+          [
+            4.2,
+            1.3295
+          ],
+          [
+            4.433,
+            1.0207
+          ],
+          [
+            4.667,
+            1.0973
+          ],
+          [
+            4.9,
+            1.1897
+          ],
+          [
+            5.133,
+            1.2808
+          ],
+          [
+            5.367,
+            1.312
+          ],
+          [
+            5.6,
+            1.3739
+          ],
+          [
+            5.833,
+            1.4957
+          ],
+          [
+            6.067,
+            1.7803
+          ],
+          [
+            6.3,
+            1.7644
+          ],
+          [
+            6.533,
+            1.7642
+          ],
+          [
+            6.767,
+            1.7643
+          ],
+          [
+            7.0,
+            1.7644
+          ],
+          [
+            7.233,
+            1.7644
+          ],
+          [
+            7.467,
+            1.7641
+          ],
+          [
+            7.7,
+            1.7641
+          ],
+          [
+            7.933,
+            1.764
+          ],
+          [
+            8.167,
+            1.8917
+          ],
+          [
+            8.4,
+            1.8918
+          ],
+          [
+            8.633,
+            1.8917
+          ],
+          [
+            8.867,
+            1.8919
+          ],
+          [
+            9.1,
+            1.8922
+          ],
+          [
+            9.333,
+            1.887
+          ]
+        ],
+        "measured_final_ratio": 1.8918,
+        "measured_max_dev": 0.8923,
+        "measured_spread": 0.0628,
+        "expected_final_ratio": 1.25,
+        "max_abs_err": 0.6425,
+        "measured_t50": 5.833,
+        "expected_t50": 5.874,
+        "measured_dur": 6.774,
+        "measured_zoom_start": 2.192,
+        "measured_ease": "inout",
+        "ease_fit_rmse": 0.0757,
+        "measured_center_canvas": [
+          544.3,
+          950.4
+        ],
+        "recenter_obs": {
+          "method": "출력 프레임끼리의 유사변환(ORB+RANSAC) 고정점 vs 렌더러 규칙(edit.resolve.src_to_region)의 recenter false/true 고정점",
+          "n": 7,
+          "tolerance_px": 30.4,
+          "separation_min_px": 60.8,
+          "samples": [
+            {
+              "t": 5.8,
+              "anchor_t": 5.2,
+              "scale": 1.1,
+              "measured": [
+                387.3,
+                912.5
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 147.0,
+              "err_true": 228.7,
+              "sep": 192.7
+            },
+            {
+              "t": 5.9,
+              "anchor_t": 5.2,
+              "scale": 1.2,
+              "measured": [
+                411.6,
+                899.4
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 123.4,
+              "err_true": 204.9,
+              "sep": 192.7
+            },
+            {
+              "t": 5.9,
+              "anchor_t": 5.2,
+              "scale": 1.2,
+              "measured": [
+                416.7,
+                912.0
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 117.6,
+              "err_true": 213.6,
+              "sep": 192.7
+            },
+            {
+              "t": 5.9,
+              "anchor_t": 5.2,
+              "scale": 1.3,
+              "measured": [
+                425.3,
+                911.9
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 109.1,
+              "err_true": 209.8,
+              "sep": 192.7
+            },
+            {
+              "t": 6.0,
+              "anchor_t": 5.2,
+              "scale": 1.3,
+              "measured": [
+                414.8,
+                904.9
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 119.8,
+              "err_true": 208.2,
+              "sep": 192.7
+            },
+            {
+              "t": 6.0,
+              "anchor_t": 5.2,
+              "scale": 1.3,
+              "measured": [
+                429.8,
+                909.2
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 104.6,
+              "err_true": 205.5,
+              "sep": 192.7
+            },
+            {
+              "t": 8.1,
+              "anchor_t": 6.0,
+              "scale": 1.1,
+              "measured": [
+                421.7,
+                873.4
+              ],
+              "rule_false": [
+                534.4,
+                912.1
+              ],
+              "rule_true": [
+                511.9,
+                720.7
+              ],
+              "err_false": 119.1,
+              "err_true": 177.2,
+              "sep": 192.7
+            }
+          ],
+          "err_false_px": 119.1,
+          "err_true_px": 208.2,
+          "separation_px": 192.7,
+          "status": "unmeasured",
+          "reason": "측정 고정점이 어느 규칙과도(또는 둘 다와) 허용오차 안에서 맞지 않음"
+        },
+        "source_ratio": 0.9988,
+        "zoom_ratio_corrected": 1.8941,
+        "status": "measured",
+        "tolerance": {
+          "ratio": 0.04,
+          "t50_s": 0.1
+        },
+        "geometry": {
+          "status": "measured",
+          "confirmed": true,
+          "ncc_median": 0.9964,
+          "ncc_min": 0.9936,
+          "zoom_alt": [
+            1.04,
+            0.9615
+          ],
+          "alt_gap_median": 0.0575,
+          "n_extra": 3,
+          "masked": true,
+          "samples": [
+            {
+              "t": 1.0,
+              "expected_src_t": 3.8,
+              "src_t": 3.75,
+              "ncc": 0.9936,
+              "masked_frac": 0.096,
+              "ncc_alt": 0.8995
+            },
+            {
+              "t": 2.867,
+              "expected_src_t": 5.667,
+              "src_t": 5.667,
+              "ncc": 0.9943,
+              "masked_frac": 0.096,
+              "ncc_alt": 0.9113
+            },
+            {
+              "t": 4.733,
+              "expected_src_t": 7.533,
+              "src_t": 7.5,
+              "ncc": 0.9956,
+              "masked_frac": 0.042,
+              "ncc_alt": 0.9331
+            },
+            {
+              "t": 6.6,
+              "expected_src_t": 9.4,
+              "src_t": 9.5,
+              "ncc": 0.9975,
+              "masked_frac": 0.059,
+              "ncc_alt": 0.9452
+            },
+            {
+              "t": 8.467,
+              "expected_src_t": 11.267,
+              "src_t": 11.25,
+              "ncc": 0.996,
+              "masked_frac": 0.133,
+              "ncc_alt": 0.9042
+            },
+            {
+              "t": 5.867,
+              "expected_src_t": 8.667,
+              "src_t": 8.667,
+              "ncc": 0.9967,
+              "masked_frac": 0.072,
+              "ncc_alt": 0.9443,
+              "extra": true
+            },
+            {
+              "t": 5.967,
+              "expected_src_t": 8.767,
+              "src_t": 8.75,
+              "ncc": 0.9974,
+              "masked_frac": 0.063,
+              "ncc_alt": 0.9453,
+              "extra": true
+            },
+            {
+              "t": 6.033,
+              "expected_src_t": 8.833,
+              "src_t": 8.833,
+              "ncc": 0.9975,
+              "masked_frac": 0.061,
+              "ncc_alt": 0.9452,
+              "extra": true
+            }
+          ],
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040/0.962 대안과 비교",
+          "ramp_times": [
+            5.888,
+            5.975,
+            6.062
+          ]
+        }
+      },
+      {
+        "clip_id": "s2",
+        "n_samples": 45,
+        "n_rejected_low_inliers": 0,
+        "median_inliers": 34.0,
+        "curve": [
+          [
+            9.567,
+            1.0
+          ],
+          [
+            9.6,
+            1.0011
+          ],
+          [
+            9.633,
+            1.0007
+          ],
+          [
+            9.667,
+            1.0007
+          ],
+          [
+            9.7,
+            1.0008
+          ],
+          [
+            9.733,
+            1.0009
+          ],
+          [
+            9.767,
+            1.0014
+          ],
+          [
+            9.8,
+            1.0012
+          ],
+          [
+            9.833,
+            1.0012
+          ],
+          [
+            9.867,
+            1.0005
+          ],
+          [
+            9.9,
+            1.015
+          ],
+          [
+            9.933,
+            1.0287
+          ],
+          [
+            9.967,
+            1.0301
+          ],
+          [
+            10.0,
+            1.0038
+          ],
+          [
+            10.033,
+            1.0
+          ],
+          [
+            10.067,
+            1.0
+          ],
+          [
+            10.1,
+            1.0
+          ],
+          [
+            10.133,
+            1.0
+          ],
+          [
+            10.167,
+            1.0
+          ],
+          [
+            10.2,
+            1.0
+          ],
+          [
+            10.233,
+            1.0
+          ],
+          [
+            10.267,
+            1.0
+          ],
+          [
+            10.3,
+            1.0
+          ],
+          [
+            10.333,
+            1.0
+          ],
+          [
+            10.367,
+            1.0
+          ],
+          [
+            10.4,
+            1.0
+          ],
+          [
+            10.433,
+            1.0006
+          ],
+          [
+            10.467,
+            1.0006
+          ],
+          [
+            10.5,
+            1.0006
+          ],
+          [
+            10.533,
+            1.0005
+          ],
+          [
+            10.567,
+            1.0005
+          ],
+          [
+            10.6,
+            1.0016
+          ],
+          [
+            10.633,
+            1.0016
+          ],
+          [
+            10.667,
+            1.0016
+          ],
+          [
+            10.7,
+            1.0005
+          ],
+          [
+            10.733,
+            1.0005
+          ],
+          [
+            10.767,
+            1.0005
+          ],
+          [
+            10.8,
+            1.0005
+          ],
+          [
+            10.833,
+            1.0006
+          ],
+          [
+            10.867,
+            1.0003
+          ],
+          [
+            10.9,
+            1.0003
+          ],
+          [
+            10.933,
+            1.0003
+          ],
+          [
+            10.967,
+            1.0003
+          ],
+          [
+            11.0,
+            1.0003
+          ],
+          [
+            11.033,
+            1.0001
+          ]
+        ],
+        "measured_final_ratio": 1.0003,
+        "measured_max_dev": 0.015,
+        "measured_spread": 0.0005,
+        "expected_final_ratio": 1.0,
+        "max_abs_err": 0.0301,
+        "source_ratio": 1.0006,
+        "zoom_ratio_corrected": 0.9997,
+        "status": "measured",
+        "tolerance": {
+          "ratio": 0.04,
+          "t50_s": 0.1
+        }
+      },
+      {
+        "clip_id": "s3",
+        "n_samples": 214,
+        "n_rejected_low_inliers": 0,
+        "median_inliers": 49.0,
+        "curve": [
+          [
+            11.367,
+            1.0
+          ],
+          [
+            11.533,
+            1.0
+          ],
+          [
+            11.7,
+            1.0001
+          ],
+          [
+            11.867,
+            1.0
+          ],
+          [
+            12.033,
+            1.0
+          ],
+          [
+            12.2,
+            1.0001
+          ],
+          [
+            12.367,
+            1.0
+          ],
+          [
+            12.533,
+            1.0
+          ],
+          [
+            12.7,
+            1.0
+          ],
+          [
+            12.867,
+            1.0001
+          ],
+          [
+            13.033,
+            1.0001
+          ],
+          [
+            13.2,
+            1.0
+          ],
+          [
+            13.367,
+            1.0004
+          ],
+          [
+            13.533,
+            1.0002
+          ],
+          [
+            13.7,
+            0.9999
+          ],
+          [
+            13.867,
+            1.0003
+          ],
+          [
+            14.033,
+            1.0001
+          ],
+          [
+            14.2,
+            1.0003
+          ],
+          [
+            14.367,
+            1.0002
+          ],
+          [
+            14.533,
+            1.0003
+          ],
+          [
+            14.7,
+            1.0003
+          ],
+          [
+            14.867,
+            1.0003
+          ],
+          [
+            15.033,
+            1.0005
+          ],
+          [
+            15.2,
+            1.0004
+          ],
+          [
+            15.367,
+            1.0005
+          ],
+          [
+            15.533,
+            1.0009
+          ],
+          [
+            15.7,
+            1.0005
+          ],
+          [
+            15.867,
+            1.0003
+          ],
+          [
+            16.033,
+            1.0004
+          ],
+          [
+            16.2,
+            1.0102
+          ],
+          [
+            16.367,
+            0.9751
+          ],
+          [
+            16.533,
+            0.9989
+          ],
+          [
+            16.7,
+            0.9996
+          ],
+          [
+            16.867,
+            1.0008
+          ],
+          [
+            17.033,
+            1.0
+          ],
+          [
+            17.2,
+            0.9999
+          ],
+          [
+            17.367,
+            1.0013
+          ],
+          [
+            17.533,
+            1.0002
+          ],
+          [
+            17.7,
+            0.996
+          ],
+          [
+            17.867,
+            0.996
+          ],
+          [
+            18.033,
+            0.996
+          ],
+          [
+            18.2,
+            0.9963
+          ],
+          [
+            18.367,
+            0.996
+          ]
+        ],
+        "measured_final_ratio": 0.9961,
+        "measured_max_dev": 0.0574,
+        "measured_spread": 0.021,
+        "expected_final_ratio": 1.0,
+        "max_abs_err": 0.0826,
+        "source_ratio": 1.0,
+        "zoom_ratio_corrected": 0.9961,
+        "status": "measured",
+        "tolerance": {
+          "ratio": 0.04,
+          "t50_s": 0.1
+        },
+        "geometry": {
+          "status": "measured",
+          "confirmed": true,
+          "ncc_median": 0.988,
+          "ncc_min": 0.9876,
+          "zoom_alt": 1.04,
+          "alt_gap_median": 0.149,
+          "n_extra": 0,
+          "masked": true,
+          "samples": [
+            {
+              "t": 12.0,
+              "expected_src_t": 28.8,
+              "src_t": 28.75,
+              "ncc": 0.9896,
+              "masked_frac": 0.0,
+              "ncc_alt": 0.8645
+            },
+            {
+              "t": 13.267,
+              "expected_src_t": 30.067,
+              "src_t": 30.0,
+              "ncc": 0.988,
+              "masked_frac": 0.0,
+              "ncc_alt": 0.8494
+            },
+            {
+              "t": 15.267,
+              "expected_src_t": 31.367,
+              "src_t": 31.333,
+              "ncc": 0.9877,
+              "masked_frac": 0.0,
+              "ncc_alt": 0.8242
+            },
+            {
+              "t": 16.533,
+              "expected_src_t": 32.633,
+              "src_t": 32.583,
+              "ncc": 0.9876,
+              "masked_frac": 0.0,
+              "ncc_alt": 0.8339
+            },
+            {
+              "t": 17.8,
+              "expected_src_t": 33.9,
+              "src_t": 33.833,
+              "ncc": 0.9883,
+              "masked_frac": 0.0,
+              "ncc_alt": 0.8393
+            }
+          ],
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC (자막·장식·정리 영역 제외), 배율 1.040 대안과 비교"
+        }
+      }
+    ],
+    "max_consecutive_measured": 0
+  },
+  "decorations": {
+    "items": []
+  },
+  "mapping": {
+    "clips": [
+      {
+        "clip_id": "s1",
+        "source": "warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4",
+        "expected_src": [
+          2.8,
+          12.3
+        ],
+        "speed": 1.0,
+        "samples": [
+          {
+            "t": 1.94,
+            "expected_src_t": 4.74,
+            "matched_src_t": 4.667,
+            "ncc": 0.994,
+            "ncc_moving": 0.982,
+            "offset": -0.073,
+            "prominence": 0.0913,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9935,
+            "overlay_masked_frac": 0.096
+          },
+          {
+            "t": 4.75,
+            "expected_src_t": 7.55,
+            "matched_src_t": 7.5,
+            "ncc": 0.996,
+            "ncc_moving": 0.989,
+            "offset": -0.05,
+            "prominence": 0.0649,
+            "moving_frac": 0.147,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9956,
+            "overlay_masked_frac": 0.042
+          },
+          {
+            "t": 7.56,
+            "expected_src_t": 10.36,
+            "matched_src_t": 10.333,
+            "ncc": 0.891,
+            "ncc_moving": 0.923,
+            "offset": -0.027,
+            "prominence": 0.0158,
+            "moving_frac": 0.027,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false,
+            "ncc_planned": 0.9964,
+            "overlay_masked_frac": 0.171
+          }
+        ],
+        "src_fps": 12.0,
+        "status": "measured",
+        "offset_p50": -0.061,
+        "speed_obs": 1.008,
+        "speed_quant_frac": 0.0294,
+        "speed_samples": 2
+      },
+      {
+        "clip_id": "s2",
+        "source": "warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4",
+        "expected_src": [
+          17.9,
+          19.6
+        ],
+        "speed": 1.0,
+        "samples": [
+          {
+            "t": 9.88,
+            "expected_src_t": 18.28,
+            "matched_src_t": 18.25,
+            "ncc": 0.996,
+            "ncc_moving": 0.998,
+            "offset": -0.03,
+            "prominence": 0.0102,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false,
+            "ncc_planned": 0.996,
+            "overlay_masked_frac": 0.042
+          },
+          {
+            "t": 10.35,
+            "expected_src_t": 18.75,
+            "matched_src_t": 18.667,
+            "ncc": 0.996,
+            "ncc_moving": 0.997,
+            "offset": -0.083,
+            "prominence": 0.1045,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9961,
+            "overlay_masked_frac": 0.042
+          },
+          {
+            "t": 10.82,
+            "expected_src_t": 19.22,
+            "matched_src_t": 19.167,
+            "ncc": 0.996,
+            "ncc_moving": 0.998,
+            "offset": -0.053,
+            "prominence": 0.3618,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9959,
+            "overlay_masked_frac": 0.042
+          }
+        ],
+        "src_fps": 12.0,
+        "status": "measured",
+        "offset_p50": -0.068,
+        "speed_obs": 1.064,
+        "speed_quant_frac": 0.1667,
+        "speed_samples": 2
+      },
+      {
+        "clip_id": "s3",
+        "source": "assets/test/generated/video/people-detection.mp4",
+        "expected_src": [
+          28.0,
+          34.6
+        ],
+        "speed": 1.0,
+        "samples": [
+          {
+            "t": 11.943,
+            "expected_src_t": 28.743,
+            "matched_src_t": 28.667,
+            "ncc": 0.989,
+            "ncc_moving": 0.995,
+            "offset": -0.076,
+            "prominence": 0.1672,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9894,
+            "overlay_masked_frac": 0.0
+          },
+          {
+            "t": 15.633,
+            "expected_src_t": 31.733,
+            "matched_src_t": 31.667,
+            "ncc": 0.988,
+            "ncc_moving": 0.98,
+            "offset": -0.067,
+            "prominence": 0.4527,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9884,
+            "overlay_masked_frac": 0.0
+          },
+          {
+            "t": 17.733,
+            "expected_src_t": 33.833,
+            "matched_src_t": 33.833,
+            "ncc": 0.988,
+            "ncc_moving": 0.965,
+            "offset": 0.0,
+            "prominence": 0.0968,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": true,
+            "ncc_planned": 0.9884,
+            "overlay_masked_frac": 0.0
+          }
+        ],
+        "src_fps": 12.0,
+        "status": "measured",
+        "offset_p50": -0.067,
+        "speed_obs": 1.014,
+        "speed_quant_frac": 0.0161,
+        "speed_samples": 3
+      }
+    ]
+  },
+  "residual": {
+    "items": [
+      {
+        "clip_id": "s1",
+        "op": "inpaint",
+        "rect_src": [
+          13.0,
+          11.0,
+          218.0,
+          50.0
+        ],
+        "src_range": [
+          2.8,
+          12.3
+        ],
+        "reason": "ov1 watermark '@fake repost'",
+        "samples": [
+          {
+            "t": 1.448,
+            "visible": true,
+            "rect_out": [
+              17.9,
+              671.5,
+              306.8,
+              70.4
+            ],
+            "edge_ncc": 0.134,
+            "pix_ncc": 0.133,
+            "text_src": "@fa ke_repost",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.2147,
+                "max_tile_ncc": 0.3762,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 17,
+                  "y": 671,
+                  "w": 308,
+                  "h": 71
+                },
+                "per_time": [
+                  {
+                    "t": 1.448,
+                    "ncc": 0.2147,
+                    "tile_ncc": [
+                      0.1942,
+                      0.2813,
+                      0.3762,
+                      0.2563
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0001448.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 4.75,
+            "visible": true,
+            "rect_out": [
+              17.9,
+              671.5,
+              306.8,
+              70.4
+            ],
+            "edge_ncc": 0.167,
+            "pix_ncc": 0.137,
+            "text_src": "@fa ke_repost",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.217,
+                "max_tile_ncc": 0.3104,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 17,
+                  "y": 671,
+                  "w": 308,
+                  "h": 71
+                },
+                "per_time": [
+                  {
+                    "t": 4.75,
+                    "ncc": 0.217,
+                    "tile_ncc": [
+                      0.1887,
+                      0.2347,
+                      0.2748,
+                      0.3104
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0004750.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 8.052,
+            "visible": true,
+            "rect_out": [
+              0.0,
+              656.0,
+              272.2,
+              43.3
+            ],
+            "edge_ncc": 0.147,
+            "pix_ncc": -0.243,
+            "text_src": "Hb",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.262,
+                "max_tile_ncc": 0.379,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 0,
+                  "y": 656,
+                  "w": 273,
+                  "h": 44
+                },
+                "per_time": [
+                  {
+                    "t": 8.052,
+                    "ncc": 0.262,
+                    "tile_ncc": [
+                      0.3561,
+                      0.1901,
+                      0.3778,
+                      0.2949,
+                      0.379,
+                      0.263
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0008051.png",
+              "present": false
+            },
+            "residual": false
+          }
+        ],
+        "resolution": [
+          1080,
+          1920
+        ],
+        "status": "measured",
+        "residual": false
+      },
+      {
+        "clip_id": "s1",
+        "op": "inpaint",
+        "rect_src": [
+          239.0,
+          354.0,
+          283.0,
+          51.0
+        ],
+        "src_range": [
+          2.8,
+          6.083
+        ],
+        "reason": "ov2 burned_subtitle 'WAIT FOR IT'",
+        "samples": [
+          {
+            "t": 0.521,
+            "visible": true,
+            "rect_out": [
+              335.9,
+              1154.2,
+              398.3,
+              71.8
+            ],
+            "edge_ncc": 0.06,
+            "pix_ncc": 0.273,
+            "text_src": "FOR IT...",
+            "text_out": "—",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.1253,
+                "max_tile_ncc": 0.3484,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 335,
+                  "y": 1154,
+                  "w": 400,
+                  "h": 72
+                },
+                "per_time": [
+                  {
+                    "t": 0.521,
+                    "ncc": 0.1253,
+                    "tile_ncc": [
+                      0.1789,
+                      0.1293,
+                      0.3484,
+                      0.178,
+                      0.233,
+                      0.1817
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "때",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0000520.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 1.658,
+            "visible": true,
+            "rect_out": [
+              335.9,
+              1154.2,
+              398.3,
+              71.8
+            ],
+            "edge_ncc": 0.036,
+            "pix_ncc": 0.293,
+            "text_src": "WAIT FOR IT...",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.12,
+                "max_tile_ncc": 0.3271,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 335,
+                  "y": 1154,
+                  "w": 400,
+                  "h": 72
+                },
+                "per_time": [
+                  {
+                    "t": 1.658,
+                    "ncc": 0.12,
+                    "tile_ncc": [
+                      0.175,
+                      0.1322,
+                      0.3271,
+                      0.1987,
+                      0.1842,
+                      0.2971
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0001658.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 2.796,
+            "visible": true,
+            "rect_out": [
+              335.9,
+              1154.2,
+              398.3,
+              71.8
+            ],
+            "edge_ncc": 0.04,
+            "pix_ncc": 0.238,
+            "text_src": "WAIT FOR IT...",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.0921,
+                "max_tile_ncc": 0.2213,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 335,
+                  "y": 1154,
+                  "w": 400,
+                  "h": 72
+                },
+                "per_time": [
+                  {
+                    "t": 2.796,
+                    "ncc": 0.0921,
+                    "tile_ncc": [
+                      0.2213,
+                      0.1217,
+                      0.2129,
+                      0.1313,
+                      0.1254,
+                      0.1658
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0002795.png",
+              "present": false
+            },
+            "residual": false
+          }
+        ],
+        "resolution": [
+          1080,
+          1920
+        ],
+        "status": "measured",
+        "residual": false
+      },
+      {
+        "clip_id": "s1",
+        "op": "inpaint",
+        "rect_src": [
+          468.0,
+          378.0,
+          53.0,
+          21.0
+        ],
+        "src_range": [
+          2.8,
+          6.083
+        ],
+        "reason": "ov3 burned_subtitle 'O00'",
+        "samples": [
+          {
+            "t": 0.521,
+            "visible": true,
+            "rect_out": [
+              658.2,
+              1188.0,
+              74.6,
+              29.6
+            ],
+            "edge_ncc": 0.052,
+            "pix_ncc": -0.108,
+            "text_src": "",
+            "text_out": "~:",
+            "text_sim": null,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.2207,
+                "max_tile_ncc": 0.2863,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 658,
+                  "y": 1188,
+                  "w": 75,
+                  "h": 30
+                },
+                "per_time": [
+                  {
+                    "t": 0.521,
+                    "ncc": 0.2207,
+                    "tile_ncc": [
+                      0.2847,
+                      0.2863
+                    ],
+                    "ocr_text": "Oo",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0000520.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 1.658,
+            "visible": true,
+            "rect_out": [
+              658.2,
+              1188.0,
+              74.6,
+              29.6
+            ],
+            "edge_ncc": -0.014,
+            "pix_ncc": -0.125,
+            "text_src": "",
+            "text_out": "",
+            "text_sim": null,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.3359,
+                "max_tile_ncc": 0.4542,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 658,
+                  "y": 1188,
+                  "w": 75,
+                  "h": 30
+                },
+                "per_time": [
+                  {
+                    "t": 1.658,
+                    "ncc": 0.3359,
+                    "tile_ncc": [
+                      0.4542,
+                      0.264
+                    ],
+                    "ocr_text": "ee:",
+                    "ocr_conf": 39,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0001658.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 2.796,
+            "visible": true,
+            "rect_out": [
+              658.2,
+              1188.0,
+              74.6,
+              29.6
+            ],
+            "edge_ncc": -0.025,
+            "pix_ncc": -0.086,
+            "text_src": "",
+            "text_out": "—",
+            "text_sim": null,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.2577,
+                "max_tile_ncc": 0.34,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 658,
+                  "y": 1188,
+                  "w": 75,
+                  "h": 30
+                },
+                "per_time": [
+                  {
+                    "t": 2.796,
+                    "ncc": 0.2577,
+                    "tile_ncc": [
+                      0.34,
+                      0.2087
+                    ],
+                    "ocr_text": "Oo",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0002795.png",
+              "present": false
+            },
+            "residual": false
+          }
+        ],
+        "resolution": [
+          1080,
+          1920
+        ],
+        "status": "measured",
+        "residual": false
+      },
+      {
+        "clip_id": "s2",
+        "op": "inpaint",
+        "rect_src": [
+          13.0,
+          11.0,
+          218.0,
+          50.0
+        ],
+        "src_range": [
+          17.9,
+          19.6
+        ],
+        "reason": "ov1 watermark '@fake repost'",
+        "samples": [
+          {
+            "t": 9.778,
+            "visible": true,
+            "rect_out": [
+              17.9,
+              671.5,
+              306.8,
+              70.4
+            ],
+            "edge_ncc": 0.165,
+            "pix_ncc": 0.137,
+            "text_src": "@fa ke_repost",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.1995,
+                "max_tile_ncc": 0.2851,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 17,
+                  "y": 671,
+                  "w": 308,
+                  "h": 71
+                },
+                "per_time": [
+                  {
+                    "t": 9.778,
+                    "ncc": 0.1995,
+                    "tile_ncc": [
+                      0.1853,
+                      0.2407,
+                      0.2842,
+                      0.2851
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "4",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0009778.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 10.35,
+            "visible": true,
+            "rect_out": [
+              17.9,
+              671.5,
+              306.8,
+              70.4
+            ],
+            "edge_ncc": 0.145,
+            "pix_ncc": 0.141,
+            "text_src": "@fa ke_repost",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.2054,
+                "max_tile_ncc": 0.3213,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 17,
+                  "y": 671,
+                  "w": 308,
+                  "h": 71
+                },
+                "per_time": [
+                  {
+                    "t": 10.35,
+                    "ncc": 0.2054,
+                    "tile_ncc": [
+                      0.1911,
+                      0.2181,
+                      0.2838,
+                      0.3213
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0010350.png",
+              "present": false
+            },
+            "residual": false
+          },
+          {
+            "t": 10.922,
+            "visible": true,
+            "rect_out": [
+              17.9,
+              671.5,
+              306.8,
+              70.4
+            ],
+            "edge_ncc": 0.121,
+            "pix_ncc": 0.138,
+            "text_src": "@fa ke_repost",
+            "text_out": "",
+            "text_sim": 0.0,
+            "clean_verify": {
+              "raw": {
+                "max_ncc": 0.1998,
+                "max_tile_ncc": 0.2872,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "thresholds": {
+                  "ncc": 0.5,
+                  "tile_ncc": 0.6,
+                  "text_sim": 0.6,
+                  "partial_ocr_conf": [
+                    60,
+                    85
+                  ]
+                },
+                "method": "gradient-NCC template match (whole + per tile) + Tesseract OCR (similar text or a piece of it)",
+                "rect": {
+                  "x": 17,
+                  "y": 671,
+                  "w": 308,
+                  "h": 71
+                },
+                "per_time": [
+                  {
+                    "t": 10.922,
+                    "ncc": 0.1998,
+                    "tile_ncc": [
+                      0.1936,
+                      0.226,
+                      0.2619,
+                      0.2872
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              },
+              "template": "episodes/test-restore-001/qa/frames/residual_tmpl_0010921.png",
+              "present": false
+            },
+            "residual": false
+          }
+        ],
+        "resolution": [
+          1080,
+          1920
+        ],
+        "status": "measured",
+        "residual": false
+      },
+      {
+        "clip_id": "s2",
+        "op": "inpaint",
+        "rect_src": [
+          239.0,
+          354.0,
+          283.0,
+          51.0
+        ],
+        "src_range": [
+          17.9,
+          6.083
+        ],
+        "reason": "ov2 burned_subtitle 'WAIT FOR IT'",
+        "status": "not_applicable",
+        "note": "이 클립 구간과 겹치지 않음"
+      },
+      {
+        "clip_id": "s2",
+        "op": "inpaint",
+        "rect_src": [
+          468.0,
+          378.0,
+          53.0,
+          21.0
+        ],
+        "src_range": [
+          17.9,
+          6.083
+        ],
+        "reason": "ov3 burned_subtitle 'O00'",
+        "status": "not_applicable",
+        "note": "이 클립 구간과 겹치지 않음"
+      }
+    ],
+    "clean_verify_available": true
+  },
+  "provenance": {
+    "status": "measured",
+    "sources": [
+      {
+        "source_id": "v_hall",
+        "path": "assets/test/generated/dirty_source_facewalk.mp4",
+        "sha256": "b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971",
+        "sha256_from": "plan sources[].sha256",
+        "items": [
+          {
+            "overlay_id": "ov1",
+            "kind": "watermark",
+            "text": "@fake repost",
+            "clip_id": "s1",
+            "rect_src": {
+              "x": 15.0,
+              "y": 13.0,
+              "w": 214.0,
+              "h": 46.0
+            },
+            "resolution_src": [
+              768,
+              432
+            ],
+            "overlay_src_range": [
+              0.0,
+              20.0
+            ],
+            "src_range_used": [
+              2.8,
+              12.3
+            ],
+            "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov1.png",
+            "mapping": "clean.verify.source_rect_to_canvas",
+            "how": "pixels",
+            "resolution_out": [
+              1080,
+              1920
+            ],
+            "checks": [
+              {
+                "times": [
+                  0.983,
+                  2.933,
+                  4.933
+                ],
+                "rect_out": {
+                  "x": 20.7,
+                  "y": 674.3,
+                  "w": 301.2,
+                  "h": 64.7
+                },
+                "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov1.png",
+                "template_cropped": false,
+                "max_ncc": 0.2113,
+                "max_tile_ncc": 0.3428,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "per_time": [
+                  {
+                    "t": 0.983,
+                    "ncc": 0.2112,
+                    "tile_ncc": [
+                      0.2325,
+                      0.2722,
+                      0.2055,
+                      0.3428,
+                      0.2556
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "| 4",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 2.933,
+                    "ncc": 0.2085,
+                    "tile_ncc": [
+                      0.2311,
+                      0.2735,
+                      0.2301,
+                      0.3268,
+                      0.2797
+                    ],
+                    "ocr_similarity": 0.167,
+                    "ocr_text": "Oe",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 4.933,
+                    "ncc": 0.2113,
+                    "tile_ncc": [
+                      0.2339,
+                      0.2878,
+                      0.1966,
+                      0.3307,
+                      0.283
+                    ],
+                    "ocr_similarity": 0.167,
+                    "ocr_text": "Oe",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              }
+            ],
+            "times": [
+              0.983,
+              2.933,
+              4.933
+            ],
+            "rect_out": {
+              "x": 20.7,
+              "y": 674.3,
+              "w": 301.2,
+              "h": 64.7
+            },
+            "max_ncc": 0.2113,
+            "max_tile_ncc": 0.3428,
+            "ocr_hits": 0,
+            "ocr_partial_hits": 0,
+            "thresholds": {
+              "ncc": 0.5,
+              "tile_ncc": 0.6,
+              "text_sim": 0.6,
+              "partial_ocr_conf": [
+                60,
+                85
+              ]
+            },
+            "status": "measured",
+            "residual": false
+          },
+          {
+            "overlay_id": "ov1",
+            "kind": "watermark",
+            "text": "@fake repost",
+            "clip_id": "s2",
+            "rect_src": {
+              "x": 15.0,
+              "y": 13.0,
+              "w": 214.0,
+              "h": 46.0
+            },
+            "resolution_src": [
+              768,
+              432
+            ],
+            "overlay_src_range": [
+              0.0,
+              20.0
+            ],
+            "src_range_used": [
+              17.9,
+              19.6
+            ],
+            "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov1.png",
+            "mapping": "clean.verify.source_rect_to_canvas",
+            "how": "pixels",
+            "resolution_out": [
+              1080,
+              1920
+            ],
+            "checks": [
+              {
+                "times": [
+                  9.833,
+                  10.333,
+                  10.833
+                ],
+                "rect_out": {
+                  "x": 20.7,
+                  "y": 674.3,
+                  "w": 301.2,
+                  "h": 64.7
+                },
+                "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov1.png",
+                "template_cropped": false,
+                "max_ncc": 0.221,
+                "max_tile_ncc": 0.3321,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "per_time": [
+                  {
+                    "t": 9.833,
+                    "ncc": 0.2056,
+                    "tile_ncc": [
+                      0.2237,
+                      0.2226,
+                      0.2183,
+                      0.3014,
+                      0.3105
+                    ],
+                    "ocr_similarity": 0.182,
+                    "ocr_text": "E",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 10.333,
+                    "ncc": 0.2069,
+                    "tile_ncc": [
+                      0.2348,
+                      0.2394,
+                      0.2139,
+                      0.3165,
+                      0.2957
+                    ],
+                    "ocr_similarity": 0.167,
+                    "ocr_text": "EF",
+                    "ocr_conf": 24,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 10.833,
+                    "ncc": 0.221,
+                    "tile_ncc": [
+                      0.2268,
+                      0.282,
+                      0.2366,
+                      0.3321,
+                      0.3017
+                    ],
+                    "ocr_similarity": 0.167,
+                    "ocr_text": "Oe",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              }
+            ],
+            "times": [
+              9.833,
+              10.333,
+              10.833
+            ],
+            "rect_out": {
+              "x": 20.7,
+              "y": 674.3,
+              "w": 301.2,
+              "h": 64.7
+            },
+            "max_ncc": 0.221,
+            "max_tile_ncc": 0.3321,
+            "ocr_hits": 0,
+            "ocr_partial_hits": 0,
+            "thresholds": {
+              "ncc": 0.5,
+              "tile_ncc": 0.6,
+              "text_sim": 0.6,
+              "partial_ocr_conf": [
+                60,
+                85
+              ]
+            },
+            "status": "measured",
+            "residual": false
+          },
+          {
+            "overlay_id": "ov2",
+            "kind": "burned_subtitle",
+            "text": "WAIT FOR IT",
+            "clip_id": "s1",
+            "rect_src": {
+              "x": 241.0,
+              "y": 356.0,
+              "w": 279.0,
+              "h": 47.0
+            },
+            "resolution_src": [
+              768,
+              432
+            ],
+            "overlay_src_range": [
+              2.0,
+              6.083
+            ],
+            "src_range_used": [
+              2.8,
+              6.083
+            ],
+            "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov2.png",
+            "mapping": "clean.verify.source_rect_to_canvas",
+            "how": "pixels",
+            "resolution_out": [
+              1080,
+              1920
+            ],
+            "checks": [
+              {
+                "times": [
+                  0.583,
+                  1.633,
+                  2.683
+                ],
+                "rect_out": {
+                  "x": 338.7,
+                  "y": 1157.0,
+                  "w": 392.7,
+                  "h": 66.1
+                },
+                "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov2.png",
+                "template_cropped": false,
+                "max_ncc": 0.1216,
+                "max_tile_ncc": 0.3269,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "per_time": [
+                  {
+                    "t": 0.583,
+                    "ncc": 0.1216,
+                    "tile_ncc": [
+                      0.1646,
+                      0.1185,
+                      0.3269,
+                      0.1546,
+                      0.2266,
+                      0.1725
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "때",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 1.633,
+                    "ncc": 0.1176,
+                    "tile_ncc": [
+                      0.1648,
+                      0.1207,
+                      0.3156,
+                      0.1958,
+                      0.1941,
+                      0.3128
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 2.683,
+                    "ncc": 0.1005,
+                    "tile_ncc": [
+                      0.2111,
+                      0.1288,
+                      0.2854,
+                      0.1377,
+                      0.1611,
+                      0.1481
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "다",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              }
+            ],
+            "times": [
+              0.583,
+              1.633,
+              2.683
+            ],
+            "rect_out": {
+              "x": 338.7,
+              "y": 1157.0,
+              "w": 392.7,
+              "h": 66.1
+            },
+            "max_ncc": 0.1216,
+            "max_tile_ncc": 0.3269,
+            "ocr_hits": 0,
+            "ocr_partial_hits": 0,
+            "thresholds": {
+              "ncc": 0.5,
+              "tile_ncc": 0.6,
+              "text_sim": 0.6,
+              "partial_ocr_conf": [
+                60,
+                85
+              ]
+            },
+            "status": "measured",
+            "residual": false
+          },
+          {
+            "overlay_id": "ov3",
+            "kind": "burned_subtitle",
+            "text": "O00",
+            "clip_id": "s1",
+            "rect_src": {
+              "x": 470.0,
+              "y": 380.0,
+              "w": 49.0,
+              "h": 17.0
+            },
+            "resolution_src": [
+              768,
+              432
+            ],
+            "overlay_src_range": [
+              2.0,
+              6.083
+            ],
+            "src_range_used": [
+              2.8,
+              6.083
+            ],
+            "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov3.png",
+            "mapping": "clean.verify.source_rect_to_canvas",
+            "how": "pixels",
+            "resolution_out": [
+              1080,
+              1920
+            ],
+            "checks": [
+              {
+                "times": [
+                  0.583,
+                  1.633,
+                  2.683
+                ],
+                "rect_out": {
+                  "x": 661.0,
+                  "y": 1190.8,
+                  "w": 69.0,
+                  "h": 23.9
+                },
+                "template": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/ov3.png",
+                "template_cropped": false,
+                "max_ncc": 0.317,
+                "max_tile_ncc": 0.3641,
+                "ocr_hits": 0,
+                "ocr_partial_hits": 0,
+                "residual": false,
+                "status": "measured",
+                "per_time": [
+                  {
+                    "t": 0.583,
+                    "ncc": 0.1707,
+                    "tile_ncc": [
+                      0.2674,
+                      0.1841,
+                      0.2777
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "때 ;",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 1.633,
+                    "ncc": 0.317,
+                    "tile_ncc": [
+                      0.3641,
+                      0.2634,
+                      0.3079
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  },
+                  {
+                    "t": 2.683,
+                    "ncc": 0.1694,
+                    "tile_ncc": [
+                      0.2534,
+                      0.3092,
+                      0.2581
+                    ],
+                    "ocr_similarity": 0.0,
+                    "ocr_text": "",
+                    "ocr_conf": 0,
+                    "ocr_hit": false
+                  }
+                ]
+              }
+            ],
+            "times": [
+              0.583,
+              1.633,
+              2.683
+            ],
+            "rect_out": {
+              "x": 661.0,
+              "y": 1190.8,
+              "w": 69.0,
+              "h": 23.9
+            },
+            "max_ncc": 0.317,
+            "max_tile_ncc": 0.3641,
+            "ocr_hits": 0,
+            "ocr_partial_hits": 0,
+            "thresholds": {
+              "ncc": 0.5,
+              "tile_ncc": 0.6,
+              "text_sim": 0.6,
+              "partial_ocr_conf": [
+                60,
+                85
+              ]
+            },
+            "status": "measured",
+            "residual": false
+          }
+        ],
+        "record": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971.json",
+        "status": "measured",
+        "used_src_ranges": [
+          [
+            2.8,
+            12.3
+          ],
+          [
+            17.9,
+            19.6
+          ]
+        ],
+        "carried_unmeasured": [
+          {
+            "check": "static_graphics",
+            "status": "unmeasured",
+            "doc_status": "unmeasured",
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함",
+            "impact": "원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요",
+            "shots": [
+              {
+                "id": 0,
+                "start": 0.0,
+                "end": 20.0
+              }
+            ]
+          },
+          {
+            "check": "corner:top_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 0,
+              "w": 230,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/corner_top_left.png",
+            "visible_in_clips": [
+              "s1",
+              "s2"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:top_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 0,
+              "w": 231,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/corner_top_right.png",
+            "visible_in_clips": [
+              "s1",
+              "s2"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 345,
+              "w": 230,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/corner_bottom_left.png",
+            "visible_in_clips": [
+              "s1",
+              "s2"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 345,
+              "w": 231,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971/corner_bottom_right.png",
+            "visible_in_clips": [
+              "s1",
+              "s2"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          }
+        ]
+      },
+      {
+        "source_id": "v_room",
+        "path": "assets/test/generated/video/people-detection.mp4",
+        "sha256": "18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693",
+        "sha256_from": "plan sources[].sha256",
+        "items": [],
+        "record": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693.json",
+        "status": "measured",
+        "used_src_ranges": [
+          [
+            28.0,
+            34.6
+          ]
+        ],
+        "carried_unmeasured": [
+          {
+            "check": "static_graphics",
+            "status": "unmeasured",
+            "doc_status": "unmeasured",
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함",
+            "impact": "원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요",
+            "shots": [
+              {
+                "id": 0,
+                "start": 0.0,
+                "end": 49.667
+              }
+            ]
+          },
+          {
+            "check": "corner:top_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 0,
+              "w": 230,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png",
+            "visible_in_clips": [
+              "s3"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:top_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 0,
+              "w": 231,
+              "h": 86
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png",
+            "visible_in_clips": [
+              "s3"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_left",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 0,
+              "y": 345,
+              "w": 230,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png",
+            "visible_in_clips": [
+              "s3"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          },
+          {
+            "check": "corner:bottom_right",
+            "status": "unmeasured",
+            "unmeasured": [
+              "graphic"
+            ],
+            "region": {
+              "x": 537,
+              "y": 345,
+              "w": 231,
+              "h": 87
+            },
+            "resolution": [
+              768,
+              432
+            ],
+            "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png",
+            "visible_in_clips": [
+              "s3"
+            ],
+            "reason": "고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함"
+          }
+        ]
+      }
+    ]
+  },
+  "arrows": {
+    "items": []
+  },
+  "canvas_geometry": {
+    "fit": [
+      {
+        "clip_id": "s1",
+        "expected": "cover",
+        "t": 4.7333,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s2",
+        "expected": "cover",
+        "t": 10.3333,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s3",
+        "expected": "cover",
+        "t": 14.8333,
+        "band_share": 0.0008,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      }
+    ],
+    "blur": null
+  },
+  "protected": [
+    {
+      "label": "남성 얼굴(복도 끝)",
+      "clip_id": "s1",
+      "start": 0.5,
+      "end": 1.3,
+      "rect": [
+        661.0,
+        895.3,
+        126.7,
+        70.4
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(걸어옴 1)",
+      "clip_id": "s1",
+      "start": 1.2,
+      "end": 2.1,
+      "rect": [
+        590.7,
+        888.2,
+        133.7,
+        80.2
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(걸어옴 2)",
+      "clip_id": "s1",
+      "start": 2.0,
+      "end": 3.1,
+      "rect": [
+        506.2,
+        874.1,
+        126.7,
+        98.5
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(걸어옴 3)",
+      "clip_id": "s1",
+      "start": 3.0,
+      "end": 4.3,
+      "rect": [
+        457.0,
+        860.1,
+        140.7,
+        115.4
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(가까이 옴)",
+      "clip_id": "s1",
+      "start": 4.2,
+      "end": 5.3,
+      "rect": [
+        435.9,
+        836.1,
+        171.7,
+        140.7
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(정면으로 섬)",
+      "clip_id": "s1",
+      "start": 5.2,
+      "end": 9.5,
+      "rect": [
+        411.2,
+        803.1,
+        246.3,
+        219.9
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 두 손(걸어올 때 1)",
+      "clip_id": "s1",
+      "start": 1.7,
+      "end": 2.6,
+      "rect": [
+        548.4,
+        1071.2,
+        154.8,
+        84.4
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 두 손(걸어올 때 2)",
+      "clip_id": "s1",
+      "start": 2.5,
+      "end": 3.4,
+      "rect": [
+        421.8,
+        1106.4,
+        260.4,
+        119.6
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(정면으로 섬)",
+      "clip_id": "s2",
+      "start": 9.5,
+      "end": 9.9,
+      "rect": [
+        435.9,
+        824.9,
+        197.0,
+        175.9
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(오른쪽으로 나감)",
+      "clip_id": "s2",
+      "start": 9.8,
+      "end": 10.5,
+      "rect": [
+        478.1,
+        789.7,
+        422.2,
+        253.3
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "남성 얼굴(화면 가장자리)",
+      "clip_id": "s2",
+      "start": 10.5,
+      "end": 11.1,
+      "rect": [
+        900.3,
+        712.3,
+        179.7,
+        281.5
+      ],
+      "visible_frac": 0.998,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "들어오는 세 사람",
+      "clip_id": "s3",
+      "start": 11.4,
+      "end": 12.8,
+      "rect": [
+        210.7,
+        824.9,
+        703.7,
+        439.1
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "걸어가는 세 사람",
+      "clip_id": "s3",
+      "start": 12.7,
+      "end": 13.8,
+      "rect": [
+        238.8,
+        789.7,
+        605.2,
+        474.3
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "갈라지기 직전 세 사람",
+      "clip_id": "s3",
+      "start": 13.7,
+      "end": 14.8,
+      "rect": [
+        252.9,
+        733.4,
+        605.2,
+        464.4
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "왼쪽으로 가는 남성",
+      "clip_id": "s3",
+      "start": 14.7,
+      "end": 15.8,
+      "rect": [
+        126.2,
+        698.2,
+        183.0,
+        337.8
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "오른쪽으로 가는 두 사람",
+      "clip_id": "s3",
+      "start": 14.7,
+      "end": 15.8,
+      "rect": [
+        647.0,
+        740.4,
+        309.6,
+        380.0
+      ],
+      "visible_frac": 1.0,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "왼쪽 벽 앞 남성",
+      "clip_id": "s3",
+      "start": 15.7,
+      "end": 16.3,
+      "rect": [
+        0.0,
+        740.4,
+        196.6,
+        281.5
+      ],
+      "visible_frac": 0.998,
+      "resolution": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "label": "오른쪽 벽 앞 두 사람",
+      "clip_id": "s3",
+      "start": 15.7,
+      "end": 17.8,
+      "rect": [
+        787.7,
+        740.4,
+        292.3,
+        351.9
+      ],
+      "visible_frac": 0.998,
+      "resolution": [
+        1080,
+        1920
+      ]
+    }
+  ],
+  "layout": {
+    "status": "measured",
+    "video_region": [
+      0.0,
+      656.0,
+      1080.0,
+      608.0
+    ],
+    "background": {
+      "type": "color",
+      "color": "#000000",
+      "temporal_std": 0.01
+    },
+    "resolution": [
+      1080,
+      1920
+    ],
+    "fps": 30.0
+  },
+  "faces": {
+    "detector": "shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))",
+    "status": "measured",
+    "frames": 4,
+    "sample_times": [
+      6.233,
+      7.233,
+      8.233,
+      9.233
+    ],
+    "sample_fps_max": 1.0,
+    "covered": [],
+    "unsampled_captions": [],
+    "faces": [
+      {
+        "t": 6.233,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              463.5,
+              820.2,
+              168.8,
+              168.8
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 7.233,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              461.2,
+              818.0,
+              175.5,
+              175.5
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 8.233,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              456.8,
+              815.8,
+              180.0,
+              180.0
+            ],
+            "from": "output"
+          }
+        ]
+      },
+      {
+        "t": 9.233,
+        "clip_id": "s1",
+        "faces": [
+          {
+            "rect": [
+              461.2,
+              818.0,
+              171.0,
+              171.0
+            ],
+            "from": "output"
+          }
+        ]
+      }
+    ],
+    "resolution": [
+      1080,
+      1920
+    ],
+    "min_face_px_canvas": 45.0,
+    "method": "얼굴: 출력 프레임 + 같은 순간의 소스 프레임(자막이 덮은 얼굴은 출력에서 안 보임)을 캔버스 좌표로 옮겨 검출; 자막 상자: 출력에서 측정"
+  }
+}

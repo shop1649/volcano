@@ -5,7 +5,7 @@
   "preset_name": "joshuamagazine",
   "format_id": "UNCLASSIFIED",
   "mode": "test",
-  "measured_at": "2026-09-25T12:06:17+00:00",
+  "measured_at": "2026-09-25T14:10:33+00:00",
   "principle": "최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)",
   "output": {
     "path": "episodes/test-coverage-001/output/test-coverage-001.mp4",
@@ -58,16 +58,16 @@
     "clean_verify": true
   },
   "timing_s": {
-    "text_s": 179.0,
-    "video_s": 48.0,
-    "audio_s": 8.4,
-    "total_s": 248.3
+    "text_s": 182.6,
+    "video_s": 49.6,
+    "audio_s": 9.5,
+    "total_s": 255.4
   },
   "summary": {
-    "total": 218,
-    "same": 147,
+    "total": 226,
+    "same": 151,
     "different": 0,
-    "unmeasured": 71,
+    "unmeasured": 75,
     "intended_change": 0,
     "different_unintended": 0,
     "by_category": {
@@ -112,7 +112,7 @@
         "unmeasured": 2
       },
       "모션(확대·정지·전환)": {
-        "same": 14,
+        "same": 17,
         "different": 0,
         "unmeasured": 9
       },
@@ -129,10 +129,10 @@
       "로고 잔류": {
         "same": 1,
         "different": 0,
-        "unmeasured": 2
+        "unmeasured": 6
       },
       "얼굴·손·물체 가림": {
-        "same": 18,
+        "same": 19,
         "different": 0,
         "unmeasured": 0
       },
@@ -179,8 +179,8 @@
     },
     "by_kind": {
       "output_vs_plan": {
-        "same": 147,
-        "unmeasured": 7
+        "same": 151,
+        "unmeasured": 11
       },
       "style_vs_reference": {
         "unmeasured": 64
@@ -567,11 +567,47 @@
       "covered_by": null
     },
     {
-      "row_id": "clean.residual:prov:v_room",
-      "item": "원본 오버레이 검출 기록 [v_room]",
-      "required": false,
+      "row_id": "clean.residual:prov:v_room:static_graphics",
+      "item": "글자 없는 고정 로고 검사 [v_room] (출처 기록)",
+      "required": true,
       "kind": "output_vs_plan",
-      "reason": "출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용)",
+      "reason": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 — 제작 영향: 원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요",
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
+      "covered_by": null
+    },
+    {
+      "row_id": "clean.residual:prov:v_room:corner:top_left",
+      "item": "원본 좌상단 글자 없는 로고 [v_room] (출처 기록)",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png)",
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
+      "covered_by": null
+    },
+    {
+      "row_id": "clean.residual:prov:v_room:corner:top_right",
+      "item": "원본 우상단 글자 없는 로고 [v_room] (출처 기록)",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png)",
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
+      "covered_by": null
+    },
+    {
+      "row_id": "clean.residual:prov:v_room:corner:bottom_left",
+      "item": "원본 좌하단 글자 없는 로고 [v_room] (출처 기록)",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png)",
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
+      "covered_by": null
+    },
+    {
+      "row_id": "clean.residual:prov:v_room:corner:bottom_right",
+      "item": "원본 우하단 글자 없는 로고 [v_room] (출처 기록)",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png)",
       "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험",
       "covered_by": null
     },
@@ -5779,6 +5815,28 @@
       "keys": []
     },
     {
+      "check_id": "video.speed",
+      "row_id": "video.speed:s1",
+      "item": "재생 속도 [s1]",
+      "category": "모션(확대·정지·전환)",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": 1.0,
+      "observed": {
+        "speed": 0.982,
+        "samples": 3,
+        "quantisation_frac": 0.0303
+      },
+      "tolerance": "±10.0% (기본 10%(1배속 클립: 속도 변화 없음 판정), 소스 1프레임/표본 구간 3.0% 중 큰 값); 정지(freeze) 구간은 재생 시계에서 뺌",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "",
+      "required": true,
+      "keys": []
+    },
+    {
       "check_id": "video.mapping",
       "row_id": "video.mapping:s2",
       "item": "소스 구간 [s2]",
@@ -5847,6 +5905,28 @@
       "evidence": {
         "t": 5.84
       },
+      "note": "",
+      "required": true,
+      "keys": []
+    },
+    {
+      "check_id": "video.speed",
+      "row_id": "video.speed:s2",
+      "item": "재생 속도 [s2]",
+      "category": "모션(확대·정지·전환)",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": 1.0,
+      "observed": {
+        "speed": 0.97,
+        "samples": 3,
+        "quantisation_frac": 0.0294
+      },
+      "tolerance": "±10.0% (기본 10%(1배속 클립: 속도 변화 없음 판정), 소스 1프레임/표본 구간 2.9% 중 큰 값); 정지(freeze) 구간은 재생 시계에서 뺌",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
       "note": "",
       "required": true,
       "keys": []
@@ -5969,6 +6049,28 @@
       "evidence": {
         "t": 14.636
       },
+      "note": "",
+      "required": true,
+      "keys": []
+    },
+    {
+      "check_id": "video.speed",
+      "row_id": "video.speed:s4",
+      "item": "재생 속도 [s4]",
+      "category": "모션(확대·정지·전환)",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": 1.0,
+      "observed": {
+        "speed": 0.995,
+        "samples": 2,
+        "quantisation_frac": 0.0588
+      },
+      "tolerance": "±10.0% (기본 10%(1배속 클립: 속도 변화 없음 판정), 소스 1프레임/표본 구간 5.9% 중 큰 값); 정지(freeze) 구간은 재생 시계에서 뺌",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
       "note": "",
       "required": true,
       "keys": []
@@ -6179,7 +6281,7 @@
         "samples": 11,
         "quantisation_frac": 0.0476
       },
-      "tolerance": "±5.0% (기본 5%, 소스 1프레임/표본 구간 4.8% 중 큰 값)",
+      "tolerance": "±5.0% (기본 5%, 소스 1프레임/표본 구간 4.8% 중 큰 값); 정지(freeze) 구간은 재생 시계에서 뺌",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -6260,8 +6362,8 @@
         "spread": 0.0474,
         "geometry": {
           "confirmed": true,
-          "ncc_median": 0.9951,
-          "ncc_min": 0.9892,
+          "ncc_median": 0.9956,
+          "ncc_min": 0.9945,
           "alt_gap_median": 0.0623
         }
       },
@@ -6270,7 +6372,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "특징점 배율 곡선은 0.27 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9951, 4% 확대 대안보다 0.0623 높음) → 피사체 움직임",
+      "note": "특징점 배율 곡선은 0.27 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9956, 4% 확대 대안보다 0.0623 높음) → 피사체 움직임",
       "required": false,
       "keys": []
     },
@@ -6320,9 +6422,9 @@
         "spread": 0.0499,
         "geometry": {
           "confirmed": true,
-          "ncc_median": 0.9932,
-          "ncc_min": 0.9892,
-          "alt_gap_median": 0.0838
+          "ncc_median": 0.9938,
+          "ncc_min": 0.9932,
+          "alt_gap_median": 0.08
         }
       },
       "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다); 계획 기하 NCC ≥ 0.95 + 4% 확대보다 0.02 높으면 줌 없음",
@@ -6330,7 +6432,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "특징점 배율 곡선은 0.75 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9932, 4% 확대 대안보다 0.0838 높음) → 피사체 움직임",
+      "note": "특징점 배율 곡선은 0.75 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9938, 4% 확대 대안보다 0.08 높음) → 피사체 움직임",
       "required": false,
       "keys": []
     },
@@ -7262,23 +7364,197 @@
     },
     {
       "check_id": "clean.residual",
-      "row_id": "clean.residual:prov:v_room",
-      "item": "원본 오버레이 검출 기록 [v_room]",
+      "row_id": "clean.residual:prov:v_room:static_graphics",
+      "item": "글자 없는 고정 로고 검사 [v_room] (출처 기록)",
       "category": "로고 잔류",
       "kind": "output_vs_plan",
       "reference": null,
       "expected": {
-        "record": "warehouse/overlays/<sha256>.json",
-        "sha256": "18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693"
+        "checked": true
       },
-      "observed": null,
+      "observed": {
+        "check": "static_graphics",
+        "status": "unmeasured",
+        "doc_status": "unmeasured",
+        "shots": [
+          {
+            "id": 0,
+            "start": 0.0,
+            "end": 49.667
+          }
+        ]
+      },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용)",
-      "required": false,
+      "note": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 — 제작 영향: 원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요",
+      "required": true,
+      "keys": [],
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
+    },
+    {
+      "check_id": "clean.residual",
+      "row_id": "clean.residual:prov:v_room:corner:top_left",
+      "item": "원본 좌상단 글자 없는 로고 [v_room] (출처 기록)",
+      "category": "로고 잔류",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "checked": true
+      },
+      "observed": {
+        "check": "corner:top_left",
+        "status": "unmeasured",
+        "unmeasured": [
+          "graphic"
+        ],
+        "region": {
+          "x": 0,
+          "y": 0,
+          "w": 230,
+          "h": 86
+        },
+        "resolution": [
+          768,
+          432
+        ],
+        "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png",
+        "visible_in_clips": [
+          "s1"
+        ]
+      },
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png)",
+      "required": true,
+      "keys": [],
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
+    },
+    {
+      "check_id": "clean.residual",
+      "row_id": "clean.residual:prov:v_room:corner:top_right",
+      "item": "원본 우상단 글자 없는 로고 [v_room] (출처 기록)",
+      "category": "로고 잔류",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "checked": true
+      },
+      "observed": {
+        "check": "corner:top_right",
+        "status": "unmeasured",
+        "unmeasured": [
+          "graphic"
+        ],
+        "region": {
+          "x": 537,
+          "y": 0,
+          "w": 231,
+          "h": 86
+        },
+        "resolution": [
+          768,
+          432
+        ],
+        "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png",
+        "visible_in_clips": [
+          "s1"
+        ]
+      },
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png)",
+      "required": true,
+      "keys": [],
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
+    },
+    {
+      "check_id": "clean.residual",
+      "row_id": "clean.residual:prov:v_room:corner:bottom_left",
+      "item": "원본 좌하단 글자 없는 로고 [v_room] (출처 기록)",
+      "category": "로고 잔류",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "checked": true
+      },
+      "observed": {
+        "check": "corner:bottom_left",
+        "status": "unmeasured",
+        "unmeasured": [
+          "graphic"
+        ],
+        "region": {
+          "x": 0,
+          "y": 345,
+          "w": 230,
+          "h": 87
+        },
+        "resolution": [
+          768,
+          432
+        ],
+        "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png",
+        "visible_in_clips": [
+          "s1"
+        ]
+      },
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png)",
+      "required": true,
+      "keys": [],
+      "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
+    },
+    {
+      "check_id": "clean.residual",
+      "row_id": "clean.residual:prov:v_room:corner:bottom_right",
+      "item": "원본 우하단 글자 없는 로고 [v_room] (출처 기록)",
+      "category": "로고 잔류",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "checked": true
+      },
+      "observed": {
+        "check": "corner:bottom_right",
+        "status": "unmeasured",
+        "unmeasured": [
+          "graphic"
+        ],
+        "region": {
+          "x": 537,
+          "y": 345,
+          "w": 231,
+          "h": 87
+        },
+        "resolution": [
+          768,
+          432
+        ],
+        "crop": "warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png",
+        "visible_in_clips": [
+          "s1"
+        ]
+      },
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png)",
+      "required": true,
       "keys": [],
       "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
     },
@@ -7303,6 +7579,29 @@
       "required": false,
       "keys": [],
       "impact": "원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험"
+    },
+    {
+      "check_id": "clean.protected_overlap",
+      "row_id": "clean.protected_overlap:all",
+      "item": "원본 정리(국소 복원)가 보호 영역을 덮지 않음",
+      "category": "얼굴·손·물체 가림",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "overlaps": 0
+      },
+      "observed": {
+        "clean_ops": 0,
+        "overlaps": 0
+      },
+      "tolerance": "보호 영역 면적의 5% 초과를 덮는 국소 복원 0건",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "plan 의 정리 영역(inpaint/delogo/blur)과 보호 영역을 원본 좌표·시각으로 대조",
+      "required": true,
+      "keys": []
     },
     {
       "check_id": "cover_up.protected",
@@ -9691,13 +9990,18 @@
     "complete": false,
     "mode": "test",
     "production_rules": false,
-    "checked_at": "2026-09-25T12:06:17+00:00",
+    "checked_at": "2026-09-25T14:10:33+00:00",
     "failures": [
       {
         "rule": "G2",
-        "message": "필수 항목 못 잼 1건 — 못 잼은 완료가 아님",
+        "message": "필수 항목 못 잼 6건 — 못 잼은 완료가 아님",
         "rows": [
-          "caption.reveal:reveal"
+          "caption.reveal:reveal",
+          "clean.residual:prov:v_room:static_graphics",
+          "clean.residual:prov:v_room:corner:top_left",
+          "clean.residual:prov:v_room:corner:top_right",
+          "clean.residual:prov:v_room:corner:bottom_left",
+          "clean.residual:prov:v_room:corner:bottom_right"
         ]
       }
     ],
@@ -9840,22 +10144,21 @@
       },
       {
         "rule": "P4",
-        "message": "필수 표시가 없는 못 잼 6건 — 못 잰 항목은 완료로 치지 않음",
+        "message": "필수 표시가 없는 못 잼 5건 — 못 잰 항목은 완료로 치지 않음",
         "rows": [
           "canvas.video_region:fit",
           "identity.logo_templates:all",
           "identity.reference_footage:all",
-          "clean.residual:prov:v_room",
           "clean.residual:prov:v_face",
           "audio.bgm:clean_file"
         ]
       }
     ],
     "unmeasured": {
-      "total": 71,
-      "required": 1,
-      "not_required": 70,
-      "not_required_uncovered": 70
+      "total": 75,
+      "required": 6,
+      "not_required": 69,
+      "not_required_uncovered": 69
     },
     "approval": {
       "state": {
@@ -9879,10 +10182,10 @@
       "mode": "test",
       "episode_index": 2
     },
-    "verdict_ko": "불합격 — 못 잼 71건(필수 1, 참고 70)"
+    "verdict_ko": "불합격 — 못 잼 75건(필수 6, 참고 69)"
   },
   "defects": {
-    "new": 0,
+    "new": 5,
     "verified_now": 0,
     "reopened": 0,
     "still_open": 1,
@@ -9891,13 +10194,9 @@
     "unmeasured_now": 0,
     "superseded": 0,
     "reclassified": 0,
-    "open": 1,
+    "open": 6,
     "needs_record": 1,
-    "total": 16,
-    "rechecked_other_episodes": [
-      "test-pipeline-001: caption.font=ok, caption.reveal=ok",
-      "test-qa-bad: caption.font=problem, caption.reveal=problem",
-      "test-qa-good: caption.font=ok, caption.reveal=problem"
-    ]
+    "total": 21,
+    "rechecked_other_episodes": []
   }
 }

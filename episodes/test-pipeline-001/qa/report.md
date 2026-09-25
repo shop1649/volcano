@@ -5,7 +5,7 @@
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스(같은 절대 시각 비교): 없음(못 잼) (분석 파일: 없음)
 - 포맷 UNCLASSIFIED 대표 영상(formats.yaml): 못 잼 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- 측정 시각: 2026-09-25T11:53:42+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
+- 측정 시각: 2026-09-25T14:06:16+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
 ## 최종 관문: **통과 (완료 아님: P1, P2, P3, P4) — 못 잼 89건(필수 0, 참고 89)**
 - △ R1: 레퍼런스 같은 시각 비교 없음/불충분: 레퍼런스 영상 없음 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
@@ -15,8 +15,8 @@
 - △ P4: 필수 표시가 없는 못 잼 7건 — 못 잰 항목은 완료로 치지 않음
 
 ## 요약
-- 전체 269행: 같다 180 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 89
-- 계획 대비(출력이 계획대로인가): {'same': 180, 'unmeasured': 7}
+- 전체 273행: 같다 184 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 89
+- 계획 대비(출력이 계획대로인가): {'same': 184, 'unmeasured': 7}
 - 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 82}
 - 프리셋 미측정(임시값) 키: 266개
 
@@ -30,11 +30,11 @@
 | 자막 타이밍 | 9 | 0 | 7 |
 | 자막 등장·퇴장 모션 | 17 | 0 | 6 |
 | 컷 | 9 | 0 | 2 |
-| 모션(확대·정지·전환) | 11 | 0 | 8 |
+| 모션(확대·정지·전환) | 14 | 0 | 8 |
 | 움직이는 장식(위치/밝기 각각) | 3 | 0 | 2 |
 | 식별 요소 | 1 | 0 | 2 |
 | 로고 잔류 | 1 | 0 | 2 |
-| 얼굴·손·물체 가림 | 23 | 0 | 0 |
+| 얼굴·손·물체 가림 | 24 | 0 | 0 |
 | 음악 구간 | 15 | 0 | 9 |
 | 원음 | 5 | 0 | 4 |
 | 효과음 종류별 개수 | 15 | 0 | 7 |
@@ -234,11 +234,14 @@
 | 전환 종류·길이 [s2] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":39.09} | 같다 | 아니오 | t=4.00s |
 | 전환 종류·길이 [s3] | 못 잼 | {"type":"flash","dur":0.12,"color":"#FFFFFF","scope":"region"} | {"type":"flash","dur":0.1,"score":120.9,"color":"#FDFDFD","scope":"region","scope_measure… | 같다 | 아니오 | t=7.47s 플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위 region (기… |
 | 전환 종류·길이 [s4] | 못 잼 | {"type":"crossfade","dur":0.25} | {"type":"crossfade","dur":0.2519,"score":0.994} | 같다 | 아니오 | t=12.75s |
+| 재생 속도 [s1] | — | 1.0 | {"speed":0.948,"samples":2,"quantisation_frac":0.0303} | 같다 | 아니오 | — |
+| 재생 속도 [s2] | — | 1.0 | {"speed":0.906,"samples":2,"quantisation_frac":0.0454} | 같다 | 아니오 | — |
+| 재생 속도 [s3] | — | 1.0 | {"speed":0.99,"samples":3,"quantisation_frac":0.0112} | 같다 | 아니오 | — |
 | 확대(줌) [s1] | 못 잼 | {"final_ratio":1.25,"t50":1.374,"dur":0.35,"ease":"out","center_canvas":[731.4,971.3],"re… | {"measured_final_ratio":1.2506,"source_ratio":1.0001,"zoom_ratio_corrected":1.2504,"measu… | 같다 | 아니오 | t=1.40s ORB+RANSAC 유사변환 배율(출력 프레임끼리 비교, 소스 자체의 배율 변화로 나눔); 줌 고정점이 렌더러 규칙 rece… |
 | 줌 없음 확인 [s2] | — | {"final_ratio":1.0} | {"max_dev":0.0005,"final_ratio":0.9996,"source_ratio":0.9994,"corrected":1.0002,"median_i… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 줌 없음 확인 [s3] | — | {"final_ratio":1.0} | {"max_dev":0.0009,"final_ratio":1.0002,"source_ratio":1.0002,"corrected":1.0,"median_inli… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 줌 없음 확인 [s4] | — | {"final_ratio":1.0} | {"max_dev":0.2638,"final_ratio":0.9542,"source_ratio":null,"corrected":null,"median_inlie… | 같다 (참고) | 아니오 | 특징점 배율 곡선은 0.26 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9… |
-| 연속 세그먼트 줌 횟수(같은 효과 쌓기 금지) | 못 잼 | {"max":1} | {"measured":1} | 같다 | 아니오 | — |
+| 연속 세그먼트 줌 횟수(같은 효과 쌓기 금지) | 못 잼 | {"max":1} | {"measured":0} | 같다 | 아니오 | — |
 | 줌 배율·길이·가속 곡선·고정점 규칙 (레퍼런스 대비) | 못 잼 | {"motion.zoom.scale_to":1.25,"motion.zoom.dur_s":0.35,"motion.zoom.ease":"out","motion.zo… | {"final_ratio":1.2506,"dur_s":0.357,"ease":"out","recenter":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: motion.zoom.scale_to, motion.zoom.dur_s, motion.z… |
 | 정지(프리즈) [s2] | 못 잼 | {"start":6.8,"hold":0.7} | {"presence":"present","start":6.7667,"hold":0.7,"mean_diff":0.0132} | 같다 | 아니오 | t=6.80s |
 | 계획에 없는 정지 화면 | — | [] | [] | 같다 | 아니오 | 소스도 정지해 있으면 제외; 판단 불가(소스 없음)면 포함 |
@@ -281,6 +284,7 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
+| 원본 정리(국소 복원)가 보호 영역을 덮지 않음 | — | {"overlaps":0} | {"clean_ops":0,"overlaps":0} | 같다 | 아니오 | plan 의 정리 영역(inpaint/delogo/blur)과 보호 영역을 원본 좌표·시각으로 대조 |
 | 보호 영역 가림·잘림 [창가 남성 얼굴(앉음)·s1] | — | {"rect":[675.1,960.0,78.8,90.1],"resolution":[1080,1920],"t":[0.0,1.3],"covered":false,"v… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=0.00s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [창가 남성 손(책상 위)·s1] | — | {"rect":[686.4,1106.4,112.6,61.9],"resolution":[1080,1920],"t":[0.0,1.3],"covered":false,… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=0.00s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [창가 남성(일어서는 중)·s1] | — | {"rect":[661.0,809.4,211.1,267.4],"resolution":[1080,1920],"t":[1.3,3.5],"covered":false,… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=1.30s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
@@ -518,9 +522,6 @@
 
 ## 결함 기록 (defects.jsonl)
 - 열림 0 / 이번에 고침 확인 0 / 재발 0 / 새로 등록 0 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 41 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
-- 같은 검사 재확인: test-coverage-001: audio.ducking=ok, audio.sfx.count=ok, audio.sfx.placement=ok, audio.sfx.unexplained=ok, audio.silence=ok, caption.font=ok, caption.motion=ok, caption.position=ok, caption.style=ok, caption.timing=ok, clean.corners=ok, cover.frame=ok, cover_up.protected=ok, video.cuts=ok, video.freeze=ok, video.transitions=ok, video.zoom=ok
-- 같은 검사 재확인: test-qa-bad: audio.ducking=problem, audio.sfx.count=problem, audio.sfx.placement=ok, audio.sfx.unexplained=problem, audio.silence=ok, caption.font=problem, caption.motion=ok, caption.position=problem, caption.style=ok, caption.timing=ok, clean.corners=problem, cover.frame=ok, cover_up.protected=problem, video.cuts=ok, video.freeze=ok, video.transitions=ok, video.zoom=ok
-- 같은 검사 재확인: test-qa-good: audio.ducking=ok, audio.sfx.count=ok, audio.sfx.placement=ok, audio.sfx.unexplained=ok, audio.silence=ok, caption.font=ok, caption.motion=ok, caption.position=ok, caption.style=ok, caption.timing=ok, clean.corners=ok, cover.frame=ok, cover_up.protected=ok, video.cuts=ok, video.freeze=ok, video.transitions=ok, video.zoom=ok
 
 ---
 판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음 — 필수 표시가 없는 '참고' 못 잼도 production 최종 관문 P4 에서 완료를 막는다; 다른 필수 행이 같은 판정을 하는 경우만 예외). 레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.

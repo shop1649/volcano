@@ -5,19 +5,19 @@
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스(같은 절대 시각 비교): 없음(못 잼) (분석 파일: 없음)
 - 포맷 UNCLASSIFIED 대표 영상(formats.yaml): 못 잼 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- 측정 시각: 2026-09-25T12:06:17+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
+- 측정 시각: 2026-09-25T14:10:33+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
-## 최종 관문: **불합격 — 못 잼 71건(필수 1, 참고 70)**
-- ✗ G2: 필수 항목 못 잼 1건 — 못 잼은 완료가 아님 — caption.reveal:reveal
+## 최종 관문: **불합격 — 못 잼 75건(필수 6, 참고 69)**
+- ✗ G2: 필수 항목 못 잼 6건 — 못 잼은 완료가 아님 — caption.reveal:reveal, clean.residual:prov:v_room:static_graphics, clean.residual:prov:v_room:corner:top_left, clean.residual:prov:v_room:corner:top_right, clean.residual:prov:v_room:corner:bottom_left, clean.residual:prov:v_room:corner:bottom_right
 - △ R1: 레퍼런스 같은 시각 비교 없음/불충분: 레퍼런스 영상 없음 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
 - △ P1: 프리셋 미측정(임시값) 키 266개
 - △ P2: 레퍼런스 대비 못 잼 64건
 - △ P3: 테스트 모드 출력(파이프라인 검증용) — 게시 불가
-- △ P4: 필수 표시가 없는 못 잼 6건 — 못 잰 항목은 완료로 치지 않음
+- △ P4: 필수 표시가 없는 못 잼 5건 — 못 잰 항목은 완료로 치지 않음
 
 ## 요약
-- 전체 218행: 같다 147 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 71
-- 계획 대비(출력이 계획대로인가): {'same': 147, 'unmeasured': 7}
+- 전체 226행: 같다 151 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 75
+- 계획 대비(출력이 계획대로인가): {'same': 151, 'unmeasured': 11}
 - 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 64}
 - 프리셋 미측정(임시값) 키: 266개
 
@@ -31,11 +31,11 @@
 | 자막 타이밍 | 7 | 0 | 4 |
 | 자막 등장·퇴장 모션 | 13 | 0 | 4 |
 | 컷 | 11 | 0 | 2 |
-| 모션(확대·정지·전환) | 14 | 0 | 9 |
+| 모션(확대·정지·전환) | 17 | 0 | 9 |
 | 움직이는 장식(위치/밝기 각각) | 6 | 0 | 3 |
 | 식별 요소 | 1 | 0 | 2 |
-| 로고 잔류 | 1 | 0 | 2 |
-| 얼굴·손·물체 가림 | 18 | 0 | 0 |
+| 로고 잔류 | 1 | 0 | 6 |
+| 얼굴·손·물체 가림 | 19 | 0 | 0 |
 | 음악 구간 | 11 | 0 | 6 |
 | 원음 | 1 | 0 | 2 |
 | 효과음 종류별 개수 | 9 | 0 | 5 |
@@ -205,6 +205,9 @@
 | 전환 종류·길이 [s3] | 못 잼 | {"type":"cut","dur":0.0,"visible":"none"} | {"type":"none","dur":null,"score":0.5} | 같다 | 아니오 | t=9.80s 같은 장면이 이어지는 편집점: 보이는 전환이 없어야 맞음(계획 cut = 이어 붙이기) |
 | 전환 종류·길이 [s4] | 못 잼 | {"type":"flash","dur":0.12,"color":"#FFFFFF","scope":"region"} | {"type":"flash","dur":0.1,"score":122.6,"color":"#FDFDFD","scope":"region","scope_measure… | 같다 | 아니오 | t=13.47s 플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위 region (기… |
 | 전환 종류·길이 [s5] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":10.49} | 같다 | 아니오 | t=18.50s |
+| 재생 속도 [s1] | — | 1.0 | {"speed":0.982,"samples":3,"quantisation_frac":0.0303} | 같다 | 아니오 | — |
+| 재생 속도 [s2] | — | 1.0 | {"speed":0.97,"samples":3,"quantisation_frac":0.0294} | 같다 | 아니오 | — |
+| 재생 속도 [s4] | — | 1.0 | {"speed":0.995,"samples":2,"quantisation_frac":0.0588} | 같다 | 아니오 | — |
 | 재생 속도 [s5] | 못 잼 | 0.5 | {"speed":0.499,"samples":11,"quantisation_frac":0.0476} | 같다 | 아니오 | — |
 | 줌 없음 확인 [s1] | — | {"final_ratio":1.0} | {"max_dev":0.0003,"final_ratio":1.0,"source_ratio":0.9999,"corrected":1.0001,"median_inli… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
 | 줌 없음 확인 [s2] | — | {"final_ratio":1.0} | {"max_dev":0.2707,"final_ratio":1.2605,"source_ratio":1.0,"corrected":1.2605,"median_inli… | 같다 (참고) | 아니오 | 특징점 배율 곡선은 0.27 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9… |
@@ -252,13 +255,18 @@
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
 | 모서리·하단 잔여 글자(출처 표기·워터마크·원어 자막) | — | [] | {"persistent":[],"single_hits":[{"zone":"video_bottom","clip_id":"s3","text":"ae","times"… | 같다 | 아니오 | 한 번만 잡힌 글자는 장면 속 글자/OCR 잡음일 수 있어 참고로만 표시 |
-| 원본 오버레이 검출 기록 [v_room] | — | {"record":"warehouse/overlays/<sha256>.json","sha256":"18ffe8672d741e3e29c9d891d22c59d453… | — | 못 잼 (참고) | 아니오 | 출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit… |
+| 글자 없는 고정 로고 검사 [v_room] (출처 기록) | — | {"checked":true} | {"check":"static_graphics","status":"unmeasured","doc_status":"unmeasured","shots":[{"id"… | 못 잼 | 아니오 | 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너… |
+| 원본 좌상단 글자 없는 로고 [v_room] (출처 기록) | — | {"checked":true} | {"check":"corner:top_left","status":"unmeasured","unmeasured":["graphic"],"region":{"x":0… | 못 잼 | 아니오 | 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너… |
+| 원본 우상단 글자 없는 로고 [v_room] (출처 기록) | — | {"checked":true} | {"check":"corner:top_right","status":"unmeasured","unmeasured":["graphic"],"region":{"x":… | 못 잼 | 아니오 | 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너… |
+| 원본 좌하단 글자 없는 로고 [v_room] (출처 기록) | — | {"checked":true} | {"check":"corner:bottom_left","status":"unmeasured","unmeasured":["graphic"],"region":{"x… | 못 잼 | 아니오 | 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너… |
+| 원본 우하단 글자 없는 로고 [v_room] (출처 기록) | — | {"checked":true} | {"check":"corner:bottom_right","status":"unmeasured","unmeasured":["graphic"],"region":{"… | 못 잼 | 아니오 | 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너… |
 | 원본 오버레이 검출 기록 [v_face] | — | {"record":"warehouse/overlays/<sha256>.json","sha256":"d88ab9aa03634f66f8815db3dc940e1cdd… | — | 못 잼 (참고) | 아니오 | 출처 기록 없음(warehouse/overlays/d88ab9aa0363….json) — `python -m shortkit… |
 
 ### 얼굴·손·물체 가림
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
+| 원본 정리(국소 복원)가 보호 영역을 덮지 않음 | — | {"overlaps":0} | {"clean_ops":0,"overlaps":0} | 같다 | 아니오 | plan 의 정리 영역(inpaint/delogo/blur)과 보호 영역을 원본 좌표·시각으로 대조 |
 | 보호 영역 가림·잘림 [걸어가는 사람(들어옴)·s1] | — | {"rect":[337.3,850.2,222.4,413.8],"resolution":[1080,1920],"t":[0.0,0.6],"covered":false,… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=0.00s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [걸어가는 사람(가운데)·s1] | — | {"rect":[407.7,774.2,259.0,391.3],"resolution":[1080,1920],"t":[0.5,1.6],"covered":false,… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=0.50s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
 | 보호 영역 가림·잘림 [걸어가는 사람(오른쪽으로)·s1] | — | {"rect":[562.5,761.6,287.1,301.2],"resolution":[1080,1920],"t":[1.5,2.6],"covered":false,… | {"hits":[],"visible_frac":1.0} | 같다 | 아니오 | t=1.50s 보호 영역은 plan 의 선언(소스 좌표)을 출력 좌표로 옮긴 것(잘림 비율도 계획 좌표로 계산), 자막·장식 bbox 는 … |
@@ -412,7 +420,11 @@
 - 장식 스타일 [box] (레퍼런스 대비) (`decor.style:d_box_ref`): 레퍼런스 미측정(임시값) 키 3개: decorations.box.color, decorations.box.stroke_px, decorations.box.blink_hz — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화살표·원 등 장식 스타일 불일치
 - 레퍼런스 로고 템플릿 없음 (`identity.logo_templates:all`): 식별 템플릿 기록이 완전하지 않음(상태 unmeasured): 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError("('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용 — `shortkit ref identity-templates` 다시 실행 — 글자 없는 로고는 OCR 검사(identity.forbidden_text)로 잡히지 않음 — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
 - 레퍼런스와 같은 녹화(영상) 재사용 없음 (`identity.reference_footage:all`): 레퍼런스 영상 지문(exclusions.jsonl reference_footage) 없음 → 같은 녹화 여부 못 잼 (URL 규칙만 확인) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
-- 원본 오버레이 검출 기록 [v_room] (`clean.residual:prov:v_room`): 출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- **필수** 글자 없는 고정 로고 검사 [v_room] (출처 기록) (`clean.residual:prov:v_room:static_graphics`): 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 — 제작 영향: 원본 채널 로고(글자 없는 그림)가 최종 화면에 남을 수 있음 → 코너 캡처 확인 필요 — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- **필수** 원본 좌상단 글자 없는 로고 [v_room] (출처 기록) (`clean.residual:prov:v_room:corner:top_left`): 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_left.png) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- **필수** 원본 우상단 글자 없는 로고 [v_room] (출처 기록) (`clean.residual:prov:v_room:corner:top_right`): 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_top_right.png) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- **필수** 원본 좌하단 글자 없는 로고 [v_room] (출처 기록) (`clean.residual:prov:v_room:corner:bottom_left`): 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_left.png) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
+- **필수** 원본 우하단 글자 없는 로고 [v_room] (출처 기록) (`clean.residual:prov:v_room:corner:bottom_right`): 출처 기록에서 못 잼: 고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함 (코너 캡처: warehouse/overlays/18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693/corner_bottom_right.png) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
 - 원본 오버레이 검출 기록 [v_face] (`clean.residual:prov:v_face`): 출처 기록 없음(warehouse/overlays/d88ab9aa0363….json) — `python -m shortkit clean detect --source assets/test/generated/video/face-demographics-walking-and-pause.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
 - BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) (`audio.bgm:clean_file`): 레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사 — 제작 영향: BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가
 - BGM 곡·버전·속도·구간 (레퍼런스 대비) (`audio.bgm:bgm_ref`): 레퍼런스 미측정(임시값) 키 5개: audio.bgm.track_id, audio.bgm.title, audio.bgm.version, audio.bgm.tempo_ratio, audio.bgm.section_start_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. audio_bgm.is_match: 곡(track_id/제목)·버전·속도·구간이 모두 레퍼런스와 같아야 같다; 계획이 파일 경로로 BGM 을 지정해 라이브러리 곡 id 가 없음 → 곡 일치는 못 잼 — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
@@ -449,10 +461,7 @@
 - `episodes/test-coverage-001/qa/compare_sheet_p02.png`
 
 ## 결함 기록 (defects.jsonl)
-- 열림 1 / 이번에 고침 확인 0 / 재발 0 / 새로 등록 0 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
-- 같은 검사 재확인: test-pipeline-001: caption.font=ok, caption.reveal=ok
-- 같은 검사 재확인: test-qa-bad: caption.font=problem, caption.reveal=problem
-- 같은 검사 재확인: test-qa-good: caption.font=ok, caption.reveal=problem
+- 열림 6 / 이번에 고침 확인 0 / 재발 0 / 새로 등록 5 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
 
 ---
 판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음 — 필수 표시가 없는 '참고' 못 잼도 production 최종 관문 P4 에서 완료를 막는다; 다른 필수 행이 같은 판정을 하는 경우만 예외). 레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.
