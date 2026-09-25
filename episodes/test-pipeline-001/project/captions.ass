@@ -22,7 +22,7 @@ Style: deco,NotoSansCJKkr-Black,20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,4
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 2,0:00:00.00,0:00:21.25,title,,0,0,0,,{\an5\pos(540,330)}움직임 테스트 영상
+Dialogue: 2,0:00:00.00,0:00:19.25,title,,0,0,0,,{\an5\pos(540,330)}움직임 테스트 영상
 Dialogue: 2,0:00:00.00,0:00:04.00,description,,0,0,0,,{\an5\pos(540,500)\fad(200,0)}파이프라인 검증용 합성 샘플
 Dialogue: 1,0:00:00.30,0:00:03.90,speaker,,0,0,0,,{\an7\pos(650,748)\fad(150,150)\bord0\shad0\blur0\1c&H000000&\1a&H59&\p3}m 0 0 l 712 0 712 196 0 196{\p0}
 Dialogue: 2,0:00:00.30,0:00:03.90,speaker,,0,0,0,,{\an5\pos(740,770)\fad(150,150)}창가 남성

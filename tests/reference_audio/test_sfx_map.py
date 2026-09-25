@@ -40,7 +40,7 @@ def test_map_have_and_none(project_env):
         m = M.build_map(PRESET)
         assert m["library_status"] == "scanned" and m["library_files"] == 6
         cat = C.build_catalog(PRESET, video_ids=["synv1", "synv2", "synv3", "synv4"], write=False)
-        from test_catalog import _members
+        from .test_catalog import _members
 
         name_of = {}
         for t in cat["types"]:

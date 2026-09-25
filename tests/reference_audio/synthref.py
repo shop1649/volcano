@@ -364,5 +364,8 @@ DEFAULT_SPECS = [
     VideoSpec("synv4", bgm_file="bed_b.wav", bgm_offset=30.0, bgm_tempo=1.05, bgm_gain_db=-12.0,
               speech=[("speech_02", 8.0, -3.0)], duck_db=9.0, attack=0.1, release=0.3,
               sfx=[("pop", 2.5, -7.0), ("ding", 5.5, -10.0), ("boom", 13.0, -8.0), ("whoosh", 8.3, -9.0)],
-              onsite=[(404, 11.0, -10.0)], format_id="F2"),
+              # seed 707 (not 404): knock(404) has waveform xcorr 0.72 with knock(202) -- by the catalog's own rule
+              # (EDIT_XCORR 0.70) the SAME waveform, so it was never a 'unique' on-site sound; this only surfaced
+              # once fingerprints stopped carrying mix residual (mockloop validation)
+              onsite=[(707, 11.0, -10.0)], format_id="F2"),
 ]

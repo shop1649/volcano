@@ -5,12 +5,12 @@
   "preset_name": "joshuamagazine",
   "format_id": "UNCLASSIFIED",
   "mode": "test",
-  "measured_at": "2026-09-24T19:51:32+00:00",
+  "measured_at": "2026-09-24T22:24:17+00:00",
   "principle": "최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)",
   "output": {
     "path": "episodes/test-pipeline-001/output/test-pipeline-001.mp4",
-    "sha256": "c391c32bb3574c40dd1c73b1050ac2c5ce34b32e6eb2cf5118f6bf59ddf24d41",
-    "duration": 21.2667,
+    "sha256": "56f4a76ce53947bc8da8d8f18a5d036b00dbeacd2e2af00d7ef4f961873736d6",
+    "duration": 19.2667,
     "resolution": [
       1080,
       1920
@@ -29,18 +29,18 @@
     "clean_verify": true
   },
   "timing_s": {
-    "text_s": 78.5,
-    "video_s": 31.2,
-    "audio_s": 8.2,
-    "total_s": 141.0
+    "text_s": 62.4,
+    "video_s": 41.1,
+    "audio_s": 8.8,
+    "total_s": 137.8
   },
   "summary": {
-    "total": 212,
-    "same": 147,
-    "different": 6,
-    "unmeasured": 59,
+    "total": 213,
+    "same": 152,
+    "different": 0,
+    "unmeasured": 61,
     "intended_change": 0,
-    "different_unintended": 6,
+    "different_unintended": 0,
     "by_category": {
       "화면 구성": {
         "same": 4,
@@ -63,9 +63,9 @@
         "unmeasured": 6
       },
       "폰트": {
-        "same": 7,
-        "different": 1,
-        "unmeasured": 7
+        "same": 6,
+        "different": 0,
+        "unmeasured": 9
       },
       "자막 타이밍": {
         "same": 9,
@@ -113,13 +113,13 @@
         "unmeasured": 2
       },
       "원음": {
-        "same": 3,
+        "same": 4,
         "different": 0,
         "unmeasured": 1
       },
       "효과음 종류별 개수": {
-        "same": 10,
-        "different": 5,
+        "same": 15,
+        "different": 0,
         "unmeasured": 2
       },
       "사건과의 시차": {
@@ -145,9 +145,8 @@
     },
     "by_kind": {
       "output_vs_plan": {
-        "same": 147,
-        "unmeasured": 6,
-        "different": 6
+        "same": 152,
+        "unmeasured": 8
       },
       "style_vs_reference": {
         "unmeasured": 53
@@ -197,11 +196,27 @@
       "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치"
     },
     {
-      "row_id": "caption.font:c_sit3",
-      "item": "자막 글꼴 [c_sit3·situation] \"뒷줄 남성이 손을 든다\"",
+      "row_id": "caption.font:c_desc",
+      "item": "자막 글꼴 [c_desc·description] \"파이프라인 검증용 합성 샘플\"",
       "required": true,
       "kind": "output_vs_plan",
-      "reason": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.963 < 천장 p10 0.966; 차순위 대비 차이 +0.051 > 잡음 0.006; 글자별 검사 통과",
+      "reason": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.951 < 천장 p10 0.959; 차순위 대비 차이 +0.057 > 잡음 0.038; 글자별 검사 통과",
+      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
+    },
+    {
+      "row_id": "caption.font:c_dlg",
+      "item": "자막 글꼴 [c_dlg·dialogue] \"\"저기 봐, 들어온다!\"\"",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.962 < 천장 p10 0.964; 차순위 대비 차이 +0.132 > 잡음 0.017; 글자별 검사 통과",
+      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
+    },
+    {
+      "row_id": "caption.font:c_sit4",
+      "item": "자막 글꼴 [c_sit4·situation] \"두 사람이 고개를 기울인다\"",
+      "required": true,
+      "kind": "output_vs_plan",
+      "reason": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.969 < 천장 p10 0.972; 차순위 대비 차이 +0.053 > 잡음 0.007; 글자별 검사 통과",
       "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
     },
     {
@@ -505,8 +520,8 @@
       "item": "자막 말투 (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 4개: text.tone.register, text.tone.sentence_end_examples, text.tone.emoji, text.tone.notes — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
-      "impact": "자막 말투가 레퍼런스와 다를 수 있음"
+      "reason": "레퍼런스 미측정(임시값) 키 3개: text.tone.register, text.tone.sentence_end_examples, text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "impact": "자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음"
     },
     {
       "row_id": "video.zoom:zoom_ref",
@@ -593,7 +608,7 @@
       "item": "보존 원음 크기·경계 (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 크기 = 보존 원음 통합 음량 − 프로그램 통합 음량(LU), ref audio-measure 와 같은 정의",
       "impact": "보존 원음 크기 불일치"
     },
     {
@@ -626,7 +641,7 @@
       "required": false,
       "kind": "style_vs_reference",
       "reason": "레퍼런스 미측정(임시값) 키 4개: structure.duration_s.p10, structure.duration_s.p50, structure.duration_s.p90, structure.duration_s.n — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
-      "impact": "영상 길이·전개 구조 불일치"
+      "impact": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능"
     },
     {
       "row_id": "structure.duration:first_caption_ref",
@@ -714,15 +729,15 @@
       "overall": {
         "n": 5,
         "p10": 0.0,
-        "p50": 0.048,
-        "p90": 0.08
+        "p50": 0.05,
+        "p90": 0.1588
       },
       "by_format": {
         "UNCLASSIFIED": {
           "n": 5,
           "p10": 0.0,
-          "p50": 0.048,
-          "p90": 0.08
+          "p50": 0.05,
+          "p90": 0.1588
         }
       }
     },
@@ -744,7 +759,7 @@
     }
   },
   "preset_unmeasured_keys": {
-    "count": 257,
+    "count": 255,
     "keys": [
       "audio.bgm.fade_in_s",
       "audio.bgm.fade_out_s",
@@ -806,7 +821,6 @@
       "motion.zoom.ease",
       "motion.zoom.recenter",
       "motion.zoom.scale_to",
-      "render.clean.blur_sigma_ratio",
       "structure.duration_s.n",
       "structure.duration_s.p10",
       "structure.duration_s.p50",
@@ -1000,7 +1014,6 @@
       "text.roles.title.timing.lead_s",
       "text.roles.title.timing.min_dur_s",
       "text.tone.emoji",
-      "text.tone.notes",
       "text.tone.register",
       "text.tone.sentence_end_examples"
     ]
@@ -1355,7 +1368,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -1457,19 +1470,19 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9728,
-          "p50": 0.98,
-          "noise_p90": 0.0191,
-          "n": 6,
-          "size_bucket": 80,
-          "cached": false
+          "p10": 0.9797,
+          "p50": 0.9839,
+          "noise_p90": 0.0111,
+          "n": 12,
+          "size_px": 84.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
@@ -1482,7 +1495,7 @@
         "t": 0.12,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_title_0000120.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.988 >= 천장 p10 0.973; 차순위 대비 차이 +0.073 > 잡음 0.019; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.988 >= 천장 p10 0.980; 차순위 대비 차이 +0.073 > 잡음 0.011; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.title.font_name",
@@ -1498,11 +1511,11 @@
       "reference": "못 잼",
       "expected": {
         "start": 0.0,
-        "end": 21.25
+        "end": 19.25
       },
       "observed": {
         "onset": 0.0,
-        "offset": 21.2667
+        "offset": 19.2667
       },
       "tolerance": "±1프레임(페이드 ±1.5프레임: 투명도 경사 외삽)",
       "status": "same",
@@ -1662,7 +1675,7 @@
         "similarity": 0.75,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -1723,19 +1736,19 @@
       "reference": "못 잼",
       "expected": "Noto Sans CJK KR Bold",
       "observed": {
-        "verdict": "identical",
-        "verdict_ko": "동일",
+        "verdict": "similar",
+        "verdict_ko": "유사(동일 확정 불가)",
         "iou_expected": 0.9511,
         "margin": 0.0573,
         "top": "Noto Sans CJK KR Bold",
-        "top_verdict": "identical",
+        "top_verdict": "similar",
         "ranked": [
           {
             "rank": 1,
             "font": "Noto Sans CJK KR Bold",
             "iou": 0.9511,
             "margin": 0.0573,
-            "verdict": "identical",
+            "verdict": "similar",
             "glyph_pass": true
           },
           {
@@ -1764,37 +1777,38 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9296,
-          "p50": 0.9404,
-          "noise_p90": 0.021,
-          "n": 6,
-          "size_bucket": 45,
-          "cached": false
+          "p10": 0.9587,
+          "p50": 0.9605,
+          "noise_p90": 0.0385,
+          "n": 12,
+          "size_px": 46.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
       },
       "tolerance": "identical(기대 글꼴 IoU ≥ 출력 인코딩 조건의 같은 글꼴 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 같다 · different(IoU < 천장 p10 − 잡음)는 다르다 · similar 는 못 잼",
-      "status": "same",
+      "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
         "t": 0.32,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_desc_0000320.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.951 >= 천장 p10 0.930; 차순위 대비 차이 +0.057 > 잡음 0.021; 글자별 검사 통과",
+      "note": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.951 < 천장 p10 0.959; 차순위 대비 차이 +0.057 > 잡음 0.038; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.description.font_name",
         "text.roles.description.bold"
-      ]
+      ],
+      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
     },
     {
       "check_id": "caption.timing",
@@ -1986,7 +2000,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2088,12 +2102,12 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9449,
-          "p50": 0.9559,
-          "noise_p90": 0.0142,
-          "n": 6,
-          "size_bucket": 40,
-          "cached": false
+          "p10": 0.951,
+          "p50": 0.9556,
+          "noise_p90": 0.0315,
+          "n": 12,
+          "size_px": 40.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
@@ -2113,7 +2127,7 @@
         "t": 0.57,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_spk_0000570.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.959 >= 천장 p10 0.945; 차순위 대비 차이 +0.053 > 잡음 0.014; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.959 >= 천장 p10 0.951; 차순위 대비 차이 +0.053 > 잡음 0.032; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.speaker.font_name",
@@ -2315,7 +2329,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2417,19 +2431,19 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9655,
-          "p50": 0.9702,
-          "noise_p90": 0.0058,
-          "n": 6,
-          "size_bucket": 63,
-          "cached": false
+          "p10": 0.9667,
+          "p50": 0.97,
+          "noise_p90": 0.0118,
+          "n": 12,
+          "size_px": 66.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
@@ -2442,7 +2456,7 @@
         "t": 1.54,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_sit1_0001540.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.973 >= 천장 p10 0.966; 차순위 대비 차이 +0.053 > 잡음 0.006; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.973 >= 천장 p10 0.967; 차순위 대비 차이 +0.053 > 잡음 0.012; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.situation.font_name",
@@ -2644,7 +2658,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2746,11 +2760,11 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9655,
-          "p50": 0.9702,
-          "noise_p90": 0.0058,
-          "n": 6,
-          "size_bucket": 63,
+          "p10": 0.968,
+          "p50": 0.9712,
+          "noise_p90": 0.0174,
+          "n": 12,
+          "size_px": 66.0,
           "cached": true
         },
         "conditions": {
@@ -2758,7 +2772,7 @@
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
@@ -2771,7 +2785,7 @@
         "t": 4.34,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_sit2_0004340.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.970 >= 천장 p10 0.966; 차순위 대비 차이 +0.062 > 잡음 0.006; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.970 >= 천장 p10 0.968; 차순위 대비 차이 +0.062 > 잡음 0.017; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.situation.font_name",
@@ -2973,7 +2987,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3034,19 +3048,19 @@
       "reference": "못 잼",
       "expected": "Noto Sans CJK KR Black",
       "observed": {
-        "verdict": "similar",
-        "verdict_ko": "유사(동일 확정 불가)",
+        "verdict": "identical",
+        "verdict_ko": "동일",
         "iou_expected": 0.9634,
         "margin": 0.0513,
         "top": "Noto Sans CJK KR Black",
-        "top_verdict": "similar",
+        "top_verdict": "identical",
         "ranked": [
           {
             "rank": 1,
             "font": "Noto Sans CJK KR Black",
             "iou": 0.9634,
             "margin": 0.0513,
-            "verdict": "similar",
+            "verdict": "identical",
             "glyph_pass": true
           },
           {
@@ -3075,11 +3089,11 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9655,
-          "p50": 0.9702,
-          "noise_p90": 0.0058,
-          "n": 6,
-          "size_bucket": 63,
+          "p10": 0.9578,
+          "p50": 0.9637,
+          "noise_p90": 0.0187,
+          "n": 12,
+          "size_px": 66.0,
           "cached": true
         },
         "conditions": {
@@ -3087,26 +3101,25 @@
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
       },
       "tolerance": "identical(기대 글꼴 IoU ≥ 출력 인코딩 조건의 같은 글꼴 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 같다 · different(IoU < 천장 p10 − 잡음)는 다르다 · similar 는 못 잼",
-      "status": "unmeasured",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
         "t": 7.94,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_sit3_0007940.png"
       },
-      "note": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.963 < 천장 p10 0.966; 차순위 대비 차이 +0.051 > 잡음 0.006; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.963 >= 천장 p10 0.958; 차순위 대비 차이 +0.051 > 잡음 0.019; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.situation.font_name",
         "text.roles.situation.bold"
-      ],
-      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
+      ]
     },
     {
       "check_id": "caption.timing",
@@ -3303,7 +3316,7 @@
         "similarity": 0.833,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3366,19 +3379,19 @@
       "reference": "못 잼",
       "expected": "Noto Sans CJK KR Black",
       "observed": {
-        "verdict": "identical",
-        "verdict_ko": "동일",
+        "verdict": "similar",
+        "verdict_ko": "유사(동일 확정 불가)",
         "iou_expected": 0.9622,
         "margin": 0.1321,
         "top": "Noto Sans CJK KR Black",
-        "top_verdict": "identical",
+        "top_verdict": "similar",
         "ranked": [
           {
             "rank": 1,
             "font": "Noto Sans CJK KR Black",
             "iou": 0.9622,
             "margin": 0.1321,
-            "verdict": "identical",
+            "verdict": "similar",
             "glyph_pass": true
           },
           {
@@ -3407,37 +3420,38 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9526,
-          "p50": 0.9628,
-          "noise_p90": 0.0155,
-          "n": 6,
-          "size_bucket": 63,
-          "cached": false
+          "p10": 0.9644,
+          "p50": 0.9697,
+          "noise_p90": 0.0168,
+          "n": 12,
+          "size_px": 62.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
       },
       "tolerance": "identical(기대 글꼴 IoU ≥ 출력 인코딩 조건의 같은 글꼴 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 같다 · different(IoU < 천장 p10 − 잡음)는 다르다 · similar 는 못 잼",
-      "status": "same",
+      "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
         "t": 10.22,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_dlg_0010219.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.962 >= 천장 p10 0.953; 차순위 대비 차이 +0.132 > 잡음 0.015; 글자별 검사 통과",
+      "note": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.962 < 천장 p10 0.964; 차순위 대비 차이 +0.132 > 잡음 0.017; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.dialogue.font_name",
         "text.roles.dialogue.bold"
-      ]
+      ],
+      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
     },
     {
       "check_id": "caption.timing",
@@ -3634,7 +3648,7 @@
         "similarity": 0.667,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3736,12 +3750,12 @@
           }
         ],
         "ceiling": {
-          "p10": 0.9632,
-          "p50": 0.9716,
-          "noise_p90": 0.0163,
-          "n": 6,
-          "size_bucket": 80,
-          "cached": false
+          "p10": 0.9699,
+          "p50": 0.9762,
+          "noise_p90": 0.0165,
+          "n": 12,
+          "size_px": 76.0,
+          "cached": true
         },
         "conditions": {
           "label": "h264_crf18_1080x1920",
@@ -3761,7 +3775,7 @@
         "t": 15.32,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_rx_0015319.png"
       },
-      "note": "판정: 동일(identical) — IoU 0.980 >= 천장 p10 0.963; 차순위 대비 차이 +0.084 > 잡음 0.016; 글자별 검사 통과",
+      "note": "판정: 동일(identical) — IoU 0.980 >= 천장 p10 0.970; 차순위 대비 차이 +0.084 > 잡음 0.017; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.reaction.font_name",
@@ -3963,7 +3977,7 @@
         "similarity": 1.0,
         "match": "ocr"
       },
-      "tolerance": "OCR 유사도 ≥ 0.6",
+      "tolerance": "OCR 유사도 ≥ 0.6 (짧은 문구 OCR 실패 시 글자별 모양 대조)",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -4026,52 +4040,52 @@
       "reference": "못 잼",
       "expected": "Noto Sans CJK KR Black",
       "observed": {
-        "verdict": "different",
-        "verdict_ko": "다름",
-        "iou_expected": 0.8462,
-        "margin": 0.0377,
+        "verdict": "similar",
+        "verdict_ko": "유사(동일 확정 불가)",
+        "iou_expected": 0.9686,
+        "margin": 0.0532,
         "top": "Noto Sans CJK KR Black",
-        "top_verdict": "different",
+        "top_verdict": "similar",
         "ranked": [
           {
             "rank": 1,
             "font": "Noto Sans CJK KR Black",
-            "iou": 0.8462,
-            "margin": 0.0377,
-            "verdict": "different",
-            "glyph_pass": false
+            "iou": 0.9686,
+            "margin": 0.0532,
+            "verdict": "similar",
+            "glyph_pass": true
           },
           {
             "rank": 2,
-            "font": "Pretendard ExtraBold",
-            "iou": 0.8085,
-            "margin": -0.0377,
+            "font": "Pretendard Black",
+            "iou": 0.9154,
+            "margin": -0.0532,
             "verdict": "unmeasured",
             "glyph_pass": null
           },
           {
             "rank": 3,
-            "font": "Pretendard Black",
-            "iou": 0.7982,
-            "margin": -0.048,
+            "font": "Pretendard ExtraBold",
+            "iou": 0.9031,
+            "margin": -0.0655,
             "verdict": "unmeasured",
             "glyph_pass": null
           },
           {
             "rank": 4,
             "font": "Noto Sans CJK KR Bold",
-            "iou": 0.7696,
-            "margin": -0.0766,
+            "iou": 0.8495,
+            "margin": -0.1191,
             "verdict": "unmeasured",
             "glyph_pass": null
           }
         ],
         "ceiling": {
-          "p10": 0.9655,
-          "p50": 0.9702,
-          "noise_p90": 0.0058,
-          "n": 6,
-          "size_bucket": 63,
+          "p10": 0.972,
+          "p50": 0.9739,
+          "noise_p90": 0.0069,
+          "n": 12,
+          "size_px": 66.0,
           "cached": true
         },
         "conditions": {
@@ -4079,25 +4093,26 @@
           "crf": 18.0,
           "x264_preset": "veryfast",
           "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
-          "background": "video",
+          "background": "color:#000000",
           "assumed": false,
           "source": "output MP4 x264 SEI"
         }
       },
       "tolerance": "identical(기대 글꼴 IoU ≥ 출력 인코딩 조건의 같은 글꼴 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 같다 · different(IoU < 천장 p10 − 잡음)는 다르다 · similar 는 못 잼",
-      "status": "different",
+      "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
         "t": 15.34,
         "frame": "episodes/test-pipeline-001/qa/frames/cap_c_sit4_0015339.png"
       },
-      "note": "판정: 다름(different) — IoU 0.846 < 천장 p10 0.966 - 잡음 0.006; 글자별 하한(0.86)보다 나쁜 글자: 울(0.26), 인(0.65), 다(0.82) — 다른 글꼴이거나 OCR 문구 오류일 수 있음",
+      "note": "판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. IoU 0.969 < 천장 p10 0.972; 차순위 대비 차이 +0.053 > 잡음 0.007; 글자별 검사 통과",
       "required": true,
       "keys": [
         "text.roles.situation.font_name",
         "text.roles.situation.bold"
-      ]
+      ],
+      "impact": "글꼴이 맞는지 확인하지 못함 → 글자 인상이 다를 수 있음"
     },
     {
       "check_id": "caption.timing",
@@ -4224,14 +4239,60 @@
       "observed": {
         "n": 4,
         "counts": {
-          "기타": 2,
-          "반말_구어체": 4
+          "명사형/기타": 3,
+          "반말": 4
         },
         "mode": "반말_구어체",
-        "note": "기타(감탄사·명사 끝)는 판정에서 제외",
+        "items": [
+          {
+            "text": "움직임 테스트 영상",
+            "class": "명사형/기타",
+            "ending": "영상",
+            "register": null
+          },
+          {
+            "text": "파 이 프 라인 ASS 합성 샘플",
+            "class": "명사형/기타",
+            "ending": "샘플",
+            "register": null
+          },
+          {
+            "text": "창가 남 성 이 일 어 선다",
+            "class": "반말",
+            "ending": "선다",
+            "register": "반말_구어체"
+          },
+          {
+            "text": "다시 자 리 에 앉는다",
+            "class": "반말",
+            "ending": "앉는다",
+            "register": "반말_구어체"
+          },
+          {
+            "text": "뒷 줄 남 성 이 손 을 든다",
+            "class": "반말",
+            "ending": "든다",
+            "register": "반말_구어체"
+          },
+          {
+            "text": "가 우 뚱 ?",
+            "class": "명사형/기타",
+            "ending": "뚱",
+            "register": null
+          },
+          {
+            "text": "두 사 람 이 고 개 를 기울인다",
+            "class": "반말",
+            "ending": "기울인다",
+            "register": "반말_구어체"
+          }
+        ],
+        "method": "shortkit.reference.aggregate.ending_class (분석기·validate 와 같은 분류기), 최빈 종결 ≥ 0.6 이면 그 말투, 아니면 혼합",
+        "note": "명사형/기타(명사·감탄사 끝)는 판정에서 제외",
         "roles_used": [
-          "situation",
+          "title",
           "description",
+          "situation",
           "reaction"
         ]
       },
@@ -4240,7 +4301,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "OCR 문구의 마지막 글자로 분류(휴리스틱)",
+      "note": "OCR 문구의 종결 어미를 레퍼런스 분석기·validate 와 같은 분류기(reference.aggregate.ending_class)로 분류",
       "required": false,
       "keys": [
         "text.tone.register"
@@ -4388,9 +4449,7 @@
         "text.roles.description.font_name": "Noto Sans CJK KR Bold",
         "text.roles.description.bold": true
       },
-      "observed": {
-        "best": "Noto Sans CJK KR Bold"
-      },
+      "observed": null,
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
@@ -4589,9 +4648,7 @@
         "text.roles.dialogue.font_name": "Noto Sans CJK KR Black",
         "text.roles.dialogue.bold": true
       },
-      "observed": {
-        "best": "Noto Sans CJK KR Black"
-      },
+      "observed": null,
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
@@ -5419,7 +5476,7 @@
         "text.roles.title.persist": "whole_video"
       },
       "observed": {
-        "min_dur_s": 21.267
+        "min_dur_s": 19.267
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -5476,7 +5533,12 @@
       "item": "자막 말투 (레퍼런스 대비)",
       "category": "자막 내용·말투",
       "kind": "style_vs_reference",
-      "reference": "못 잼",
+      "reference": {
+        "text.tone.register": "못 잼",
+        "text.tone.sentence_end_examples": "못 잼",
+        "text.tone.emoji": "못 잼",
+        "text.tone.notes": "해당 없음(meta)"
+      },
       "expected": {
         "text.tone.register": "반말_구어체",
         "text.tone.sentence_end_examples": [],
@@ -5491,7 +5553,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 4개: text.tone.register, text.tone.sentence_end_examples, text.tone.emoji, text.tone.notes — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "note": "레퍼런스 미측정(임시값) 키 3개: text.tone.register, text.tone.sentence_end_examples, text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
       "required": false,
       "keys": [
         "text.tone.register",
@@ -5499,7 +5561,7 @@
         "text.tone.emoji",
         "text.tone.notes"
       ],
-      "impact": "자막 말투가 레퍼런스와 다를 수 있음"
+      "impact": "자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음"
     },
     {
       "check_id": "video.cuts",
@@ -5709,6 +5771,7 @@
             "prominence": 0.0031,
             "moving_frac": 0.08,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           },
           {
@@ -5721,6 +5784,7 @@
             "prominence": 0.1567,
             "moving_frac": 0.149,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -5733,6 +5797,7 @@
             "prominence": 0.1056,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           }
         ]
@@ -5773,6 +5838,7 @@
             "prominence": 0.1041,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -5785,6 +5851,7 @@
             "prominence": 0.0975,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -5797,6 +5864,7 @@
             "prominence": 0.0263,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           }
         ]
@@ -5837,6 +5905,7 @@
             "prominence": 0.0324,
             "moving_frac": 0.085,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -5849,6 +5918,7 @@
             "prominence": 0.0323,
             "moving_frac": 0.094,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -5861,6 +5931,7 @@
             "prominence": 0.0438,
             "moving_frac": 0.093,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           }
         ]
@@ -5885,47 +5956,89 @@
       "reference": null,
       "expected": {
         "src_in": 3.0,
-        "src_out": 11.5,
+        "src_out": 9.5,
         "source": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4"
       },
       "observed": {
-        "offset_s": -0.023,
+        "offset_s": -0.068,
         "samples": [
           {
-            "t": 14.69,
-            "expected_src_t": 4.94,
-            "matched_src_t": 4.917,
+            "t": 14.29,
+            "expected_src_t": 4.54,
+            "matched_src_t": 4.583,
             "ncc": 0.998,
             "ncc_moving": 0.991,
-            "offset": -0.023,
-            "prominence": 0.108,
+            "offset": 0.043,
+            "prominence": 0.0143,
             "moving_frac": 0.15,
             "at_window_edge": false,
-            "decisive": true
-          },
-          {
-            "t": 17.125,
-            "expected_src_t": 7.375,
-            "matched_src_t": 7.833,
-            "ncc": 0.953,
-            "ncc_moving": 0.876,
-            "offset": 0.458,
-            "prominence": 0.0002,
-            "moving_frac": 0.079,
-            "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           },
           {
-            "t": 19.56,
-            "expected_src_t": 9.81,
-            "matched_src_t": 9.667,
+            "t": 16.125,
+            "expected_src_t": 6.375,
+            "matched_src_t": 6.417,
+            "ncc": 0.953,
+            "ncc_moving": 0.981,
+            "offset": 0.042,
+            "prominence": 0.0129,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false
+          },
+          {
+            "t": 17.96,
+            "expected_src_t": 8.21,
+            "matched_src_t": 8.167,
+            "ncc": 0.997,
+            "ncc_moving": 0.913,
+            "offset": -0.043,
+            "prominence": 0.0293,
+            "moving_frac": 0.052,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false
+          },
+          {
+            "t": 13.373,
+            "expected_src_t": 3.623,
+            "matched_src_t": 2.5,
+            "ncc": 0.998,
+            "ncc_moving": 0.948,
+            "offset": -1.123,
+            "prominence": 0.0029,
+            "moving_frac": 0.071,
+            "at_window_edge": true,
+            "stage": 2,
+            "decisive": false
+          },
+          {
+            "t": 13.678,
+            "expected_src_t": 3.928,
+            "matched_src_t": 4.5,
             "ncc": 0.998,
             "ncc_moving": 0.983,
-            "offset": -0.143,
-            "prominence": 0.0055,
+            "offset": 0.572,
+            "prominence": 0.006,
+            "moving_frac": 0.136,
+            "at_window_edge": false,
+            "stage": 2,
+            "decisive": false
+          },
+          {
+            "t": 14.902,
+            "expected_src_t": 5.152,
+            "matched_src_t": 5.083,
+            "ncc": 0.998,
+            "ncc_moving": 0.991,
+            "offset": -0.068,
+            "prominence": 0.2094,
             "moving_frac": 0.15,
             "at_window_edge": false,
-            "decisive": false
+            "stage": 2,
+            "decisive": true
           }
         ]
       },
@@ -5934,7 +6047,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {
-        "t": 14.69
+        "t": 14.29
       },
       "note": "",
       "required": true,
@@ -6003,7 +6116,7 @@
         "median_inliers": 354.0,
         "spread": 0.0002
       },
-      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다)",
+      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다); 계획 기하 NCC ≥ 0.95 + 4% 확대보다 0.02 높으면 줌 없음",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -6030,7 +6143,7 @@
         "median_inliers": 291.0,
         "spread": 0.0001
       },
-      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다)",
+      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다); 계획 기하 NCC ≥ 0.95 + 4% 확대보다 0.02 높으면 줌 없음",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -6051,18 +6164,24 @@
       },
       "observed": {
         "max_dev": 0.2638,
-        "final_ratio": 0.9519,
-        "source_ratio": 0.987,
-        "corrected": 0.9645,
-        "median_inliers": 150.0,
-        "spread": 0.0109
+        "final_ratio": 0.9542,
+        "source_ratio": null,
+        "corrected": null,
+        "median_inliers": 235.0,
+        "spread": 0.0804,
+        "geometry": {
+          "confirmed": true,
+          "ncc_median": 0.9974,
+          "ncc_min": 0.9529,
+          "alt_gap_median": 0.0357
+        }
       },
-      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다)",
+      "tolerance": "배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다); 계획 기하 NCC ≥ 0.95 + 4% 확대보다 0.02 높으면 줌 없음",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "소스 자체의 카메라 줌도 여기에 잡힘",
+      "note": "특징점 배율 곡선은 0.26 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9974, 4% 확대 대안보다 0.0357 높음) → 피사체 움직임",
       "required": false,
       "keys": []
     },
@@ -6507,7 +6626,7 @@
       },
       "observed": {
         "hits": [],
-        "frames_ocr": 25
+        "frames_ocr": 23
       },
       "tolerance": "0건",
       "status": "same",
@@ -7632,7 +7751,7 @@
         ],
         "t": [
           12.75,
-          21.25
+          19.25
         ],
         "covered": false,
         "visible_frac_min": 0.5
@@ -7672,7 +7791,7 @@
         ],
         "t": [
           12.75,
-          21.25
+          19.25
         ],
         "covered": false,
         "visible_frac_min": 0.5
@@ -7744,46 +7863,46 @@
       },
       "observed": {
         "presence": "present",
-        "waveform_ncc": 0.9181,
+        "waveform_ncc": 0.8439,
         "local_match": {
-          "n": 84,
+          "n": 76,
           "q95": 0.9999,
           "q70": 0.9998,
-          "explained": 0.931,
-          "explained_null": 0.041
+          "explained": 0.8059,
+          "explained_null": 0.0477
         },
         "tempo_candidates": {
           "1.0": {
-            "ncc": 0.9181,
-            "n": 84,
+            "ncc": 0.8439,
+            "n": 76,
             "q95": 0.9999,
             "q70": 0.9998,
-            "explained": 0.931,
-            "explained_null": 0.041
+            "explained": 0.8059,
+            "explained_null": 0.0477
           },
           "1.005": {
-            "ncc": 0.1679,
-            "n": 84,
-            "q95": 0.8119,
-            "q70": 0.3801,
-            "explained": 0.1613,
-            "explained_null": 0.0416
+            "ncc": 0.1774,
+            "n": 45,
+            "q95": 0.9759,
+            "q70": 0.3694,
+            "explained": 0.1117,
+            "explained_null": 0.0155
           },
           "0.995": {
-            "ncc": 0.1266,
-            "n": 65,
-            "q95": 0.6016,
-            "q70": 0.2944,
-            "explained": 0.0661,
-            "explained_null": 0.0589
+            "ncc": 0.1331,
+            "n": 76,
+            "q95": 0.5178,
+            "q70": 0.273,
+            "explained": 0.076,
+            "explained_null": 0.0594
           },
           "0.99": {
-            "ncc": 0.1409,
-            "n": 84,
-            "q95": 0.4879,
-            "q70": 0.3179,
-            "explained": 0.0777,
-            "explained_null": 0.0585
+            "ncc": 0.1473,
+            "n": 48,
+            "q95": 0.8051,
+            "q70": 0.4264,
+            "explained": 0.0947,
+            "explained_null": 0.0284
           }
         }
       },
@@ -7811,14 +7930,14 @@
         "track_id": "assets/test/generated/music_bed_a.wav",
         "version": "file:assets/test/generated/music_bed_a.wav",
         "tempo_ratio": 1.0,
-        "section_start_s": 12.0
+        "section_start_s": 0.0
       },
       "observed": {
         "observed": {
           "track_id": "assets/test/generated/music_bed_a.wav",
           "version": "file:assets/test/generated/music_bed_a.wav",
           "tempo_ratio": 1.0,
-          "section_start_s": 12.0
+          "section_start_s": 0.0
         },
         "checks": {
           "track_id": true,
@@ -7857,7 +7976,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "후보 템포 상위: [[1.0, 0.8094], [1.005, 0.256], [0.995, 0.2381], [0.99, 0.1628], [0.985, 0.1619]]",
+      "note": "후보 템포 상위: [[1.0, 0.7685], [1.005, 0.2572], [0.995, 0.2305], [0.99, 0.1679], [0.8, 0.1572]]",
       "required": true,
       "keys": [
         "audio.bgm.tempo_ratio",
@@ -7872,18 +7991,18 @@
       "kind": "output_vs_plan",
       "reference": "못 잼",
       "expected": {
-        "section_start_s": 12.0
+        "section_start_s": 0.0
       },
       "observed": {
-        "section_start_s": 12.0,
+        "section_start_s": 0.0,
         "used_section": [
-          12.025,
-          33.215
+          0.025,
+          19.216
         ],
         "runner_up": {
-          "section_start_s": 36.0,
-          "ncc": 0.9172,
-          "explained": 0.9291,
+          "section_start_s": 16.0,
+          "ncc": 0.8429,
+          "explained": 0.804,
           "q95": 0.9999
         }
       },
@@ -7913,10 +8032,10 @@
       },
       "observed": {
         "fade_in_s": 0.0,
-        "fade_out_s": 0.689,
+        "fade_out_s": 0.686,
         "audible_span": [
           0.025,
-          21.215
+          19.216
         ]
       },
       "tolerance": "±0.20s",
@@ -7954,7 +8073,7 @@
         "title": null,
         "version": null,
         "tempo_ratio": 1.0,
-        "section_start_s": 12.0
+        "section_start_s": 0.0
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -7999,8 +8118,8 @@
             12.444
           ],
           [
-            20.791,
-            21.24
+            18.791,
+            19.241
           ]
         ],
         "coverage": [
@@ -8090,7 +8209,7 @@
         "depth_db": -10.0
       },
       "observed": {
-        "depth_db": -10.0
+        "depth_db": -10.01
       },
       "tolerance": "±3.0 dB",
       "status": "same",
@@ -8116,7 +8235,7 @@
         "audio.ducking.release_s": 0.3
       },
       "observed": {
-        "depth_db": -10.0
+        "depth_db": -10.01
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -8194,14 +8313,14 @@
       "reference": "못 잼",
       "expected": {
         "present": true,
-        "gain_db": 0.0,
+        "applied_gain_db": 5.6,
         "stem": "raw",
         "reason": "소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증"
       },
       "observed": {
         "presence": "present",
         "present_fraction": 1.0,
-        "gain_db_mix_scale": -0.01
+        "gain_db_mix_scale": 5.48
       },
       "tolerance": "창의 70% 이상에서 원음 확인",
       "status": "same",
@@ -8243,6 +8362,39 @@
       "required": false,
       "keys": [
         "audio.original.remove_embedded_music"
+      ]
+    },
+    {
+      "check_id": "audio.original",
+      "row_id": "audio.original:level0",
+      "item": "보존 원음 크기(프로그램 음량 대비) [s3 10.00–12.30s]",
+      "category": "원음",
+      "kind": "output_vs_plan",
+      "reference": "못 잼",
+      "expected": {
+        "rel_lu": 0.0,
+        "source": "audio.original.keep_gain_db",
+        "definition": "보존 원음 통합 음량 − 프로그램 통합 음량 (LU)"
+      },
+      "observed": {
+        "rel_lu_obs": 0.33,
+        "src_lufs": -19.6,
+        "src_scope": "clip",
+        "fit_gain_db": 5.23,
+        "n_windows": 7,
+        "mix_lufs": -14.7
+      },
+      "tolerance": "±1.5 LU (audio.loudness.tolerance_lu + 측정 잡음 0.5)",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {
+        "t": 10.0
+      },
+      "note": "L_src(소스 통합 음량) + 출력 믹스 속 원음 이득(창별 최소제곱 중앙값) − 출력 통합 음량",
+      "required": true,
+      "keys": [
+        "audio.original.keep_gain_db"
       ]
     },
     {
@@ -8290,14 +8442,14 @@
         "audio.original.fade_s": 0.04
       },
       "observed": {
-        "gain_db": -0.01
+        "rel_lu": 0.33
       },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "note": "레퍼런스 미측정(임시값) 키 2개: audio.original.keep_gain_db, audio.original.fade_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 크기 = 보존 원음 통합 음량 − 프로그램 통합 음량(LU), ref audio-measure 와 같은 정의",
       "required": false,
       "keys": [
         "audio.original.keep_gain_db",
@@ -8313,19 +8465,19 @@
       "kind": "output_vs_plan",
       "reference": null,
       "expected": {
-        "t": 1.25,
+        "t": 1.1,
         "type": "whoosh"
       },
       "observed": {
-        "t": 1.2522,
-        "ncc": 0.915
+        "t": 1.1022,
+        "ncc": 0.986
       },
       "tolerance": "같은 파일, 시각 ±0.05s",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
-        "t": 1.2522
+        "t": 1.1022
       },
       "note": "",
       "required": true,
@@ -8342,15 +8494,15 @@
         "gain_db": -12.0
       },
       "observed": {
-        "gain_db_mix_scale": -15.97,
+        "gain_db_mix_scale": -12.31,
         "reference": "local_bgm"
       },
       "tolerance": "±3.0 dB (같은 순간 BGM 대비로 환산)",
-      "status": "different",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
-        "t": 1.2522
+        "t": 1.1022
       },
       "note": "",
       "required": false,
@@ -8372,15 +8524,15 @@
         "max_abs_offset": 0.3
       },
       "observed": {
-        "sfx_t": 1.2522,
-        "offset": -0.048
+        "sfx_t": 1.1022,
+        "offset": -0.198
       },
       "tolerance": "|효과음 − 사건| ≤ 0.3s",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
-        "t": 1.2522
+        "t": 1.1022
       },
       "note": "사건 시각은 plan 의 선언(화면 사건), 효과음 시각은 출력에서 측정",
       "required": true,
@@ -8401,7 +8553,7 @@
       },
       "observed": {
         "t": 6.8,
-        "ncc": 0.994
+        "ncc": 0.999
       },
       "tolerance": "같은 파일, 시각 ±0.05s",
       "status": "same",
@@ -8425,11 +8577,11 @@
         "gain_db": -8.0
       },
       "observed": {
-        "gain_db_mix_scale": -11.05,
+        "gain_db_mix_scale": -8.06,
         "reference": "bgm_plateau (BGM 없음/정적 구간)"
       },
       "tolerance": "±3.0 dB (같은 순간 BGM 대비로 환산)",
-      "status": "different",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
@@ -8484,7 +8636,7 @@
       },
       "observed": {
         "t": 7.7501,
-        "ncc": 0.991
+        "ncc": 0.993
       },
       "tolerance": "같은 파일, 시각 ±0.05s",
       "status": "same",
@@ -8508,11 +8660,11 @@
         "gain_db": -8.0
       },
       "observed": {
-        "gain_db_mix_scale": -11.74,
+        "gain_db_mix_scale": -8.05,
         "reference": "local_bgm"
       },
       "tolerance": "±3.0 dB (같은 순간 BGM 대비로 환산)",
-      "status": "different",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
@@ -8591,11 +8743,11 @@
         "gain_db": -8.0
       },
       "observed": {
-        "gain_db_mix_scale": -11.91,
+        "gain_db_mix_scale": -8.04,
         "reference": "local_bgm"
       },
       "tolerance": "±3.0 dB (같은 순간 BGM 대비로 환산)",
-      "status": "different",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
@@ -8650,7 +8802,7 @@
       },
       "observed": {
         "t": 15.0,
-        "ncc": 0.992
+        "ncc": 0.971
       },
       "tolerance": "같은 파일, 시각 ±0.05s",
       "status": "same",
@@ -8674,11 +8826,11 @@
         "gain_db": -8.0
       },
       "observed": {
-        "gain_db_mix_scale": -11.19,
+        "gain_db_mix_scale": -8.04,
         "reference": "local_bgm"
       },
       "tolerance": "±3.0 dB (같은 순간 BGM 대비로 환산)",
-      "status": "different",
+      "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
@@ -8860,7 +9012,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {
-        "t": 1.2522
+        "t": 1.1022
       },
       "note": "",
       "required": true,
@@ -8904,7 +9056,7 @@
         "audio.sfx.gain_db_default": -8.0
       },
       "observed": {
-        "gain_db": -11.74
+        "gain_db": -8.05
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -8930,9 +9082,9 @@
         "true_peak_db": -1.5
       },
       "observed": {
-        "integrated_lufs": -14.9,
-        "lra": 2.0,
-        "true_peak_db": -2.0
+        "integrated_lufs": -14.7,
+        "lra": 1.4,
+        "true_peak_db": -1.9
       },
       "tolerance": "±1.0 LU, 트루피크 ≤ 목표+0.5 dB",
       "status": "same",
@@ -8958,7 +9110,7 @@
         "audio.loudness.true_peak_db": -1.5
       },
       "observed": {
-        "integrated_lufs": -14.9
+        "integrated_lufs": -14.7
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -8980,8 +9132,8 @@
       "category": "구성·표지",
       "kind": "output_vs_plan",
       "reference": null,
-      "expected": 21.25,
-      "observed": 21.267,
+      "expected": 19.25,
+      "observed": 19.267,
       "tolerance": "±2프레임",
       "status": "same",
       "intended_change": false,
@@ -9005,7 +9157,7 @@
         "structure.duration_s.n": 0
       },
       "observed": {
-        "duration": 21.27
+        "duration": 19.27
       },
       "tolerance": null,
       "status": "unmeasured",
@@ -9020,7 +9172,7 @@
         "structure.duration_s.p90",
         "structure.duration_s.n"
       ],
-      "impact": "영상 길이·전개 구조 불일치"
+      "impact": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능"
     },
     {
       "check_id": "structure.duration",
@@ -9121,32 +9273,22 @@
     "complete": false,
     "mode": "test",
     "production_rules": false,
-    "checked_at": "2026-09-24T19:51:32+00:00",
+    "checked_at": "2026-09-24T22:24:17+00:00",
     "failures": [
       {
-        "rule": "G1",
-        "message": "의도하지 않은 차이(다르다) 6건",
-        "rows": [
-          "caption.font:c_sit4",
-          "audio.sfx.placement:fx1:gain",
-          "audio.sfx.placement:fx2:gain",
-          "audio.sfx.placement:fx3:gain",
-          "audio.sfx.placement:fx4:gain",
-          "audio.sfx.placement:fx5:gain"
-        ]
-      },
-      {
         "rule": "G2",
-        "message": "필수 항목 못 잼 1건 — 못 잼은 완료가 아님",
+        "message": "필수 항목 못 잼 3건 — 못 잼은 완료가 아님",
         "rows": [
-          "caption.font:c_sit3"
+          "caption.font:c_desc",
+          "caption.font:c_dlg",
+          "caption.font:c_sit4"
         ]
       }
     ],
     "warnings": [
       {
         "rule": "P1",
-        "message": "프리셋 미측정(임시값) 키 257개",
+        "message": "프리셋 미측정(임시값) 키 255개",
         "rows": [
           "audio.bgm.fade_in_s",
           "audio.bgm.fade_out_s",
@@ -9268,13 +9410,17 @@
     "verdict_ko": "불합격"
   },
   "defects": {
-    "new": 2,
+    "new": 0,
     "verified_now": 3,
-    "reopened": 0,
-    "still_open": 5,
+    "reopened": 1,
+    "still_open": 2,
     "not_rechecked": 0,
-    "open": 7,
-    "total": 49,
-    "rechecked_other_episodes": []
+    "open": 3,
+    "total": 53,
+    "rechecked_other_episodes": [
+      "test-coverage-001: audio.sfx.count=ok, audio.sfx.no_event=ok, audio.sfx.placement=ok, caption.font=problem",
+      "test-qa-bad: audio.sfx.count=problem, audio.sfx.no_event=problem, audio.sfx.placement=ok, caption.font=problem",
+      "test-qa-good: audio.sfx.count=ok, audio.sfx.no_event=ok, audio.sfx.placement=ok, caption.font=ok"
+    ]
   }
 }

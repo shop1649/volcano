@@ -23,7 +23,7 @@ from collections import Counter
 
 import numpy as np
 
-from . import QAContext, hex_rgb, rect_intersection, rgb_hex, rnd, tesseract_env
+from . import CAPTION_REST_SETTLE_S, QAContext, hex_rgb, rect_intersection, rgb_hex, rnd, tesseract_env
 from .probes_video import color_mask, grab, grab_window, text_similarity
 
 OCR_LANG = "kor+eng"
@@ -323,6 +323,21 @@ def _style_at_rest(frame: np.ndarray, m: np.ndarray, bbox, cap) -> dict:
     region = frame[y0:y1, x0:x1]
     oc = hex_rgb(cap.outline_color, (0, 0, 0))
     near = color_mask(region, oc, 90.0)
+    # a dark background can lie inside the fixed 90 tolerance of a black outline (test-coverage-001 c_rx over a
+    # navy shirt #2D2B3B: 7 px outline measured 11 px): classify each pixel to the NEARER of the outline colour
+    # and the local background colour (median of a band well outside the expected outline)
+    k_in_bg = int(2 * max(op, 2) + 7)
+    k_out_bg = int(4 * max(op, 2) + 11)
+    band = cv2.dilate(fm, np.ones((k_out_bg, k_out_bg), np.uint8)).astype(bool) & \
+        ~cv2.dilate(fm, np.ones((k_in_bg, k_in_bg), np.uint8)).astype(bool)
+    if band.sum() > 20:
+        bgc = np.median(region[band], axis=0).astype(np.float32)
+        if float(np.sqrt(((bgc - np.array(oc, np.float32)) ** 2).sum())) >= 30.0:
+            rf = region.astype(np.float32)
+            d_oc = np.sqrt(((rf - np.array(oc, np.float32)) ** 2).sum(axis=2))
+            d_bg = np.sqrt(((rf - bgc) ** 2).sum(axis=2))
+            near = near & (d_oc < d_bg)
+            out["outline_bg_color"] = rgb_hex(bgc)
     prev = fm.astype(bool)
     fracs = []
     for k in range(1, int(max(4, op * 2.5)) + 2):
@@ -474,7 +489,7 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
     prev_end = max([o.end for o in same_place if o.end <= cap.start + fr], default=None)
     next_start = min([o.start for o in same_place if o.start >= cap.end - fr], default=None)
     # ---------------- onset
-    t_rest = min(cap.start + dur_in + 0.12, (cap.start + cap.end) / 2)
+    t_rest = min(cap.start + dur_in + CAPTION_REST_SETTLE_S, (cap.start + cap.end) / 2)
     t_a = max(0.0, cap.start - 0.35)
     if prev_end is not None and prev_end > t_a:
         t_a = prev_end
@@ -592,8 +607,9 @@ def _motion_in(ts, frs, p, i0, rest, mask, cap, fps) -> dict:
 
 # ----------------------------------------------------------------------------- font
 def recolor_blend(img: np.ndarray, src_rgb, dst_rgb, base_rgb) -> np.ndarray:
-    """Map pixels lying on the base->src colour line (src-coloured text anti-aliased into the
-    outline) onto the base->dst line with the same blend fraction."""
+    """Map pixels lying on the base->src RGB colour line (src-coloured text anti-aliased into the
+    outline) onto the base->dst line with the same blend fraction.  Fallback of
+    ``recolor_highlight`` when the highlight and the base colour have no usable luma contrast."""
     p = img.astype(np.float32)
     b = np.array(base_rgb, np.float32)
     v = np.array(src_rgb, np.float32) - b
@@ -607,6 +623,64 @@ def recolor_blend(img: np.ndarray, src_rgb, dst_rgb, base_rgb) -> np.ndarray:
     out = p.copy()
     out[sel] = b + a[sel][:, None] * (np.array(dst_rgb, np.float32) - b)
     return np.clip(out + 0.5, 0, 255).astype(np.uint8)
+
+
+HIGHLIGHT_CORE_TOL = 80.0     # RGB distance of a highlight-coloured core pixel (same as ink_mask)
+HIGHLIGHT_ZONE_PX = 3         # chroma bleed of yuv420 + x264 around a coloured glyph (measured: 2 px suffices)
+
+
+def _ycc_to_rgb(Y: np.ndarray, C: np.ndarray) -> np.ndarray:
+    """Inverse of ``shortkit.reference.typography._ycc`` (BT.601 full range)."""
+    Cb, Cr = C[..., 0], C[..., 1]
+    return np.stack([Y + 1.402 * Cr, Y - 0.344136 * Cb - 0.714136 * Cr, Y + 1.772 * Cb], axis=-1)
+
+
+def recolor_highlight(img: np.ndarray, src_rgb, dst_rgb, base_rgb) -> np.ndarray:
+    """Paint highlighted (``src_rgb``) glyphs in the main fill colour ``dst_rgb`` so the font check
+    sees the whole line in one colour.
+
+    yuv420 video keeps luma at full resolution but chroma at half: at the edges of a coloured glyph
+    the decoded pixels carry the glyph's luma with a chroma half-way to the outline's, so they lie
+    OFF the base->src RGB line and a pure RGB mapping (``recolor_blend``) leaves them coloured --
+    the typography mask then rejects them and drops whole glyph components (measured on
+    test-pipeline-001 c_sit4: 울 0.26, 인 0.65 glyph IoU; tests/qa/test_qa_loop.py reproduces it
+    through x264).  Here, within ``HIGHLIGHT_ZONE_PX`` of the highlight-coloured core pixels, the
+    coverage is taken from LUMA, t = (Y - Y_base) / (Y_src - Y_base), and the pixel is rebuilt as the
+    base->dst mixture of that coverage (luma and chroma).  Without luma contrast between highlight
+    and base the RGB mapping is used."""
+    from ..reference.typography import _ycc
+
+    cv2 = _cv2()
+    p = img.astype(np.float32)
+    s, d, b = (np.array(c, np.float32) for c in (src_rgb, dst_rgb, base_rgb))
+    Ys, Cs = _ycc(s)
+    Yb, Cb = _ycc(b)
+    Yd, Cd = _ycc(d)
+    if abs(float(Ys - Yb)) < 50.0:
+        return recolor_blend(img, src_rgb, dst_rgb, base_rgb)
+    core = np.sqrt(((p - s) ** 2).sum(axis=2)) < HIGHLIGHT_CORE_TOL
+    if not core.any():
+        return img.copy()
+    k = 2 * HIGHLIGHT_ZONE_PX + 1
+    zone = cv2.dilate(core.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))) > 0
+    Y, C = _ycc(p)
+    t = np.clip((Y - float(Yb)) / float(Ys - Yb), 0.0, 1.5)
+    rgb = _ycc_to_rgb(float(Yb) + t * float(Yd - Yb), Cb + t[..., None] * (Cd - Cb))
+    out = p.copy()
+    out[zone] = rgb[zone]
+    return np.clip(out + 0.5, 0, 255).astype(np.uint8)
+
+
+FLAT_BG_STD = 4.0     # grey-level std around a caption below which its background counts as a flat colour
+
+
+def _flat_bg(loc: dict | None, boxed: bool) -> tuple | None:
+    """The flat colour measured around a NON-boxed caption (e.g. text on the canvas margin outside the
+    video region), so the font ceiling is rendered over what is really behind the caption; None when the
+    caption sits over footage (the ceiling then uses the episode's own footage)."""
+    if boxed or not loc or not loc.get("box_region_color") or loc.get("box_region_std") is None:
+        return None
+    return hex_rgb(loc["box_region_color"]) if float(loc["box_region_std"]) <= FLAT_BG_STD else None
 
 
 def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None, ctx: QAContext | None = None) -> dict:
@@ -631,22 +705,22 @@ def measure_font(frame: np.ndarray, cap, bbox, loc: dict | None = None, ctx: QAC
     pad = 3 if boxed else int(float(cap.outline_px or 0) + 6)     # stay inside a label box
     crop = frame[max(0, y - pad):y + h + pad, max(0, x - pad):x + w + pad]
     text = "\n".join(expected_lines(cap))
-    # highlighted words use another fill colour: paint them in the main fill colour so the font
-    # comparison sees the whole line
-    if cap.highlight and hex_rgb(cap.highlight_color):
-        crop = recolor_blend(crop, hex_rgb(cap.highlight_color), hex_rgb(cap.color, (255, 255, 255)),
-                             hex_rgb(cap.outline_color, (0, 0, 0)))
     # the colour around the glyphs: outline colour, or the (measured) box colour for label boxes
     around = hex_rgb(cap.outline_color) if cap.outline_px else None
     if boxed and loc and loc.get("box_region_color"):
         around = hex_rgb(loc["box_region_color"])
+    # highlighted words use another fill colour: paint them in the main fill colour so the font
+    # comparison sees the whole line (luma coverage, see recolor_highlight)
+    if cap.highlight and hex_rgb(cap.highlight_color):
+        crop = recolor_highlight(crop, hex_rgb(cap.highlight_color), hex_rgb(cap.color, (255, 255, 255)),
+                                 around if around is not None else hex_rgb(cap.outline_color, (0, 0, 0)))
     fill = hex_rgb(cap.color, (255, 255, 255))
     ident = None
     if ctx is not None:
         try:
             from .font_id import identify_caption_font
 
-            ident = identify_caption_font(ctx, cap, crop, text, fill, around, boxed)
+            ident = identify_caption_font(ctx, cap, crop, text, fill, around, boxed, bg=_flat_bg(loc, boxed))
         except Exception as e:
             ident = {"status": "unmeasured", "verdict": "unmeasured",
                      "reason": f"글꼴 판별(identify) 실패: {type(e).__name__}: {e}"[:300]}
@@ -702,27 +776,38 @@ def _font_iou_scores(crop: np.ndarray, text: str, cap, exp_path, around, find_fo
 
 
 # ----------------------------------------------------------------------------- tone
+# share of the top sentence-ending class for one register (below it: 혼합) -- the reference analyzer's
+# per-video rule in shortkit.reference.aggregate.tone_items (tests/qa/test_qa_loop.py pins the two together)
+TONE_TOP_SHARE = 0.6
+
+
 def classify_register(texts: list[str]) -> dict:
+    """Register of the narration captions read from the output, with the SAME classifier the reference
+    analyzer measures ``text.tone.register`` with and ``episode validate`` enforces
+    (``shortkit.reference.aggregate.ending_class`` + ``REGISTER_MAP``): the last line of each caption is
+    classified by its ending; noun phrases (명사형/기타) are register-neutral; the top class is the
+    register when it holds >= TONE_TOP_SHARE of the classified captions, else 혼합."""
+    from ..reference.aggregate import REGISTER_MAP, ending_class
+
     cnt: Counter = Counter()
+    items = []
     for t in texts:
-        s = re.sub(r"[^\w가-힣]+$", "", (t or "").strip())
-        if not s:
+        lines = [ln for ln in (t or "").split("\n") if ln.strip()]
+        r = ending_class(lines[-1]) if lines else None
+        if r is None:
             continue
-        last = s[-1]
-        if last == "요":
-            cnt["해요체"] += 1
-        elif last in "음함임슴됨":
-            cnt["음슴체"] += 1
-        elif last in "다야어아지네냐까군라자해봐와줘가":
-            cnt["반말_구어체"] += 1
-        else:
-            cnt["기타"] += 1
-    real = {k: v for k, v in cnt.items() if k != "기타"}
+        cnt[r[0]] += 1
+        items.append({"text": t, "class": r[0], "ending": r[1], "register": REGISTER_MAP.get(r[0])})
+    real = {k: v for k, v in cnt.items() if k in REGISTER_MAP}
     n = sum(real.values())
-    mode = max(real, key=real.get) if n else None
-    if n and max(real.values()) / n < 0.7 and len(real) > 1:
-        mode = "혼합"
-    return {"n": n, "counts": dict(cnt), "mode": mode, "note": "기타(감탄사·명사 끝)는 판정에서 제외"}
+    mode = None
+    if n:
+        top, k = max(real.items(), key=lambda kv: kv[1])
+        mode = REGISTER_MAP[top] if k / n >= TONE_TOP_SHARE else "혼합"
+    return {"n": n, "counts": dict(cnt), "mode": mode, "items": items,
+            "method": "shortkit.reference.aggregate.ending_class (분석기·validate 와 같은 분류기), 최빈 종결 "
+                      f"≥ {TONE_TOP_SHARE:g} 이면 그 말투, 아니면 혼합",
+            "note": "명사형/기타(명사·감탄사 끝)는 판정에서 제외"}
 
 
 # ----------------------------------------------------------------------------- identity / corners
@@ -857,7 +942,7 @@ def probe_captions(ctx: QAContext) -> list[dict]:
     for cap in ctx.resolved.captions:
         mi = cap.motion_in or {}
         dur_in = float(mi.get("dur_s") or 0.0)
-        t_rest = min(cap.start + dur_in + 0.12, (cap.start + cap.end) / 2)
+        t_rest = min(cap.start + dur_in + CAPTION_REST_SETTLE_S, (cap.start + cap.end) / 2)
         t_rest = max(cap.start + fr_, min(t_rest, cap.end - 2 * fr_))
         t_key = round(t_rest, 3)
         item = {"id": cap.id, "role": cap.role, "text": cap.text, "start": cap.start, "end": cap.end,
@@ -936,11 +1021,16 @@ def probe_text(ctx: QAContext) -> dict:
     except Exception as e:
         res["errors"]["identity"] = f"{type(e).__name__}: {e}"
     try:
-        # the channel's own voice: narration roles only (dialogue quotes real speech; title/speaker are labels)
+        # the channel's own voice: the analyzer's narration roles (dialogue quotes real speech, speaker is a
+        # label); like validate.check_tone, a caption transcribing on-screen text is not our voice
+        from ..reference.aggregate import NARRATION_ROLES
+
+        grounding = {c.id: (c.grounding or {}) for c in ctx.resolved.captions}
         good = [c.get("ocr", "") for c in res["captions"] if c.get("found") and (c.get("similarity") or 0) >= 0.6
-                and c.get("role") in ("situation", "description", "reaction")]
+                and c.get("role") in NARRATION_ROLES
+                and (grounding.get(c.get("id")) or {}).get("kind") != "on_screen_text"]
         res["tone"] = classify_register(good)
-        res["tone"]["roles_used"] = ["situation", "description", "reaction"]
+        res["tone"]["roles_used"] = list(NARRATION_ROLES)
     except Exception as e:
         res["errors"]["tone"] = f"{type(e).__name__}: {e}"
     try:

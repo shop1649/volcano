@@ -267,15 +267,19 @@ def build_audio(bad: bool, out_wav: Path) -> dict:
     bgm = music[a:a + n]
     mix = np.zeros((n, 2), np.float64)
     mix[:len(bgm)] += bgm * _db(BGM["gain"]) * _bgm_env(n, bad)[:len(bgm), None]
+    # the kept line is placed like the production renderer places it: the stereo source channels as they are
     o = read_audio(root / ORIG["path"], sr=SR, mono=False, start=ORIG["src"][0],
-                   duration=ORIG["src"][1] - ORIG["src"][0]).mean(axis=1)          # (L+R)/2
+                   duration=ORIG["src"][1] - ORIG["src"][0])
     k = len(o)
     fl = int(ORIG["fade"] * SR)
     env = np.ones(k)
     env[:fl] = np.linspace(0, 1, fl)
     env[-fl:] = np.linspace(1, 0, fl)
     s = int(round(ORIG["out"][0] * SR))
-    mix[s:s + k] += (o * env * _db(ORIG["gain"]))[:, None][: n - s]
+    orig_stem = np.zeros((n, 2), np.float64)
+    orig_stem[s:s + k] = (o * env[:, None] * _db(ORIG["gain"]))[: n - s]
+    o_s0, o_s1 = s, min(n, s + k)
+    mix += orig_stem
     placements = [dict(type=x["type"], t=x["t"], gain=x["gain"]) for x in SFX] + (BAD["extra_sfx"] if bad else [])
     for p in placements:
         sfx = read_audio(root / f"{GEN}/sfx/{p['type']}.wav", sr=SR, mono=True)
@@ -290,8 +294,13 @@ def build_audio(bad: bool, out_wav: Path) -> dict:
     g = _db(TARGET_LUFS - L)
     mix *= g
     write_wav(out_wav, mix.astype(np.float32), SR)
+    # ground truth of the kept line's level: its loudness relative to the programme (the definition of
+    # audio.original.keep_gain_db / plan original_audio.gain_db: the kept segment alone -- like ref audio-measure's
+    # concatenated speech segments -- minus the whole mix), from the PCM of THIS synthetic render
+    write_wav(tmp, (orig_stem[o_s0:o_s1] * g).astype(np.float32), SR)
+    rel = lufs(tmp)["integrated_lufs"] - lufs(out_wav)["integrated_lufs"]
     tmp.unlink()
-    return {"pre_lufs": L, "gain": g, "peak": float(np.abs(mix).max())}
+    return {"pre_lufs": L, "gain": g, "peak": float(np.abs(mix).max()), "orig_rel_lu": round(float(rel), 2)}
 
 
 # ----------------------------------------------------------------------------- truth bboxes
@@ -368,13 +377,17 @@ def build_resolved(episode_id: str, bboxes: dict) -> ResolvedEdit:
                         output_path=f"episodes/{episode_id}/output/{episode_id}.mp4")
 
 
-def build_plan(episode_id: str) -> dict:
+def build_plan(episode_id: str, orig_rel_lu: float | None = None) -> dict:
+    """``orig_rel_lu``: the kept line's true level re programme (``build_audio``), declared as the plan's level
+    for it (original_audio.gain_db, LU) so QA compares its measurement with the synthetic ground truth."""
+    tl = [] if orig_rel_lu is None else [{"id": ORIG["clip_id"], "original_audio": {
+        "keep": True, "gain_db": orig_rel_lu, "stem": "raw", "reason": "합성 정답: 살린 대사 한 줄"}}]
     return {"schema": "shortkit.plan/1", "episode_id": episode_id, "preset_id": "joshuamagazine-v1",
             "format_id": "UNCLASSIFIED", "mode": "test", "notes": "SYNTHETIC QA test episode (tests/qa/qa_synth.py)",
             "cover": {"text": "실험 영상 모음", "frame_t": 0.0},
             "sources": [{"id": c["id"] + "_src", "path": c["source"],
                          **({"protected": [PROTECTED]} if c["id"] == "c1" else {})} for c in CLIPS],
-            "timeline": [], "captions": [],
+            "timeline": tl, "captions": [],
             "sfx": [{"id": s["id"], "type": s["type"], "t": s["t"],
                      "event": {"t": s["event_t"], "desc": s["desc"], "kind": s["kind"]}} for s in SFX]}
 
@@ -389,11 +402,11 @@ def render_episode(episode_id: str, bad: bool = False) -> dict:
     bboxes = caption_truth_bboxes(ep / "build")
     res = build_resolved(episode_id, bboxes)
     write_json(ep / "build" / "resolved.json", res.to_dict())
-    write_yaml(ep / "plan.yaml", build_plan(episode_id))
     ass = ep / "build" / "captions.ass"
     ass.write_text(build_ass(bad), encoding="utf-8")
     wav = ep / "build" / "synthetic_mix.wav"
     ainfo = build_audio(bad, wav)
+    write_yaml(ep / "plan.yaml", build_plan(episode_id, ainfo["orig_rel_lu"]))
     # sources, decoded once at region size
     srcs = {}
     for c in CLIPS:

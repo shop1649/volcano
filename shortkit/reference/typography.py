@@ -166,7 +166,27 @@ def estimate_colors(crop_rgb: np.ndarray) -> dict:
 
 
 def extract_masks(crop_rgb: np.ndarray, fill_rgb: Any = None, outline_rgb: Any = None,
-                  drop_border: bool = True) -> dict:
+                  drop_border: bool = True, alt_fill_rgb: Any = None) -> dict:
+    """Fill / outline masks of a caption crop; ``alt_fill_rgb`` = a second fill colour (the caption's
+    measured highlight colour): its glyphs are classified against the same outline and added, so a
+    highlighted word is not missing from the fill mask (mockloop: the highlighted title words scored glyph
+    IoU 0.00 and the right font -- ranked first -- was called 'different')."""
+    m = _extract_masks_one(crop_rgb, fill_rgb, outline_rgb, drop_border)
+    if alt_fill_rgb is None:
+        return m
+    try:
+        m2 = _extract_masks_one(crop_rgb, alt_fill_rgb, m["outline_rgb"], drop_border)
+    except ValueError:          # highlight too close to the outline colour: nothing to add
+        return m
+    out = dict(m)
+    out["fill"] = m["fill"] | m2["fill"]
+    out["outline"] = (m["outline"] | m2["outline"]) & ~out["fill"]
+    out["alt_fill_rgb"] = m2["fill_rgb"]
+    return out
+
+
+def _extract_masks_one(crop_rgb: np.ndarray, fill_rgb: Any = None, outline_rgb: Any = None,
+                       drop_border: bool = True) -> dict:
     """Fill / outline masks of a caption crop by colour classification.
 
     ``fill_rgb``/``outline_rgb`` given -> used as is; missing ones are estimated
@@ -1012,7 +1032,8 @@ def score_crops(items: Sequence[dict], candidates: Sequence[FontRef | str],
     for it in items:
         try:
             masks.append(extract_masks(it["crop"], it.get("fill_rgb") if color_mode == "given" else None,
-                                       it.get("outline_rgb") if color_mode == "given" else None))
+                                       it.get("outline_rgb") if color_mode == "given" else None,
+                                       alt_fill_rgb=it.get("highlight_rgb") if color_mode == "given" else None))
         except ValueError as e:     # no separable text colours: this crop cannot be scored
             masks.append(None)
             failed.append({"id": it.get("id"), "reason": str(e)})
@@ -1190,9 +1211,14 @@ def _pmap(fn, arglist: list[tuple], jobs: int, progress=None) -> list:
             if progress:
                 progress(i + 1, len(arglist))
         return out
+    import multiprocessing
     from concurrent.futures import ProcessPoolExecutor
 
-    with ProcessPoolExecutor(max_workers=jobs, initializer=_worker_init) as ex:
+    # 'spawn', not the Linux default 'fork': by now this process has used OpenCV (crop collection), whose
+    # worker-thread pool locks are copied held into forked children -> every worker hung at 0 % CPU
+    # (mockloop: `ref fonts --jobs 3` idle for 30 min)
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=jobs, initializer=_worker_init, mp_context=ctx) as ex:
         futs = [ex.submit(fn, *a) for a in arglist]
         for i, f in enumerate(futs):
             out.append(f.result())
@@ -1414,7 +1440,8 @@ def _style_colors(style: dict) -> dict:
     visible = (vis == "visible") or (vis is None and outline_col is not None and (opx is None or float(opx) > 0))
     edge = outline_col if visible else rgb(style.get("bg_color"))
     size = style.get("size_px")
-    return {"fill": fill, "edge": edge, "outline": outline_col if visible else None,
+    hl = rgb(style.get("highlight_color"))
+    return {"fill": fill, "edge": edge, "outline": outline_col if visible else None, "highlight": hl,
             "outline_px": float(opx) if (visible and opx is not None) else None,
             "size_px": float(size) if size is not None else None,
             "ink_h": float(style["ink_h"]) if style.get("ink_h") else None,
@@ -1511,6 +1538,7 @@ def collect_reference_crops(preset_name: str, roles: Sequence[str] | None = None
                     "id": f"{vid}#{k}.{li}", "video_id": vid, "t": round(float(t), 3), "crop": frame[y0:y1, x0:x1].copy(),
                     "start": float(it.get("start", t)), "end": float(it.get("end", t)),
                     "text": text, "size_hint_px": size, "fill_rgb": st["fill"], "outline_rgb": st["edge"],
+                    "highlight_rgb": st["highlight"],
                     "outline_color": st["outline"], "outline_px": st["outline_px"] * sy if st["outline_px"] else None,
                     "ink_h": (ln.get("ink_h") or st["ink_h"] or 0) * sy or None, "bg_rgb": st["bg"],
                     "bbox": [x0, y0, x1 - x0, y1 - y0], "resolution": [info.width, info.height]})
@@ -1751,7 +1779,8 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
         inks = []
         for i in its:
             m = extract_masks(i["crop"], i["fill_rgb"] if color_mode == "given" else None,
-                              i["outline_rgb"] if color_mode == "given" else None)
+                              i["outline_rgb"] if color_mode == "given" else None,
+                              alt_fill_rgb=i.get("highlight_rgb") if color_mode == "given" else None)
             inks.append(_ink_height(m["fill"], 0.02))
         inks = [v for v in inks if v > 0] or [i["bbox"][3] / 1.3 for i in its]
         ink_canvas = sorted({int(round(v / sc)) for v in np.percentile(inks, [10, 50, 90])})

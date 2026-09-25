@@ -38,7 +38,7 @@
   <library>
     <event name="shortkit test-pipeline-001">
       <project name="test-pipeline-001">
-        <sequence format="r1" duration="319/15s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+        <sequence format="r1" duration="289/15s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
           <spine>
             <asset-clip ref="r3" offset="0s" name="s1" start="3/2s" duration="4s" tcFormat="NDF" srcEnable="video">
               <adjust-conform type="none" />
@@ -156,59 +156,45 @@
                   </keyframeAnimation>
                 </param>
               </adjust-transform>
-              <asset-clip ref="r7" lane="-1" offset="3/2s" name="BGM" start="12s" duration="319/15s" audioRole="music">
-                <adjust-volume amount="-0.07dB">
+              <asset-clip ref="r7" lane="-1" offset="3/2s" name="BGM" start="0s" duration="289/15s" audioRole="music">
+                <adjust-volume amount="-0.24dB">
                   <param name="amount">
                     <keyframeAnimation>
-                      <keyframe time="12s" value="-0.07dB" interp="linear" />
-                      <keyframe time="281/15s" value="-0.07dB" interp="linear" />
-                      <keyframe time="563/30s" value="-40.07dB" interp="linear" />
-                      <keyframe time="94/5s" value="-120.00dB" interp="linear" />
-                      <keyframe time="583/30s" value="-120.00dB" interp="linear" />
-                      <keyframe time="292/15s" value="-80.07dB" interp="linear" />
-                      <keyframe time="39/2s" value="-0.07dB" interp="linear" />
-                      <keyframe time="219/10s" value="-0.07dB" interp="linear" />
-                      <keyframe time="329/15s" value="-1.73dB" interp="linear" />
-                      <keyframe time="22s" value="-10.07dB" interp="linear" />
-                      <keyframe time="243/10s" value="-10.07dB" interp="linear" />
-                      <keyframe time="123/5s" value="-0.07dB" interp="linear" />
-                      <keyframe time="487/15s" value="-0.07dB" interp="linear" />
-                      <keyframe time="979/30s" value="-2.10dB" interp="linear" />
-                      <keyframe time="983/30s" value="-4.15dB" interp="linear" />
-                      <keyframe time="493/15s" value="-6.09dB" interp="linear" />
-                      <keyframe time="494/15s" value="-7.67dB" interp="linear" />
-                      <keyframe time="989/30s" value="-8.59dB" interp="linear" />
-                      <keyframe time="33s" value="-9.61dB" interp="linear" />
-                      <keyframe time="991/30s" value="-10.77dB" interp="linear" />
-                      <keyframe time="496/15s" value="-12.11dB" interp="linear" />
-                      <keyframe time="331/10s" value="-13.69dB" interp="linear" />
-                      <keyframe time="497/15s" value="-15.63dB" interp="linear" />
-                      <keyframe time="199/6s" value="-18.13dB" interp="linear" />
-                      <keyframe time="166/5s" value="-21.65dB" interp="linear" />
-                      <keyframe time="997/30s" value="-27.67dB" interp="linear" />
+                      <keyframe time="0s" value="-0.24dB" interp="linear" />
+                      <keyframe time="101/15s" value="-0.24dB" interp="linear" />
+                      <keyframe time="203/30s" value="-40.24dB" interp="linear" />
+                      <keyframe time="34/5s" value="-120.00dB" interp="linear" />
+                      <keyframe time="223/30s" value="-120.00dB" interp="linear" />
+                      <keyframe time="112/15s" value="-80.24dB" interp="linear" />
+                      <keyframe time="15/2s" value="-0.24dB" interp="linear" />
+                      <keyframe time="99/10s" value="-0.24dB" interp="linear" />
+                      <keyframe time="149/15s" value="-1.90dB" interp="linear" />
+                      <keyframe time="10s" value="-10.24dB" interp="linear" />
+                      <keyframe time="123/10s" value="-10.24dB" interp="linear" />
+                      <keyframe time="63/5s" value="-0.24dB" interp="linear" />
+                      <keyframe time="277/15s" value="-0.24dB" interp="linear" />
+                      <keyframe time="559/30s" value="-2.27dB" interp="linear" />
+                      <keyframe time="563/30s" value="-4.32dB" interp="linear" />
+                      <keyframe time="283/15s" value="-6.26dB" interp="linear" />
+                      <keyframe time="284/15s" value="-7.84dB" interp="linear" />
+                      <keyframe time="569/30s" value="-8.76dB" interp="linear" />
+                      <keyframe time="19s" value="-9.78dB" interp="linear" />
+                      <keyframe time="571/30s" value="-10.94dB" interp="linear" />
+                      <keyframe time="286/15s" value="-12.28dB" interp="linear" />
+                      <keyframe time="191/10s" value="-13.86dB" interp="linear" />
+                      <keyframe time="287/15s" value="-15.80dB" interp="linear" />
+                      <keyframe time="115/6s" value="-18.30dB" interp="linear" />
+                      <keyframe time="96/5s" value="-21.82dB" interp="linear" />
+                      <keyframe time="577/30s" value="-27.84dB" interp="linear" />
                     </keyframeAnimation>
                   </param>
                 </adjust-volume>
               </asset-clip>
-              <asset-clip ref="r8" lane="-2" offset="83/30s" name="SFX whoosh" start="0s" duration="7/15s" audioRole="effects">
-                <adjust-volume amount="-12.07dB">
-                  <param name="amount">
-                    <keyframeAnimation>
-                      <keyframe time="0s" value="-12.07dB" interp="linear" />
-                      <keyframe time="2/15s" value="-12.07dB" interp="linear" />
-                      <keyframe time="1/6s" value="-12.14dB" interp="linear" />
-                      <keyframe time="1/5s" value="-13.00dB" interp="linear" />
-                      <keyframe time="7/30s" value="-14.20dB" interp="linear" />
-                      <keyframe time="4/15s" value="-13.52dB" interp="linear" />
-                      <keyframe time="3/10s" value="-12.33dB" interp="linear" />
-                      <keyframe time="1/3s" value="-12.07dB" interp="linear" />
-                      <keyframe time="13/30s" value="-12.07dB" interp="linear" />
-                    </keyframeAnimation>
-                  </param>
-                </adjust-volume>
+              <asset-clip ref="r8" lane="-2" offset="13/5s" name="SFX whoosh" start="0s" duration="7/15s" audioRole="effects">
+                <adjust-volume amount="-12.24dB" />
                 <note>event 1.30s: 창가 남성이 일어서기 시작함(확대 시작)</note>
               </asset-clip>
-              <caption lane="10" offset="3/2s" name="제목" start="3600s" duration="319/15s" role="iTT?captionFormat=ITT.ko">
+              <caption lane="10" offset="3/2s" name="제목" start="3600s" duration="289/15s" role="iTT?captionFormat=ITT.ko">
                 <text placement="top">
                   <text-style ref="ts1">움직임 테스트 영상</text-style>
                 </text>
@@ -253,7 +239,7 @@
               </adjust-crop>
               <adjust-transform position="0.0000 -0.0000" scale="0.562963 0.562963" anchor="0 0" />
               <asset-clip ref="r9" lane="-3" offset="84/5s" name="SFX click" start="0s" duration="1/10s" audioRole="effects">
-                <adjust-volume amount="-8.07dB" />
+                <adjust-volume amount="-8.24dB" />
                 <note>event 6.80s: 다시 앉은 순간 화면이 멈춤</note>
               </asset-clip>
               <video ref="r13" lane="2" offset="262/15s" name="플래시 s3" start="0s" duration="1/10s">
@@ -285,22 +271,52 @@
               </adjust-crop>
               <adjust-transform position="0.0000 -0.0000" scale="0.562963 0.562963" anchor="0 0" />
               <asset-clip ref="r10" lane="-2" offset="517/30s" name="SFX pop" start="0s" duration="2/15s" audioRole="effects">
-                <adjust-volume amount="-8.07dB" />
+                <adjust-volume amount="-8.24dB" />
                 <note>event 7.75s: 뒷줄 남성이 손을 들어 올림</note>
               </asset-clip>
               <asset-clip ref="r11" lane="-3" offset="102/5s" name="SFX ding" start="0s" duration="6/5s" audioRole="effects">
-                <adjust-volume amount="-8.07dB" />
+                <adjust-volume amount="-8.24dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-8.24dB" interp="linear" />
+                      <keyframe time="2/5s" value="-8.24dB" interp="linear" />
+                      <keyframe time="13/30s" value="-8.44dB" interp="linear" />
+                      <keyframe time="7/15s" value="-8.87dB" interp="linear" />
+                      <keyframe time="1/2s" value="-8.99dB" interp="linear" />
+                      <keyframe time="8/15s" value="-8.58dB" interp="linear" />
+                      <keyframe time="17/30s" value="-8.27dB" interp="linear" />
+                      <keyframe time="7/6s" value="-8.24dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
                 <note>event 11.00s: 뒷줄 남성이 자리에서 일어섬</note>
               </asset-clip>
               <asset-clip ref="r3" lane="-4" offset="39/2s" name="원본 s3" start="39/2s" duration="23/10s" audioRole="dialogue" srcEnable="audio">
-                <adjust-volume amount="-0.07dB">
+                <adjust-volume amount="5.36dB">
                   <param name="amount">
                     <keyframeAnimation>
-                      <keyframe time="39/2s" value="-120.00dB" interp="linear" />
-                      <keyframe time="293/15s" value="-1.65dB" interp="linear" />
-                      <keyframe time="587/30s" value="-0.07dB" interp="linear" />
-                      <keyframe time="326/15s" value="-0.07dB" interp="linear" />
-                      <keyframe time="653/30s" value="-1.65dB" interp="linear" />
+                      <keyframe time="39/2s" value="-114.64dB" interp="linear" />
+                      <keyframe time="293/15s" value="3.78dB" interp="linear" />
+                      <keyframe time="587/30s" value="5.36dB" interp="linear" />
+                      <keyframe time="59/3s" value="5.36dB" interp="linear" />
+                      <keyframe time="197/10s" value="4.84dB" interp="linear" />
+                      <keyframe time="296/15s" value="3.44dB" interp="linear" />
+                      <keyframe time="593/30s" value="2.61dB" interp="linear" />
+                      <keyframe time="99/5s" value="3.60dB" interp="linear" />
+                      <keyframe time="119/6s" value="4.89dB" interp="linear" />
+                      <keyframe time="298/15s" value="5.36dB" interp="linear" />
+                      <keyframe time="121/6s" value="5.35dB" interp="linear" />
+                      <keyframe time="607/30s" value="5.08dB" interp="linear" />
+                      <keyframe time="304/15s" value="5.14dB" interp="linear" />
+                      <keyframe time="61/3s" value="5.36dB" interp="linear" />
+                      <keyframe time="104/5s" value="5.36dB" interp="linear" />
+                      <keyframe time="125/6s" value="5.16dB" interp="linear" />
+                      <keyframe time="313/15s" value="4.73dB" interp="linear" />
+                      <keyframe time="209/10s" value="4.61dB" interp="linear" />
+                      <keyframe time="314/15s" value="5.02dB" interp="linear" />
+                      <keyframe time="629/30s" value="5.33dB" interp="linear" />
+                      <keyframe time="326/15s" value="5.36dB" interp="linear" />
+                      <keyframe time="653/30s" value="3.78dB" interp="linear" />
                     </keyframeAnimation>
                   </param>
                 </adjust-volume>
@@ -325,14 +341,21 @@
             <transition name="Cross Dissolve" offset="383/30s" duration="7/30s">
               <filter-video ref="r2" name="Cross Dissolve" />
             </transition>
-            <asset-clip ref="r5" offset="193/15s" name="s4" start="31/10s" duration="42/5s" tcFormat="NDF" srcEnable="video">
+            <asset-clip ref="r5" offset="193/15s" name="s4" start="31/10s" duration="32/5s" tcFormat="NDF" srcEnable="video">
               <adjust-conform type="none" />
               <adjust-crop mode="trim">
                 <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
               </adjust-crop>
               <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
               <asset-clip ref="r12" lane="-2" offset="157/30s" name="SFX boing" start="0s" duration="3/5s" audioRole="effects">
-                <adjust-volume amount="-8.07dB" />
+                <adjust-volume amount="-8.24dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-8.33dB" interp="linear" />
+                      <keyframe time="17/30s" value="-8.24dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
                 <note>event 15.05s: 두 사람이 동시에 고개를 옆으로 기울임</note>
               </asset-clip>
               <caption lane="12" offset="16/3s" name="반응" start="3600s" duration="12/5s" role="iTT?captionFormat=ITT.ko">

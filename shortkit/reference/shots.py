@@ -29,7 +29,10 @@ METHOD = {
     "cut": "HSV histogram Bhattacharyya distance between consecutive frames >= 0.35 and >= 3x the local median",
     "flash": "mean luma of the footage region >= 40 above the local median and >= 150, lasting <= 0.5 s",
     "crossfade": "4-24 frame window whose frames are least-squares blends of the frames just outside it "
-                 "(blend weight monotonic 0->1, residual < 35% of the endpoint difference)",
+                 "(blend weight monotonic 0->1, residual < 35% of the endpoint difference) AND the blend is spatially "
+                 "uniform: in the interior frames with 0.25 <= weight <= 0.75, >= 60% of the pixels that change by "
+                 ">= 20 levels have their own weight within +-0.2 of the frame's weight (median over those frames); "
+                 "a zoom or a person moving in a static shot changes pixels all-or-nothing and fails this",
     "frame_times": "frame index / fps (constant frame rate assumed)",
 }
 
@@ -214,6 +217,29 @@ def flash_scope(video: Path, ev: dict, reg: dict, W: int, H: int, fps: float, fu
     return out
 
 
+XF_UNIFORM_MIN = 0.6     # share of changed pixels following the frame's blend weight (renderer crossfades: ~0.97;
+XF_PIXEL_DIFF = 20.0     # zoom ramps / walking people in static shots mis-taken for blends: 0.12-0.39, mockloop)
+XF_ALPHA_TOL = 0.2
+
+
+def _blend_uniformity(grays, a: int, b: int, alphas: np.ndarray, diff: np.ndarray) -> float | None:
+    """Median over interior frames (0.25 <= weight <= 0.75) of the share of changing pixels whose own blend
+    weight (g_k - g_a) / (g_b - g_a) lies within XF_ALPHA_TOL of the frame's least-squares weight.
+    A crossfade mixes every pixel by the same weight; geometric change (zoom, pan) or an object moving
+    over a still background switches pixels between the two end states instead.  None = not testable."""
+    sel = np.abs(diff) >= XF_PIXEL_DIFF
+    if sel.sum() < 20:
+        return None
+    ga = grays[a]
+    shares = []
+    for k, al in zip(range(a + 1, b), alphas):
+        if not 0.25 <= al <= 0.75:
+            continue
+        ai = (grays[k] - ga)[sel] / diff[sel]
+        shares.append(float(np.mean(np.abs(ai - al) <= XF_ALPHA_TOL)))
+    return float(np.median(shares)) if shares else None
+
+
 def _crossfades(grays, hists, dh, fps, blocked) -> list[dict]:
     import cv2
     n = len(grays)
@@ -248,6 +274,9 @@ def _crossfades(grays, hists, dh, fps, blocked) -> list[dict]:
             if not mono or alphas[0] > 0.35 or alphas[-1] < 0.65 or rr > 0.35:
                 continue
             if np.corrcoef(np.arange(len(alphas)), alphas)[0, 1] < 0.95:
+                continue
+            uni = _blend_uniformity(grays, a, b, alphas, diff)
+            if uni is not None and uni < XF_UNIFORM_MIN:
                 continue
             cands.append((span * (1 - rr), a, b, alphas, rr, span))
     cands.sort(key=lambda c: -c[0])

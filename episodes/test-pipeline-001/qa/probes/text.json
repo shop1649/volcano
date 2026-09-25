@@ -7,7 +7,7 @@
       "role": "title",
       "text": "움직임 테스트 영상",
       "start": 0.0,
-      "end": 21.25,
+      "end": 19.25,
       "t_rest": 0.12,
       "expected_bbox": [
         205.64,
@@ -136,7 +136,7 @@
           1.0
         ]
       ],
-      "offset": 21.2667,
+      "offset": 19.2667,
       "offset_note": "영상 끝까지 표시",
       "font": {
         "status": "measured",
@@ -191,26 +191,26 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9728,
-            "p50": 0.98,
-            "p90": 0.9856,
+            "n": 12,
+            "p10": 0.9797,
+            "p50": 0.9839,
+            "p90": 0.987,
             "n_failed": 0,
-            "noise_p90": 0.0191,
-            "glyph_p10": 0.962,
-            "size_bucket": 80,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0111,
+            "glyph_p10": 0.9724,
+            "size_px": 84.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -248,7 +248,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.988, 천장 p10 0.973, 차순위 대비 +0.073 > 잡음 0.019)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.988, 천장 p10 0.980, 차순위 대비 +0.073 > 잡음 0.011)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -257,8 +257,8 @@
           "iou_expected": 0.9883,
           "margin": 0.0727,
           "reasons": [
-            "IoU 0.988 >= 천장 p10 0.973",
-            "차순위 대비 차이 +0.073 > 잡음 0.019",
+            "IoU 0.988 >= 천장 p10 0.980",
+            "차순위 대비 차이 +0.073 > 잡음 0.011",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -559,7 +559,7 @@
           {
             "font": "Noto Sans CJK KR Bold",
             "iou": 0.9511,
-            "verdict": "identical"
+            "verdict": "similar"
           },
           {
             "font": "Pretendard Bold",
@@ -602,26 +602,26 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9296,
-            "p50": 0.9404,
-            "p90": 0.9536,
+            "n": 12,
+            "p10": 0.9587,
+            "p50": 0.9605,
+            "p90": 0.9672,
             "n_failed": 0,
-            "noise_p90": 0.021,
-            "glyph_p10": 0.8967,
-            "size_bucket": 45,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0385,
+            "glyph_p10": 0.9245,
+            "size_px": 46.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -629,7 +629,7 @@
               "font": "Noto Sans CJK KR Bold",
               "iou": 0.9511,
               "margin": 0.0573,
-              "verdict": "identical",
+              "verdict": "similar",
               "glyph_pass": true
             },
             {
@@ -658,18 +658,18 @@
             }
           ],
           "top": "Noto Sans CJK KR Bold",
-          "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.951, 천장 p10 0.930, 차순위 대비 +0.057 > 잡음 0.021)",
+          "top_verdict": "similar",
+          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Bold 는 '유사' (동일 폰트라고 쓰지 않음)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
-          "verdict": "identical",
-          "verdict_ko": "동일",
+          "verdict": "similar",
+          "verdict_ko": "유사(동일 확정 불가)",
           "iou_expected": 0.9511,
           "margin": 0.0573,
           "reasons": [
-            "IoU 0.951 >= 천장 p10 0.930",
-            "차순위 대비 차이 +0.057 > 잡음 0.021",
+            "IoU 0.951 < 천장 p10 0.959",
+            "차순위 대비 차이 +0.057 > 잡음 0.038",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -710,13 +710,14 @@
       "lines_found": 1,
       "lines_expected": 1,
       "fill_color": "#FFFFFF",
+      "outline_bg_color": "#585755",
       "outline_px_obs": 0,
       "outline_ring_fracs": [
-        0.02,
-        0.08,
-        0.06,
-        0.09,
-        0.1
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.02
       ],
       "outline_color": "#504E4C",
       "outline_bg_same_color_frac": 0.0,
@@ -1036,7 +1037,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
             "background": "color:#585858",
             "scale_flags": "bicubic",
@@ -1045,16 +1046,16 @@
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9449,
-            "p50": 0.9559,
-            "p90": 0.9631,
+            "n": 12,
+            "p10": 0.951,
+            "p50": 0.9556,
+            "p90": 0.9684,
             "n_failed": 0,
-            "noise_p90": 0.0142,
-            "glyph_p10": 0.9076,
-            "size_bucket": 40,
+            "noise_p90": 0.0315,
+            "glyph_p10": 0.9267,
+            "size_px": 40.0,
             "background": "color:#585858"
           },
           "ranked": [
@@ -1093,7 +1094,7 @@
           ],
           "top": "Noto Sans CJK KR Bold",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.959, 천장 p10 0.945, 차순위 대비 +0.053 > 잡음 0.014)",
+          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.959, 천장 p10 0.951, 차순위 대비 +0.053 > 잡음 0.032)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1102,8 +1103,8 @@
           "iou_expected": 0.9587,
           "margin": 0.0532,
           "reasons": [
-            "IoU 0.959 >= 천장 p10 0.945",
-            "차순위 대비 차이 +0.053 > 잡음 0.014",
+            "IoU 0.959 >= 천장 p10 0.951",
+            "차순위 대비 차이 +0.053 > 잡음 0.032",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -1459,26 +1460,26 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9655,
-            "p50": 0.9702,
-            "p90": 0.9725,
+            "n": 12,
+            "p10": 0.9667,
+            "p50": 0.97,
+            "p90": 0.9761,
             "n_failed": 0,
-            "noise_p90": 0.0058,
-            "glyph_p10": 0.9389,
-            "size_bucket": 63,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0118,
+            "glyph_p10": 0.9439,
+            "size_px": 66.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -1516,7 +1517,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.973, 천장 p10 0.966, 차순위 대비 +0.053 > 잡음 0.006)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.973, 천장 p10 0.967, 차순위 대비 +0.053 > 잡음 0.012)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1525,8 +1526,8 @@
           "iou_expected": 0.9729,
           "margin": 0.0531,
           "reasons": [
-            "IoU 0.973 >= 천장 p10 0.966",
-            "차순위 대비 차이 +0.053 > 잡음 0.006",
+            "IoU 0.973 >= 천장 p10 0.967",
+            "차순위 대비 차이 +0.053 > 잡음 0.012",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -1878,9 +1879,9 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
@@ -1889,15 +1890,15 @@
           },
           "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9655,
-            "p50": 0.9702,
-            "p90": 0.9725,
+            "n": 12,
+            "p10": 0.968,
+            "p50": 0.9712,
+            "p90": 0.9808,
             "n_failed": 0,
-            "noise_p90": 0.0058,
-            "glyph_p10": 0.9389,
-            "size_bucket": 63,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0174,
+            "glyph_p10": 0.9399,
+            "size_px": 66.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -1935,7 +1936,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.970, 천장 p10 0.966, 차순위 대비 +0.062 > 잡음 0.006)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.970, 천장 p10 0.968, 차순위 대비 +0.062 > 잡음 0.017)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -1944,8 +1945,8 @@
           "iou_expected": 0.9701,
           "margin": 0.0621,
           "reasons": [
-            "IoU 0.970 >= 천장 p10 0.966",
-            "차순위 대비 차이 +0.062 > 잡음 0.006",
+            "IoU 0.970 >= 천장 p10 0.968",
+            "차순위 대비 차이 +0.062 > 잡음 0.017",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -2254,7 +2255,7 @@
           {
             "font": "Noto Sans CJK KR Black",
             "iou": 0.9634,
-            "verdict": "similar"
+            "verdict": "identical"
           },
           {
             "font": "Pretendard ExtraBold",
@@ -2297,9 +2298,9 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
@@ -2308,15 +2309,15 @@
           },
           "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9655,
-            "p50": 0.9702,
-            "p90": 0.9725,
+            "n": 12,
+            "p10": 0.9578,
+            "p50": 0.9637,
+            "p90": 0.9757,
             "n_failed": 0,
-            "noise_p90": 0.0058,
-            "glyph_p10": 0.9389,
-            "size_bucket": 63,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0187,
+            "glyph_p10": 0.94,
+            "size_px": 66.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -2324,7 +2325,7 @@
               "font": "Noto Sans CJK KR Black",
               "iou": 0.9634,
               "margin": 0.0513,
-              "verdict": "similar",
+              "verdict": "identical",
               "glyph_pass": true
             },
             {
@@ -2353,18 +2354,18 @@
             }
           ],
           "top": "Noto Sans CJK KR Black",
-          "top_verdict": "similar",
-          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Black 는 '유사' (동일 폰트라고 쓰지 않음)",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.963, 천장 p10 0.958, 차순위 대비 +0.051 > 잡음 0.019)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
-          "verdict": "similar",
-          "verdict_ko": "유사(동일 확정 불가)",
+          "verdict": "identical",
+          "verdict_ko": "동일",
           "iou_expected": 0.9634,
           "margin": 0.0513,
           "reasons": [
-            "IoU 0.963 < 천장 p10 0.966",
-            "차순위 대비 차이 +0.051 > 잡음 0.006",
+            "IoU 0.963 >= 천장 p10 0.958",
+            "차순위 대비 차이 +0.051 > 잡음 0.019",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -2665,7 +2666,7 @@
           {
             "font": "Noto Sans CJK KR Black",
             "iou": 0.9622,
-            "verdict": "identical"
+            "verdict": "similar"
           },
           {
             "font": "Noto Sans CJK KR Bold",
@@ -2708,26 +2709,26 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9526,
-            "p50": 0.9628,
-            "p90": 0.9682,
+            "n": 12,
+            "p10": 0.9644,
+            "p50": 0.9697,
+            "p90": 0.9752,
             "n_failed": 0,
-            "noise_p90": 0.0155,
-            "glyph_p10": 0.9253,
-            "size_bucket": 63,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0168,
+            "glyph_p10": 0.9345,
+            "size_px": 62.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
@@ -2735,7 +2736,7 @@
               "font": "Noto Sans CJK KR Black",
               "iou": 0.9622,
               "margin": 0.1321,
-              "verdict": "identical",
+              "verdict": "similar",
               "glyph_pass": true
             },
             {
@@ -2764,18 +2765,18 @@
             }
           ],
           "top": "Noto Sans CJK KR Black",
-          "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.962, 천장 p10 0.953, 차순위 대비 +0.132 > 잡음 0.015)",
+          "top_verdict": "similar",
+          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Black 는 '유사' (동일 폰트라고 쓰지 않음)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
-          "verdict": "identical",
-          "verdict_ko": "동일",
+          "verdict": "similar",
+          "verdict_ko": "유사(동일 확정 불가)",
           "iou_expected": 0.9622,
           "margin": 0.1321,
           "reasons": [
-            "IoU 0.962 >= 천장 p10 0.953",
-            "차순위 대비 차이 +0.132 > 잡음 0.015",
+            "IoU 0.962 < 천장 p10 0.964",
+            "차순위 대비 차이 +0.132 > 잡음 0.017",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -2816,18 +2817,19 @@
       "lines_found": 1,
       "lines_expected": 1,
       "fill_color": "#FEE300",
+      "outline_bg_color": "#584F4D",
       "outline_px_obs": 7,
       "outline_ring_fracs": [
-        0.37,
+        0.36,
         1.0,
         1.0,
         1.0,
         1.0,
-        0.91,
-        0.73,
-        0.44,
-        0.22,
-        0.2
+        0.86,
+        0.62,
+        0.23,
+        0.04,
+        0.02
       ],
       "outline_color": "#050000",
       "outline_bg_same_color_frac": 0.011,
@@ -3147,7 +3149,7 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
             "background": "video",
             "scale_flags": "bicubic",
@@ -3156,17 +3158,17 @@
             "source": "output MP4 x264 SEI",
             "label": "h264_crf18_1080x1920"
           },
-          "ceiling_cached": false,
+          "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9632,
-            "p50": 0.9716,
-            "p90": 0.9802,
+            "n": 12,
+            "p10": 0.9699,
+            "p50": 0.9762,
+            "p90": 0.9839,
             "n_failed": 0,
-            "noise_p90": 0.0163,
-            "glyph_p10": 0.9448,
-            "size_bucket": 80,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0165,
+            "glyph_p10": 0.9584,
+            "size_px": 76.0,
+            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@8.38;assets/test/generated/classroom_voice.mp4@20.88"
           },
           "ranked": [
             {
@@ -3204,7 +3206,7 @@
           ],
           "top": "Noto Sans CJK KR Black",
           "top_verdict": "identical",
-          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.980, 천장 p10 0.963, 차순위 대비 +0.084 > 잡음 0.016)",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.980, 천장 p10 0.970, 차순위 대비 +0.084 > 잡음 0.017)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
@@ -3213,8 +3215,8 @@
           "iou_expected": 0.9802,
           "margin": 0.0842,
           "reasons": [
-            "IoU 0.980 >= 천장 p10 0.963",
-            "차순위 대비 차이 +0.084 > 잡음 0.016",
+            "IoU 0.980 >= 천장 p10 0.970",
+            "차순위 대비 차이 +0.084 > 잡음 0.017",
             "글자별 검사 통과"
           ],
           "glyph_below_floor": []
@@ -3524,18 +3526,6 @@
         [
           19.233,
           0.0
-        ],
-        [
-          19.267,
-          0.0
-        ],
-        [
-          19.3,
-          0.0
-        ],
-        [
-          19.333,
-          0.0
         ]
       ],
       "font": {
@@ -3543,26 +3533,26 @@
         "method": "identify",
         "expected": "Noto Sans CJK KR Black",
         "best": "Noto Sans CJK KR Black",
-        "iou_expected": 0.8462,
+        "iou_expected": 0.9686,
         "scores": [
           {
             "font": "Noto Sans CJK KR Black",
-            "iou": 0.8462,
-            "verdict": "different"
-          },
-          {
-            "font": "Pretendard ExtraBold",
-            "iou": 0.8085,
-            "verdict": "unmeasured"
+            "iou": 0.9686,
+            "verdict": "similar"
           },
           {
             "font": "Pretendard Black",
-            "iou": 0.7982,
+            "iou": 0.9154,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.9031,
             "verdict": "unmeasured"
           },
           {
             "font": "Noto Sans CJK KR Bold",
-            "iou": 0.7696,
+            "iou": 0.8495,
             "verdict": "unmeasured"
           }
         ],
@@ -3591,9 +3581,9 @@
             "qp": null,
             "x264_preset": "veryfast",
             "gop": 60,
-            "frames_per_sample": 3,
+            "frames_per_sample": 6,
             "fps": 30.0,
-            "background": "video",
+            "background": "color:#000000",
             "scale_flags": "bicubic",
             "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
             "assumed": false,
@@ -3602,81 +3592,66 @@
           },
           "ceiling_cached": true,
           "ceiling": {
-            "n": 6,
-            "p10": 0.9655,
-            "p50": 0.9702,
-            "p90": 0.9725,
+            "n": 12,
+            "p10": 0.972,
+            "p50": 0.9739,
+            "p90": 0.9774,
             "n_failed": 0,
-            "noise_p90": 0.0058,
-            "glyph_p10": 0.9389,
-            "size_bucket": 63,
-            "background": "video:assets/test/generated/video/head-pose-face-detection-female-and-male.mp4@10.18;assets/test/generated/classroom_voice.mp4@20.88"
+            "noise_p90": 0.0069,
+            "glyph_p10": 0.9471,
+            "size_px": 66.0,
+            "background": "color:#000000"
           },
           "ranked": [
             {
               "rank": 1,
               "font": "Noto Sans CJK KR Black",
-              "iou": 0.8462,
-              "margin": 0.0377,
-              "verdict": "different",
-              "glyph_pass": false
+              "iou": 0.9686,
+              "margin": 0.0532,
+              "verdict": "similar",
+              "glyph_pass": true
             },
             {
               "rank": 2,
-              "font": "Pretendard ExtraBold",
-              "iou": 0.8085,
-              "margin": -0.0377,
+              "font": "Pretendard Black",
+              "iou": 0.9154,
+              "margin": -0.0532,
               "verdict": "unmeasured",
               "glyph_pass": null
             },
             {
               "rank": 3,
-              "font": "Pretendard Black",
-              "iou": 0.7982,
-              "margin": -0.048,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.9031,
+              "margin": -0.0655,
               "verdict": "unmeasured",
               "glyph_pass": null
             },
             {
               "rank": 4,
               "font": "Noto Sans CJK KR Bold",
-              "iou": 0.7696,
-              "margin": -0.0766,
+              "iou": 0.8495,
+              "margin": -0.1191,
               "verdict": "unmeasured",
               "glyph_pass": null
             }
           ],
           "top": "Noto Sans CJK KR Black",
-          "top_verdict": "different",
-          "summary": "모든 후보가 '다름' — 레퍼런스 글꼴이 후보 목록에 없을 가능성(확보 못 한 글꼴 목록 확인)",
+          "top_verdict": "similar",
+          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Black 는 '유사' (동일 폰트라고 쓰지 않음)",
           "failed_crops": [],
           "missing_candidates": [],
           "status": "measured",
-          "verdict": "different",
-          "verdict_ko": "다름",
-          "iou_expected": 0.8462,
-          "margin": 0.0377,
+          "verdict": "similar",
+          "verdict_ko": "유사(동일 확정 불가)",
+          "iou_expected": 0.9686,
+          "margin": 0.0532,
           "reasons": [
-            "IoU 0.846 < 천장 p10 0.966 - 잡음 0.006",
-            "글자별 하한(0.86)보다 나쁜 글자: 울(0.26), 인(0.65), 다(0.82) — 다른 글꼴이거나 OCR 문구 오류일 수 있음"
+            "IoU 0.969 < 천장 p10 0.972",
+            "차순위 대비 차이 +0.053 > 잡음 0.007",
+            "글자별 검사 통과"
           ],
-          "glyph_below_floor": [
-            {
-              "crop": "c_sit4",
-              "ch": "울",
-              "iou": 0.2582
-            },
-            {
-              "crop": "c_sit4",
-              "ch": "인",
-              "iou": 0.6453
-            },
-            {
-              "crop": "c_sit4",
-              "ch": "다",
-              "iou": 0.8232
-            }
-          ]
+          "glyph_below_floor": []
         }
       }
     }
@@ -3709,12 +3684,10 @@
       13.5,
       14.5,
       15.5,
+      16.0,
       16.5,
-      17.0,
       17.5,
-      18.5,
-      19.5,
-      20.5
+      18.5
     ],
     "forbidden_hits": [],
     "leftovers": [
@@ -4377,20 +4350,66 @@
         "persistent": false
       }
     ],
-    "ocr_calls": 118,
+    "ocr_calls": 110,
     "ocr_timeouts": 0
   },
   "tone": {
     "n": 4,
     "counts": {
-      "기타": 2,
-      "반말_구어체": 4
+      "명사형/기타": 3,
+      "반말": 4
     },
     "mode": "반말_구어체",
-    "note": "기타(감탄사·명사 끝)는 판정에서 제외",
+    "items": [
+      {
+        "text": "움직임 테스트 영상",
+        "class": "명사형/기타",
+        "ending": "영상",
+        "register": null
+      },
+      {
+        "text": "파 이 프 라인 ASS 합성 샘플",
+        "class": "명사형/기타",
+        "ending": "샘플",
+        "register": null
+      },
+      {
+        "text": "창가 남 성 이 일 어 선다",
+        "class": "반말",
+        "ending": "선다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "다시 자 리 에 앉는다",
+        "class": "반말",
+        "ending": "앉는다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "뒷 줄 남 성 이 손 을 든다",
+        "class": "반말",
+        "ending": "든다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "가 우 뚱 ?",
+        "class": "명사형/기타",
+        "ending": "뚱",
+        "register": null
+      },
+      {
+        "text": "두 사 람 이 고 개 를 기울인다",
+        "class": "반말",
+        "ending": "기울인다",
+        "register": "반말_구어체"
+      }
+    ],
+    "method": "shortkit.reference.aggregate.ending_class (분석기·validate 와 같은 분류기), 최빈 종결 ≥ 0.6 이면 그 말투, 아니면 혼합",
+    "note": "명사형/기타(명사·감탄사 끝)는 판정에서 제외",
     "roles_used": [
-      "situation",
+      "title",
       "description",
+      "situation",
       "reaction"
     ]
   },

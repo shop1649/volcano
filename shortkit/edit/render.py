@@ -47,13 +47,14 @@ from .audio import SILENCE_DB
 from .ir import Clip, ResolvedEdit
 from .resolve import base_fit, effective_src_rect, src_time_at, src_to_region
 
-TP_MARGIN_DB = 0.5          # internal true-peak headroom below the preset ceiling (AAC overshoot)
+TP_MARGIN_DB = 0.5          # internal true-peak headroom below the preset ceiling (AAC overshoot); the DELIVERED
+                            # true peak is then verified on a trial AAC encode (``encoded_true_peak``) and corrected
+AAC_FRAME = 1024            # AAC-LC frame length in samples (codec constant): ffmpeg's native encoder overshoots on an
+                            # abrupt start inside frame 0 (measured on test-pipeline-001: mix -2.87 dBTP in the first
+                            # 30 ms -> -0.87 dBTP after 192k AAC; a 1024-sample start ramp -> -1.87, whole file)
 LOUDNESS_ITER_TOL_LU = 0.3
 NORM_TRIM_WARN_DB = 3.0     # diagnostic only: a larger normalisation gain means the plan/preset levels
                             # are not levels at program loudness (every stem ends up that far off plan)
-# DEPRECATED legacy alias (exporters still import it): the blur strength is the preset key
-# render.clean.blur_sigma_ratio carried in Clip.blur_sigma_ratio -- use ``blur_sigma_src``.
-BLUR_SIGMA_FRAC = 1 / 6.0
 EPS_T = 1e-3
 
 
@@ -126,11 +127,17 @@ def _has_filter(name: str) -> bool:
 
 
 def tempo_stretch(src: Path, ratio: float, dst: Path, sr: int) -> str:
-    """Pitch-preserving tempo change (rubberband if available, else atempo). Returns method."""
+    """Pitch-preserving tempo change (rubberband if available, else atempo) to a STEREO file. Returns method.
+
+    Channel convention = ``util.media.read_audio``: a mono source is duplicated onto both channels at
+    unity (``pan=stereo|c0=c0|c1=c0``) -- ffmpeg's implicit ``-ac 2`` upmix puts it at -3 dB, which would
+    make a tempo-changed mono BGM 3 dB quieter than the same file at ratio 1."""
     if _has_filter("rubberband"):
         af, method = f"rubberband=tempo={ratio:.6f}", "rubberband"
     else:
         af, method = _atempo_chain(ratio), "atempo"
+    if int(probe(src).audio_channels or 1) == 1:
+        af = "pan=stereo|c0=c0|c1=c0," + af
     ffmpeg(["-i", src, "-af", af, "-ar", str(sr), "-ac", "2", "-c:a", "pcm_f32le", dst])
     return method
 
@@ -236,6 +243,25 @@ def _true_peak_db(x: np.ndarray) -> float:
     return 20 * math.log10(p) if p > 0 else -math.inf
 
 
+def encoded_true_peak(x: np.ndarray, sr: int, bitrate: str, tmpdir: Path) -> tuple[float, float]:
+    """(true peak dBTP, time s) of ``x`` after the master's own AAC encode (same codec / bitrate / rate /
+    channels as ``render_video``), decoded back -- the peak the delivered MP4 will really have."""
+    from ..util.media import read_audio
+
+    w, m = tmpdir / "tp_trial.wav", tmpdir / "tp_trial.m4a"
+    write_wav(w, x, sr)
+    ffmpeg(["-i", w, "-c:a", "aac", "-b:a", bitrate, "-ar", "48000", "-ac", "2", m])
+    y = read_audio(m, sr=sr, mono=False)
+    from scipy.signal import resample_poly
+
+    up = np.abs(resample_poly(y, 4, 1, axis=0)).max(axis=1) if len(y) else np.zeros(1)
+    i = int(np.argmax(up))
+    pk = float(up[i])
+    for f in (w, m):
+        f.unlink(missing_ok=True)
+    return (20 * math.log10(pk) if pk > 0 else -math.inf), i / 4.0 / sr
+
+
 def _measure(x: np.ndarray, sr: int, tmpdir: Path) -> dict:
     f = tmpdir / "measure.wav"
     write_wav(f, x, sr)
@@ -261,10 +287,56 @@ class Stems:
         return self.originals + self.sfx
 
 
-def pre_norm_stems(r: ResolvedEdit) -> Stems:
+def loop_fill(seg: np.ndarray, n: int, nx: int) -> tuple[np.ndarray, list[int]]:
+    """Repeat ``seg`` (the music from section_start to the end of the file, at the tempo) until ``n``
+    samples: copy c starts at c * (len(seg) - nx); where copy c's last ``nx`` samples overlap copy c+1's
+    first ``nx`` samples they are crossfaded with an equal-power law (cos / sin, sum of powers = 1).
+    Copy 0 is unchanged up to its tail.  -> (stem (n, ch), loop start sample of every repeat)."""
+    L = len(seg)
+    if nx < 1 or 2 * nx >= L:
+        raise RenderError(f"BGM 반복 크로스페이드 {nx} 샘플이 반복 구간 {L} 샘플에 맞지 않음")
+    th = (np.arange(nx, dtype=np.float64) + 0.5) / nx * (math.pi / 2)
+    fo, fi = np.cos(th).astype(np.float32), np.sin(th).astype(np.float32)
+    if seg.ndim > 1:
+        fo, fi = fo[:, None], fi[:, None]
+    out = np.zeros((n,) + seg.shape[1:], np.float32)
+    m = min(L, n)
+    out[:m] = seg[:m]
+    P = L - nx
+    starts = []
+    pos = P
+    while pos < n:
+        starts.append(pos)
+        m = min(L, n - pos)
+        k = min(nx, m)
+        out[pos:pos + k] *= fo[:k]
+        piece = seg[:m].copy()
+        piece[:k] *= fi[:k]
+        out[pos:pos + m] += piece
+        pos += P
+    return out, starts
+
+
+def bgm_loop_xfade(r: ResolvedEdit, preset: config.Preset | None) -> float:
+    """audio.bgm.loop_xfade_s through the (caller's) preset -- the IR does not carry it."""
+    from .audio import bgm_loop_xfade_s
+
+    pr = preset if preset is not None else \
+        config.load_preset(r.preset_name, None if r.format_id == "UNCLASSIFIED" else r.format_id)
+    v = bgm_loop_xfade_s(pr)
+    if v is None:
+        raise RenderError("audio.bgm.loop=true 로 BGM 을 반복해야 하지만 프리셋에 audio.bgm.loop_xfade_s(규칙 키)가 없습니다 "
+                          "— 프리셋/설정 담당이 추가해야 합니다(추측값으로 반복하지 않음)")
+    return v
+
+
+def pre_norm_stems(r: ResolvedEdit, preset: config.Preset | None = None) -> Stems:
     """Build the BGM / kept-originals / SFX stems from the IR exactly as the master mix uses them,
     BEFORE loudness normalisation and limiting.  Side-effect free: nothing is written to the project
-    (tempo / speed intermediates live in a system temporary directory that is removed)."""
+    (tempo / speed intermediates live in a system temporary directory that is removed).
+    BGM shorter than the episode: with ``bgm.loop`` the music from section_start is repeated
+    (``loop_fill``, equal-power crossfade audio.bgm.loop_xfade_s read through ``preset``); without it the
+    rest stays silent (a warning; resolve refuses it in production)."""
     a = r.audio
     sr = a.sample_rate
     n = int(round(r.duration * sr))
@@ -285,13 +357,21 @@ def pre_norm_stems(r: ResolvedEdit) -> Stems:
             else:
                 info["bgm_tempo_method"] = "none(ratio=1)"
             x = read_audio(src, sr=sr, mono=False, start=offset, duration=n / sr)
-            if len(x) < n:
+            if len(x) < n and b.loop:
+                xf = bgm_loop_xfade(r, preset)
+                seg_s = len(x) / sr
+                x, starts = loop_fill(x, n, int(round(xf * sr)))
+                info["bgm_loop"] = {"segment_s": round(seg_s, 4), "xfade_s": xf, "repeats": len(starts),
+                                    "loop_starts_out_s": [round(v / sr, 4) for v in starts],
+                                    "law": "equal-power (cos/sin)"}
+            elif len(x) < n:
                 info["warnings"].append(f"BGM 이 {(n - len(x)) / sr:.2f}s 부족 → 뒤는 무음")
             x = _fit_len(x, n)
             g = db2lin(b.gain_db) * _lin_fade(n, sr, b.fade_in_s, b.fade_out_s) * envelope_gain(b.envelope, n, sr)
             bgm = (x * g[:, None]).astype(np.float32)
             info["bgm"] = {"path": b.path, "section_start_s": b.section_start_s, "tempo_ratio": b.tempo_ratio,
-                           "gain_db": b.gain_db, "envelope_points": len(b.envelope)}
+                           "gain_db": b.gain_db, "envelope_points": len(b.envelope), "loop": bool(b.loop),
+                           "loop_applied": info.get("bgm_loop")}
         for o in a.originals:
             src = paths.absp(o.path)
             dur = o.src_end - o.src_start
@@ -374,14 +454,14 @@ def fg_gain_frames(k: np.ndarray, sr: int, fps: float, duration: float) -> tuple
     return mins, means
 
 
-def mix_audio(r: ResolvedEdit, build: Path) -> dict:
+def mix_audio(r: ResolvedEdit, build: Path, preset: config.Preset | None = None) -> dict:
     a = r.audio
     if a.max_limiter_db is None or a.loudness_tolerance_lu is None:
         raise RenderError("resolved.json 에 audio.max_limiter_db / loudness_tolerance_lu 가 없습니다(이전 버전 IR): "
                           f"`shortkit episode resolve {r.episode_id}` 를 다시 실행하세요")
     sr = a.sample_rate
     prod = r.mode == "production"
-    st = pre_norm_stems(r)
+    st = pre_norm_stems(r, preset)
     n = len(st.bgm)
     rep: dict = {"sample_rate": sr, "samples": n, "warnings": list(st.info["warnings"]), "errors": [],
                  "level_semantics": "gain_db = 최종 프로그램 음량에서의 레벨(정규화는 작은 보정이어야 함)"}
@@ -428,6 +508,35 @@ def mix_audio(r: ResolvedEdit, build: Path) -> dict:
             trim = db2lin(ceiling - tp)
             bgm, orig, sfx, mix = bgm * trim, orig * trim, sfx * trim, mix * trim
             rep["final_trim_db"] = round(ceiling - tp, 3)
+        # the DELIVERED true peak: AAC can overshoot the PCM peak by more than TP_MARGIN_DB (content-dependent)
+        br = str((r.canvas.get("encode") or {}).get("audio_bitrate") or "192k")
+        enc_tp, enc_t = encoded_true_peak(mix, sr, br, tmpdir)
+        tp_log = [{"step": "pcm", "encoded_tp_db": round(enc_tp, 2), "at_s": round(enc_t, 3)}]
+        target_tp = float(a.true_peak_db)
+        if enc_tp > target_tp and enc_t < 2.0 * AAC_FRAME / sr:
+            # an overshoot inside the first AAC frame is the encoder's abrupt-start artefact: one-frame start ramp
+            ramp = np.ones(len(mix), np.float32)
+            nr = min(len(mix), AAC_FRAME)
+            ramp[:nr] = np.linspace(0.0, 1.0, nr, endpoint=False, dtype=np.float32)
+            bgm, orig, sfx, mix = bgm * ramp[:, None], orig * ramp[:, None], sfx * ramp[:, None], mix * ramp[:, None]
+            enc_tp, enc_t = encoded_true_peak(mix, sr, br, tmpdir)
+            tp_log.append({"step": f"start_ramp_{AAC_FRAME}_samples", "encoded_tp_db": round(enc_tp, 2), "at_s": round(enc_t, 3)})
+            rep["start_ramp_samples"] = nr
+        for _ in range(3):
+            if enc_tp <= target_tp:
+                break
+            d_db = target_tp - enc_tp - 0.05               # one global trim of every stem (never BGM-only)
+            trim = db2lin(d_db)
+            bgm, orig, sfx, mix = bgm * trim, orig * trim, sfx * trim, mix * trim
+            rep["final_trim_db"] = round(rep["final_trim_db"] + d_db, 3)
+            enc_tp, enc_t = encoded_true_peak(mix, sr, br, tmpdir)
+            tp_log.append({"step": f"trim_{round(d_db, 3)}_db", "encoded_tp_db": round(enc_tp, 2), "at_s": round(enc_t, 3)})
+        rep["encoded_true_peak"] = {"target_db": target_tp, "audio_bitrate": br, "final_db": round(enc_tp, 2),
+                                    "ok": bool(enc_tp <= target_tp + 1e-6), "steps": tp_log,
+                                    "method": "마스터와 같은 AAC 인코딩을 한 번 해 보고 되읽어 4배 오버샘플 피크"}
+        if enc_tp > target_tp + 1e-6:
+            msg = f"AAC 인코딩 뒤 true peak {enc_tp:.2f} dBTP > 목표 {target_tp} dBTP (전체 보정 3회 후)"
+            (rep["errors"] if prod else rep["warnings"]).append(msg)
         write_wav(build / "mix.wav", mix, sr)
         (build / "stems").mkdir(exist_ok=True)
         write_wav(build / "stems" / "bgm.wav", bgm, sr)
@@ -443,7 +552,8 @@ def mix_audio(r: ResolvedEdit, build: Path) -> dict:
                          "round((f+1)·sr/fps)); gain_min = 그 프레임의 최소 k(피크 순간), gain_mean = 평균 k. "
                          "BGM 에는 적용하지 않음.",
             "norm_gain_db": rep["norm_gain_db"], "final_trim_db": rep["final_trim_db"],
-            "max_limiter_db": max_lim, "max_reduction_db": round(red, 3), "gain_min": kmin, "gain_mean": kmean})
+            "max_limiter_db": max_lim, "max_reduction_db": round(red, 3), "gain_min": kmin, "gain_mean": kmean,
+            "start_ramp_samples": int(rep.get("start_ramp_samples") or 0)})
         rep["fg_gain_file"] = f"episodes/{r.episode_id}/build/fg_gain.json"
         rep["mix_wav"] = lufs(build / "mix.wav")
         got = rep["mix_wav"].get("integrated_lufs")
@@ -796,7 +906,7 @@ def render(resolved: ResolvedEdit, *, allow_unmeasured: bool = False, preset: co
         bad = {k: v for k, v in fontcheck["styles"].items() if not v["ok"]}
         write_json(build / "fontcheck.json", fontcheck)
         raise RenderError("libass 가 요청한 글꼴을 쓰지 않음(대체 글꼴 사용 금지): " + json.dumps(bad, ensure_ascii=False)[:800])
-    audio_rep = mix_audio(r, build)
+    audio_rep = mix_audio(r, build, preset)
     if audio_rep.get("errors") and r.mode == "production":
         write_json(build / "render_report.json", {
             "schema": "shortkit.render_report/1", "episode_id": r.episode_id, "started_at": t0, "finished_at": now_iso(),

@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-coverage-001.mlt",
-    "created_at": "2026-09-24T20:31:56+00:00",
+    "created_at": "2026-09-24T21:50:21+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -159,12 +159,12 @@
       "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
     ]
   },
-  "updated_at": "2026-09-24T20:31:58+00:00",
+  "updated_at": "2026-09-24T21:50:23+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-coverage-001.fcpxml",
-    "created_at": "2026-09-24T20:31:57+00:00",
+    "created_at": "2026-09-24T21:50:22+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -224,7 +224,7 @@
   "otio": {
     "format": "otio",
     "file": "test-coverage-001.otio",
-    "created_at": "2026-09-24T20:31:57+00:00",
+    "created_at": "2026-09-24T21:50:22+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",

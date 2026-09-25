@@ -1,6 +1,6 @@
 # test-coverage-001 편집 프로젝트
 
-- 생성 2026-09-24T20:33:05+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-24T21:51:25+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 22.50s · 마스터 `episodes/test-coverage-001/output/test-coverage-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 

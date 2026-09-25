@@ -44,11 +44,18 @@ SCHEMA = "shortkit.ref_motion/1"
 WIDTH = 320
 METHOD = {
     "zoom": "ORB (600) + RANSAC similarity per frame pair in the footage region (captions masked); runs of "
-            "same-sign scale change >= 0.3%/frame totalling >= 5%, or one-frame jumps >= 5%",
+            "same-sign scale change >= 0.3%/frame totalling >= 5% (one weak frame may interrupt a run unless it is a "
+            "duplicated frame: a digital zoom rescales every output frame), or one-frame jumps >= 5%; scale_to of a "
+            "ramp = ECC affine scale between the frame before the run and the frame 0.25 s after it (same shot) when "
+            "the ECC correlation >= 0.9, else the per-frame ORB product; a one-frame jump is kept only when that ECC "
+            "(correlation >= 0.9) confirms a >= 5% rescale of the whole region",
     "freeze": ">= 0.25 s of frames with <= 0.03% pixels changing by > 6 levels, with motion (>= 0.3% pixels) "
               "right before and after inside the same shot",
-    "speed": "unique-frame rate change (>= 1.4x or <= 0.7x, sustained >= 0.4 s) inside one shot "
-             "(frame-duplication slow/fast motion only)",
+    "speed": "unique-frame rate change (>= 1.43x or <= 0.7x, sustained >= 0.4 s; a change < 0.25 must also show a regular "
+             "duplication cadence with the same ratio on both sides) "
+             "inside one shot, outside freezes and digital-zoom runs; runs of >= 0.4 s without a new frame count as a "
+             "still scene, not as duplicates; each 0.5 s window needs >= 3 new frames (frame-duplication slow/fast "
+             "motion only)",
     "flash": "copied from shots.json (incl. scope: canvas | region)",
     "zoom_ease": "cumulative scale over the zoom run + up to 0.5 s of the same shot on each side, fitted with "
                  "c0 + A*ease((t-t0)/dur) for the renderer eases linear/in(u^3)/out(1-(1-u)^3)/inout (t0, dur on a "
@@ -101,6 +108,52 @@ RECENTER_PURE_DRIFT = 0.05     # pure zoom: fixed-point drift <= 5 % of the regi
 RECENTER_CENTRE_ZONE = 0.1     # |fixed point - region centre| <= 10 % of the shorter side: both modes identical
 RECENTER_OUTSIDE_TOL = 0.03    # fixed point this far (share of the side) outside the region = outside
 EASE_EXT_S = 0.5               # frames of the same shot added before / after a zoom run for the fits
+ZOOM_TAIL_S = 0.25             # end frame of the end-to-end scale: this long after the run (ease-out tails)
+ZOOM_ECC_MIN_CC = 0.9          # ECC correlation needed to replace the per-frame ORB product
+SPEED_CADENCE_TOL = 0.15       # cadence ratio vs rate ratio agreement for small-rate ramps
+
+
+def _cadence(x: np.ndarray) -> float | None:
+    """New frames per output frame from the gaps between clearly new frames (1.0 entries) of a window, when the
+    gaps are regular (max <= 1.5 x median, >= 3 new frames): frame duplication has a fixed cadence."""
+    idx = np.nonzero(x == 1.0)[0]
+    if len(idx) < 3:
+        return None
+    g = np.diff(idx)
+    med = float(np.median(g))
+    if med <= 0 or float(g.max()) > 1.5 * med + 1e-9:
+        return None
+    return 1.0 / med
+SPEED_STILL_RUN_S = 0.4        # identical frames for this long = still scene (not counted as duplicates)
+SPEED_MIN_NEW_FRAMES = 3       # clearly new frames needed in each 0.5 s window to read a rate
+
+
+def _ecc_scale(video: Path, fps: float, reg: dict, t_before: float, t_after: float, sign: int) -> tuple[float, float] | None:
+    """(ECC correlation, scale) of the affine map frame(t_before) -> frame(t_after) inside the footage region
+    (320 px wide gray, Gaussian 5x5).  Several scale inits in the zoom direction; best correlation wins."""
+    import cv2
+
+    from .common import read_segment
+
+    fa = read_segment(video, t_before, t_before + 0.5 / fps, fps, crop=reg, width=WIDTH, gray=True)
+    fb = read_segment(video, t_after, t_after + 0.5 / fps, fps, crop=reg, width=WIDTH, gray=True)
+    if not fa or not fb:
+        return None
+    a = cv2.GaussianBlur(fa[0][1].astype(np.float32), (5, 5), 0)
+    b = cv2.GaussianBlur(fb[0][1].astype(np.float32), (5, 5), 0)
+    h, w = a.shape
+    crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 200, 1e-6)
+    best = None
+    for s0 in ((1.0, 1.2, 1.4, 1.6) if sign > 0 else (1.0, 1 / 1.2, 1 / 1.4, 1 / 1.6)):
+        M = np.array([[s0, 0, (1 - s0) * w / 2], [0, s0, (1 - s0) * h / 2]], np.float32)
+        try:
+            cc, M = cv2.findTransformECC(a, b, M, cv2.MOTION_AFFINE, crit, None, 5)
+        except cv2.error:
+            continue
+        scale = float(np.sqrt(abs(np.linalg.det(M[:2, :2]))))
+        if best is None or cc > best[0]:
+            best = (round(float(cc), 4), round(scale, 4))
+    return best
 
 
 def ease_curve(u, kind: str) -> np.ndarray:
@@ -311,7 +364,14 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
     events: list[dict] = []
     # ------------------------------------------------------------------ zoom
     logs = [math.log(s["sim"]["s"]) if s["sim"] else None for s in stats]
+    npix0 = stats[0]["npix"] if stats else 1
+    dup_thr = max(3, int(0.0003 * npix0))
+    # an editorial (digital) zoom rescales EVERY output frame; a duplicated frame (low-frame-rate source
+    # played at the output rate) inside a run means the scale jumps come from the source, not the edit
+    dup = [s["changed"] <= dup_thr for s in stats]
     analysable = sum(1 for s in stats if s["sim"] is not None)
+    punches_rejected: list[dict] = []
+    zoom_runs: list[tuple[int, int]] = []
     i = 0
     while i < n:
         lg = logs[i]
@@ -328,7 +388,8 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
                 j += 1
                 total += nx
                 gaps = 0
-            elif gaps == 0 and j + 2 < n and logs[j + 2] is not None and logs[j + 2] * sign >= 0.003:
+            elif gaps == 0 and j + 2 < n and not dup[j + 1] and logs[j + 2] is not None \
+                    and logs[j + 2] * sign >= 0.003:
                 j += 1
                 gaps = 1
             else:
@@ -363,6 +424,32 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
                 ev_z["ease_fit"] = fit
                 ev_z["scale_curve"] = [[round(tt, 4), round(zz, 5)] for tt, zz in zip(times, zs)]
                 ev_z["recenter_fit"] = classify_recenter(mats, sc, reg)
+                # end-to-end scale: the frame before the run vs the frame ZOOM_TAIL_S after it (same shot) --
+                # the per-frame ORB product drifts when people move in the shot (mockloop: 1.25 / 1.45 / 1.52
+                # for true 1.35 / 1.32 / 1.30); a whole-region ECC fit is dominated by the static background
+                k1 = j
+                while k1 + 1 < n and k1 - j < int(round(ZOOM_TAIL_S * fps)) and not stats[k1 + 1]["skip"]:
+                    k1 += 1
+                ecc = _ecc_scale(video, fps, reg, t0, stats[k1]["t"], sign)
+                zoom_runs.append((i, k1))
+                if ecc is not None:
+                    ev_z["scale_ecc"] = {"cc": ecc[0], "scale": ecc[1], "t_after": round(stats[k1]["t"], 3)}
+                    if ecc[0] >= ZOOM_ECC_MIN_CC:
+                        ev_z["scale_orb"] = ev_z["scale_to"]
+                        ev_z["scale_to"] = ev_z["value"] = ecc[1]
+                        ev_z["scale_method"] = "ecc(before, after)"
+            else:
+                # a one-frame "punch" is kept only when the whole region really rescaled (ECC), not when a
+                # new frame of a low-frame-rate source moved a person (mockloop: 1.11 / 1.06 false punches)
+                ecc = _ecc_scale(video, fps, reg, t0, t1, sign)
+                ok = ecc is not None and ecc[0] >= ZOOM_ECC_MIN_CC and abs(math.log(max(ecc[1], 1e-6))) >= math.log(1.05)
+                if not ok:
+                    punches_rejected.append({"t": ev_z["t"], "scale_orb": ev_z["scale_to"],
+                                             "ecc": None if ecc is None else {"cc": ecc[0], "scale": ecc[1]}})
+                    i = j + 1
+                    continue
+                ev_z.update({"scale_orb": ev_z["scale_to"], "scale_to": ecc[1], "value": ecc[1],
+                             "scale_method": "ecc(before, after)", "scale_ecc": {"cc": ecc[0], "scale": ecc[1]}})
             events.append(ev_z)
         i = j + 1
     # ------------------------------------------------------------------ freeze
@@ -408,7 +495,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
             k += 1
     # ------------------------------------------------------------------ speed ramps
     in_freeze = np.zeros(n, bool)
-    for a, b in freeze_runs:
+    for a, b in freeze_runs + zoom_runs:        # a digital zoom renders every frame new: not a speed change
         in_freeze[a:b + 1] = True
     win = max(4, int(round(0.5 * fps)))
     speed_checked = 0
@@ -421,6 +508,21 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
         # (a still scene is not frame duplication)
         u = np.array([1.0 if stats[k]["changed"] >= move_thr else (0.0 if stats[k]["changed"] <= still_thr else np.nan)
                       for k in idx])
+        # a long run without any clearly new frame is a still scene (static camera, nobody moving), not duplication: even
+        # a 0.25x ramp of a 12 fps source repeats a frame only ~9 times (mockloop: empty-room stretches of a
+        # CCTV-like source read as 0.25x / 2.6x 'ramps')
+        runlen = max(2, int(round(SPEED_STILL_RUN_S * fps)))
+        k0 = 0
+        while k0 < len(u):
+            if u[k0] != 1.0:                       # duplicate or too-little-to-tell: no clearly new frame
+                k1 = k0
+                while k1 + 1 < len(u) and u[k1 + 1] != 1.0:
+                    k1 += 1
+                if k1 - k0 + 1 >= runlen:
+                    u[k0:k1 + 1] = np.nan
+                k0 = k1 + 1
+            else:
+                k0 += 1
         ts = np.array([stats[k]["t"] for k in idx])
         best = None
 
@@ -432,15 +534,27 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
             left, right = wmean(u[p - win:p]), wmean(u[p:p + win])
             if not left or not right:
                 continue
+            # a rate needs a few new frames on both sides (one or two new frames after a still stretch is a person
+            # entering an empty static shot, not a ramp: mockloop 2.6x false ramps)
+            if min(int(np.nansum(u[p - win:p] == 1.0)), int(np.nansum(u[p:p + win] == 1.0))) < SPEED_MIN_NEW_FRAMES:
+                continue
             ratio = right / left
-            if (ratio <= 0.7 or ratio >= 1.43) and abs(right - left) >= 0.25:
-                # sustained: the new rate holds until the shot end / at least 0.4 s
-                hold = wmean(u[p:]) if len(u) - p < 2 * win else wmean(u[p:p + 2 * win])
-                if hold is None or abs(hold / left - ratio) > 0.25:
+            if not (ratio <= 0.7 or ratio >= 1.43):
+                continue
+            if abs(right - left) < 0.25:
+                # small absolute change (a low-frame-rate source: 12 fps at 30 fps has rate 0.4 -> 0.2 at 0.5x, which
+                # the 0.25 floor hid -- mockloop): accept only a REGULAR duplication cadence on both sides whose ratio
+                # agrees; natural motion slowing down gives irregular gaps between new frames
+                cl, cr = _cadence(u[p - win:p]), _cadence(u[p:p + win])
+                if cl is None or cr is None or abs(cr / cl - ratio) > SPEED_CADENCE_TOL:
                     continue
-                score = abs(math.log(ratio))
-                if best is None or score > best[0] + 1e-9:
-                    best = (score, p, ratio)
+            # sustained: the new rate holds until the shot end / at least 0.4 s
+            hold = wmean(u[p:]) if len(u) - p < 2 * win else wmean(u[p:p + 2 * win])
+            if hold is None or abs(hold / left - ratio) > 0.25:
+                continue
+            score = abs(math.log(ratio))
+            if best is None or score > best[0] + 1e-9:
+                best = (score, p, ratio)
         if best:
             _, p, ratio = best
             # align to the first changed-rate frame
@@ -465,6 +579,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, region:
     res = {"schema": SCHEMA, "video_id": video_id, "resolution": [W, H], "fps": fps, "duration": round(duration, 3),
            "region_used": reg, "analysis_width": WIDTH, "method": METHOD, "analyzed_at": now_iso(),
            "zoom_analysable_share": round(cover, 3), "still_runs_not_freeze": rejected_still,
+           "zoom_punches_rejected": punches_rejected,
            "events": events, "presence": presence,
            "speed_shots_checked": speed_checked,
            "presence_note": "speed 는 프레임 복제 방식만 검출 가능 → 못 찾으면 '없다'가 아니라 '못 잼'"}

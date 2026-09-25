@@ -8,8 +8,11 @@ interpolates the gain across the first pass's event intervals so that the SFX th
 bias the BGM gain.  Events are segmented on the residual (log-mel spectral flux + energy with
 onset back-tracking on a 5 ms envelope) and must also be present in the ORIGINAL MIX: a
 separation/subtraction artifact is rejected when (a) the event's share of the mix energy in its
-own bands is too small, (b) the mix shows no energy rise at the onset, or (c) the residual
-waveform is mostly a copy of the BGM or of the vocals stem.  Rejected candidates are kept in
+own bands is too small, (b) the mix shows no energy rise at the onset, (c) the residual
+waveform is mostly a copy of the BGM or of the vocals stem, or (d) it starts with a BGM transient in its
+own bands (>= 10 dB rise of the aligned BGM there) and is not louder than that transient (lossy-codec /
+limiter error of the BGM; a real sound that weak on a BGM hit is not separable without stems).
+Rejected candidates are kept in
 ``rejected`` with the reason.  Events under speech/BGM are kept (the residual has them removed).
 
 Fingerprints: 64-band log-mel patch (onset-20 ms .. +0.5 s, hop 256) saved as ``sfx_fp/eNNN.npy``,
@@ -34,14 +37,36 @@ SCHEMA = "shortkit.audio_sfx_events/1"
 EV_NFFT, EV_HOP, EV_MELS = 1024, 128, 64
 FP_NFFT, FP_HOP, FP_MELS = 1024, 256, 64
 FP_PRE_S, FP_LEN_S, WAVE_MAX_S = 0.02, 0.5, 0.4   # wave snippet = what the edit-vs-onsite xcorr uses
+FP_TAIL_S = 0.03               # fingerprint frames kept after the event end
+FP_COMPARE_RANGE_DB = 40.0     # dynamic range of a fingerprint used for similarity (dB under its max)
 DETECT_ABOVE_FLOOR_DB = 15.0
 SPLIT_ONSET_DB = 9.0
+# A split must not sit in a DECAYING sound: band 'onsets' in a ding's tail (BGM residual transients; total energy
+# -0.9 dB over +-8 ms, -3 dB per 100 ms) cut one 1.2 s ding into 2-3 events (mockloop).  A split needs either an
+# impulsive total-energy rise (>= SPLIT_MIN_SHORT_RISE_DB over +-3 frames: a knock under speech) or a mean energy
+# over the next SPLIT_WIN_S not below the previous SPLIT_WIN_S (a slow-attack whoosh after another sound).
+SPLIT_MIN_SHORT_RISE_DB = 1.0
+LEAD_IN_S, LEAD_IN_DB = 0.12, 20.0   # onset: a hit this much louder within this long after a faint start wins,
+LEAD_IN_ATTACK_S = 0.015             # if the hit itself rises by LEAD_IN_DB within this long
+SPLIT_MIN_TOTAL_RISE_DB = 0.0
+SPLIT_WIN_S = 0.1
+
+
+def _mean_db(x: np.ndarray) -> float:
+    return float(10 * np.log10(np.mean(10 ** (np.asarray(x, float) / 10)) + 1e-12)) if len(x) else -120.0
 MIN_EVENT_S = 0.02
 MAX_EVENT_S = 3.0
 MIX_SHARE_MIN = 0.2          # event energy / mix energy in the event's bands
 MIX_RISE_MIN_DB = 1.0        # mix band energy rise at the onset (required unless the event dominates its bands)
 MIX_SHARE_DOMINANT = 0.5     # share at/above which the event is plainly in the mix (e.g. SFX under speech)
 ARTIFACT_CORR_MAX = 0.5      # |corr(residual, bgm or vocals)| above this = copy of a known stem
+# BGM transient residue: a residual event that starts WITH a BGM transient in its own bands and is not louder
+# than that transient there is lossy-codec / limiter error of the BGM, not a new sound (mockloop: hi-hats of
+# the bed in AAC left -38 dBFS 4.5-11 kHz bursts after subtraction -> 5 fake 'onsite' sounds in 4 videos;
+# the pre-encode mix has the hi-hat only).  A real sound this weak exactly on a BGM transient cannot be
+# separated without stems -- it is rejected with this reason, not reported.
+BGM_TRANSIENT_RISE_DB = 10.0  # BGM band energy rise from [t-0.25, t-0.03] to the event window
+BGM_TRANSIENT_RATIO_MAX = 1.0 # residual band energy / BGM band energy at or below this = residue
 SUB_NFFT, SUB_HOP, SUB_OVER, SUB_FLOOR = 512, 128, 1.5, 0.03   # spectral-mode subtraction
 
 
@@ -120,6 +145,7 @@ def detect_events(res: np.ndarray, sr: int = SR) -> tuple[list[dict], dict]:
     et, env = _short_env_db(res, sr)
     ev_floor = max(float(np.percentile(env, 20)), -100.0)
     events = []
+    wsplit = max(2, int(round(SPLIT_WIN_S / hop_s)))
     for a, b in merged:
         if (b - a) * hop_s < MIN_EVENT_S:
             continue
@@ -128,7 +154,10 @@ def detect_events(res: np.ndarray, sr: int = SR) -> tuple[list[dict], dict]:
         i = a + 3
         while i < b - 2:
             if strength[i] >= SPLIT_ONSET_DB and strength[i] == strength[max(a, i - 6):i + 7].max() \
-                    and (i - starts[-1]) * hop_s >= 0.08 and E[min(b - 1, i + 3)] >= E[max(a, i - 3)] - 1.0:
+                    and (i - starts[-1]) * hop_s >= 0.08 \
+                    and (E[min(b - 1, i + 3)] >= E[max(a, i - 3)] + SPLIT_MIN_SHORT_RISE_DB
+                         or (E[min(b - 1, i + 3)] >= E[max(a, i - 3)] - 1.0
+                             and _mean_db(E[i:i + wsplit]) >= _mean_db(E[max(a, i - wsplit):i]) + SPLIT_MIN_TOTAL_RISE_DB)):
                 starts.append(i)
                 i += int(0.08 / hop_s)
             else:
@@ -158,6 +187,26 @@ def detect_events(res: np.ndarray, sr: int = SR) -> tuple[list[dict], dict]:
                     elif env[i] > env[imin] + 6.0:     # climbing into an earlier sound: stop at the valley
                         i = imin
                         break
+                # a faint lead-in (>= LEAD_IN_DB under a hit that follows within LEAD_IN_S) is not the onset: back-track
+                # from the hit instead (mockloop: -51 dB residual 60 ms before a -17 dB pop moved the onset 60 ms early
+                # and split that pop into its own catalog type)
+                ahead = np.nonzero((et >= et[ic]) & (et <= et[ic] + LEAD_IN_S))[0]
+                if len(ahead):
+                    jk = int(ahead[np.argmax(env[ahead])])
+                    # ... only when the hit has its OWN abrupt attack (a slow-attack whoosh rising out of silence
+                    # is one sound: its quiet beginning is not a lead-in)
+                    pre = np.nonzero((et >= et[jk] - LEAD_IN_ATTACK_S) & (et < et[jk]))[0]
+                    abrupt = bool(len(pre)) and float(env[pre].min()) <= float(env[jk]) - LEAD_IN_DB
+                    if env[jk] >= env[ic] + LEAD_IN_DB and abrupt:
+                        i = imin = jk
+                        lvl2 = max(level, float(env[jk]) - LEAD_IN_DB)
+                        while i > ic and env[i - 1] > lvl2:
+                            i -= 1
+                            if env[i] < env[imin]:
+                                imin = i
+                            elif env[i] > env[imin] + 6.0:
+                                i = imin
+                                break
                 onset = float(et[i]) - 0.0025
             else:
                 # a new sound over a tail: first point of the steepest envelope rise
@@ -255,7 +304,19 @@ def mix_check(ev: dict, res: np.ndarray, mix: np.ndarray, sr: int, bgm_est: np.n
     # BGM) no reliable copy test exists -> only the mix share / mix rise checks apply (limitation).
     c_bgm = _local_abs_corr(seg_r, bgm_est[a:b], sr) if bgm_est is not None else None
     c_voc = _local_abs_corr(seg_r, vocals[a:b], sr) if vocals is not None else None
+    bgm_rise_db, bgm_ratio = None, None
+    if bgm_est is not None and pb - pa >= 64 and b <= len(bgm_est):
+        seg_b, pre_b = bgm_est[a:b], bgm_est[pa:pb]
+        Rb = np.abs(np.fft.rfft(seg_b * np.hanning(len(seg_b)), nfft)) ** 2
+        Rbp = np.abs(np.fft.rfft(pre_b * np.hanning(len(pre_b)), nfft)) ** 2 * (len(seg_b) / len(pre_b))
+        band_b = np.array([Rb[(freqs >= lo) & (freqs < hi)].sum() for lo, hi in zip(edges[:-1], edges[1:])])
+        band_bp = np.array([Rbp[(freqs >= lo) & (freqs < hi)].sum() for lo, hi in zip(edges[:-1], edges[1:])])
+        eb = float(band_b[sel].sum())
+        bgm_rise_db = float(10 * np.log10(max(eb, 1e-20) / max(float(band_bp[sel].sum()), 1e-20)))
+        bgm_ratio = float(band_r[sel].sum() / max(eb, 1e-20))
     reasons = []
+    if bgm_rise_db is not None and bgm_rise_db >= BGM_TRANSIENT_RISE_DB and bgm_ratio <= BGM_TRANSIENT_RATIO_MAX:
+        reasons.append(f"bgm_transient_residue (BGM rise {bgm_rise_db:.1f} dB, residual/BGM {bgm_ratio:.2f})")
     if share < MIX_SHARE_MIN:
         reasons.append(f"mix_share {share:.2f} < {MIX_SHARE_MIN}")
     if rise_db is not None and rise_db < MIX_RISE_MIN_DB and share < MIX_SHARE_DOMINANT:
@@ -268,6 +329,8 @@ def mix_check(ev: dict, res: np.ndarray, mix: np.ndarray, sr: int, bgm_est: np.n
             "mix_rise_db": None if rise_db is None else round(rise_db, 2),
             "corr_bgm": None if c_bgm is None else round(c_bgm, 3),
             "corr_vocals": None if c_voc is None else round(c_voc, 3),
+            "bgm_rise_db": None if bgm_rise_db is None else round(bgm_rise_db, 2),
+            "residual_over_bgm": None if bgm_ratio is None else round(bgm_ratio, 3),
             "band_hz": [None if lo_hz is None else round(lo_hz), None if hi_hz is None else round(hi_hz)]}
 
 
@@ -283,6 +346,12 @@ def fingerprint_clip(x: np.ndarray, sr: int = SR, onset_s: float = 0.0, dur_s: f
     L = logmel(seg, sr, FP_NFFT, FP_HOP, FP_MELS).T.astype(np.float32)     # [mels, frames]
     L = np.maximum(L - L.max(), -80.0)
     dur = dur_s if dur_s is not None else _auto_duration(x, sr, onset_s)
+    # the fingerprint describes the EVENT: frames after its end (+ FP_TAIL_S) are set to the floor, otherwise a
+    # 0.12 s pop is compared through 0.4 s of whatever residual follows it (mockloop: the same pop.wav over
+    # different BGM passages never clustered)
+    end_fr = int(np.ceil((FP_PRE_S + max(0.0, float(dur)) + FP_TAIL_S) * sr / FP_HOP))
+    if 0 < end_fr < L.shape[1]:
+        L[:, end_fr:] = -80.0
     w0 = max(0, int(round(onset_s * sr)))
     wave = np.asarray(x[w0:w0 + int(min(max(dur, 0.02), WAVE_MAX_S) * sr)], np.float32)
     return {"patch": L, "wave": wave, "stats": clip_stats(wave, sr, dur)}
@@ -321,7 +390,11 @@ def patch_matrix(patches: list[np.ndarray], shift: int = 0, mode: str = "shape")
     """Normalised feature rows for cosine similarity; ``shift`` moves the patch in time (frames)."""
     rows = []
     for p in patches:
-        q = p + 80.0                                      # 0 .. 80 dB above the floor
+        # compare only the top FP_COMPARE_RANGE_DB of each patch: bands/frames the event leaves empty hold
+        # mix residual (BGM subtraction error 30-60 dB down) that differs between videos and dominated the
+        # log-dB cosine (mockloop: the same ding.wav over different BGM passages scored 0.31-0.60, pops 0.31;
+        # at a 40 dB range the within-type median rose 0.71 -> 0.84 and the between-type p90 fell 0.28 -> 0.11)
+        q = np.maximum(p - float(np.max(p)), -FP_COMPARE_RANGE_DB) + FP_COMPARE_RANGE_DB   # 0 .. range dB
         if shift:
             q = np.roll(q, shift, axis=1)
             if shift > 0:
@@ -488,7 +561,9 @@ def analyze_sfx_events(preset_name: str, video_id: str, audio_path: str | os.Pat
                                    "rule": "믹스 안 같은 대역에서 이벤트 몫 >= min AND (몫 >= dominant OR 시작점에서 믹스 "
                                            "상승 >= rise) AND 잔여가 BGM/보컬 stem 의 복사본이 아님(20 ms 구간 |상관|)"},
                 "fingerprint": {"method": f"log-mel {FP_MELS} bands, n_fft {FP_NFFT}, hop {FP_HOP}, "
-                                          f"onset-{FP_PRE_S}s..+{FP_LEN_S}s, dB re max floored -80 (float16); "
+                                          f"onset-{FP_PRE_S}s..+{FP_LEN_S}s, dB re max floored -80, frames after the "
+                                          f"event end + {FP_TAIL_S}s set to the floor (float16); compared over the top "
+                                          f"{FP_COMPARE_RANGE_DB:g} dB; "
                                           f"residual waveform <= {WAVE_MAX_S}s (float16)"},
                 "gain_db_ref": "이벤트 RMS(최대 0.5 s) / 믹스 전체 RMS (dB)",
                 "events": events, "silences_unclassified": sil_other, "rejected": rejected})

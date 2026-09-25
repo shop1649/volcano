@@ -73,15 +73,22 @@ def quote_pair(text: str) -> dict:
 LETTER_RE = re.compile(r"[가-힣A-Za-z0-9]")
 
 METHOD = {
-    "detection": "morphological gradient (>=60) on pixels unchanged since previous sample (<14), horizontal close, "
-                 "row-valley split; tracked by IoU>=0.5 and gradient-signature correlation>=0.55",
+    "detection": "morphological gradient (>=60) on pixels unchanged since previous sample (<14), glyph-like "
+                 "components (frame-like ones peeled: straight runs >= 4 x min line height cut out, a peeled "
+                 "word kept where it continues a kept text row), horizontal close, row-valley split; tracked "
+                 "by IoU>=0.5 and gradient-signature correlation>=0.55",
     "ocr": "tesseract kor+eng --psm 7 on fill mask (black on white, ink height scaled to ~44px)",
     "size_px": "Hangul ink height (row-profile >= 12% of max) / (ink height per em px of the calibration font "
                "rendered by libass) -> font EM size in px at the video resolution (renderer convention; "
                "libass Fontsize = size_px * (winAscent+winDescent)/unitsPerEm)",
-    "outline_px": "sum over distance-transform rings around the fill of the share of outline-colored pixels",
-    "box": "4-sided luminance step around the ink bbox (>=15 levels, same sign, pad>=2px); alpha by linear "
-           "regression box = a*C + (1-a)*background using the frame before the text appears",
+    "outline_px": "sum over distance-transform rings around the fill of the share of outline-colored pixels "
+                  "(closer to the outline colour than to the fill and to the LOCAL background = median of the 3 "
+                  "rings past the first ring-median step > max(12, 4 x robust noise)); no step within 0.5 x "
+                  "text height -> 'unbounded' (not measured)",
+    "box": "4-sided luminance step around the glyph fill bbox (>=15 levels, same sign, pad>=2px); pad = step "
+           "distance minus a visible outline (renderer: box = ink incl. outline + pad; an outline invisible "
+           "against the box stays in the pad, noted); alpha by linear regression box = a*C + (1-a)*background "
+           "using the frame before the text appears",
     "motion": "native frames around appear/disappear; changed-pixel bbox scale/offset vs rest; alpha by "
               "projection on the rest footprint; pop if |scale-1|>=0.06, slide if offset>=max(3px,0.1h), "
               "fade if alpha<=0.75 on the first visible frame",
@@ -203,6 +210,9 @@ def _grad(gray: np.ndarray) -> np.ndarray:
     return cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, k)
 
 
+PEEL_RUN_MIN_H = 4.0   # straight runs >= this x min line height are cut out of frame-like components
+
+
 def detect_lines(rgb: np.ndarray, prev_gray: np.ndarray | None) -> tuple[list[tuple[int, int, int, int]], np.ndarray]:
     """Candidate text-line boxes (x, y, w, h) and the stable-gradient mask used for tracking."""
     import cv2
@@ -221,11 +231,51 @@ def detect_lines(rgb: np.ndarray, prev_gray: np.ndarray | None) -> tuple[list[tu
     share = np.bincount(lab0.ravel(), weights=strong, minlength=n0) / np.maximum(area, 1)
     cw, ch = st0[:, 2], st0[:, 3]
     dens0 = area / np.maximum(cw * ch, 1)
-    keep = ((share >= 0.3) & (area >= 6) & (ch >= 0.35 * min_h) & (ch <= 0.2 * H)
-            & ~((dens0 < 0.1) & (np.maximum(cw, ch) > 2.5 * min_h))     # rectangle outlines, table edges
-            & ~((cw > 4 * ch) & (dens0 < 0.2)))                            # long straight edges
+    frame_like = (((dens0 < 0.1) & (np.maximum(cw, ch) > 2.5 * min_h))     # rectangle outlines, table edges
+                  | ((cw > 4 * ch) & (dens0 < 0.2)))                          # long straight edges
+    glyphish = (share >= 0.3) & (area >= 6) & (ch >= 0.35 * min_h)
+    keep = glyphish & (ch <= 0.2 * H) & ~frame_like
     keep[0] = False
     mu = keep[lab0].astype(np.uint8)
+    # A glyph that touches a frame-like structure is dropped with it (mockloop: the first word of a speaker
+    # label touched its own box's top edge (pad 3 px at the working scale), which met scene edges running
+    # up to the video border).  Peel such components: cut their straight runs out and re-test the rest.
+    fl = np.nonzero(frame_like & glyphish)[0]
+    fl = fl[fl != 0]
+    if fl.size:
+        run = max(5, int(round(PEEL_RUN_MIN_H * min_h)))
+        fm = np.isin(lab0, fl).astype(np.uint8)
+        runs = (cv2.morphologyEx(fm, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (run, 1)))
+                | cv2.morphologyEx(fm, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1, run))))
+        # the runs' 1-px neighbourhood goes too (antialiased edge rows beside the straight run)
+        runs = cv2.dilate(runs, np.ones((3, 3), np.uint8))
+        rest = fm & (1 - runs)
+        n1, lab1, st1, _ = cv2.connectedComponentsWithStats(rest, 8)
+        if n1 > 1:
+            a1 = st1[:, 4].astype(float)
+            sh1 = np.bincount(lab1.ravel(), weights=strong, minlength=n1) / np.maximum(a1, 1)
+            w1, h1 = st1[:, 2], st1[:, 3]
+            d1 = a1 / np.maximum(w1 * h1, 1)
+            k1 = ((sh1 >= 0.3) & (a1 >= 6) & (h1 >= 0.35 * min_h) & (h1 <= 0.2 * H)
+                  & ~((d1 < 0.1) & (np.maximum(w1, h1) > 2.5 * min_h)) & ~((w1 > 4 * h1) & (d1 < 0.2)))
+            k1[0] = False
+            # accept a peeled word only where it continues a kept text row (same band, similar height,
+            # within one line height) -- the first word of a label beside its other words; loose scene
+            # bits left over from the peel never
+            pk = k1[lab1].astype(np.uint8)
+            kxw = max(5, int(round(0.02 * W)))
+            ker = cv2.getStructuringElement(cv2.MORPH_RECT, (kxw, 3))
+            ng, labg, stg, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(pk, cv2.MORPH_CLOSE, ker), 8)
+            nr, _labr, str_, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(mu, cv2.MORPH_CLOSE, ker), 8)
+            rows = [str_[j] for j in range(1, nr) if str_[j][3] >= min_h]
+            for j in range(1, ng):
+                x_, y_, w_, h_ = stg[j][:4]
+                for (rx, ry, rw, rh, _a) in rows:
+                    vov = min(y_ + h_, ry + rh) - max(y_, ry)
+                    gap = max(x_ - (rx + rw), rx - (x_ + w_))
+                    if vov >= 0.6 * max(h_, rh) and gap <= max(h_, rh) and 0.6 <= h_ / max(rh, 1) <= 1.6:
+                        mu |= (pk & (labg == j)).astype(np.uint8)
+                        break
     kx = max(5, int(round(0.02 * W)))
     closed = cv2.morphologyEx(mu, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (kx, 3)))
     n, lab, st, _ = cv2.connectedComponentsWithStats(closed, 8)
@@ -495,12 +545,65 @@ def segment_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
         if touches and (ch >= 0.9 * h or cw >= 0.9 * w):
             continue  # a frame/box edge, not a glyph
         keep[i] = True
+    _drop_corner_background(crop, lab, st, keep, (x, y, w, h))
     fill = keep[lab]
     if fill.sum() < 10:
         return None
     ys, xs = np.nonzero(fill)
     return {"fill": fill, "fill_bbox": (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1),
                                        int(ys.max() - ys.min() + 1)), "L": L}
+
+
+CORNER_BG_CONTINUE_DIST = 40.0   # RGB distance: a piece whose colour continues past the line box is background
+CORNER_BG_TEXT_DIST = 60.0       # ... unless its colour is within this of the interior glyphs' colour
+
+
+def _drop_corner_background(crop, lab, st, keep, core) -> None:
+    """Background pieces on the fill side of the threshold that are clipped by the line box: the detector's
+    box encloses the whole ink, so a real glyph ends inside it, while a background piece continues past the
+    box edge with the same colour.  mockloop: a red reaction word with a black outline over a wood floor --
+    floor pieces in the box corners became a 14-17 % 'highlight' colour (#5A453A) of the fill."""
+    x, y, w, h = core
+    Hc, Wc = lab.shape
+    idx = [i for i in range(1, len(keep)) if keep[i]]
+    touch = {i: (st[i][0] <= x or st[i][1] <= y or st[i][0] + st[i][2] >= x + w or st[i][1] + st[i][3] >= y + h)
+             for i in idx}
+    interior = [i for i in idx if not touch[i]]
+    if not interior:
+        return
+    # ... and only pieces that do not have the text colour (interior glyphs) -- a faint watermark's edge
+    # glyphs continue into similar-looking footage too
+    txt = np.median(crop[np.isin(lab, interior)].astype(float), axis=0)
+    for i in idx:
+        if not touch[i]:
+            continue
+        cx, cy, cw, ch, _a = st[i]
+        m = lab == i
+        if float(np.linalg.norm(np.median(crop[m].astype(float), axis=0) - txt)) <= CORNER_BG_TEXT_DIST:
+            continue
+        edge_in, edge_out = [], []
+        if cx <= x and x - 2 >= 0:
+            r = np.nonzero(m[:, x])[0]
+            edge_in.append(crop[r, x]); edge_out.append(crop[r, x - 2])
+        if cx + cw >= x + w and x + w + 1 < Wc:
+            r = np.nonzero(m[:, x + w - 1])[0]
+            edge_in.append(crop[r, x + w - 1]); edge_out.append(crop[r, x + w + 1])
+        if cy <= y and y - 2 >= 0:
+            c = np.nonzero(m[y, :])[0]
+            edge_in.append(crop[y, c]); edge_out.append(crop[y - 2, c])
+        if cy + ch >= y + h and y + h + 1 < Hc:
+            c = np.nonzero(m[y + h - 1, :])[0]
+            edge_in.append(crop[y + h - 1, c]); edge_out.append(crop[y + h + 1, c])
+        if not edge_in:
+            continue
+        a = np.concatenate(edge_in).astype(float)
+        b = np.concatenate(edge_out).astype(float)
+        if len(a) < 3:
+            continue
+        # per pixel: does the piece's colour carry on 2 px outside the box?
+        cont = np.linalg.norm(a - b, axis=1) < CORNER_BG_CONTINUE_DIST
+        if cont.mean() >= 0.6:
+            keep[i] = False
 
 
 def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | None:
@@ -528,11 +631,24 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
     else:
         far = dist > max(6.0, 0.45 * fh)
     bg_col = np.median(crop[far].astype(float), axis=0) if far.sum() >= 20 else None
+    dmax = int(max(3, min(0.5 * fh, 20)))
+    # What the outline is judged against is the colour just OUTSIDE it (first plateau past the ring
+    # profile's first step), not a far-field median: a dark semi-transparent box around the line (found or
+    # not -- per-line box search misses the box of a multi-line block) otherwise reads as outline, and a
+    # black outline on a near-black box (mockloop: #000 on #070C19) as "indistinguishable".
+    step_thr, local_bg, edge_d = _outline_edge(crop, dist, out_col, dmax)
+    bg_far = bg_col
+    if local_bg is not None:
+        bg_col = local_bg
     outline_px, outline_color, vis = None, None, "unmeasured"
     if out_col is not None and bg_col is not None:
         d_ob = float(np.linalg.norm(out_col - bg_col))
+        if bg_far is not None:
+            # the ring must differ from the far field too: a light label box (white text on pink) has a
+            # "step" where the ring leaves the box, but its ring colour is the box colour
+            d_ob = min(d_ob, float(np.linalg.norm(out_col - bg_far)))
         d_of = float(np.linalg.norm(out_col - np.asarray(color_rgb(color))))
-        if d_ob < 30:
+        if d_ob < max(OUTLINE_MIN_STEP, step_thr):
             vis = "indistinguishable"   # ring looks like the local background: no visible outline to measure
         elif d_of < 30:
             vis = "none"
@@ -540,7 +656,7 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
         else:
             vis = "visible"
             total = 0.0
-            dmax = int(max(3, min(0.5 * fh, 20)))
+            ended = False
             for d in range(1, dmax + 1):
                 ring = (dist > d - 1) & (dist <= d)
                 if ring.sum() < 5:
@@ -548,13 +664,33 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
                 c = crop[ring].astype(float)
                 to_o = np.linalg.norm(c - out_col, axis=1)
                 to_b = np.linalg.norm(c - bg_col, axis=1)
+                if bg_far is not None:
+                    # a pixel must also be closer to the outline than to the far-field background: the
+                    # local plateau is one colour, the background around a word often two (wall / floor)
+                    to_b = np.minimum(to_b, np.linalg.norm(c - bg_far, axis=1))
                 to_f = np.linalg.norm(c - np.asarray(color_rgb(color)), axis=1)
                 frac = float(((to_o < to_b) & (to_o < to_f)).mean())
                 if d > 1 and frac < 0.15:
+                    ended = True
                     break
                 total += frac
-            outline_px = round(total, 2)
-            outline_color = hexrgb(out_col)
+            if not ended and edge_d is None:
+                # outline-coloured rings up to 0.5 x text height and no colour step: a dark region around the
+                # text (an undetected box), not a measurable outline
+                vis, outline_px = "unbounded", None
+            else:
+                outline_px = round(total, 2)
+                outline_color = hexrgb(out_col)
+    if box.get("present") == "present":
+        # renderer contract (shortkit/edit/resolve.py): box = ink bbox INCLUDING the outline + pad per side.
+        # _find_box measured from the glyph fill, so a visible outline is subtracted; an outline that is not
+        # visible against the box cannot be separated from the pad and stays inside it (noted).
+        box["pad_fill_x"], box["pad_fill_y"] = box["pad_x"], box["pad_y"]
+        if vis == "visible" and outline_px:
+            box["pad_x"] = int(max(0, round(box["pad_x"] - outline_px)))
+            box["pad_y"] = int(max(0, round(box["pad_y"] - outline_px)))
+        elif vis != "none":
+            box["pad_note"] = "outline not separable from the box: pad measured from the glyph fill"
     # ink = fill + outline
     ink = fill.copy()
     if outline_px:
@@ -567,8 +703,48 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
     return {"fill": fill, "ink": ink, "fill_bbox": seg["fill_bbox"], "ink_bbox": ink_bbox, "ink_h": hang,
             "color": color, "highlight_color": highlight, "highlight_share": hl_share,
             "outline_px": outline_px, "outline_color": outline_color, "outline_visibility": vis,
-            "bg_color": hexrgb(bg_col) if bg_col is not None else None,
+            # the colour right next to the glyphs: inside a box that is the box (its interior median), not the
+            # plateau past the first ring step (which leaves a tight box -- the typography masks use this)
+            "bg_color": (hexrgb(bg_far) if (box.get("present") == "present" and bg_far is not None)
+                         else hexrgb(bg_col) if bg_col is not None else None),
             "shadow_px": shadow_px, "shadow_color": shadow_color, "box": box}
+
+
+OUTLINE_MIN_STEP = 12.0     # RGB distance: smallest ring-colour step read as the outline's outer edge
+OUTLINE_STEP_SIGMA = 4.0    # ... or this many robust noise sigmas of the outline ring, if larger
+
+
+def _outline_edge(crop: np.ndarray, dist: np.ndarray, out_col, dmax: int):
+    """Outer edge of the outline ring from the ring-median colour profile.
+
+    Returns ``(step_threshold, local_background, edge_d)``: the first ring (d >= 2) whose median colour
+    differs from the outline colour by more than ``max(OUTLINE_MIN_STEP, OUTLINE_STEP_SIGMA * noise)`` is
+    the edge; the median of the next three rings is the local background.  ``edge_d`` None = no step.
+    """
+    if out_col is None:
+        return OUTLINE_MIN_STEP, None, None
+    core = (dist > 1.0) & (dist <= 2.0)
+    if core.sum() < 10:
+        return OUTLINE_MIN_STEP, None, None
+    c = crop[core].astype(float)
+    ref = np.median(c, axis=0)          # the ring right outside the glyph edge's antialiasing
+    mad = np.median(np.abs(c - ref), axis=0) * 1.4826
+    thr = max(OUTLINE_MIN_STEP, OUTLINE_STEP_SIGMA * float(np.linalg.norm(mad)))
+    meds = []
+    for d in range(1, dmax + 4):
+        ring = (dist > d - 1) & (dist <= d)
+        if ring.sum() < 5:
+            break
+        meds.append(np.median(crop[ring].astype(float), axis=0))
+    # from d = 3 on, against the d = 2 ring (the 0.5-2 px ring colour can be a fill/outline blend, which
+    # made the outline itself the "step" -- mockloop SYNTHmock05 reaction: 0.77 px for a 6 px outline)
+    for i in range(2, len(meds)):
+        if float(np.linalg.norm(meds[i] - ref)) > thr:
+            nxt = meds[i + 1:i + 4]
+            if not nxt:
+                return thr, None, None
+            return thr, np.median(np.array(nxt), axis=0), i + 1
+    return thr, None, None
 
 
 def color_rgb(hexstr: str) -> list[float]:
@@ -661,13 +837,15 @@ def _shadow(crop: np.ndarray, ink: np.ndarray, bg_col) -> tuple[float | None, st
     return float(best), hexrgb(np.median(np.stack(cols), axis=0))
 
 
-def _find_box(L: np.ndarray, ink_bbox) -> dict:
-    """Rectangle behind the text: consistent luminance step on all four sides."""
+def _find_box(L: np.ndarray, ink_bbox, line_h: float | None = None) -> dict:
+    """Rectangle behind the text: consistent luminance step on all four sides.  ``line_h`` = one text
+    line's height when ``ink_bbox`` holds a multi-line block (default: the bbox height)."""
     Hc, Wc = L.shape
     x, y, w, h = ink_bbox
     x1, y1 = x + w - 1, y + h - 1
-    maxd = int(max(4, 1.3 * h))
-    mind = int(max(3, round(0.2 * h)))   # glyph outlines are thinner than 0.2 h; box pads are wider
+    lh = float(line_h or h)
+    maxd = int(max(4, 1.3 * lh))
+    mind = int(max(3, round(0.2 * lh)))   # glyph outlines are thinner than 0.2 h; box pads are wider
     steps: dict[str, list[tuple[int, float]]] = {"l": [], "r": [], "t": [], "b": []}
     med = np.median
     # per-row / per-column step, then the median: a real box edge crosses the whole side,
@@ -714,13 +892,22 @@ def ocr_line(fill: np.ndarray, bbox) -> tuple[str, float]:
     weak the line is re-read at other scales and the most confident reading with letters wins.
     """
     best = ("", -1.0)
+    best_hangul = ("", -1.0)
     for lang in ("kor+eng", "kor"):
         for target in (44.0, 32.0, 60.0):
             txt, conf = _ocr_once(fill, bbox, target, lang)
-            if LETTER_RE.search(txt) and conf > best[1]:
+            if not LETTER_RE.search(txt):
+                continue
+            if conf > best[1]:
                 best = (txt, conf)
-            if best[1] >= 75:
-                return best
+            if HANGUL_RE.search(txt) and _hangul_share(txt) >= 0.5 and conf > best_hangul[1]:
+                best_hangul = (txt, conf)
+            if best_hangul[1] >= 75:
+                return best_hangul
+    # Korean captions: a Hangul reading of usable confidence beats a more 'confident' Latin misreading of
+    # heavy glyphs (mockloop: '빤히' -> 'mts]' 50 vs '반히' 46.5)
+    if best_hangul[1] >= 40:
+        return best_hangul
     return best
 
 
@@ -740,11 +927,16 @@ def _ocr_once(fill: np.ndarray, bbox, target_h: float, lang: str = "kor+eng") ->
     m = fill[max(0, y - 2):y + h + 2, max(0, x - 2):x + w + 2].astype(np.uint8)
     if m.size == 0:
         return "", -1.0
-    scale = max(1.0, target_h / max(1, h))
+    # normalise the ink height to ~target_h in BOTH directions: tesseract misreads very large glyphs
+    # (a 110 px heavy two-syllable reaction word read as 'HTS' at native size -- mockloop validation)
+    scale = max(0.2, target_h / max(1, h))
     scale = min(scale, 3000.0 / max(1, m.shape[1]), 8.0)
     img = np.where(m > 0, 0, 255).astype(np.uint8)
     if scale != 1.0:
-        img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+        img = cv2.resize(img, None, fx=scale, fy=scale,
+                         interpolation=cv2.INTER_CUBIC if scale > 1.0 else cv2.INTER_AREA)
+        if scale < 1.0:
+            img = np.where(img >= 128, 255, 0).astype(np.uint8)
     img = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=255)
     try:
         d = pytesseract.image_to_data(img, lang=lang, config="--psm 7",
@@ -834,6 +1026,9 @@ def _merge_box(boxes: list[dict], origin, mid) -> dict:
     return {"present": "present", "polarity": ref.get("polarity"),
             "bbox": [bx[0] + origin[0], bx[1] + origin[1], bx[2], bx[3]],
             "pad_x": _median([b["pad_x"] for b in pb]), "pad_y": _median([b["pad_y"] for b in pb]),
+            "pad_fill_x": _median([b.get("pad_fill_x") for b in pb]),
+            "pad_fill_y": _median([b.get("pad_fill_y") for b in pb]),
+            **({"pad_note": ref["pad_note"]} if ref.get("pad_note") else {}),
             "color": None, "alpha": None}
 
 
@@ -875,6 +1070,54 @@ def _mode(vals):
 
 
 # ============================================================================= grouping into items
+def _letters(t: str) -> str:
+    return re.sub(r"[^0-9A-Za-z\uac00-\ud7a3]", "", t or "")
+
+
+def merge_split_lines(lines: list[dict], sample_dt: float) -> list[dict]:
+    """Re-join ONE on-screen line whose track broke in two back-to-back tracks (part of the line lost its
+    'stable gradient' for a while, e.g. a semi-transparent label box over moving footage: mockloop saw
+    '파란 셔츠 남성' 6.4-8.4 s + '셔츠 남성' 8.4-9.6 s).  Joined only when the tracks touch in time (<= 1.5
+    samples apart), sit on the same row (vertical overlap >= 70 % of the lower one), overlap horizontally
+    (>= 50 % of the narrower), have the same ink height (+-20 %) and fill colour (RGB <= 40), and the
+    letters of one reading are contained in the other.  The merged line keeps the longer reading and its
+    measurement, the union box and the full time span."""
+    from .common import color_dist
+
+    out: list[dict] = []
+    for ln in sorted(lines, key=lambda l: l["start_sample"]):
+        for pv in out:
+            if not (0 <= ln["start_sample"] - pv["end_sample"] <= 1.5 * sample_dt + 1e-6):
+                continue
+            (ax, ay, aw, ah), (bx, by, bw, bh) = pv["bbox"], ln["bbox"]
+            vov = min(ay + ah, by + bh) - max(ay, by)
+            hov = min(ax + aw, bx + bw) - max(ax, bx)
+            if vov < 0.7 * min(ah, bh) or hov < 0.5 * min(aw, bw):
+                continue
+            ha, hb = pv.get("ink_h") or 0, ln.get("ink_h") or 0
+            if not ha or not hb or max(ha, hb) > 1.2 * min(ha, hb):
+                continue
+            if not (pv.get("color") and ln.get("color")) or color_dist(pv["color"], ln["color"]) > 40:
+                continue
+            ta, tb_ = _letters(pv["text"]), _letters(ln["text"])
+            if not ta or not tb_ or (ta not in tb_ and tb_ not in ta):
+                continue
+            keep, other = (pv, ln) if len(ta) >= len(tb_) else (ln, pv)
+            merged = dict(keep)
+            x0, y0 = min(ax, bx), min(ay, by)
+            x1, y1 = max(ax + aw, bx + bw), max(ay + ah, by + bh)
+            merged.update({"bbox": [x0, y0, x1 - x0, y1 - y0], "start_sample": min(pv["start_sample"], ln["start_sample"]),
+                           "end_sample": max(pv["end_sample"], ln["end_sample"]),
+                           "n_samples": pv.get("n_samples", 0) + ln.get("n_samples", 0),
+                           "merged_tracks": [pv.get("track"), ln.get("track")],
+                           "merged_texts": [pv["text"], ln["text"]]})
+            out[out.index(pv)] = merged
+            break
+        else:
+            out.append(ln)
+    return out
+
+
 def group_items(lines: list[dict], sample_dt: float) -> list[list[dict]]:
     lines = sorted(lines, key=lambda l: (l["start_sample"], l["bbox"][1]))
     items: list[list[dict]] = []
@@ -905,8 +1148,17 @@ def group_items(lines: list[dict], sample_dt: float) -> list[list[dict]]:
 
 
 # ============================================================================= native refinement
-def _text_masks(rest: np.ndarray, lines_rel: list[tuple[int, int, int, int]]) -> dict | None:
-    """Fill / edge-ring masks and colors of an item at rest inside a native crop."""
+FILL_HINT_DIST = 60.0   # RGB distance to the measured fill colour for a pixel to stay in the rest fill mask
+
+
+def _text_masks(rest: np.ndarray, lines_rel: list[tuple[int, int, int, int]], fill_hint=None) -> dict | None:
+    """Fill / edge-ring masks and colors of an item at rest inside a native crop.
+
+    ``fill_hint`` = the fill colour measured on the sampled lines: the luminance split of
+    ``segment_line`` also takes background brighter than the text (a red word over a beige wall --
+    mockloop), and background pixels in the mask 'match the rest appearance' before the text exists,
+    so no text-free frame was found and the timing/motion stayed unmeasured.
+    """
     import cv2
     H, W = rest.shape[:2]
     fill = np.zeros((H, W), bool)
@@ -915,6 +1167,10 @@ def _text_masks(rest: np.ndarray, lines_rel: list[tuple[int, int, int, int]]) ->
         seg = segment_line(rest, (x0, y0, min(w + 4, W - x0), min(h + 4, H - y0)))
         if seg is not None:
             fill |= seg["fill"]
+    if fill_hint is not None and fill.sum() >= 10:
+        near = np.linalg.norm(rest.astype(float) - np.asarray(fill_hint, float), axis=2) < FILL_HINT_DIST
+        if (fill & near).sum() >= 0.3 * fill.sum():
+            fill &= near
     if fill.sum() < 10:
         return None
     dist = cv2.distanceTransform((~fill).astype(np.uint8), cv2.DIST_L2, 3)
@@ -1073,8 +1329,10 @@ def refine_item(video: Path, item: dict, fps_native: float, sample_dt: float, W:
     seg_out = read_segment(video, item["end_sample"], t_b1, fps_native, crop=R)
     lines_rel = [(l["bbox"][0] - R["x"], l["bbox"][1] - R["y"], l["bbox"][2], l["bbox"][3]) for l in item["lines"]]
     res: dict[str, Any] = {"region": R}
-    tm_in = _text_masks(seg_in[-1][1], lines_rel) if seg_in else None
-    tm_out = _text_masks(seg_out[0][1], lines_rel) if seg_out else None
+    cols = [l.get("color") for l in item["lines"] if l.get("color")]
+    hint = color_rgb(color_mode(cols)["mode"]) if cols and color_mode(cols)["mode"] else None
+    tm_in = _text_masks(seg_in[-1][1], lines_rel, hint) if seg_in else None
+    tm_out = _text_masks(seg_out[0][1], lines_rel, hint) if seg_out else None
     # near the ends of the video, check the actual first / last frame instead of assuming
     at_video_start = bool(item["start_sample"] <= sample_dt + 1e-6 and seg_in and tm_in
                           and seg_in[0][0] <= 0.5 / fps_native
@@ -1112,6 +1370,42 @@ def refine_item(video: Path, item: dict, fps_native: float, sample_dt: float, W:
     res["motion_in"], res["motion_out"] = mi, mo
     res["_seg_in"], res["_seg_out"] = seg_in, seg_out
     return res
+
+
+def _block_box(ref: dict, grp: list[dict], style: dict) -> dict | None:
+    """One box around a multi-line block.  The per-line search misses it (its edges lie beyond the other
+    line, out of the 1.3 x line-height range -- mockloop: 2-line situation captions reported no box and
+    the safe-margin bottom lost the box pad), so the box is searched around the union of the lines'
+    glyph fills in the rest frame, with the one-line step range."""
+    import cv2
+
+    seg = ref.get("_seg_in") or []
+    fbs = [l.get("fill_bbox") for l in grp]
+    if not seg or any(f is None for f in fbs):
+        return None
+    R = ref["region"]
+    rest = seg[-1][1]
+    x0 = min(f[0] for f in fbs) - R["x"]
+    y0 = min(f[1] for f in fbs) - R["y"]
+    x1 = max(f[0] + f[2] for f in fbs) - R["x"]
+    y1 = max(f[1] + f[3] for f in fbs) - R["y"]
+    if x0 < 0 or y0 < 0 or x1 > rest.shape[1] or y1 > rest.shape[0]:
+        return None
+    L = cv2.cvtColor(rest, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    box = _find_box(L, (x0, y0, x1 - x0, y1 - y0), line_h=float(np.median([f[3] for f in fbs])))
+    if box.get("present") != "present":
+        return None
+    box["pad_fill_x"], box["pad_fill_y"] = box["pad_x"], box["pad_y"]
+    op = style.get("outline_px")
+    if style.get("outline_visibility") == "visible" and op:
+        box["pad_x"] = int(max(0, round(box["pad_x"] - op)))
+        box["pad_y"] = int(max(0, round(box["pad_y"] - op)))
+    elif style.get("outline_visibility") != "none":
+        box["pad_note"] = "outline not separable from the box: pad measured from the glyph fill"
+    bx, by, bw, bh = box["bbox"]
+    box["bbox"] = [bx + R["x"], by + R["y"], bw, bh]
+    box.update({"color": None, "alpha": None, "source": "block (multi-line)"})
+    return box
 
 
 def box_alpha(item: dict, ref: dict) -> dict:
@@ -1306,6 +1600,7 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
             dropped += 1
             continue
         lines.append(m)
+    lines = merge_split_lines(lines, sample_dt)
     groups = group_items(lines, sample_dt)
     speech = _speech_ranges(out_dir)
     shots = read_json(out_dir / "shots.json") or {}
@@ -1323,6 +1618,10 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
         it["start"], it["end"] = ref["start"], ref["end"]
         it["text"] = "\n".join(l["text"] for l in grp)
         it["style"] = _item_style(grp)
+        if len(grp) >= 2 and it["style"]["box"].get("present") != "present":
+            blk = _block_box(ref, grp, it["style"])
+            if blk is not None:
+                it["style"]["box"] = blk
         it["_ref"] = ref
         items.append(it)
     assign_roles(items, duration, H, speech, identity_texts)
@@ -1581,10 +1880,19 @@ def _role_alignment(its: list[dict]) -> str:
 
 
 def _speech_ranges(out_dir: Path) -> list[tuple[float, float]] | None:
+    """Speech intervals of the reference from ``audio/original.json`` (shortkit.reference.audio_original):
+    ``speech.segments`` [{start, end}] when ``speech.presence == present`` (mockloop: only the older
+    ``events`` list was read, so dialogue lead_s was never measured and speech never helped role
+    assignment).  Without a vocals stem these edges come from a heuristic (``confidence: low``)."""
     d = read_json(out_dir / "audio" / "original.json")
     if not d:
         return None
     rng = []
+    sp = d.get("speech") or {}
+    if sp.get("presence") == "present":
+        for sgm in sp.get("segments") or []:
+            if sgm.get("start") is not None and sgm.get("end") is not None:
+                rng.append((float(sgm["start"]), float(sgm["end"])))
     for e in d.get("events") or []:
         cls = str(e.get("class") or e.get("type_id") or "").lower()
         if cls in ("speech", "dialogue", "voice", "vocals", "speech_kept") or "speech" in cls:

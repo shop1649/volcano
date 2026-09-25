@@ -171,6 +171,9 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
     except Exception as e:
         rep["defects"] = {"error": f"{type(e).__name__}: {e}"}
     (ctx.qa_dir / "report.md").write_text(render_md(rep), encoding="utf-8")
+    # the preset keys this QA run read (-> settings_registry code links; config.ACCESS_LOG_GLOBS collects it).
+    # Only full runs write it: a partial re-check (only=..., write=False) returns above without touching it.
+    ctx.preset.save_access_log(ctx.qa_dir / "preset_access.json")
     return rep
 
 

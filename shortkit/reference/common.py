@@ -204,6 +204,13 @@ def detect_video_region(video: str | Path, fps: float = 4.0, width: int = 216,
     more than 8 levels; rows/columns where >50 % of pixels are active form the region.  When the
     whole frame is active, a low-sharpness band at the top/bottom is treated as a blurred copy of
     the source (``blur_source``).  Returns coordinates in the video's own resolution.
+
+    Static-camera footage (CCTV-like: an empty room where only a person moves) is mostly NOT active,
+    so activity alone can lose it and return a caption box instead.  When the canvas has a FLAT
+    background (>= 60 % of the border pixels of the per-pixel temporal median frame within RGB 30 of
+    their median colour), pixels whose temporal median differs from that colour by > 30 also count
+    (union with activity: rows found by activity are never dropped).  Brief global events such as a
+    full-canvas flash do not move a temporal median.
     """
     import cv2
 
@@ -220,7 +227,15 @@ def detect_video_region(video: str | Path, fps: float = 4.0, width: int = 216,
     mean_rgb = None
     vgrad = None
     n = 0
+    kept: list[np.ndarray] = []          # frames for the temporal median (decimated to <= MEDIAN_MAX_FRAMES)
+    stride, k = 1, 0
     for t, fr in iter_frames(video, fps=fps, width=width, duration=max_seconds):
+        if k % stride == 0:
+            kept.append(fr)
+            if len(kept) > MEDIAN_MAX_FRAMES:
+                kept = kept[::2]
+                stride *= 2
+        k += 1
         g = cv2.cvtColor(fr, cv2.COLOR_RGB2GRAY).astype(np.int16)
         lap = np.abs(cv2.Laplacian(g.astype(np.float32), cv2.CV_32F, ksize=3))
         if act is None:
@@ -244,6 +259,10 @@ def detect_video_region(video: str | Path, fps: float = 4.0, width: int = 216,
     h, w = act.shape
     sx, sy = W / w, H / h
     active = act > 0.12
+    med = np.median(np.stack(kept), axis=0)
+    flat_bg = flat_border_color(med)
+    if flat_bg is not None:
+        active = active | (np.linalg.norm(med - np.asarray(flat_bg, float), axis=2) > FLAT_BG_TOL)
     row = active.mean(axis=1)
     rows = _longest_run(row > 0.5)
     note = ""
@@ -304,7 +323,26 @@ def detect_video_region(video: str | Path, fps: float = 4.0, width: int = 216,
             "note": note, "method": _REGION_METHOD, "sampled_fps": fps, "analysis_width": width}
 
 
-_REGION_METHOD = ("per-pixel activity (gray change > 8 between frames sampled at fps) → rows/cols with >50% active "
+MEDIAN_MAX_FRAMES = 160
+FLAT_BG_TOL = 30.0          # RGB distance to the flat background colour
+FLAT_BG_SHARE = 0.6         # share of border pixels that must be that colour
+
+
+def flat_border_color(med_rgb: np.ndarray) -> tuple[float, float, float] | None:
+    """Colour of a flat canvas background from a temporal-median frame (None when the border is not flat):
+    border = top/bottom 3 % rows + left/right 2 % columns; flat when >= FLAT_BG_SHARE of those pixels lie
+    within FLAT_BG_TOL of their per-channel median."""
+    h, w = med_rgb.shape[:2]
+    ty, tx = max(1, int(round(0.03 * h))), max(1, int(round(0.02 * w)))
+    border = np.concatenate([med_rgb[:ty].reshape(-1, 3), med_rgb[-ty:].reshape(-1, 3),
+                             med_rgb[:, :tx].reshape(-1, 3), med_rgb[:, -tx:].reshape(-1, 3)]).astype(float)
+    c = np.median(border, axis=0)
+    share = float((np.linalg.norm(border - c, axis=1) <= FLAT_BG_TOL).mean())
+    return (float(c[0]), float(c[1]), float(c[2])) if share >= FLAT_BG_SHARE else None
+
+
+_REGION_METHOD = ("per-pixel activity (gray change > 8 between frames sampled at fps) OR, on a flat canvas background, "
+                  "temporal-median colour != background colour (RGB > 30) → rows/cols with >50% such pixels "
                   "pixels; blurred background via 30th-percentile Laplacian profile")
 
 

@@ -332,10 +332,28 @@ def detect_sfx(res: np.ndarray, templates: dict, sr: int = SR, thr: float = 0.45
         # own tail left over after subtraction (e.g. a limiter changed its envelope), not a new one
         if any(o["key"] == key and o["t"] <= p / sr < o["t"] + o["len"] and g < 0.5 * o["gain"] for o in out):
             continue
-        out.append({"t": p / sr, "key": key, "type": tps[key]["type"], "file": tps[key].get("file"), "ncc": h,
-                    "gain": g, "len": len(s) / sr})
+        out.append({"t": p / sr, "sample": int(p), "key": key, "type": tps[key]["type"], "file": tps[key].get("file"),
+                    "ncc": h, "gain": g, "len": len(s) / sr})
     out.sort(key=lambda d: d["t"])
     return out
+
+
+# a matched component this far below the programme over its own span is masked -- not a placed sound but fit
+# leakage in the residual (the same -24 dB floor the unexplained-onset detector uses).  Measured on the test
+# renders: every placed SFX contributes -11.5..+0.1 dB (test-pipeline-001, test-coverage-001, test-qa-good/bad);
+# a "pop" matched at NCC 0.51 inside loud kept speech (test-pipeline-001 10.74 s) contributed -34.3 dB.
+SFX_MIN_CONTRIB_DB = -24.0
+
+
+def sfx_contrib_db(y: np.ndarray, sample: int, tmpl: np.ndarray, gain: float) -> float | None:
+    """Energy of the fitted SFX over its span relative to the output mix over the same span (dB)."""
+    a = int(sample)
+    b = min(len(y), a + len(tmpl))
+    if b - a < 16:
+        return None
+    es = (float(gain) ** 2) * float((tmpl[:b - a].astype(np.float64) ** 2).sum())
+    ey = float((y[a:b].astype(np.float64) ** 2).sum())
+    return 10 * math.log10(es / ey + 1e-12) if ey > 0 else None
 
 
 def place(template: np.ndarray, t: float, g: float, n: int, sr: int = SR) -> np.ndarray:
@@ -553,6 +571,125 @@ def _planned_bgm_env(ctx: QAContext):
     return f
 
 
+def _planned_loop(ctx: QAContext, bgm, file_dur_s: float, out_dur_s: float) -> dict | None:
+    """The plan's BGM loop geometry (None when no loop is planned or needed): with audio.bgm.loop the music
+    from section_start (at the tempo) repeats from section_start every (segment - crossfade) seconds, the
+    crossfade being audio.bgm.loop_xfade_s (``shortkit.edit.render.loop_fill`` is the renderer's side)."""
+    if not getattr(bgm, "loop", False):
+        return None
+    r = float(bgm.tempo_ratio or 1.0)
+    seg = (file_dur_s - float(bgm.section_start_s)) / r
+    if seg >= out_dur_s - 1e-3:
+        return None
+    try:
+        xf = float(ctx.preset.get("audio.bgm.loop_xfade_s"))
+    except (KeyError, TypeError, ValueError):
+        return {"error": "audio.bgm.loop_xfade_s 없음 — 반복 지점 크로스페이드 길이를 모름", "segment_s": round(seg, 4),
+                "starts_out_s": [], "xfade_s": None, "section_start_s": float(bgm.section_start_s)}
+    P = seg - xf
+    starts = []
+    t = P
+    while P > 0 and t < out_dur_s:
+        starts.append(round(t, 4))
+        t += P
+    return {"segment_s": round(seg, 4), "period_s": round(P, 4), "xfade_s": xf, "starts_out_s": starts,
+            "section_start_s": float(bgm.section_start_s)}
+
+
+def bgm_loop_pieces(y: np.ndarray, ref: np.ndarray, sr: int, r: float, starts_out_s: list[float],
+                    xfade_s: float | None, margin_s: float = 0.1) -> dict:
+    """Measure a looped BGM piece by piece: the output between consecutive planned loop starts (minus the
+    crossfade and a margin) is aligned on its own with the music at tempo ``r`` (``global_align``) ->
+    per piece the music time at the piece's start (original-file seconds) and the window match (q95).
+    Also returns the aligned regressor (each piece at its measured lag, equal-power crossfades at the
+    planned loop starts)."""
+    n = len(y)
+    xf = float(xfade_s or 0.0)
+    bounds = [0.0] + [float(t) for t in starts_out_s] + [n / sr]
+    pieces, lags = [], []
+    for k in range(len(bounds) - 1):
+        a, b = bounds[k], bounds[k + 1]
+        a_m = a + (xf + margin_s if k > 0 else 0.0)
+        b_m = b - margin_s
+        item = {"piece": k, "out": [rnd(a, 3), rnd(b, 3)], "measured_span": [rnd(a_m, 3), rnd(b_m, 3)],
+                "section_start_obs": None, "q95": None}
+        if b_m - a_m < 0.5:
+            item["reason"] = "조각이 너무 짧음(< 0.5 s)"
+            pieces.append(item)
+            lags.append(None)
+            continue
+        A, B = int(round(a_m * sr)), int(round(b_m * sr))
+        seg = y[A:B]
+        ga = global_align(seg, ref, sr=sr)
+        lm = local_match(seg, align_signal(ref, ga["lag"], len(seg)), sr)
+        lag_full = ga["lag"] - A                       # y[t] ~ ref[t + lag_full] on the whole timeline
+        item["section_start_obs"] = rnd((ga["lag"] / sr - (a_m - a)) * r, 4)   # music time at the piece start
+        item["q95"] = lm.get("q95")
+        item["found"] = match_found(lm)
+        item["waveform_ncc"] = rnd(ga["ncc"], 4)
+        pieces.append(item)
+        lags.append(lag_full if item["found"] else None)
+    aligned = None
+    if all(v is not None for v in lags):
+        aligned = np.zeros(n, np.float32)
+        nx = int(round(xf * sr))
+        th = (np.arange(max(nx, 1)) + 0.5) / max(nx, 1) * (math.pi / 2)
+        for k, L in enumerate(lags):
+            w = np.zeros(n, np.float32)
+            s0 = int(round(bounds[k] * sr))
+            s1 = int(round(bounds[k + 1] * sr))
+            w[s0:s1] = 1.0
+            if k > 0 and nx > 0:                    # fade in over [s0, s0 + nx)
+                e = min(n, s0 + nx)
+                w[s0:e] = np.sin(th[:e - s0])
+            if k < len(lags) - 1 and nx > 0:        # fade out over [s1, s1 + nx) (overlaps the next piece)
+                e = min(n, s1 + nx)
+                w[s1:e] = np.cos(th[:e - s1])
+            aligned += w * align_signal(ref, L, n)
+    return {"pieces": pieces, "aligned": aligned,
+            "method": "반복 조각별 파형 상호상관(global_align) — 조각 시작의 원곡 시각 = section_start 여야 함"}
+
+
+def kept_levels_obs(ctx: QAContext, orig_rows: list[dict], mix_lufs: float | None) -> list[dict]:
+    """Kept original sound level relative to the programme, measured on the output -- the definition of
+    audio.original.keep_gain_db (``ref audio-measure``: kept speech integrated loudness - mix integrated
+    loudness, LU) and of the renderer's gain rule T + keep_gain_db - L_src (``shortkit.edit.audio``):
+
+        rel = L_src + 20 log10(g) - L_mix
+
+    L_src = integrated loudness of the kept source audio (``edit.audio.kept_levels``: per clip, per source
+    when a clip keeps < KEPT_LEVEL_MIN_S; the SOURCE file is an input, not the renderer's output), g = median
+    least-squares gain of that clip's source track in the output mix over its kept windows (0.25 s, edges
+    +-0.15 s excluded, windows where the original is present), L_mix = the MP4's integrated loudness.  The
+    renderer's own stems are never used."""
+    from ..edit.audio import kept_levels
+
+    res = ctx.resolved
+    kept = [{"clip_id": o.clip_id, "path": o.path, "src_start": o.src_start, "src_end": o.src_end}
+            for o in res.audio.originals]
+    levels = kept_levels(kept) if kept else {}
+    out = []
+    for i, o in enumerate(res.audio.originals):
+        lv = levels.get(i) or {}
+        ws = [w for w in orig_rows if w["clip_id"] == o.clip_id and w.get("present")
+              and o.out_start + 0.15 <= w["t"] <= o.out_end - 0.15 and w.get("gain") is not None]
+        g = float(np.median([abs(float(w["gain"])) for w in ws])) if ws else None
+        item = {"index": i, "clip_id": o.clip_id, "out": [rnd(o.out_start, 3), rnd(o.out_end, 3)],
+                "src_lufs": lv.get("lufs"), "src_scope": lv.get("scope"), "src_seconds": lv.get("seconds"),
+                "fit_gain_db": rnd(20 * math.log10(g), 2) if g and g > 0 else None, "n_windows": len(ws),
+                "mix_lufs": mix_lufs, "rel_lu_obs": None}
+        if lv.get("lufs") is None:
+            item["reason"] = lv.get("reason") or "소스 음량 측정 실패"
+        elif not g or g <= 0:
+            item["reason"] = "출력에서 원음 창을 찾지 못함(존재 창 없음)"
+        elif mix_lufs is None:
+            item["reason"] = "출력 통합 음량 측정 실패"
+        else:
+            item["rel_lu_obs"] = rnd(float(lv["lufs"]) + 20 * math.log10(g) - float(mix_lufs), 2)
+        out.append(item)
+    return out
+
+
 # ----------------------------------------------------------------------------- main probe
 def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
     from .. import paths
@@ -628,6 +765,18 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
                                                        "ncc": ga["runner_up"]["ncc"], "explained": lm_ru["explained"],
                                                        "q95": lm_ru["q95"]}
                     bgm_al = align_signal(refs[r_best], L, n)
+                    lp = _planned_loop(ctx, bgm, len(music) / sr, T)
+                    if lp is not None:
+                        # the music loops back to section_start: one alignment per repeat (a single lag fits one
+                        # piece only); the regressor for the gain curves follows the measured pieces
+                        lpm = bgm_loop_pieces(y, refs[r_best], sr, r_best, lp["starts_out_s"], lp["xfade_s"])
+                        b_info["loop"] = {"planned": lp, **{k: v for k, v in lpm.items() if k != "aligned"}}
+                        if lpm.get("aligned") is not None:
+                            bgm_al = lpm["aligned"]
+                            if lpm["pieces"] and lpm["pieces"][0].get("section_start_obs") is not None:
+                                b_info["section_start_obs"] = lpm["pieces"][0]["section_start_obs"]
+                                b_info["offset_method"] = "waveform cross-correlation per loop piece"
+                                b_info.pop("runner_up_section", None)
                 else:
                     b_info["found"] = False
                     b_info["reason"] = "계획한 음악 파일의 파형을 출력에서 찾지 못함(0.25초 창별 상관 q95 < 0.7)"
@@ -684,11 +833,13 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
     dets = detect_sfx(lowpass(r1, sr), tpl_lp, sr) if templates else []
     out["sfx_band"] = "0-5 kHz (AAC 고역 잡음 대체 영향 제외)"
     for d in dets:
+        # the exact matched sample is kept for placement and gain: re-deriving it from a time rounded to 0.1 ms
+        # moved a noise-like whoosh by one sample (22.05 kHz) and its fitted gain fell 3.3 dB (test-pipeline-001 fx1)
         d["t"] = round(d["t"], 4)
         d["gain_db_file"] = rnd(20 * math.log10(max(1e-9, abs(d["gain"]))), 2)
     # ---------------- pass 2 LS with the detected SFX placed
     templates_by_det = [templates[d["key"]]["audio"] for d in dets]
-    sfx_cols = [place(templates[d["key"]]["audio"], d["t"], 1.0, n, sr) for d in dets]
+    sfx_cols = [place(templates[d["key"]]["audio"], d["sample"] / sr, 1.0, n, sr) for d in dets]
     all_cols = cols + sfx_cols
     if all_cols:
         tc, G, _ = window_ls(y, all_cols, sr, WIN)
@@ -726,7 +877,7 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
         # where the BGM ends (last window with the music present and audible)
         aud = [t for t, v in zip(tcf, relf) if np.isfinite(v) and v > -30]
         b_info["audible_span_obs"] = [rnd(min(aud), 3), rnd(max(aud), 3)] if aud else None
-        if b_info.get("section_start_obs") is not None and aud:
+        if b_info.get("section_start_obs") is not None and aud and not b_info.get("loop"):
             r_used = b_info.get("tempo_obs") or 1.0
             b_info["used_section_obs"] = [rnd(b_info["section_start_obs"] + r_used * min(aud), 3),
                                           rnd(b_info["section_start_obs"] + r_used * max(aud), 3)]
@@ -773,12 +924,16 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
                         "expected_gain_db": exp_gain, "windows": orig_rows,
                         "present_ranges_obs": [[rnd(a, 3), rnd(b, 3)] for a, b in merge_ranges(
                             [(r["t"] - WIN / 2, r["t"] + WIN / 2) for r in orig_rows if r["present"]], gap=0.01)]}
+    try:
+        out["originals"]["levels"] = kept_levels_obs(ctx, orig_rows, (out.get("loudness") or {}).get("integrated_lufs"))
+    except Exception as e:
+        out["errors"]["original_levels"] = f"{type(e).__name__}: {e}"
     # ---------------- SFX gains relative to the BGM heard at the same moment
     env = _planned_bgm_env(ctx)
     y_lp = lowpass(y, sr) if dets else y
     cols_lp = [lowpass(c, sr) for c in cols] if dets else cols
     for i, d in enumerate(dets):
-        jg = sfx_joint_gain(y_lp, d["t"], lowpass(templates_by_det[i], sr), cols_lp, sr)
+        jg = sfx_joint_gain(y_lp, d["sample"] / sr, lowpass(templates_by_det[i], sr), cols_lp, sr)
         if jg is not None:
             d["gain"] = jg
             d["gain_db_file"] = rnd(20 * math.log10(max(1e-9, abs(jg))), 2)
@@ -797,8 +952,15 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
             elif bgm_gain_db is not None:
                 d["gain_db_mix_scale"] = rnd(d["gain_db_rel_bgm_plateau"] + bgm_gain_db, 2)
                 d["gain_reference"] = "bgm_plateau (BGM 없음/정적 구간)"
+        cdb = sfx_contrib_db(y, d["sample"], templates_by_det[i], d["gain"])
+        d["contrib_db_rel_mix"] = rnd(cdb, 1)
         d.pop("key", None)
-    out["sfx"] = {"detections": dets, "threshold_ncc": 0.45}
+    subaudible = [d for d in dets if d.get("contrib_db_rel_mix") is not None and d["contrib_db_rel_mix"] < SFX_MIN_CONTRIB_DB]
+    for d in subaudible:
+        d["why_dropped"] = f"믹스 대비 {d['contrib_db_rel_mix']} dB < {SFX_MIN_CONTRIB_DB:g} dB: 가려져 들리지 않는 잔차 일치(배치된 소리 아님)"
+    dets = [d for d in dets if d not in subaudible]
+    out["sfx"] = {"detections": dets, "threshold_ncc": 0.45, "min_contrib_db_rel_mix": SFX_MIN_CONTRIB_DB,
+                  "subaudible_matches": subaudible}
     # ---------------- unexplained onsets in the final residual
     exclude = [(d["t"] - 0.05, d["t"] + d["len"] + 0.05) for d in dets] + [(a - 0.1, b + 0.1) for a, b in kept]
     # fast gain changes of the BGM itself (edges of measured ducks/silences, planned envelope steps,

@@ -146,3 +146,22 @@ def test_unscorable_crop_is_reported_not_guessed(fonts_ready):
     r = T.identify_many(items, ["Jua", "Gugi"], ceil, color_mode="estimated")
     assert [f["id"] for f in r["failed_crops"]] == ["blank"]
     assert r["ranked"][0]["font"] == "Jua" and len(r["ranked"][0]["per_crop"]) == 1
+
+
+def test_extract_masks_adds_the_highlight_colour(fonts_ready):
+    """mockloop defect: a title with one highlighted word (second fill colour) lost that word from the fill
+    mask -> glyph IoU 0.00 for its syllables and the right font (ranked first) was judged 'different'.
+    ``alt_fill_rgb`` (the caption's measured highlight colour) adds those glyphs."""
+    crop, xy, truth = clean_crop("Pretendard Black", "빈 방에 온 사람들", 60, fill=(255, 243, 176))
+    # recolour the last word as the highlight: same glyph pixels, yellow instead of cream
+    f = T.load_font(T.font_ref("Pretendard Black").abspath, 60, T.font_ref("Pretendard Black").index)
+    x_hl = xy[0] + f.getlength("빈 방에 온 ")
+    hl = truth.copy()
+    hl[:, :int(x_hl)] = False
+    img = crop.copy()
+    img[hl] = (255, 212, 0)
+    only_main = T.extract_masks(img, (255, 243, 176), (0, 0, 0))
+    both = T.extract_masks(img, (255, 243, 176), (0, 0, 0), alt_fill_rgb=(255, 212, 0))
+    assert _iou(only_main["fill"], truth) < 0.8                 # the highlighted word is missing
+    assert _iou(both["fill"], truth) > 0.95
+    assert not (both["fill"] & both["outline"]).any()

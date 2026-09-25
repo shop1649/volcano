@@ -16,9 +16,15 @@ Method (shortkit.reference.typography, applied to the output instead of the refe
 3. Verdicts are typography's: ``identical`` / ``similar`` / ``different`` / ``unmeasured``.  The QA
    row says ``same`` ONLY for ``identical``.
 
-Ceilings are cached in ``warehouse/cache/qa/font_ceilings/`` per (font, size bucket, crf) --
-the key also carries the x264 preset, canvas width, fps and caption style class (outline /
-label box / plain, colours), because each of those changes what the true font can reach.
+Ceilings are cached in ``warehouse/cache/qa/font_ceilings/`` per (font, EXACT size_px, crf) --
+the key also carries the x264 preset, canvas width, fps, caption style class (outline / label box /
+plain, colours) and the background behind the caption (the episode's footage, or the flat colour
+measured around the caption), because each of those changes what the true font can reach.
+Size is NOT bucketed: measured on test-pipeline-001 (Noto Sans CJK KR Black, outline 6/66, crf 18
+veryfast, 24 libass samples per size on black) the same-font IoU p10 was 0.9607 / 0.9621 / 0.9739 /
+0.9595 / 0.9663 / 0.9722 at 60 / 63 / 64.5 / 66 / 68 / 71 px -- it moves by ~0.01 between neighbouring
+sizes (pixel-grid / hinting), so a 66 px caption compared with a 63 px ceiling was judged against the
+wrong threshold (c_sit3: 0.963 vs p10 0.966 -> 'similar').
 """
 from __future__ import annotations
 
@@ -33,12 +39,21 @@ from pathlib import Path
 
 import numpy as np
 
-SAMPLER = "shortkit.qa.font_id/libass-subtitles/1"
+SAMPLER = "shortkit.qa.font_id/libass-subtitles/3"   # /2: exact size_px, flat bg; /3: sampled at the QA rest delay
 CACHE_DIR = "warehouse/cache/qa/font_ceilings"
 SIZE_BUCKETS = (14, 16, 18, 20, 22, 24, 27, 30, 33, 36, 40, 45, 50, 56, 63, 71, 80, 90, 100, 112, 125, 140, 160,
                 180, 200, 225, 250)
-CEIL_REPEATS = 2
-FRAMES_PER_SAMPLE = 3
+CEIL_REPEATS = 4          # per string slot: 3 slots x 4 = 12 samples (6 left p10 / noise too uncertain, see ceiling_strings)
+FRAMES_PER_SAMPLE = 3     # minimum frames a sample string is shown (see sample_frames)
+
+
+def sample_frames(fps: float) -> tuple[int, int]:
+    """(frames each ceiling string is shown, index of the frame that is cropped): the crop is taken
+    CAPTION_REST_SETTLE_S after the text appears -- the delay at which QA measures the output caption."""
+    from . import CAPTION_REST_SETTLE_S
+
+    idx = max(1, int(round(CAPTION_REST_SETTLE_S * float(fps))))
+    return max(FRAMES_PER_SAMPLE, idx + 2), idx
 N_NEAREST = 3
 # x264 presets are identified by their subme value (unique per preset unless a tune overrides it)
 SUBME_PRESET = {0: "ultrafast", 1: "superfast", 2: "veryfast", 4: "faster", 6: "fast", 7: "medium", 8: "slow",
@@ -50,7 +65,8 @@ def _canon(v) -> str:
 
 
 def size_bucket(size_px: float) -> int:
-    """Nearest size of a ~11 % geometric ladder (the ceiling changes slowly with size)."""
+    """Nearest size of a ~11 % geometric ladder.  Display / grouping only: ceilings are measured at the
+    caption's exact size (module doc: the ceiling does NOT change slowly with size)."""
     s = max(1.0, float(size_px))
     return min(SIZE_BUCKETS, key=lambda b: abs(math.log(b / s)))
 
@@ -163,29 +179,31 @@ def _ass_doc(W: int, Hs: int, style: str, events: list[str]) -> str:
 
 def libass_samples(ctx, font: str, size: float, fill: tuple, outline: tuple | None, outline_px: float,
                    box: tuple | None, strings, crf: float, preset: str, fps: float, seed: int = 7,
-                   font_file: str | None = None):
-    """typography.Sample list rendered like the production renderer (see module doc)."""
+                   font_file: str | None = None, bg: tuple | None = None):
+    """typography.Sample list rendered like the production renderer (see module doc).
+    Background: the label-box colour when ``box``, else the flat colour ``bg`` when given (caption over
+    a flat canvas area), else strips of the episode's own source footage."""
     from ..edit import captions as capmod
     from ..reference import typography as ty
     from ..util.media import FFMPEG
 
     face = capmod.resolve_font(font, font_file).face
     W = int(ctx.canvas_w)
-    k = FRAMES_PER_SAMPLE
+    k, k_at = sample_frames(fps)
     Hs = int(math.ceil(size * 2.6 / 16.0)) * 16
     rng = np.random.default_rng(seed)
-    specs = [(s, rep) for s in strings for rep in range(CEIL_REPEATS)]
+    specs = [(si, s, rep) for si, s in enumerate(strings) for rep in range(CEIL_REPEATS)]
     n = len(specs) * k
     hexc = lambda c: "#%02X%02X%02X" % tuple(int(v) for v in c)   # noqa: E731
     style = capmod.style_line("s", face.ass_name, face.ass_fontsize(size), hexc(fill), hexc(outline or (0, 0, 0)),
                               "#000000", face.weight, outline_px if outline is not None else 0.0, 0.0)
     evs = []
-    for j, (s, _rep) in enumerate(specs):
+    for j, (_si, s, _rep) in enumerate(specs):
         x = W / 2 + rng.uniform(-40, 40) + rng.uniform(0, 1)
         y = Hs / 2 + rng.uniform(-6, 6) + rng.uniform(0, 1)
         evs.append(f"Dialogue: 2,{capmod.ass_time(j * k / fps)},{capmod.ass_time((j + 1) * k / fps)},s,,0,0,0,,"
                    f"{{\\an5\\pos({x:.2f},{y:.2f})}}{s}")
-    bgs, bg_desc = _bg_strips(ctx, n, W, Hs, seed, box)
+    bgs, bg_desc = _bg_strips(ctx, n, W, Hs, seed, box if box is not None else bg)
     # plain canvas for locating the fill ink: far from the fill colour (dark fills on white)
     luma = 0.2126 * fill[0] + 0.7152 * fill[1] + 0.0722 * fill[2]
     black = np.full((Hs, W, 3), 0 if luma > 110 else 255, np.uint8)
@@ -221,8 +239,8 @@ def libass_samples(ctx, font: str, size: float, fill: tuple, outline: tuple | No
     dec = [np.frombuffer(raw_dec[i * fb:(i + 1) * fb], np.uint8).reshape(Hs, W, 3) for i in range(len(raw_dec) // fb)]
     fv = np.array(fill, np.int32)
     samples = []
-    for j, (s, _rep) in enumerate(specs):
-        mid = j * k + k // 2
+    for j, (si, s, _rep) in enumerate(specs):
+        mid = j * k + k_at
         if mid >= len(ref) or mid >= len(dec):
             continue
         m = np.sqrt(((ref[mid].astype(np.int32) - fv) ** 2).sum(axis=2)) < 80
@@ -235,7 +253,7 @@ def libass_samples(ctx, font: str, size: float, fill: tuple, outline: tuple | No
         around = box if box is not None else outline
         samples.append(ty.Sample(crop=dec[mid][y0:y1, x0:x1].copy(), text=s, size_px=float(size),
                                  fill_rgb=tuple(fill), outline_rgb=None if around is None else tuple(around),
-                                 font=font, group=f"{s}|{size:g}", style="box" if box is not None else
+                                 font=font, group=f"{si}:{s}|{size:g}", style="box" if box is not None else
                                  ("outline" if outline is not None else "plain"), canvas_size_px=float(size)))
     return samples, bg_desc
 
@@ -294,9 +312,31 @@ def expected_ref(font: str, font_file: str | None = None):
     return ty.font_ref(font)
 
 
+def _quant(c) -> tuple:
+    """Measured colour quantised so near-identical backgrounds share a ceiling."""
+    return tuple(int(min(255, max(0, round(float(v) / 8.0) * 8))) for v in c)
+
+
+def ceiling_strings(text: str, slots: int = 3) -> list[str]:
+    """The caption's own lines as the ceiling's sample strings (>= ``slots`` slots, each rendered
+    CEIL_REPEATS times at jittered positions).  The IoU the true font reaches depends on the TEXT (small
+    glyphs such as quote marks or dense syllables have relatively more edge): measured on test-pipeline-001
+    c_dlg ("저기 봐, 들어온다!" in quotes, 62 px on black) the generic strings gave p10 0.977 while the
+    caption's quote glyphs alone scored 0.89/0.91 -- a content effect, not a font difference."""
+    lines = [ln for ln in (text or "").split("\n") if ln.strip()]
+    if not lines:
+        return []
+    k = -(-slots // len(lines))
+    return (lines * k)[:max(slots, len(lines))]
+
+
 def ceiling_for(ctx, font: str, size_px: float, fill: tuple, outline: tuple | None, outline_px: float,
-                box: tuple | None, font_file: str | None = None) -> tuple[dict, dict, bool]:
-    """(ceiling, conditions, from_cache) for ``font`` under the output's encode settings."""
+                box: tuple | None, font_file: str | None = None, bg: tuple | None = None,
+                strings: list[str] | None = None) -> tuple[dict, dict, bool]:
+    """(ceiling, conditions, from_cache) for ``font`` at the caption's exact ``size_px`` under the output's
+    encode settings.  ``bg``: flat colour measured around a non-boxed caption (None = footage behind it);
+    ``strings``: the sample strings (default: typography.DEFAULT_STRINGS[:3]; QA passes the caption's own
+    lines, ``ceiling_strings``)."""
     from ..reference import typography as ty
 
     enc = encode_settings(ctx)
@@ -305,33 +345,38 @@ def ceiling_for(ctx, font: str, size_px: float, fill: tuple, outline: tuple | No
     preset = enc.get("preset")
     assumed = preset is None
     preset = preset or "medium"
-    b = size_bucket(size_px)
+    size = round(float(size_px), 1)
+    strs = list(strings) if strings else list(ty.DEFAULT_STRINGS[:3])
     fr = expected_ref(font, font_file)
     if box is not None:     # measured label-box colour: quantised so near-identical boxes share a ceiling
-        box = tuple(int(min(255, max(0, round(float(v) / 8.0) * 8))) for v in box)
+        box = _quant(box)
+        bg = None
+    elif bg is not None:
+        bg = _quant(bg)
     frac = round(float(outline_px) / float(size_px), 3) if (outline is not None and size_px) else 0.0
     style = {"kind": "box" if box is not None else ("outline" if outline is not None else "plain"),
              "fill": list(fill), "outline": list(outline) if outline is not None else None, "outline_frac": frac,
-             "box": list(box) if box is not None else None}
+             "box": list(box) if box is not None else None, "bg": list(bg) if bg is not None else "footage"}
     fps = round(float(ctx.fps), 3)
     key = {"kind": "ceiling", "sampler": SAMPLER, "font": fr.name, "face": [Path(fr.path).name, fr.index],
-           "size_bucket": b, "crf": enc["crf"], "preset": preset, "codec": "h264", "width": int(ctx.canvas_w),
-           "fps": fps, "style": style, "strings": list(ty.DEFAULT_STRINGS[:3]), "repeats": CEIL_REPEATS,
-           "frames_per_sample": FRAMES_PER_SAMPLE}
+           "size_px": size, "crf": enc["crf"], "preset": preset, "codec": "h264", "width": int(ctx.canvas_w),
+           "fps": fps, "style": style, "strings": strs, "repeats": CEIL_REPEATS,
+           "frames_per_sample": sample_frames(fps)[0], "sample_frame": sample_frames(fps)[1]}
     cond = ty.Conditions(canvas=(int(ctx.canvas_w), int(ctx.canvas_h)), ref_resolution=(int(ctx.canvas_w), int(ctx.canvas_h)),
-                         codec="h264", crf=float(enc["crf"]), x264_preset=preset, frames_per_sample=FRAMES_PER_SAMPLE,
-                         fps=fps, background="color:#%02X%02X%02X" % tuple(box) if box is not None else "video",
+                         codec="h264", crf=float(enc["crf"]), x264_preset=preset, frames_per_sample=sample_frames(fps)[0],
+                         fps=fps, background=("color:#%02X%02X%02X" % tuple(box if box is not None else bg)
+                                              if (box is not None or bg is not None) else "video"),
                          renderer="libass(ffmpeg subtitles filter, shortkit.edit.render 규약)", assumed=assumed,
                          source=f"{enc.get('source')}" + (" / x264 프리셋 특정 못 함 → medium 가정" if assumed else ""))
     hit = _read_cache(key)
     if hit is not None:
         return hit["ceiling"], cond.to_dict(), True
-    samples, bg = libass_samples(ctx, font, float(b), fill, outline, frac * b, box, ty.DEFAULT_STRINGS[:3],
-                                 float(enc["crf"]), preset, fps, font_file=font_file)
+    samples, bg_desc = libass_samples(ctx, font, size, fill, outline, frac * size, box, strs,
+                                      float(enc["crf"]), preset, fps, font_file=font_file, bg=bg)
     if len(samples) < 4:
         raise RuntimeError(f"천장 실험 샘플 부족({len(samples)}개)")
     c = ty.ceiling(fr, cond, samples=samples, color_mode="given", keep_rows=True)
-    c["background"] = bg
+    c["background"] = bg_desc
     _write_cache(key, {"ceiling": c, "conditions": cond.to_dict()})
     return c, cond.to_dict(), False
 
@@ -342,8 +387,9 @@ def _same(a: str | None, b: str | None) -> bool:
 
 
 def identify_caption_font(ctx, cap, crop: np.ndarray, text: str, fill: tuple, around: tuple | None,
-                          boxed: bool) -> dict:
-    """typography.identify_many on one output crop; verdict of the EXPECTED font."""
+                          boxed: bool, bg: tuple | None = None) -> dict:
+    """typography.identify_many on one output crop; verdict of the EXPECTED font.  ``bg``: flat colour
+    measured behind a non-boxed caption (the ceiling is then rendered over that colour)."""
     from ..reference import typography as ty
 
     font_file = getattr(cap, "font_file", None)
@@ -351,7 +397,8 @@ def identify_caption_font(ctx, cap, crop: np.ndarray, text: str, fill: tuple, ar
     outline = None if boxed else (around if (cap.outline_px and around is not None) else None)
     box = around if boxed else None
     ceil, cond, cached = ceiling_for(ctx, cap.font_name, float(cap.size_px), tuple(fill), outline,
-                                     float(cap.outline_px or 0.0), box, font_file=font_file)
+                                     float(cap.outline_px or 0.0), box, font_file=font_file, bg=bg,
+                                     strings=ceiling_strings(text) or None)
     try:
         others = nearest_fonts(cap.font_name)
     except Exception as e:  # the look-alike list is a strengthening, never a reason to skip
@@ -370,7 +417,7 @@ def identify_caption_font(ctx, cap, crop: np.ndarray, text: str, fill: tuple, ar
            "conditions": cond, "ceiling_cached": cached,
            "ceiling": {k: ceil.get(k) for k in ("n", "p10", "p50", "p90", "n_failed")} |
            {"noise_p90": (ceil.get("noise") or {}).get("p90"), "glyph_p10": (ceil.get("glyph") or {}).get("p10"),
-            "size_bucket": size_bucket(cap.size_px), "background": ceil.get("background")},
+            "size_px": round(float(cap.size_px), 1), "background": ceil.get("background")},
            "ranked": [{k: r.get(k) for k in ("rank", "font", "iou", "margin", "verdict", "glyph_pass")} for r in ranked],
            "top": res.get("top"), "top_verdict": res.get("top_verdict"), "summary": res.get("summary"),
            "failed_crops": res.get("failed_crops"), "missing_candidates": res.get("missing_candidates")}

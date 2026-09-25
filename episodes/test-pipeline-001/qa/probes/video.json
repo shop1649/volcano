@@ -4,9 +4,9 @@
     1920
   ],
   "fps": 30.0,
-  "duration": 21.2667,
+  "duration": 19.2667,
   "errors": {},
-  "n_frames": 638,
+  "n_frames": 578,
   "transitions": {
     "boundaries": [
       {
@@ -77,8 +77,8 @@
       }
     ],
     "diff_stats": {
-      "p50": 0.246,
-      "p90": 0.935
+      "p50": 0.255,
+      "p90": 0.76
     }
   },
   "freezes": {
@@ -841,96 +841,140 @@
       },
       {
         "clip_id": "s4",
-        "n_samples": 243,
+        "n_samples": 183,
         "n_rejected_low_inliers": 2,
-        "median_inliers": 150.0,
+        "median_inliers": 235.0,
         "curve": [
           [
             13.067,
             1.0
           ],
           [
-            13.267,
-            1.0003
+            13.2,
+            1.0
+          ],
+          [
+            13.333,
+            1.0009
           ],
           [
             13.467,
             1.0029
           ],
           [
-            13.667,
-            1.0076
+            13.6,
+            1.0063
+          ],
+          [
+            13.733,
+            1.0074
           ],
           [
             13.867,
             1.0109
           ],
           [
-            14.067,
-            1.0108
+            14.0,
+            1.0089
+          ],
+          [
+            14.133,
+            1.008
           ],
           [
             14.267,
             1.0138
           ],
           [
-            14.467,
-            1.0055
+            14.4,
+            1.0078
+          ],
+          [
+            14.533,
+            1.0017
           ],
           [
             14.667,
             0.9883
           ],
           [
-            14.867,
-            0.9979
+            14.8,
+            0.9706
+          ],
+          [
+            14.933,
+            0.9853
           ],
           [
             15.067,
             1.0155
           ],
           [
-            15.3,
-            0.7394
+            15.233,
+            0.7384
+          ],
+          [
+            15.367,
+            0.7376
           ],
           [
             15.5,
             0.7351
           ],
           [
-            15.7,
-            0.7376
+            15.633,
+            0.7391
+          ],
+          [
+            15.767,
+            0.7368
           ],
           [
             15.9,
             0.7373
           ],
           [
-            16.1,
-            0.7376
+            16.033,
+            0.7379
+          ],
+          [
+            16.167,
+            0.7368
           ],
           [
             16.3,
             0.7379
           ],
           [
-            16.5,
-            0.7382
+            16.433,
+            0.7371
+          ],
+          [
+            16.567,
+            0.7374
           ],
           [
             16.7,
             0.7373
           ],
           [
-            16.9,
-            0.7372
+            16.833,
+            0.7356
+          ],
+          [
+            16.967,
+            0.7364
           ],
           [
             17.1,
             0.7369
           ],
           [
-            17.3,
+            17.233,
+            0.7374
+          ],
+          [
+            17.367,
             0.7375
           ],
           [
@@ -938,7 +982,11 @@
             0.9535
           ],
           [
-            17.767,
+            17.7,
+            0.9534
+          ],
+          [
+            17.833,
             0.9535
           ],
           [
@@ -946,81 +994,98 @@
             0.9536
           ],
           [
-            18.167,
-            0.9536
+            18.1,
+            0.9537
+          ],
+          [
+            18.233,
+            0.9539
           ],
           [
             18.367,
             0.9541
           ],
           [
-            18.567,
+            18.5,
             0.9544
+          ],
+          [
+            18.633,
+            0.9547
           ],
           [
             18.767,
             0.9546
           ],
           [
-            18.967,
-            0.9538
+            18.9,
+            0.954
+          ],
+          [
+            19.033,
+            0.9542
           ],
           [
             19.167,
-            0.9525
-          ],
-          [
-            19.367,
-            0.9537
-          ],
-          [
-            19.567,
-            0.9547
-          ],
-          [
-            19.767,
-            0.9523
-          ],
-          [
-            19.967,
-            0.9452
-          ],
-          [
-            20.167,
-            0.9499
-          ],
-          [
-            20.367,
-            0.9496
-          ],
-          [
-            20.567,
-            0.9421
-          ],
-          [
-            20.767,
-            0.9736
-          ],
-          [
-            20.967,
-            0.9581
-          ],
-          [
-            21.167,
-            0.9579
+            0.9534
           ]
         ],
-        "measured_final_ratio": 0.9519,
+        "measured_final_ratio": 0.9542,
         "measured_max_dev": 0.2638,
-        "measured_spread": 0.0109,
+        "measured_spread": 0.0804,
         "expected_final_ratio": 1.0,
         "max_abs_err": 0.2658,
-        "source_ratio": 0.987,
-        "zoom_ratio_corrected": 0.9645,
+        "source_ratio": null,
         "status": "measured",
         "tolerance": {
           "ratio": 0.04,
           "t50_s": 0.1
+        },
+        "geometry": {
+          "status": "measured",
+          "confirmed": true,
+          "ncc_median": 0.9974,
+          "ncc_min": 0.9529,
+          "zoom_alt": 1.04,
+          "alt_gap_median": 0.0357,
+          "samples": [
+            {
+              "t": 13.678,
+              "expected_src_t": 3.928,
+              "src_t": 3.833,
+              "ncc": 0.9979,
+              "ncc_alt": 0.9718
+            },
+            {
+              "t": 14.902,
+              "expected_src_t": 5.152,
+              "src_t": 5.083,
+              "ncc": 0.9978,
+              "ncc_alt": 0.9727
+            },
+            {
+              "t": 16.125,
+              "expected_src_t": 6.375,
+              "src_t": 6.417,
+              "ncc": 0.9529,
+              "ncc_alt": 0.9172
+            },
+            {
+              "t": 17.348,
+              "expected_src_t": 7.598,
+              "src_t": 7.667,
+              "ncc": 0.9531,
+              "ncc_alt": 0.9165
+            },
+            {
+              "t": 18.572,
+              "expected_src_t": 8.822,
+              "src_t": 8.917,
+              "ncc": 0.9974,
+              "ncc_alt": 0.9579
+            }
+          ],
+          "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"
         }
       }
     ],
@@ -1677,6 +1742,7 @@
             "prominence": 0.0031,
             "moving_frac": 0.08,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           },
           {
@@ -1689,6 +1755,7 @@
             "prominence": 0.1567,
             "moving_frac": 0.149,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -1701,13 +1768,16 @@
             "prominence": 0.1056,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           }
         ],
         "src_fps": 30.0,
         "status": "measured",
         "offset_p50": 0.003,
-        "speed_obs": 0.948
+        "speed_obs": 0.948,
+        "speed_quant_frac": 0.0303,
+        "speed_samples": 2
       },
       {
         "clip_id": "s2",
@@ -1728,6 +1798,7 @@
             "prominence": 0.1041,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -1740,6 +1811,7 @@
             "prominence": 0.0975,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -1752,13 +1824,16 @@
             "prominence": 0.0263,
             "moving_frac": 0.15,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           }
         ],
         "src_fps": 30.0,
         "status": "measured",
         "offset_p50": -0.012,
-        "speed_obs": 0.906
+        "speed_obs": 0.906,
+        "speed_quant_frac": 0.0454,
+        "speed_samples": 2
       },
       {
         "clip_id": "s3",
@@ -1779,6 +1854,7 @@
             "prominence": 0.0324,
             "moving_frac": 0.085,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -1791,6 +1867,7 @@
             "prominence": 0.0323,
             "moving_frac": 0.094,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           },
           {
@@ -1803,63 +1880,108 @@
             "prominence": 0.0438,
             "moving_frac": 0.093,
             "at_window_edge": false,
+            "stage": 1,
             "decisive": true
           }
         ],
         "src_fps": 30.0,
         "status": "measured",
         "offset_p50": 0.016,
-        "speed_obs": 0.99
+        "speed_obs": 0.99,
+        "speed_quant_frac": 0.0112,
+        "speed_samples": 3
       },
       {
         "clip_id": "s4",
         "source": "assets/test/generated/video/head-pose-face-detection-female-and-male.mp4",
         "expected_src": [
           3.0,
-          11.5
+          9.5
         ],
         "speed": 1.0,
         "samples": [
           {
-            "t": 14.69,
-            "expected_src_t": 4.94,
-            "matched_src_t": 4.917,
+            "t": 14.29,
+            "expected_src_t": 4.54,
+            "matched_src_t": 4.583,
             "ncc": 0.998,
             "ncc_moving": 0.991,
-            "offset": -0.023,
-            "prominence": 0.108,
+            "offset": 0.043,
+            "prominence": 0.0143,
             "moving_frac": 0.15,
             "at_window_edge": false,
-            "decisive": true
-          },
-          {
-            "t": 17.125,
-            "expected_src_t": 7.375,
-            "matched_src_t": 7.833,
-            "ncc": 0.953,
-            "ncc_moving": 0.876,
-            "offset": 0.458,
-            "prominence": 0.0002,
-            "moving_frac": 0.079,
-            "at_window_edge": false,
+            "stage": 1,
             "decisive": false
           },
           {
-            "t": 19.56,
-            "expected_src_t": 9.81,
-            "matched_src_t": 9.667,
+            "t": 16.125,
+            "expected_src_t": 6.375,
+            "matched_src_t": 6.417,
+            "ncc": 0.953,
+            "ncc_moving": 0.981,
+            "offset": 0.042,
+            "prominence": 0.0129,
+            "moving_frac": 0.15,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false
+          },
+          {
+            "t": 17.96,
+            "expected_src_t": 8.21,
+            "matched_src_t": 8.167,
+            "ncc": 0.997,
+            "ncc_moving": 0.913,
+            "offset": -0.043,
+            "prominence": 0.0293,
+            "moving_frac": 0.052,
+            "at_window_edge": false,
+            "stage": 1,
+            "decisive": false
+          },
+          {
+            "t": 13.373,
+            "expected_src_t": 3.623,
+            "matched_src_t": 2.5,
+            "ncc": 0.998,
+            "ncc_moving": 0.948,
+            "offset": -1.123,
+            "prominence": 0.0029,
+            "moving_frac": 0.071,
+            "at_window_edge": true,
+            "stage": 2,
+            "decisive": false
+          },
+          {
+            "t": 13.678,
+            "expected_src_t": 3.928,
+            "matched_src_t": 4.5,
             "ncc": 0.998,
             "ncc_moving": 0.983,
-            "offset": -0.143,
-            "prominence": 0.0055,
+            "offset": 0.572,
+            "prominence": 0.006,
+            "moving_frac": 0.136,
+            "at_window_edge": false,
+            "stage": 2,
+            "decisive": false
+          },
+          {
+            "t": 14.902,
+            "expected_src_t": 5.152,
+            "matched_src_t": 5.083,
+            "ncc": 0.998,
+            "ncc_moving": 0.991,
+            "offset": -0.068,
+            "prominence": 0.2094,
             "moving_frac": 0.15,
             "at_window_edge": false,
-            "decisive": false
+            "stage": 2,
+            "decisive": true
           }
         ],
         "src_fps": 12.0,
         "status": "measured",
-        "offset_p50": -0.023
+        "offset_p50": -0.068
       }
     ]
   },
@@ -2237,7 +2359,7 @@
       "label": "여성 얼굴",
       "clip_id": "s4",
       "start": 12.75,
-      "end": 21.25,
+      "end": 19.25,
       "rect": [
         55.9,
         733.4,
@@ -2254,7 +2376,7 @@
       "label": "남성 얼굴",
       "clip_id": "s4",
       "start": 12.75,
-      "end": 21.25,
+      "end": 19.25,
       "rect": [
         625.9,
         719.3,

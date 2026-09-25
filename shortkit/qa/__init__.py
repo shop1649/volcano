@@ -35,6 +35,10 @@ from pathlib import Path
 from typing import Any
 
 QA_SCHEMA = "shortkit.qa_report/1"
+# a caption is measured this long after its entrance motion ends (t_rest = start + motion_in.dur_s + this); the
+# font ceiling samples its libass emulation at the same delay after the text appears (x264 keeps refining a
+# static caption: test-pipeline-001 c_sit3 IoU 0.9634 at t_rest, 0.9608 half a second later)
+CAPTION_REST_SETTLE_S = 0.12
 
 # Tesseract's OpenMP threads busy-wait; on the shared 4-core build machine one OCR call went from
 # ~0.2 s to minutes.  Every tesseract process QA starts (pytesseract here, shortkit.clean's OCR

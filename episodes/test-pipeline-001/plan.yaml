@@ -5,14 +5,17 @@
 # 자막·효과음 사건 시각은 프레임을 직접 보고 정했다(0.5s/0.17s 간격 접촉 시트):
 #   classroom  2.8s 창가 남성이 일어서기 시작 → 4.5s 선 자세 / 15.5~16.5s 다시 앉음 /
 #              17.17~17.33s 뒷줄 남성이 손을 듦 / 20.0~21.0s 뒷줄 남성이 일어섬
-#   head-pose  5.0~5.5s 두 사람이 고개를 옆으로 기울임(10.5s 까지 유지)
+#   head-pose  5.0~5.5s 두 사람이 고개를 옆으로 기울임(10.5s 까지 유지) → 10.5~11.0s 고개를 다시 바로 함
+#   s4 는 마지막 자막(c_sit4, 19.0s = 원본 9.25s) 뒤 motion.trim.tail_after_meaning_s(0.25s)까지만 쓴다(원본 9.5s):
+#   그 뒤(원본 9.5~11.5s)는 기울인 채 가만히 있다가 고개를 바로 하는 꼬리로, 자막·사건이 없는 의미 끝난 구간이라 잘랐다.
 schema: shortkit.plan/1
 episode_id: test-pipeline-001
 preset_id: joshuamagazine-v1
 format_id: UNCLASSIFIED
 mode: test
 episode_index: 1
-notes: 테스트 모드. 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음.
+notes: 테스트 모드. 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음. BGM 사용 구간 시작은
+  plan 에서 덮어쓰지 않고 프리셋 audio.bgm.section_start_s(임시값)를 쓴다 — 예전 plan 의 12.0s 덮어쓰기는 이유 기록이 없어 뺐다.
 cover:                           # 표지 문구 = 표지 프레임(0.0s)에 실제로 보이는 제목 자막(c_title)과 같은 글자
   text: 움직임 테스트 영상
   frame_t: 0.0
@@ -78,11 +81,11 @@ timeline:
 - id: s4
   source: v_pair
   src_in: 3.0
-  src_out: 11.5
+  src_out: 9.5
   purpose: reveal
   transition_in: {type: crossfade}
 captions:
-- {id: c_title, role: title, text: 움직임 테스트 영상, start: 0.0, end: 21.25}
+- {id: c_title, role: title, text: 움직임 테스트 영상, start: 0.0, end: 19.25}
 - {id: c_desc, role: description, text: 파이프라인 검증용 합성 샘플, start: 0.0, end: 4.0}
 - id: c_spk
   role: speaker
@@ -143,7 +146,10 @@ decorations:
 sfx:
 - id: fx1
   type: whoosh
-  t: 1.25
+  t: 1.1             # 사건(1.3s) 0.2s 앞에서 시작해 휙 소리가 확대 시작으로 이어짐. 1.25s 에 두면 휙 소리 몸통이 BGM(프리셋 구간
+                     # 0.0s)의 봉우리(출력 1.5s, -1.93 dBTP = true-peak 한도 -2.0 에 붙음)와 겹쳐 전경 리미터 3 dB 규칙 안에 못 들어가
+                     # 전체 이득이 -1.8 dB 로 묶였음(측정: 믹스 -16.2 LUFS, 목표 대비 2.2 LU 부족). 1.1s 에서는 상한 -0.24 dB
+                     # (1.05~1.10s, 1.45~1.60s 도 같은 -0.24 dB; 1.15~1.40s 는 -0.53~-1.8 dB) — episodes/.../qa/defects.jsonl 참조
   event: {t: 1.3, desc: 창가 남성이 일어서기 시작함(확대 시작), kind: action, source: v_class, src_t: 2.8}
   emotion: anticipation
   file: assets/test/generated/sfx/whoosh.wav
@@ -176,7 +182,6 @@ sfx:
 bgm:
   enabled: true
   path: assets/test/generated/music_bed_a.wav
-  section_start_s: 12.0
   silences:
   - {start: 6.8, end: 7.45, reason: 정지 화면 순간 음악을 끊어 강조}
 reveal:

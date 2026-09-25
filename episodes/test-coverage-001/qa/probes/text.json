@@ -1,0 +1,3069 @@
+{
+  "ocr_engine": "5.3.4",
+  "errors": {},
+  "captions": [
+    {
+      "id": "c_title",
+      "role": "title",
+      "text": "빈 방에 들어온 사람들",
+      "start": 0.0,
+      "end": 22.5,
+      "t_rest": 0.12,
+      "expected_bbox": [
+        157.38,
+        288.62,
+        765.0,
+        93.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 1,
+      "mask_px": 24238,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          172,
+          297,
+          741,
+          77
+        ]
+      ],
+      "ocr": "빈 방 에 들어온 사람들",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 16,
+      "outline_ring_fracs": [
+        0.3,
+        0.9,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.1,
+      "box_alpha_obs": null,
+      "ink_h": 77,
+      "ink_w": 741,
+      "bbox_obs": [
+        172,
+        297,
+        741,
+        77
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_title_0000120.png",
+      "region": [
+        98,
+        272,
+        888,
+        124
+      ],
+      "onset_contrast": 230.9,
+      "onset": 0.0,
+      "onset_note": "첫 프레임부터 표시",
+      "motion_in_obs": {
+        "type": "none",
+        "note": "첫 프레임부터 완전히 표시(등장 모션 없음)"
+      },
+      "presence_in": [
+        [
+          0.0,
+          0.999
+        ],
+        [
+          0.033,
+          1.0
+        ],
+        [
+          0.067,
+          1.0
+        ],
+        [
+          0.1,
+          1.0
+        ],
+        [
+          0.133,
+          1.0
+        ],
+        [
+          0.167,
+          1.0
+        ],
+        [
+          0.2,
+          1.0
+        ],
+        [
+          0.233,
+          1.0
+        ],
+        [
+          0.267,
+          1.0
+        ],
+        [
+          0.3,
+          1.0
+        ],
+        [
+          0.333,
+          1.0
+        ],
+        [
+          0.367,
+          1.0
+        ],
+        [
+          0.4,
+          1.0
+        ],
+        [
+          0.433,
+          1.0
+        ]
+      ],
+      "offset": 22.5,
+      "offset_note": "영상 끝까지 표시",
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.986,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.986,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.9152,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.8977,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.8576,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9746,
+            "p50": 0.9843,
+            "p90": 0.9888,
+            "n_failed": 0,
+            "noise_p90": 0.0185,
+            "glyph_p10": 0.9673,
+            "size_px": 84.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.986,
+              "margin": 0.0708,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.9152,
+              "margin": -0.0708,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.8977,
+              "margin": -0.0883,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.8576,
+              "margin": -0.1284,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.986, 천장 p10 0.975, 차순위 대비 +0.071 > 잡음 0.018)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.986,
+          "margin": 0.0708,
+          "reasons": [
+            "IoU 0.986 >= 천장 p10 0.975",
+            "차순위 대비 차이 +0.071 > 잡음 0.018",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_desc",
+      "role": "description",
+      "text": "설정 연결 검증 테스트 2편",
+      "start": 0.0,
+      "end": 4.0,
+      "t_rest": 0.32,
+      "expected_bbox": [
+        289.99,
+        477.06,
+        500.0,
+        52.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 5,
+      "mask_px": 40449,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          297,
+          483,
+          485,
+          41
+        ]
+      ],
+      "ocr": "설정 연결 검증 테스트 2 편",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#E5E5E5",
+      "outline_px_obs": 11,
+      "outline_ring_fracs": [
+        0.44,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.15,
+      "box_alpha_obs": null,
+      "ink_h": 41,
+      "ink_w": 485,
+      "bbox_obs": [
+        297,
+        483,
+        485,
+        41
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_desc_0000320.png",
+      "region": [
+        244,
+        464,
+        590,
+        78
+      ],
+      "onset_contrast": 216.8,
+      "onset_frame_t": 0.0333,
+      "onset": 0.0,
+      "motion_in_obs": {
+        "type": "fade",
+        "scale_first": null,
+        "presence_first": 0.166,
+        "dur_s": 0.133,
+        "scales": [
+          null,
+          null,
+          null,
+          null,
+          1.004,
+          1.004,
+          1.004,
+          1.004
+        ],
+        "presence": [
+          0.166,
+          0.331,
+          0.5,
+          0.664,
+          0.917,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.033,
+          0.166
+        ],
+        [
+          0.067,
+          0.331
+        ],
+        [
+          0.1,
+          0.5
+        ],
+        [
+          0.133,
+          0.664
+        ],
+        [
+          0.167,
+          0.917
+        ],
+        [
+          0.2,
+          1.0
+        ],
+        [
+          0.233,
+          1.0
+        ],
+        [
+          0.267,
+          1.0
+        ],
+        [
+          0.3,
+          1.0
+        ],
+        [
+          0.333,
+          1.0
+        ],
+        [
+          0.367,
+          1.0
+        ],
+        [
+          0.4,
+          1.0
+        ],
+        [
+          0.433,
+          1.0
+        ],
+        [
+          0.467,
+          1.0
+        ],
+        [
+          0.5,
+          1.0
+        ],
+        [
+          0.533,
+          1.0
+        ],
+        [
+          0.567,
+          1.0
+        ],
+        [
+          0.6,
+          1.0
+        ],
+        [
+          0.633,
+          1.0
+        ]
+      ],
+      "offset": 4.0,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          3.567,
+          1.0
+        ],
+        [
+          3.6,
+          1.0
+        ],
+        [
+          3.633,
+          1.0
+        ],
+        [
+          3.667,
+          1.0
+        ],
+        [
+          3.7,
+          1.0
+        ],
+        [
+          3.733,
+          1.0
+        ],
+        [
+          3.767,
+          1.0
+        ],
+        [
+          3.8,
+          1.0
+        ],
+        [
+          3.833,
+          1.0
+        ],
+        [
+          3.867,
+          1.0
+        ],
+        [
+          3.9,
+          1.0
+        ],
+        [
+          3.933,
+          1.0
+        ],
+        [
+          3.967,
+          1.0
+        ],
+        [
+          4.0,
+          0.0
+        ],
+        [
+          4.033,
+          0.0
+        ],
+        [
+          4.067,
+          0.0
+        ],
+        [
+          4.1,
+          0.0
+        ],
+        [
+          4.133,
+          0.0
+        ],
+        [
+          4.167,
+          0.0
+        ],
+        [
+          4.2,
+          0.0
+        ],
+        [
+          4.233,
+          0.0
+        ],
+        [
+          4.267,
+          0.0
+        ],
+        [
+          4.3,
+          0.0
+        ],
+        [
+          4.333,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Bold",
+        "best": "Noto Sans CJK KR Bold",
+        "iou_expected": 0.9433,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.9433,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Bold",
+            "iou": 0.872,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.8271,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "NanumSquare ExtraBold",
+            "iou": 0.8041,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Bold",
+          "expected_canonical": "Noto Sans CJK KR Bold",
+          "candidates": [
+            "Noto Sans CJK KR Bold",
+            "Pretendard Bold",
+            "Pretendard ExtraBold",
+            "NanumSquare ExtraBold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9327,
+            "p50": 0.9631,
+            "p90": 0.9705,
+            "n_failed": 0,
+            "noise_p90": 0.0374,
+            "glyph_p10": 0.9036,
+            "size_px": 46.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.9433,
+              "margin": 0.0713,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Bold",
+              "iou": 0.872,
+              "margin": -0.0713,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.8271,
+              "margin": -0.1162,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "NanumSquare ExtraBold",
+              "iou": 0.8041,
+              "margin": -0.1392,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Bold",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Bold (IoU 0.943, 천장 p10 0.933, 차순위 대비 +0.071 > 잡음 0.037)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.9433,
+          "margin": 0.0713,
+          "reasons": [
+            "IoU 0.943 >= 천장 p10 0.933",
+            "차순위 대비 차이 +0.071 > 잡음 0.037",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_sit1",
+      "role": "situation",
+      "text": "한 사람이 빈 방을 가로질러 나간다",
+      "start": 0.3,
+      "end": 4.8,
+      "t_rest": 0.54,
+      "expected_bbox": [
+        71.2,
+        1395.78,
+        938.0,
+        76.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 3,
+      "mask_px": 53362,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          81,
+          1403,
+          920,
+          62
+        ]
+      ],
+      "ocr": "한 사 람 이 빈 방 을 가 로 질 러 나간다",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 16,
+      "outline_ring_fracs": [
+        0.42,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.1,
+      "box_alpha_obs": null,
+      "ink_h": 62,
+      "ink_w": 920,
+      "bbox_obs": [
+        81,
+        1403,
+        920,
+        62
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_sit1_0000540.png",
+      "region": [
+        0,
+        1380,
+        1080,
+        106
+      ],
+      "onset_contrast": 246.6,
+      "onset_frame_t": 0.3,
+      "onset": 0.2667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 0.852,
+        "presence_first": 0.473,
+        "dur_s": 0.133,
+        "scales": [
+          0.852,
+          0.893,
+          0.935,
+          0.978,
+          1.002,
+          1.002,
+          1.002,
+          1.002
+        ],
+        "presence": [
+          0.473,
+          0.532,
+          0.635,
+          0.803,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.033,
+          0.0
+        ],
+        [
+          0.067,
+          0.0
+        ],
+        [
+          0.1,
+          0.0
+        ],
+        [
+          0.133,
+          0.0
+        ],
+        [
+          0.167,
+          0.0
+        ],
+        [
+          0.2,
+          0.0
+        ],
+        [
+          0.233,
+          0.0
+        ],
+        [
+          0.267,
+          0.0
+        ],
+        [
+          0.3,
+          0.473
+        ],
+        [
+          0.333,
+          0.532
+        ],
+        [
+          0.367,
+          0.635
+        ],
+        [
+          0.4,
+          0.803
+        ],
+        [
+          0.433,
+          1.0
+        ],
+        [
+          0.467,
+          1.0
+        ],
+        [
+          0.5,
+          1.0
+        ],
+        [
+          0.533,
+          1.0
+        ],
+        [
+          0.567,
+          1.0
+        ],
+        [
+          0.6,
+          1.0
+        ],
+        [
+          0.633,
+          1.0
+        ],
+        [
+          0.667,
+          1.0
+        ],
+        [
+          0.7,
+          1.0
+        ],
+        [
+          0.733,
+          1.0
+        ],
+        [
+          0.767,
+          1.0
+        ],
+        [
+          0.8,
+          1.0
+        ],
+        [
+          0.833,
+          1.0
+        ],
+        [
+          0.867,
+          1.0
+        ]
+      ],
+      "offset": 4.8,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          4.367,
+          1.0
+        ],
+        [
+          4.4,
+          1.0
+        ],
+        [
+          4.433,
+          1.0
+        ],
+        [
+          4.467,
+          1.0
+        ],
+        [
+          4.5,
+          1.0
+        ],
+        [
+          4.533,
+          1.0
+        ],
+        [
+          4.567,
+          1.0
+        ],
+        [
+          4.6,
+          1.0
+        ],
+        [
+          4.633,
+          1.0
+        ],
+        [
+          4.667,
+          1.0
+        ],
+        [
+          4.7,
+          1.0
+        ],
+        [
+          4.733,
+          1.0
+        ],
+        [
+          4.767,
+          1.0
+        ],
+        [
+          4.8,
+          0.0
+        ],
+        [
+          4.833,
+          0.0
+        ],
+        [
+          4.867,
+          0.0
+        ],
+        [
+          4.9,
+          0.0
+        ],
+        [
+          4.933,
+          0.0
+        ],
+        [
+          4.967,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.9661,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.9661,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.9075,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.9022,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.8584,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9617,
+            "p50": 0.964,
+            "p90": 0.9671,
+            "n_failed": 0,
+            "noise_p90": 0.0112,
+            "glyph_p10": 0.9355,
+            "size_px": 66.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.9661,
+              "margin": 0.0586,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.9075,
+              "margin": -0.0586,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.9022,
+              "margin": -0.0639,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.8584,
+              "margin": -0.1077,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.966, 천장 p10 0.962, 차순위 대비 +0.059 > 잡음 0.011)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.9661,
+          "margin": 0.0586,
+          "reasons": [
+            "IoU 0.966 >= 천장 p10 0.962",
+            "차순위 대비 차이 +0.059 > 잡음 0.011",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_sit2",
+      "role": "situation",
+      "text": "한 남성이 카메라 앞까지 걸어온다",
+      "start": 5.0,
+      "end": 9.8,
+      "t_rest": 5.24,
+      "expected_bbox": [
+        78.75,
+        1395.78,
+        923.0,
+        76.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 2,
+      "mask_px": 48604,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          88,
+          1403,
+          906,
+          62
+        ]
+      ],
+      "ocr": "한 남 성 이 카메라 앞 까지 걸 어 온 다",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 16,
+      "outline_ring_fracs": [
+        0.46,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.03,
+      "box_alpha_obs": null,
+      "ink_h": 62,
+      "ink_w": 906,
+      "bbox_obs": [
+        88,
+        1403,
+        906,
+        62
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_sit2_0005240.png",
+      "region": [
+        2,
+        1380,
+        1078,
+        106
+      ],
+      "onset_contrast": 245.2,
+      "onset_frame_t": 5.0,
+      "onset": 4.9667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 0.852,
+        "presence_first": 0.516,
+        "dur_s": 0.133,
+        "scales": [
+          0.852,
+          0.893,
+          0.934,
+          0.977,
+          1.002,
+          1.002,
+          1.002,
+          1.002
+        ],
+        "presence": [
+          0.516,
+          0.535,
+          0.632,
+          0.817,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          4.8,
+          0.0
+        ],
+        [
+          4.833,
+          0.0
+        ],
+        [
+          4.867,
+          0.0
+        ],
+        [
+          4.9,
+          0.0
+        ],
+        [
+          4.933,
+          0.0
+        ],
+        [
+          4.967,
+          0.0
+        ],
+        [
+          5.0,
+          0.516
+        ],
+        [
+          5.033,
+          0.535
+        ],
+        [
+          5.067,
+          0.632
+        ],
+        [
+          5.1,
+          0.817
+        ],
+        [
+          5.133,
+          1.0
+        ],
+        [
+          5.167,
+          1.0
+        ],
+        [
+          5.2,
+          1.0
+        ],
+        [
+          5.233,
+          1.0
+        ],
+        [
+          5.267,
+          1.0
+        ],
+        [
+          5.3,
+          1.0
+        ],
+        [
+          5.333,
+          1.0
+        ],
+        [
+          5.367,
+          1.0
+        ],
+        [
+          5.4,
+          1.0
+        ],
+        [
+          5.433,
+          1.0
+        ],
+        [
+          5.467,
+          1.0
+        ],
+        [
+          5.5,
+          1.0
+        ],
+        [
+          5.533,
+          1.0
+        ],
+        [
+          5.567,
+          1.0
+        ]
+      ],
+      "offset": 9.8,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          9.367,
+          1.0
+        ],
+        [
+          9.4,
+          1.0
+        ],
+        [
+          9.433,
+          1.0
+        ],
+        [
+          9.467,
+          1.0
+        ],
+        [
+          9.5,
+          1.0
+        ],
+        [
+          9.533,
+          1.0
+        ],
+        [
+          9.567,
+          1.0
+        ],
+        [
+          9.6,
+          1.0
+        ],
+        [
+          9.633,
+          1.0
+        ],
+        [
+          9.667,
+          1.0
+        ],
+        [
+          9.7,
+          1.0
+        ],
+        [
+          9.733,
+          1.0
+        ],
+        [
+          9.767,
+          1.0
+        ],
+        [
+          9.8,
+          0.0
+        ],
+        [
+          9.833,
+          0.0
+        ],
+        [
+          9.867,
+          0.0
+        ],
+        [
+          9.9,
+          0.0
+        ],
+        [
+          9.933,
+          0.0
+        ],
+        [
+          9.967,
+          0.0
+        ],
+        [
+          10.0,
+          0.0
+        ],
+        [
+          10.033,
+          0.0
+        ],
+        [
+          10.067,
+          0.0
+        ],
+        [
+          10.1,
+          0.0
+        ],
+        [
+          10.133,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.9678,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.9678,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.9035,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.8927,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.8494,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9647,
+            "p50": 0.9685,
+            "p90": 0.9701,
+            "n_failed": 0,
+            "noise_p90": 0.0064,
+            "glyph_p10": 0.9344,
+            "size_px": 66.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.9678,
+              "margin": 0.0643,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.9035,
+              "margin": -0.0643,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.8927,
+              "margin": -0.0751,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.8494,
+              "margin": -0.1184,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.968, 천장 p10 0.965, 차순위 대비 +0.064 > 잡음 0.006)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.9678,
+          "margin": 0.0643,
+          "reasons": [
+            "IoU 0.968 >= 천장 p10 0.965",
+            "차순위 대비 차이 +0.064 > 잡음 0.006",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_rx",
+      "role": "reaction",
+      "text": "빤히",
+      "start": 10.0,
+      "end": 12.6,
+      "t_rest": 10.22,
+      "expected_bbox": [
+        463.08,
+        1101.14,
+        154.0,
+        87.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 1,
+      "mask_px": 4509,
+      "match": "geometry(짧은 문구 OCR 실패)",
+      "found": true,
+      "line_boxes": [
+        [
+          474,
+          1111,
+          128,
+          69
+        ]
+      ],
+      "ocr": "",
+      "similarity": 0.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FEE300",
+      "outline_bg_color": "#302E3E",
+      "outline_px_obs": 7,
+      "outline_ring_fracs": [
+        0.21,
+        0.87,
+        1.0,
+        1.0,
+        1.0,
+        0.96,
+        0.83,
+        0.36,
+        0.0,
+        0.0
+      ],
+      "outline_color": "#040000",
+      "outline_bg_same_color_frac": 0.0,
+      "box_inside_luma": 46.8,
+      "box_outside_luma": 48.0,
+      "box_region_color": "#2D2B3B",
+      "box_region_std": 3.89,
+      "box_alpha_obs": 0.024,
+      "ink_h": 69,
+      "ink_w": 128,
+      "bbox_obs": [
+        474,
+        1111,
+        128,
+        69
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_rx_0010219.png",
+      "region": [
+        420,
+        1072,
+        236,
+        144
+      ],
+      "onset_contrast": 193.2,
+      "onset_frame_t": 10.0,
+      "onset": 9.9667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 1.37,
+        "presence_first": 0.815,
+        "dur_s": 0.1,
+        "scales": [
+          1.37,
+          1.244,
+          1.134,
+          1.016,
+          1.016,
+          1.016,
+          1.016,
+          1.016
+        ],
+        "presence": [
+          0.815,
+          0.982,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          9.667,
+          0.0
+        ],
+        [
+          9.7,
+          0.0
+        ],
+        [
+          9.733,
+          0.0
+        ],
+        [
+          9.767,
+          0.0
+        ],
+        [
+          9.8,
+          0.0
+        ],
+        [
+          9.833,
+          0.0
+        ],
+        [
+          9.867,
+          0.0
+        ],
+        [
+          9.9,
+          0.0
+        ],
+        [
+          9.933,
+          0.0
+        ],
+        [
+          9.967,
+          0.0
+        ],
+        [
+          10.0,
+          0.815
+        ],
+        [
+          10.033,
+          0.982
+        ],
+        [
+          10.067,
+          1.0
+        ],
+        [
+          10.1,
+          1.0
+        ],
+        [
+          10.133,
+          1.0
+        ],
+        [
+          10.167,
+          1.0
+        ],
+        [
+          10.2,
+          1.0
+        ],
+        [
+          10.233,
+          1.0
+        ],
+        [
+          10.267,
+          1.0
+        ],
+        [
+          10.3,
+          1.0
+        ],
+        [
+          10.333,
+          1.0
+        ],
+        [
+          10.367,
+          1.0
+        ],
+        [
+          10.4,
+          1.0
+        ],
+        [
+          10.433,
+          1.0
+        ],
+        [
+          10.467,
+          1.0
+        ],
+        [
+          10.5,
+          1.0
+        ],
+        [
+          10.533,
+          1.0
+        ]
+      ],
+      "offset": 12.6,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          12.167,
+          1.0
+        ],
+        [
+          12.2,
+          1.0
+        ],
+        [
+          12.233,
+          1.0
+        ],
+        [
+          12.267,
+          1.0
+        ],
+        [
+          12.3,
+          1.0
+        ],
+        [
+          12.333,
+          1.0
+        ],
+        [
+          12.367,
+          1.0
+        ],
+        [
+          12.4,
+          1.0
+        ],
+        [
+          12.433,
+          1.0
+        ],
+        [
+          12.467,
+          1.0
+        ],
+        [
+          12.5,
+          1.0
+        ],
+        [
+          12.533,
+          1.0
+        ],
+        [
+          12.567,
+          1.0
+        ],
+        [
+          12.6,
+          0.0
+        ],
+        [
+          12.633,
+          0.0
+        ],
+        [
+          12.667,
+          0.0
+        ],
+        [
+          12.7,
+          0.0
+        ],
+        [
+          12.733,
+          0.0
+        ],
+        [
+          12.767,
+          0.0
+        ],
+        [
+          12.8,
+          0.0
+        ],
+        [
+          12.833,
+          0.0
+        ],
+        [
+          12.867,
+          0.0
+        ],
+        [
+          12.9,
+          0.0
+        ],
+        [
+          12.933,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.9757,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.9757,
+            "verdict": "similar"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.934,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.9169,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.8641,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#302838",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9791,
+            "p50": 0.9827,
+            "p90": 0.9927,
+            "n_failed": 0,
+            "noise_p90": 0.0129,
+            "glyph_p10": 0.9764,
+            "size_px": 76.0,
+            "background": "color:#302838"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.9757,
+              "margin": 0.0417,
+              "verdict": "similar",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.934,
+              "margin": -0.0417,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.9169,
+              "margin": -0.0588,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.8641,
+              "margin": -0.1116,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "similar",
+          "summary": "동일 확정 불가: 가장 가까운 후보 Noto Sans CJK KR Black 는 '유사' (동일 폰트라고 쓰지 않음)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "similar",
+          "verdict_ko": "유사(동일 확정 불가)",
+          "iou_expected": 0.9757,
+          "margin": 0.0417,
+          "reasons": [
+            "IoU 0.976 < 천장 p10 0.979",
+            "차순위 대비 차이 +0.042 > 잡음 0.013",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_sit3",
+      "role": "situation",
+      "text": "두 사람이 나란히 와서 선다",
+      "start": 13.7,
+      "end": 18.5,
+      "t_rest": 13.94,
+      "expected_bbox": [
+        169.83,
+        1395.78,
+        740.0,
+        76.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 2,
+      "mask_px": 42416,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          180,
+          1403,
+          723,
+          62
+        ]
+      ],
+      "ocr": "두 사 람 이 나란히 와서 선다",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 16,
+      "outline_ring_fracs": [
+        0.44,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.08,
+      "box_alpha_obs": null,
+      "ink_h": 62,
+      "ink_w": 723,
+      "bbox_obs": [
+        180,
+        1403,
+        723,
+        62
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_sit3_0013939.png",
+      "region": [
+        108,
+        1380,
+        866,
+        106
+      ],
+      "onset_contrast": 246.0,
+      "onset_frame_t": 13.7,
+      "onset": 13.6667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 0.852,
+        "presence_first": 0.477,
+        "dur_s": 0.133,
+        "scales": [
+          0.852,
+          0.893,
+          0.935,
+          0.976,
+          1.003,
+          1.003,
+          1.003,
+          1.003
+        ],
+        "presence": [
+          0.477,
+          0.542,
+          0.615,
+          0.85,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          13.367,
+          0.0
+        ],
+        [
+          13.4,
+          0.0
+        ],
+        [
+          13.433,
+          0.0
+        ],
+        [
+          13.467,
+          0.0
+        ],
+        [
+          13.5,
+          0.0
+        ],
+        [
+          13.533,
+          0.0
+        ],
+        [
+          13.567,
+          0.0
+        ],
+        [
+          13.6,
+          0.0
+        ],
+        [
+          13.633,
+          0.0
+        ],
+        [
+          13.667,
+          0.0
+        ],
+        [
+          13.7,
+          0.477
+        ],
+        [
+          13.733,
+          0.542
+        ],
+        [
+          13.767,
+          0.615
+        ],
+        [
+          13.8,
+          0.85
+        ],
+        [
+          13.833,
+          1.0
+        ],
+        [
+          13.867,
+          1.0
+        ],
+        [
+          13.9,
+          1.0
+        ],
+        [
+          13.933,
+          1.0
+        ],
+        [
+          13.967,
+          1.0
+        ],
+        [
+          14.0,
+          1.0
+        ],
+        [
+          14.033,
+          1.0
+        ],
+        [
+          14.067,
+          1.0
+        ],
+        [
+          14.1,
+          1.0
+        ],
+        [
+          14.133,
+          1.0
+        ],
+        [
+          14.167,
+          1.0
+        ],
+        [
+          14.2,
+          1.0
+        ],
+        [
+          14.233,
+          1.0
+        ],
+        [
+          14.267,
+          1.0
+        ]
+      ],
+      "offset": 18.5,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          18.067,
+          1.0
+        ],
+        [
+          18.1,
+          1.0
+        ],
+        [
+          18.133,
+          1.0
+        ],
+        [
+          18.167,
+          1.0
+        ],
+        [
+          18.2,
+          1.0
+        ],
+        [
+          18.233,
+          1.0
+        ],
+        [
+          18.267,
+          1.0
+        ],
+        [
+          18.3,
+          1.0
+        ],
+        [
+          18.333,
+          1.0
+        ],
+        [
+          18.367,
+          1.0
+        ],
+        [
+          18.4,
+          1.0
+        ],
+        [
+          18.433,
+          1.0
+        ],
+        [
+          18.467,
+          1.0
+        ],
+        [
+          18.5,
+          0.0
+        ],
+        [
+          18.533,
+          0.0
+        ],
+        [
+          18.567,
+          0.0
+        ],
+        [
+          18.6,
+          0.0
+        ],
+        [
+          18.633,
+          0.0
+        ],
+        [
+          18.667,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.9658,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.9658,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.9032,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.8957,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.854,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.9658,
+            "p50": 0.9718,
+            "p90": 0.9751,
+            "n_failed": 0,
+            "noise_p90": 0.0095,
+            "glyph_p10": 0.9416,
+            "size_px": 66.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.9658,
+              "margin": 0.0626,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.9032,
+              "margin": -0.0626,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.8957,
+              "margin": -0.0701,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.854,
+              "margin": -0.1118,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.966, 천장 p10 0.966, 차순위 대비 +0.063 > 잡음 0.009)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.9658,
+          "margin": 0.0626,
+          "reasons": [
+            "IoU 0.966 >= 천장 p10 0.966",
+            "차순위 대비 차이 +0.063 > 잡음 0.009",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    },
+    {
+      "id": "c_sit4",
+      "role": "situation",
+      "text": "그리고 둘 다 떠난다",
+      "start": 18.7,
+      "end": 22.3,
+      "t_rest": 18.94,
+      "expected_bbox": [
+        268.46,
+        1395.78,
+        543.0,
+        76.0
+      ],
+      "resolution": [
+        1080,
+        1920
+      ],
+      "n_candidates": 2,
+      "mask_px": 37661,
+      "match": "ocr",
+      "found": true,
+      "line_boxes": [
+        [
+          278,
+          1403,
+          526,
+          62
+        ]
+      ],
+      "ocr": "그리고 둘 다 떠난다",
+      "similarity": 1.0,
+      "lines_found": 1,
+      "lines_expected": 1,
+      "fill_color": "#FFFFFF",
+      "outline_px_obs": 16,
+      "outline_ring_fracs": [
+        0.39,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "outline_color": "#000000",
+      "outline_bg_same_color_frac": 1.0,
+      "box_inside_luma": 0.0,
+      "box_outside_luma": 0.0,
+      "box_region_color": "#000000",
+      "box_region_std": 0.0,
+      "box_alpha_obs": null,
+      "ink_h": 62,
+      "ink_w": 526,
+      "bbox_obs": [
+        278,
+        1403,
+        526,
+        62
+      ],
+      "evidence_frame": "episodes/test-coverage-001/qa/frames/cap_c_sit4_0018940.png",
+      "region": [
+        220,
+        1380,
+        640,
+        106
+      ],
+      "onset_contrast": 246.2,
+      "onset_frame_t": 18.7,
+      "onset": 18.6667,
+      "motion_in_obs": {
+        "type": "pop",
+        "scale_first": 0.851,
+        "presence_first": 0.553,
+        "dur_s": 0.1,
+        "scales": [
+          0.851,
+          0.893,
+          0.935,
+          0.979,
+          1.004,
+          1.004,
+          1.004,
+          1.004
+        ],
+        "presence": [
+          0.553,
+          0.595,
+          0.646,
+          0.892,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "presence_in": [
+        [
+          18.5,
+          0.0
+        ],
+        [
+          18.533,
+          0.0
+        ],
+        [
+          18.567,
+          0.0
+        ],
+        [
+          18.6,
+          0.0
+        ],
+        [
+          18.633,
+          0.0
+        ],
+        [
+          18.667,
+          0.0
+        ],
+        [
+          18.7,
+          0.553
+        ],
+        [
+          18.733,
+          0.595
+        ],
+        [
+          18.767,
+          0.646
+        ],
+        [
+          18.8,
+          0.892
+        ],
+        [
+          18.833,
+          1.0
+        ],
+        [
+          18.867,
+          1.0
+        ],
+        [
+          18.9,
+          1.0
+        ],
+        [
+          18.933,
+          1.0
+        ],
+        [
+          18.967,
+          1.0
+        ],
+        [
+          19.0,
+          1.0
+        ],
+        [
+          19.033,
+          1.0
+        ],
+        [
+          19.067,
+          1.0
+        ],
+        [
+          19.1,
+          1.0
+        ],
+        [
+          19.133,
+          1.0
+        ],
+        [
+          19.167,
+          1.0
+        ],
+        [
+          19.2,
+          1.0
+        ],
+        [
+          19.233,
+          1.0
+        ],
+        [
+          19.267,
+          1.0
+        ]
+      ],
+      "offset": 22.3,
+      "motion_out_obs": {
+        "type": "none",
+        "dur_s": 0.0,
+        "expected": "none"
+      },
+      "presence_out": [
+        [
+          21.867,
+          1.0
+        ],
+        [
+          21.9,
+          1.0
+        ],
+        [
+          21.933,
+          1.0
+        ],
+        [
+          21.967,
+          1.0
+        ],
+        [
+          22.0,
+          1.0
+        ],
+        [
+          22.033,
+          1.0
+        ],
+        [
+          22.067,
+          1.0
+        ],
+        [
+          22.1,
+          1.0
+        ],
+        [
+          22.133,
+          1.0
+        ],
+        [
+          22.167,
+          1.0
+        ],
+        [
+          22.2,
+          1.0
+        ],
+        [
+          22.233,
+          1.0
+        ],
+        [
+          22.267,
+          1.0
+        ],
+        [
+          22.3,
+          0.0
+        ],
+        [
+          22.333,
+          0.0
+        ],
+        [
+          22.367,
+          0.0
+        ],
+        [
+          22.4,
+          0.0
+        ],
+        [
+          22.433,
+          0.0
+        ],
+        [
+          22.467,
+          0.0
+        ]
+      ],
+      "font": {
+        "status": "measured",
+        "method": "identify",
+        "expected": "Noto Sans CJK KR Black",
+        "best": "Noto Sans CJK KR Black",
+        "iou_expected": 0.9754,
+        "scores": [
+          {
+            "font": "Noto Sans CJK KR Black",
+            "iou": 0.9754,
+            "verdict": "identical"
+          },
+          {
+            "font": "Pretendard Black",
+            "iou": 0.9119,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Pretendard ExtraBold",
+            "iou": 0.9069,
+            "verdict": "unmeasured"
+          },
+          {
+            "font": "Noto Sans CJK KR Bold",
+            "iou": 0.8594,
+            "verdict": "unmeasured"
+          }
+        ],
+        "identify": {
+          "method": "typography.identify_many + 출력 인코딩 조건의 천장(ceiling)",
+          "expected": "Noto Sans CJK KR Black",
+          "expected_canonical": "Noto Sans CJK KR Black",
+          "candidates": [
+            "Noto Sans CJK KR Black",
+            "Pretendard Black",
+            "Pretendard ExtraBold",
+            "Noto Sans CJK KR Bold"
+          ],
+          "conditions": {
+            "canvas": [
+              1080,
+              1920
+            ],
+            "ref_resolution": [
+              1080,
+              1920
+            ],
+            "codec": "h264",
+            "crf": 18.0,
+            "bitrate_kbps": null,
+            "qp": null,
+            "x264_preset": "veryfast",
+            "gop": 60,
+            "frames_per_sample": 6,
+            "fps": 30.0,
+            "background": "color:#000000",
+            "scale_flags": "bicubic",
+            "renderer": "libass(ffmpeg subtitles filter, shortkit.edit.render 규약)",
+            "assumed": false,
+            "source": "output MP4 x264 SEI",
+            "label": "h264_crf18_1080x1920"
+          },
+          "ceiling_cached": true,
+          "ceiling": {
+            "n": 12,
+            "p10": 0.97,
+            "p50": 0.9792,
+            "p90": 0.9835,
+            "n_failed": 0,
+            "noise_p90": 0.0138,
+            "glyph_p10": 0.9525,
+            "size_px": 66.0,
+            "background": "color:#000000"
+          },
+          "ranked": [
+            {
+              "rank": 1,
+              "font": "Noto Sans CJK KR Black",
+              "iou": 0.9754,
+              "margin": 0.0635,
+              "verdict": "identical",
+              "glyph_pass": true
+            },
+            {
+              "rank": 2,
+              "font": "Pretendard Black",
+              "iou": 0.9119,
+              "margin": -0.0635,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 3,
+              "font": "Pretendard ExtraBold",
+              "iou": 0.9069,
+              "margin": -0.0685,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            },
+            {
+              "rank": 4,
+              "font": "Noto Sans CJK KR Bold",
+              "iou": 0.8594,
+              "margin": -0.116,
+              "verdict": "unmeasured",
+              "glyph_pass": null
+            }
+          ],
+          "top": "Noto Sans CJK KR Black",
+          "top_verdict": "identical",
+          "summary": "동일 판정: Noto Sans CJK KR Black (IoU 0.975, 천장 p10 0.970, 차순위 대비 +0.064 > 잡음 0.014)",
+          "failed_crops": [],
+          "missing_candidates": [],
+          "status": "measured",
+          "verdict": "identical",
+          "verdict_ko": "동일",
+          "iou_expected": 0.9754,
+          "margin": 0.0635,
+          "reasons": [
+            "IoU 0.975 >= 천장 p10 0.970",
+            "차순위 대비 차이 +0.064 > 잡음 0.014",
+            "글자별 검사 통과"
+          ],
+          "glyph_below_floor": []
+        }
+      }
+    }
+  ],
+  "identity": {
+    "forbidden_terms": [
+      "조슈아매거진",
+      "조슈아 매거진",
+      "joshuamagazine",
+      "joshua magazine",
+      "JOSHUA MAGAZINE"
+    ],
+    "sample_times": [
+      0.5,
+      1.5,
+      2.4,
+      2.5,
+      3.5,
+      4.5,
+      5.5,
+      6.5,
+      7.3,
+      7.5,
+      8.5,
+      9.5,
+      10.5,
+      11.5,
+      11.65,
+      12.5,
+      13.5,
+      14.5,
+      15.5,
+      16.0,
+      16.5,
+      17.5,
+      18.5,
+      19.5,
+      20.5,
+      21.5
+    ],
+    "forbidden_hits": [],
+    "leftovers": [
+      {
+        "t": 11.65,
+        "zone": "video_bottom",
+        "text": "ae",
+        "conf": 49.0,
+        "handle_like": false,
+        "box": [
+          959.5,
+          1220.0,
+          8.5,
+          5.5
+        ],
+        "clip_id": "s3"
+      },
+      {
+        "t": 16.5,
+        "zone": "video_bottom",
+        "text": "rd,",
+        "conf": 56.0,
+        "handle_like": false,
+        "box": [
+          148.0,
+          1156.0,
+          53.5,
+          23.5
+        ],
+        "clip_id": "s4"
+      },
+      {
+        "t": 18.5,
+        "zone": "video_bottom",
+        "text": "ae?",
+        "conf": 46.0,
+        "handle_like": false,
+        "box": [
+          192.5,
+          1120.0,
+          105.5,
+          67.5
+        ],
+        "clip_id": "s5"
+      },
+      {
+        "t": 18.5,
+        "zone": "video_bottom",
+        "text": "wl",
+        "conf": 67.0,
+        "handle_like": false,
+        "box": [
+          820.5,
+          1237.5,
+          32.0,
+          26.5
+        ],
+        "clip_id": "s5"
+      },
+      {
+        "t": 20.5,
+        "zone": "video_bottom",
+        "text": "노고",
+        "conf": 64.0,
+        "handle_like": false,
+        "box": [
+          508.0,
+          1246.0,
+          33.0,
+          18.0
+        ],
+        "clip_id": "s5"
+      }
+    ],
+    "leftover_groups": [
+      {
+        "zone": "video_bottom",
+        "clip_id": "s3",
+        "text": "ae",
+        "times": [
+          11.65
+        ],
+        "confs": [
+          49.0
+        ],
+        "box": [
+          959.5,
+          1220.0,
+          8.5,
+          5.5
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "s4",
+        "text": "rd,",
+        "times": [
+          16.5
+        ],
+        "confs": [
+          56.0
+        ],
+        "box": [
+          148.0,
+          1156.0,
+          53.5,
+          23.5
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "s5",
+        "text": "ae?",
+        "times": [
+          18.5
+        ],
+        "confs": [
+          46.0
+        ],
+        "box": [
+          192.5,
+          1120.0,
+          105.5,
+          67.5
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "s5",
+        "text": "wl",
+        "times": [
+          18.5
+        ],
+        "confs": [
+          67.0
+        ],
+        "box": [
+          820.5,
+          1237.5,
+          32.0,
+          26.5
+        ],
+        "handle_like": false,
+        "persistent": false
+      },
+      {
+        "zone": "video_bottom",
+        "clip_id": "s5",
+        "text": "노고",
+        "times": [
+          20.5
+        ],
+        "confs": [
+          64.0
+        ],
+        "box": [
+          508.0,
+          1246.0,
+          33.0,
+          18.0
+        ],
+        "handle_like": false,
+        "persistent": false
+      }
+    ],
+    "ocr_calls": 113,
+    "ocr_timeouts": 0
+  },
+  "tone": {
+    "n": 4,
+    "counts": {
+      "명사형/기타": 2,
+      "반말": 4
+    },
+    "mode": "반말_구어체",
+    "items": [
+      {
+        "text": "빈 방 에 들어온 사람들",
+        "class": "명사형/기타",
+        "ending": "사람들",
+        "register": null
+      },
+      {
+        "text": "설정 연결 검증 테스트 2 편",
+        "class": "명사형/기타",
+        "ending": "편",
+        "register": null
+      },
+      {
+        "text": "한 사 람 이 빈 방 을 가 로 질 러 나간다",
+        "class": "반말",
+        "ending": "나간다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "한 남 성 이 카메라 앞 까지 걸 어 온 다",
+        "class": "반말",
+        "ending": "다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "두 사 람 이 나란히 와서 선다",
+        "class": "반말",
+        "ending": "선다",
+        "register": "반말_구어체"
+      },
+      {
+        "text": "그리고 둘 다 떠난다",
+        "class": "반말",
+        "ending": "떠난다",
+        "register": "반말_구어체"
+      }
+    ],
+    "method": "shortkit.reference.aggregate.ending_class (분석기·validate 와 같은 분류기), 최빈 종결 ≥ 0.6 이면 그 말투, 아니면 혼합",
+    "note": "명사형/기타(명사·감탄사 끝)는 판정에서 제외",
+    "roles_used": [
+      "title",
+      "description",
+      "situation",
+      "reaction"
+    ]
+  },
+  "cover": {
+    "t": 0.0,
+    "source": "first_frame",
+    "text_role": "title",
+    "expected_text": "빈 방에 들어온 사람들",
+    "ocr": "빈 방 에 들어온 사람들",
+    "similarity": 1.0,
+    "role_caption_visible": true
+  },
+  "status": "measured"
+}

@@ -335,6 +335,104 @@ def _transition_windows(ctx: QAContext) -> list[tuple[float, float]]:
     return out
 
 
+# ----------------------------------------------------------------------------- planned-geometry frame match
+GEO_WORK_W = 240
+
+
+def _region_gray(ctx: QAContext, c, frame: np.ndarray, work_w: int = GEO_WORK_W) -> np.ndarray:
+    cv2 = _cv2()
+    rx, ry, rw, rh = rect_xywh(c.region)
+    wh = max(8, int(round(rh * work_w / rw)))
+    reg = frame[int(ry):int(ry + rh), int(rx):int(rx + rw)]
+    return cv2.cvtColor(cv2.resize(reg, (work_w, wh), interpolation=cv2.INTER_AREA), cv2.COLOR_RGB2GRAY).astype(np.float32)
+
+
+def _warp_planned(c, src_frame: np.ndarray, t: float, zoom_extra: float = 1.0, work_w: int = GEO_WORK_W) -> np.ndarray:
+    """The source frame placed in the clip region exactly as the plan says at output time t
+    (``clip_transform``: fit + eased zoom), optionally scaled by ``zoom_extra`` about the region centre."""
+    cv2 = _cv2()
+    rx, ry, rw, rh = rect_xywh(c.region)
+    k = work_w / rw
+    wh = max(8, int(round(rh * k)))
+    tr = clip_transform(c, t)
+    s_, tx, ty = tr["s"] * zoom_extra, tr["tx"], tr["ty"]
+    if zoom_extra != 1.0:
+        cx, cy = rx + rw / 2.0, ry + rh / 2.0
+        tx, ty = cx - (cx - tx) * zoom_extra, cy - (cy - ty) * zoom_extra
+    M = np.array([[s_ * k, 0, (tx - rx) * k], [0, s_ * k, (ty - ry) * k]], np.float32)
+    return cv2.cvtColor(cv2.warpAffine(src_frame, M, (work_w, wh), flags=cv2.INTER_AREA), cv2.COLOR_RGB2GRAY).astype(np.float32)
+
+
+def planned_frame_match(ctx: QAContext, c, t: float, search_s: float | None = None, zoom_alt: float | None = None) -> dict:
+    """Does the OUTPUT frame at t show the planned source frame under the planned geometry?
+    Source frames within +-``search_s`` (default 1.5 source frames) of the planned source time are
+    tried; -> {ncc, src_t, expected_src_t[, ncc_alt]} where ncc_alt is the same match with the picture
+    scaled by ``zoom_alt`` (a zoom the plan does not have) -- the gap tells whether the geometry
+    test can see a zoom of that size at all.  Empty dict when a file cannot be read."""
+    from .. import paths
+
+    p = paths.absp(c.source_path)
+    if not p.is_file():
+        return {}
+    try:
+        of = grab(ctx.mp4, t)
+        rate = _info(p).fps or 30.0
+        es = src_time(c, t)
+        w = search_s if search_s is not None else 1.5 / rate
+        ts, frs = grab_window(p, max(0.0, es - w), 2 * w + 1.0 / rate)
+    except Exception:
+        return {}
+    if not frs:
+        return {}
+    og = _region_gray(ctx, c, of)
+    vals = [ncc(_warp_planned(c, f, t), og) for f in frs]
+    j = int(np.argmax(vals))
+    out = {"t": rnd(t, 3), "expected_src_t": rnd(es, 3), "src_t": rnd(ts[j], 3), "ncc": rnd(vals[j], 4)}
+    if zoom_alt is not None:
+        out["ncc_alt"] = rnd(ncc(_warp_planned(c, frs[j], t, zoom_extra=zoom_alt), og), 4)
+    return out
+
+
+GEO_NCC_MIN = 0.95          # output frame == planned source frame under the planned geometry
+GEO_ALT_MARGIN = 0.02       # ... and a 4 % zoom of it fits clearly worse (the test can see such a zoom)
+
+
+def geometry_check(ctx: QAContext, c, n: int = 5, zoom_alt: float = 1.04) -> dict:
+    """Planned geometry verified directly: at ``n`` times across the clip (outside transitions and
+    freezes) the output region equals the planned source frame placed by ``clip_transform`` (NCC >=
+    GEO_NCC_MIN) and the same frame zoomed by ``zoom_alt`` fits worse by >= GEO_ALT_MARGIN.  Feature-based
+    scale curves are fooled by large moving subjects (people walking to the camera); this is not."""
+    fr = 1.0 / ctx.fps
+    clips = ctx.resolved.clips
+    ci = next((i for i, x in enumerate(clips) if x.id == c.id), 0)
+    t_lo = c.out_start + (float(c.transition_in.dur or 0) if ci else 0.0) + 2 * fr
+    nxt = clips[ci + 1] if ci + 1 < len(clips) else None
+    t_hi = (nxt.out_start if nxt else c.out_end) - 2 * fr
+    ranges = [(t_lo, t_hi)]
+    if c.freeze is not None:
+        ranges = [(t_lo, min(t_hi, c.freeze.out_start - fr)), (c.freeze.out_start + c.freeze.hold + fr, t_hi)]
+    span = sum(max(0.0, b - a) for a, b in ranges)
+    if span <= 0.2:
+        return {"status": "unmeasured", "reason": "비교할 구간이 너무 짧음"}
+    times, acc = [], 0.0
+    targets = [span * (k + 0.5) / n for k in range(n)]
+    for a, b in ranges:
+        L = max(0.0, b - a)
+        times += [a + (q - acc) for q in targets if acc <= q < acc + L]
+        acc += L
+    rows = [r for r in (planned_frame_match(ctx, c, t, zoom_alt=zoom_alt) for t in times) if r]
+    if len(rows) < 3:
+        return {"status": "unmeasured", "reason": "프레임을 읽지 못함", "samples": rows}
+    nccs = [r["ncc"] for r in rows]
+    gaps = [r["ncc"] - r["ncc_alt"] for r in rows]
+    confirmed = float(np.median(nccs)) >= GEO_NCC_MIN and min(nccs) >= GEO_NCC_MIN - 0.03 and \
+        float(np.median(gaps)) >= GEO_ALT_MARGIN
+    return {"status": "measured", "confirmed": bool(confirmed), "ncc_median": rnd(float(np.median(nccs)), 4),
+            "ncc_min": rnd(min(nccs), 4), "zoom_alt": zoom_alt, "alt_gap_median": rnd(float(np.median(gaps)), 4),
+            "samples": rows,
+            "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"}
+
+
 # ----------------------------------------------------------------------------- transitions
 def frame_diffs(sc: dict) -> np.ndarray:
     th = sc["thumbs"]
@@ -455,6 +553,11 @@ def _crossfade_fit(sc: dict, t_b: float, dur: float, fps: float) -> dict | None:
         k, c0 = np.polyfit(tt[sel], al[sel], 1)
         if k > 0:
             t0 = -c0 / k                     # alpha = 0
+            # a blend must happen HERE: a fitted start/length outside the searched window is not a crossfade
+            # (two nearly identical pictures around a jump cut gave t=-49 s, dur=81 s on test-coverage-001 s5)
+            win = max(dur, 0.2) + 4 * fr
+            if not (t_b - win <= t0 <= t_b + win and 2 * fr <= 1.0 / k <= 2 * win + 4 * fr):
+                return None
             return {"type": "crossfade", "t": round(float(t0), 4), "dur": round(float(1.0 / k), 4),
                     "score": round(1.0 - err, 3), "frames_in_blend": int(sel.sum())}
     return {"type": "crossfade", "t": round(float(times[a]), 4), "dur": round(float(times[b] - times[a] + fr), 4),
@@ -497,15 +600,33 @@ def analyze_transitions(ctx: QAContext, sc: dict) -> dict:
     flashes = _flash_runs(sc, fps)
     bounds = []
     claimed: list[tuple[float, float]] = []
-    for c in ctx.resolved.clips[1:]:
+    clips = ctx.resolved.clips
+    for ci, c in enumerate(clips[1:], start=1):
         tr = c.transition_in
         dur = float(tr.dur or 0.0)
         obs = _classify_boundary(sc, d, flashes, c.out_start, dur, fps)
         exp = {"type": tr.type, "t": round(c.out_start, 4), "dur": round(dur, 4),
                "color": tr.color if tr.type == "flash" else None}
-        ok = obs["type"] == tr.type
+        prev = clips[ci - 1]
+        cont = tr.type == "cut" and continuous_edit(prev, c)
+        if cont:
+            # the plan continues the same shot (same source, next source frame, same speed): there is no
+            # picture change to see -- the output is right when it shows none
+            exp["continuous"] = True
+            exp["type_visible"] = "none"
+        elif tr.type == "cut" and obs["type"] != "cut":
+            # a jump between two nearly identical pictures shows no frame-difference spike: tell the two
+            # sides apart by which planned source frame each output frame shows
+            mb = boundary_by_mapping(ctx, prev, c)
+            obs["mapping"] = mb
+            if mb.get("verified"):
+                obs = {"type": "cut", "t": round(c.out_start, 4), "dur": 0.0, "score": None, "method": "mapping",
+                       "mapping": mb, "diff_obs": obs}
+        ok = obs["type"] == (exp.get("type_visible") or tr.type)
         timing_ok = None
-        if ok and tr.type == "cut":
+        if cont:
+            timing_ok = ok
+        elif ok and tr.type == "cut":
             timing_ok = abs(obs["t"] - c.out_start) <= fr + 1e-3
         elif ok and tr.type == "crossfade":
             timing_ok = abs(obs["t"] - c.out_start) <= fr + 1e-3 and abs(obs["dur"] - dur) <= 2 * fr + 1e-3
@@ -538,11 +659,77 @@ def analyze_transitions(ctx: QAContext, sc: dict) -> dict:
             if c is not None:
                 e["clip_id"] = c.id
                 e["source_has_cut"] = source_has_cut(c, src_time(c, e["t"]))
+                # a low-fps / slowed source shows each source frame for several output frames: fast subject
+                # motion then changes the picture in one step (test-coverage-001 s5: 12 fps at 0.5x -> a step
+                # every 5 frames).  If both frames are exactly the planned source frames, it is the source's own
+                # motion, not an edit.
+                st = source_step(ctx, c, e["t"] - 1.0 / fps, e["t"])
+                e["source_step"] = st
+                if st.get("explained"):
+                    continue
         kept.append(e)
     extra = kept
     return {"boundaries": bounds, "unexpected": extra, "flashes": flashes,
             "diff_stats": {"p50": rnd(np.median(d[1:]) if len(d) > 1 else None, 3),
                            "p90": rnd(np.percentile(d[1:], 90) if len(d) > 1 else None, 3)}}
+
+
+def continuous_edit(prev, c) -> bool:
+    """The boundary continues the same shot: same source file, the next clip starts where the previous one
+    stops (within one source frame), same speed, no crop/geometry change."""
+    if prev.source_path != c.source_path or abs(float(prev.speed or 1) - float(c.speed or 1)) > 1e-6:
+        return False
+    rate = _info_safe(c.source_path)
+    if abs(float(c.src_in) - float(prev.src_out)) > 1.0 / rate + 1e-6:
+        return False
+    same_geo = rect_xywh(prev.region) == rect_xywh(c.region) and (prev.crop == c.crop) and prev.zoom is None \
+        and c.zoom is None and tuple(prev.src_size) == tuple(c.src_size) and (prev.fit or "cover") == (c.fit or "cover")
+    return bool(same_geo)
+
+
+def _info_safe(stored) -> float:
+    from .. import paths
+
+    try:
+        return float(_info(paths.absp(stored)).fps or 30.0)
+    except Exception:
+        return 30.0
+
+
+def boundary_by_mapping(ctx: QAContext, prev, c, margin: float = 0.01) -> dict:
+    """A hard cut between two similar pictures: the output frame one frame BEFORE the boundary must show
+    the previous clip's planned source frame and the frame one frame AFTER it the next clip's -- each
+    matched better than the other side's frame by ``margin`` NCC -- else the two sides are not told apart."""
+    from .. import paths
+
+    fr = 1.0 / ctx.fps
+    t0, t1 = c.out_start - fr, c.out_start + fr
+    pa, pb = planned_frame_match(ctx, prev, t0), planned_frame_match(ctx, c, t1)
+    if not pa or not pb:
+        return {"verified": False, "reason": "프레임을 읽지 못함"}
+    try:
+        fa = grab(paths.absp(prev.source_path), float(pa["src_t"]))
+        fb = grab(paths.absp(c.source_path), float(pb["src_t"]))
+        oa, ob = _region_gray(ctx, prev, grab(ctx.mp4, t0)), _region_gray(ctx, c, grab(ctx.mp4, t1))
+    except Exception:
+        return {"verified": False, "reason": "프레임을 읽지 못함"}
+    cross_a = ncc(_warp_planned(c, fb, t1), oa)        # before-frame vs the NEXT clip's frame
+    cross_b = ncc(_warp_planned(prev, fa, t0), ob)     # after-frame vs the PREVIOUS clip's frame
+    ok = pa["ncc"] >= 0.9 and pb["ncc"] >= 0.9 and pa["ncc"] - cross_a >= margin and pb["ncc"] - cross_b >= margin
+    return {"verified": bool(ok), "before": {"t": rnd(t0, 3), "own": pa["ncc"], "other": rnd(cross_a, 4), "src_t": pa["src_t"]},
+            "after": {"t": rnd(t1, 3), "own": pb["ncc"], "other": rnd(cross_b, 4), "src_t": pb["src_t"]},
+            "margin": margin}
+
+
+def source_step(ctx: QAContext, c, t_prev: float, t_cur: float) -> dict:
+    """Both output frames around a picture step show exactly the planned source frames (NCC >= 0.9,
+    within one source frame of the plan) -> the step is the source's own frame change."""
+    a, b = planned_frame_match(ctx, c, t_prev), planned_frame_match(ctx, c, t_cur)
+    if not a or not b:
+        return {"explained": False}
+    rate = _info_safe(c.source_path)
+    near = all(abs(float(r["src_t"]) - float(r["expected_src_t"])) <= 1.0 / rate + 1e-3 for r in (a, b))
+    return {"explained": bool(a["ncc"] >= 0.9 and b["ncc"] >= 0.9 and near), "before": a, "after": b}
 
 
 def source_has_cut(clip, st: float) -> bool | None:
@@ -733,9 +920,17 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
             item["zoom_ratio_corrected"] = rnd(item["measured_final_ratio"] / sr_, 4)
         item["status"] = "measured"
         item["tolerance"] = {"ratio": 0.04, "t50_s": max(0.1, 3 * fr)}
+        if z is None and (item.get("measured_max_dev") or 0) > 0.05:
+            # the scale curve says "zoom" on a clip the plan does not zoom: check the geometry directly
+            try:
+                item["geometry"] = geometry_check(ctx, c)
+            except Exception as e:
+                item["geometry"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
         out.append(item)
-    # consecutive zoom count (same effect stacked on consecutive segments)
-    zoomed = [(it.get("measured_max_dev") or 0) > 0.05 for it in out]
+    # consecutive zoom count (same effect stacked on consecutive segments): a clip counts when it zooms by
+    # plan, or when its scale curve moves and the planned (unzoomed) geometry does NOT reproduce the output
+    zoomed = [((it.get("measured_max_dev") or 0) > 0.05) and
+              not ((it.get("geometry") or {}).get("confirmed") is True) for it in out]
     run = best = 0
     for zf in zoomed:
         run = run + 1 if zf else 0
@@ -995,11 +1190,23 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
             item.update(status="unmeasured", reason="클립이 너무 짧아 비교할 프레임 없음")
             out.append(item)
             continue
+        # stage 2 (only when no stage-1 sample is decisive): more positions across the clip, because the source
+        # time can only be told where the picture moves -- a clip whose three fixed positions all fall in still
+        # stretches (test-pipeline-001 s4 after trimming: people holding a pose) was left unmeasured although it
+        # has moving moments elsewhere
+        extra_t = []
+        for a, b in ranges:
+            if b - a > 0.15:
+                extra_t += [a + (b - a) * q for q in (0.05, 0.1, 0.3, 0.4, 0.6, 0.7, 0.9, 0.95)]
         rx, ry, rw, rh = rect_xywh(c.region)
         k = work_w / rw
         wh = max(8, int(round(rh * k)))
         samples = []
-        for t in cand_t:
+        slowed = abs(float(c.speed or 1.0) - 1.0) > 1e-3
+        for t, stage in [(t_, 1) for t_ in cand_t] + [(t_, 2) for t_ in extra_t]:
+            # a speed change needs the slope over many samples (source-frame quantisation): keep going then
+            if stage == 2 and not slowed and any(s_["decisive"] and s_["ncc"] >= 0.6 for s_ in samples):
+                break
             try:
                 of = grab(ctx.mp4, t)
             except Exception:
@@ -1043,7 +1250,7 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
                 samples.append({"t": rnd(t, 3), "expected_src_t": rnd(exp_s, 3), "matched_src_t": rnd(best[1], 3),
                                 "ncc": rnd(full_ncc, 3), "ncc_moving": rnd(best[0], 3), "offset": rnd(best[1] - exp_s, 3),
                                 "prominence": rnd(prominence, 4), "moving_frac": rnd(float(mmask.mean()), 3),
-                                "at_window_edge": bool(at_edge),
+                                "at_window_edge": bool(at_edge), "stage": stage,
                                 "decisive": bool(use_mask and prominence >= 0.03 and not at_edge)})
         item["samples"] = samples
         item["src_fps"] = rnd(_info(p).fps, 3)
@@ -1062,6 +1269,12 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
                 ss = np.array([s["matched_src_t"] for s in good])
                 if tt.max() - tt.min() > 0.3:
                     item["speed_obs"] = rnd(float(np.polyfit(tt, ss, 1)[0]), 3)
+                    # matched source times are whole source frames: the slope cannot be known better than one
+                    # source frame over the sampled source span
+                    span = float(ss.max() - ss.min())
+                    fps_s = float(item.get("src_fps") or 30.0)
+                    item["speed_quant_frac"] = rnd((1.0 / fps_s) / span, 4) if span > 0 else None
+                    item["speed_samples"] = len(good)
         out.append(item)
     return {"clips": out}
 

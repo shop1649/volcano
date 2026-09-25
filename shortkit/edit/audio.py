@@ -12,11 +12,19 @@ Rules enforced here (user's audio rules):
   The used section starts at plan.bgm.section_start_s or else the preset's audio.bgm.section_start_s.
 
 Gain semantics (shared with the renderer): audio.bgm.gain_db, audio.sfx.gain_db_default / plan
-sfx gain_db and audio.original.keep_gain_db are levels AT THE FINAL PROGRAM LOUDNESS (gain applied
-to the clean file / SFX file / source audio as recorded).  ``ref audio-measure`` measures
-audio.bgm.gain_db that way (clean-file LS gain + target_lufs - reference mix LUFS), so the master's
-loudness normalisation is a small trim; the foreground safety limiter may reduce SFX / kept
-originals by at most audio.loudness.max_limiter_db (``shortkit.edit.render``).
+sfx gain_db are levels AT THE FINAL PROGRAM LOUDNESS (gain applied to the clean file / SFX file).
+``ref audio-measure`` measures audio.bgm.gain_db that way (clean-file LS gain + target_lufs -
+reference mix LUFS), so the master's loudness normalisation is a small trim; the foreground safety
+limiter may reduce SFX / kept originals by at most audio.loudness.max_limiter_db (``shortkit.edit.render``).
+
+Kept original sound is different: audio.original.keep_gain_db (and a plan's
+``timeline[].original_audio.gain_db``, same unit) is the kept speech LOUDNESS relative to the programme
+loudness in LU -- what ``ref audio-measure`` emits (value_semantics "LU re programme loudness": kept
+speech integrated loudness - mix integrated loudness).  The applied gain is therefore
+``T + keep_gain_db - L_src`` with T = audio.loudness.integrated_lufs and L_src the measured integrated
+loudness (EBU R128, ``kept_audio_loudness``) of the kept source audio of that clip -- or, when the clip
+keeps less than KEPT_LEVEL_MIN_S of audio, of everything kept from that source.  QA measures the same
+quantity on the output (``shortkit.qa.checks._rows_original``).
 """
 from __future__ import annotations
 
@@ -29,6 +37,11 @@ from . import sfxmap
 from .ir import AudioPlan, Bgm, Clip, OriginalAudio, SfxPlacement
 
 SILENCE_DB = -120.0      # envelope floor meaning "muted" (render maps <= -120 dB to exact 0)
+# kept audio needed for an EBU R128 integrated loudness: one 400 ms gating block (ffmpeg ebur128 reports
+# -70 LUFS = "none" below it; measured: 0.3 s -> -70, 0.4 s -> defined).  The reference analyzer asks
+# 1.0 s of speech (KEEP_LEVEL_MIN_S) for a stable per-video statistic; here one clip's level is needed.
+KEPT_LEVEL_MIN_S = 0.4
+LEVEL_SR = 48000
 
 
 def _issue(sev, code, msg, where=""):
@@ -278,6 +291,75 @@ def kept_original_ranges(plan: dict, clips: list[Clip], issues: list[dict], sour
     return out
 
 
+def kept_audio_loudness(pieces: list[tuple[str, float, float]], sr: int = LEVEL_SR) -> dict:
+    """Integrated loudness (EBU R128 via ``util.media.lufs``, the same measurement as the programme
+    loudness) of kept source audio: ``pieces`` = [(stored path, src_start, src_end)], each read with
+    ``util.media.read_audio``'s stereo convention (mono duplicated at unity -- exactly as the renderer
+    places it on the stereo timeline) and concatenated.  -> {lufs | None, seconds, reason}."""
+    import tempfile
+
+    import numpy as np
+
+    from ..util.media import lufs, read_audio, write_wav
+
+    parts = []
+    for path, a, b in pieces:
+        if b > a:
+            parts.append(read_audio(paths.absp(path), sr=sr, mono=False, start=float(a), duration=float(b - a)))
+    x = np.concatenate(parts) if parts else np.zeros((0, 2), np.float32)
+    secs = len(x) / sr
+    if secs < KEPT_LEVEL_MIN_S:
+        return {"lufs": None, "seconds": round(secs, 3),
+                "reason": f"보존 원음 {secs:.2f}s < {KEPT_LEVEL_MIN_S:g}s (게이트 통합 음량을 잴 수 없음)"}
+    with tempfile.TemporaryDirectory(prefix="shortkit_keptlvl_") as td:
+        f = Path(td) / "kept.wav"
+        write_wav(f, x, sr)
+        v = lufs(f).get("integrated_lufs")
+    if v is None or v <= -69.0:
+        return {"lufs": None, "seconds": round(secs, 3), "reason": "보존 원음이 무음에 가까움(통합 음량 측정 불가)"}
+    return {"lufs": float(v), "seconds": round(secs, 3), "reason": None}
+
+
+def kept_levels(kept: list[dict]) -> dict[int, dict]:
+    """Loudness of the kept source audio for every kept range (index into ``kept``): measured per clip
+    (all its kept pieces), else -- when a clip keeps less than KEPT_LEVEL_MIN_S -- per source file
+    (all kept pieces of that file).  -> {i: {lufs, seconds, scope, reason}}."""
+    by_clip: dict[str, list[int]] = {}
+    by_path: dict[str, list[int]] = {}
+    for i, k in enumerate(kept):
+        by_clip.setdefault(k["clip_id"], []).append(i)
+        by_path.setdefault(k["path"], []).append(i)
+    cache: dict[tuple, dict] = {}
+
+    def measure(idx: list[int]) -> dict:
+        key = tuple(idx)
+        if key not in cache:
+            cache[key] = kept_audio_loudness([(kept[j]["path"], kept[j]["src_start"], kept[j]["src_end"]) for j in idx])
+        return cache[key]
+
+    out: dict[int, dict] = {}
+    for cid, idx in by_clip.items():
+        m = measure(idx)
+        scope = "clip"
+        if m["lufs"] is None and m["seconds"] < KEPT_LEVEL_MIN_S:
+            ms = measure(by_path[kept[idx[0]]["path"]])
+            if ms["lufs"] is not None or ms["seconds"] >= KEPT_LEVEL_MIN_S:
+                m, scope = ms, "source"
+        for j in idx:
+            out[j] = {**m, "scope": scope}
+    return out
+
+
+def bgm_loop_xfade_s(preset: config.Preset) -> float | None:
+    """audio.bgm.loop_xfade_s (rule key: equal-power crossfade at the BGM loop point), None when the
+    preset does not define it -- callers turn that into an error, never into a default."""
+    try:
+        v = preset.get("audio.bgm.loop_xfade_s")
+    except KeyError:
+        return None
+    return None if v is None else float(v)
+
+
 # ----------------------------------------------------------------------------- main
 def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], duration: float, sources: dict,
                      issues: list[dict]) -> AudioPlan:
@@ -306,6 +388,7 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
 
     # --- originals (kept ranges only)
     originals: list[OriginalAudio] = []
+    kept: list[dict] = []
     for k in kept_original_ranges(plan, clips, issues, sources):
         seg, clip = k["seg"], k["clip"]
         oa = seg["original_audio"]
@@ -323,11 +406,24 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
             if src and src.exists and not src.has_audio:
                 issues.append(_issue("error", "original_no_audio", f"소스 {src.id} 에 오디오 스트림이 없습니다", where))
                 continue
+            if not path or not (src and src.exists):
+                continue                # missing source: reported by the source checks
+        rel = float(oa["gain_db"]) if oa.get("gain_db") is not None else keep_gain
+        kept.append({**k, "clip_id": clip.id, "path": path, "stem": stem, "rel_lu": rel, "where": where,
+                     "reason": oa.get("reason", "")})
+    levels = kept_levels(kept) if kept else {}
+    for i, k in enumerate(kept):
+        lv = levels[i]
+        if lv["lufs"] is None:
+            # no guess: without the source loudness the level rule (T + keep_gain_db - L_src) has no value
+            issues.append(_issue("error", "original_level_unmeasured",
+                                 f"보존 원음 음량(L_src)을 잴 수 없어 이득을 정할 수 없습니다: {lv['reason']} "
+                                 "(audio.original.keep_gain_db = 프로그램 음량 대비 LU)", k["where"]))
+            continue
         originals.append(OriginalAudio(
-            clip_id=clip.id, path=path, stem=stem, src_start=k["src_start"], src_end=k["src_end"],
-            out_start=k["out_start"], out_end=k["out_end"], speed=clip.speed,
-            gain_db=float(oa["gain_db"]) if oa.get("gain_db") is not None else keep_gain, fade_s=fade_s,
-            reason=oa.get("reason", "")))
+            clip_id=k["clip_id"], path=k["path"], stem=k["stem"], src_start=k["src_start"], src_end=k["src_end"],
+            out_start=k["out_start"], out_end=k["out_end"], speed=k["clip"].speed,
+            gain_db=round(target_lufs + k["rel_lu"] - lv["lufs"], 3), fade_s=fade_s, reason=k["reason"]))
     duck_ranges = merge_ranges([(o.out_start, o.out_end) for o in originals])
 
     # --- BGM
@@ -387,8 +483,22 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
                 need = section + duration * tempo
                 if bdur + 1e-3 < need:
                     if loop:
-                        issues.append(_issue("error", "bgm_loop_unsupported",
-                                             "BGM 이 짧고 audio.bgm.loop=true 이지만 반복 이어붙이기는 렌더러에 구현되지 않음", "bgm"))
+                        # the renderer loops back to section_start with an equal-power crossfade of this length
+                        xf = bgm_loop_xfade_s(preset)
+                        seg = (bdur - section) / tempo
+                        if xf is None:
+                            issues.append(_issue("error", "bgm_loop_xfade_missing",
+                                                 "audio.bgm.loop=true 로 BGM 을 반복해야 하지만 프리셋에 audio.bgm.loop_xfade_s(규칙 키) "
+                                                 "가 없습니다 — 프리셋/설정 담당이 추가해야 함(추측값으로 반복하지 않음)",
+                                                 "audio.bgm.loop_xfade_s"))
+                        elif xf <= 0 or 2 * xf >= seg:
+                            issues.append(_issue("error", "bgm_loop_xfade", f"audio.bgm.loop_xfade_s={xf}: 0 보다 크고 반복 구간"
+                                                 f"({seg:.2f}s)의 절반보다 짧아야 합니다", "audio.bgm.loop_xfade_s"))
+                        else:
+                            issues.append(_issue("warn", "bgm_loop",
+                                                 f"BGM 반복: 원곡 {section:.2f}s~끝({bdur:.2f}s, 속도 {tempo:g}배 → {seg:.2f}s)이 "
+                                                 f"영상 {duration:.2f}s 보다 짧아 section_start 로 되감아 이어 붙임"
+                                                 f"(등전력 크로스페이드 {xf:g}s, audio.bgm.loop=true)", "bgm"))
                     else:
                         sev = "error" if plan["mode"] == "production" else "warn"
                         issues.append(_issue(sev, "bgm_too_short",

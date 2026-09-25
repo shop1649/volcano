@@ -1,12 +1,12 @@
 # 제안서 — test-pipeline-001
 
 - 프리셋: `joshuamagazine-v1` / 포맷: `UNCLASSIFIED` / 모드: `test` / 회차: 1
-- plan_sha256: `5c00390ef4fa49f7f83c2d37a9544841391b131e13c9b6def787b438a4ca790f`
-- 작성 시각(UTC): 2026-09-24T18:03:22+00:00
-- 승인: 불필요(첫 에피소드 production 이 아님) / 현재 미승인
+- plan_sha256: `0d2a41e1d3d3b22bb92b65af42ae28ddd2da55f499be20e8c4b7d80e300bcc85`
+- 작성 시각(UTC): 2026-09-24T21:48:04+00:00
+- 승인: 불필요(test 모드) / 현재 미승인
 - 승인 방법: `python -m shortkit episode approve test-pipeline-001 --by 이름` (승인 뒤 수정은 기록만 하고 다시 승인받지 않음)
-- 검증 결과: 오류 0건, 경고 7건
-- 메모: 테스트 모드. 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음.
+- 검증 결과: 오류 0건, 경고 8건
+- 메모: 테스트 모드. 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음. BGM 사용 구간 시작은 plan 에서 덮어쓰지 않고 프리셋 audio.bgm.section_start_s(임시값)를 쓴다 — 예전 plan 의 12.0s 덮어쓰기는 이유 기록이 없어 뺐다.
 
 ## 소재
 
@@ -25,13 +25,13 @@
 | s1 | v_class | 1.50–5.50 | 0.00–4.00 | hook | 1.0→1.25 @+1.3s 0.35s out | 없음 | cut | 끔 |
 | s2 | v_class | 14.00–16.80 | 4.00–7.50 | build | 없음 | 0.7s (원본 16.80s) | cut | 끔 |
 | s3 | v_class | 17.00–22.50 | 7.50–13.00 | build | 없음 | 없음 | flash 0.12s | 살림: 소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증 (raw, 범위 [[19.5, 21.8]]) |
-| s4 | v_pair | 3.00–11.50 | 12.75–21.25 | reveal | 없음 | 없음 | crossfade 0.25s | 끔 |
+| s4 | v_pair | 3.00–9.50 | 12.75–19.25 | reveal | 없음 | 없음 | crossfade 0.25s | 끔 |
 
-전체 길이: 21.25s
+전체 길이: 19.25s
 
 ## 표지 문구
 
-- 문구: 교실과 벽 앞, 사람들의 움직임
+- 문구: 움직임 테스트 영상
 - 표지 프레임: 0.0s / 프리셋 표지 방식: first_frame, 글자 역할: title
 
 ## 제목 후보 3종
@@ -42,11 +42,17 @@
 
 ## 자막
 
+### 말투 안내 (프리셋 text.tone)
+
+- 말투: 반말_구어체 (임시값·못 잼) — 제목·설명·상황·반응 자막에 검사(`episode validate`의 tone_register), 대사는 예외
+- 이모지: 쓰지 않음 (임시값·못 잼)
+- 종결 어미 예시(레퍼런스 빈도 순): 못 잼(측정 전 — 예시 없음, 말투는 위 기준만 검사)
+
 ### 제목 (title)
 
 | id | 시간(s) | 문구 | 근거 |
 |---|---|---|---|
-| c_title | 0.00–21.25 | 움직임 테스트 영상 | 근거 불필요(편집 틀 문구) |
+| c_title | 0.00–19.25 | 움직임 테스트 영상 | 근거 불필요(편집 틀 문구) |
 
 ### 설명 (description)
 
@@ -87,7 +93,7 @@
 
 | id | t(s) | 종류 | 사건 t(s) | 사건 | 차이(s) | 감정 | 파일 | 맵 상태 |
 |---|---|---|---|---|---|---|---|---|
-| fx1 | 1.25 | whoosh | 1.30 | 창가 남성이 일어서기 시작함(확대 시작) | -0.05 | anticipation | assets/test/generated/sfx/whoosh.wav | 못 잼 |
+| fx1 | 1.10 | whoosh | 1.30 | 창가 남성이 일어서기 시작함(확대 시작) | -0.20 | anticipation | assets/test/generated/sfx/whoosh.wav | 못 잼 |
 | fx2 | 6.80 | click | 6.80 | 다시 앉은 순간 화면이 멈춤 | +0.00 | emphasis | assets/test/generated/sfx/click.wav | 못 잼 |
 | fx3 | 7.75 | pop | 7.75 | 뒷줄 남성이 손을 들어 올림 | +0.00 | surprise | assets/test/generated/sfx/pop.wav | 못 잼 |
 | fx4 | 10.90 | ding | 11.00 | 뒷줄 남성이 자리에서 일어섬 | -0.10 | surprise | assets/test/generated/sfx/ding.wav | 못 잼 |
@@ -99,7 +105,7 @@
 
 - 파일: assets/test/generated/music_bed_a.wav / track_id: -
 - 프리셋 곡 정보: 제목 못 잼, 버전 못 잼
-- 사용 구간 시작: 12.0s / 속도 비율: 1.0 / 레벨: -20.0 dB / 페이드 인 0.0s · 아웃 0.8s
+- 사용 구간 시작: 0.0s / 속도 비율: 1.0 / 레벨: 0.0 dB / 페이드 인 0.0s · 아웃 0.8s
 - 덕킹(보존 대사 구간에서만): [(10.0, 12.3)]
 - 의도적 정적: [(6.8, 7.45)]
 - 원음 살린 구간: [('s3', 10.0, 12.3, '소스에 들어 있는 대사 한 줄(합성 TTS)을 살림 — 원음 보존·덕킹 경로 검증')]
@@ -107,16 +113,19 @@
 
 ## 미측정 영향
 
-이 에피소드가 읽은 프리셋 값 중 230개가 미측정(못 잼, 임시값)입니다. 아래 값은 레퍼런스와 같다고 말할 수 없습니다.
+이 에피소드가 읽은 프리셋 값 중 238개가 미측정(못 잼, 임시값)입니다. 아래 값은 레퍼런스와 같다고 말할 수 없습니다.
 
 | 키 | 현재(임시)값 | 영향 |
 |---|---|---|
 | `audio.bgm.fade_in_s` | 0.0 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
 | `audio.bgm.fade_out_s` | 0.8 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
-| `audio.bgm.gain_db` | -20.0 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
+| `audio.bgm.gain_db` | 0.0 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
 | `audio.bgm.loop` | False | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
+| `audio.bgm.section_start_s` | 0.0 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
 | `audio.bgm.tempo_ratio` | 1.0 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
+| `audio.bgm.title` | None | BGM 곡 제목 미식별 → 음악 라이브러리 파일이 그 곡인지 판정 불가 |
 | `audio.bgm.track_id` | None | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 |
+| `audio.bgm.version` | None | BGM 버전 미식별 → 같은 곡의 다른 버전(다른 트랙)을 쓸 위험 |
 | `audio.ducking.attack_s` | 0.08 | 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치 |
 | `audio.ducking.depth_db` | 10.0 | 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치 |
 | `audio.ducking.release_s` | 0.3 | 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치 |
@@ -143,16 +152,21 @@
 | `canvas.width` | 1080 | 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치 |
 | `decorations.arrow.blink_hz` | 0.0 | 화살표·원 등 장식 스타일 불일치 |
 | `decorations.arrow.color` | #FF2A2A | 화살표·원 등 장식 스타일 불일치 |
+| `decorations.arrow.head_len_ratio` | 0.45 | 화살표·원 등 장식 스타일 불일치 |
+| `decorations.arrow.head_width_ratio` | 0.62 | 화살표·원 등 장식 스타일 불일치 |
 | `decorations.arrow.outline_color` | #FFFFFF | 화살표·원 등 장식 스타일 불일치 |
 | `decorations.arrow.outline_px` | 6 | 화살표·원 등 장식 스타일 불일치 |
+| `decorations.arrow.shaft_width_ratio` | 0.24 | 화살표·원 등 장식 스타일 불일치 |
 | `decorations.arrow.size_px` | 120 | 화살표·원 등 장식 스타일 불일치 |
 | `motion.freeze.hold_s` | 0.7 | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.transitions.crossfade.dur_s` | 0.25 | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.transitions.default` | cut | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.transitions.flash.color` | #FFFFFF | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.transitions.flash.dur_s` | 0.12 | 확대·정지·전환의 크기/길이 불일치 |
+| `motion.transitions.flash.scope` | region | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.zoom.dur_s` | 0.35 | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.zoom.ease` | out | 확대·정지·전환의 크기/길이 불일치 |
+| `motion.zoom.recenter` | False | 확대·정지·전환의 크기/길이 불일치 |
 | `motion.zoom.scale_to` | 1.25 | 확대·정지·전환의 크기/길이 불일치 |
 | `text.roles.description.anchor.align` | center | 제목/자막 위치 불일치 |
 | `text.roles.description.anchor.valign` | middle | 제목/자막 위치 불일치 |
@@ -343,8 +357,9 @@
 | `text.roles.title.timing.min_dur_s` | 1.0 | 자막 등장 타이밍 불일치 |
 
 검증에서 나온 미측정 항목:
-- duration_unmeasured: 영상 길이 분포 미측정(못 잼): 21.25s 의 적합성 판정 불가
+- duration_unmeasured: 영상 길이 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 19.25s 의 적합성 판정 불가
 - sfx_range_unmeasured: 효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 (2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단)
-- preset_unmeasured: 테스트 모드: 프리셋 미측정(못 잼) 키 251개로 렌더합니다(레퍼런스 일치 아님)
+- bgm_identity_unmeasured: 프리셋 BGM 제목·버전 미식별(못 잼: title=None, version=None): 쓰는 음악 파일이 레퍼런스 곡·버전과 같은지 판정 불가
+- preset_unmeasured: 테스트 모드: 프리셋 미측정(못 잼) 키 255개로 렌더합니다(레퍼런스 일치 아님)
 
 _범례: 있다/없다/못 잼 = 있다/없다/못 잼_

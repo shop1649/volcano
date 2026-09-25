@@ -82,8 +82,11 @@ def synth_project(tmp_path_factory):
                                           "events": [{"t": 12.55, "end": 13.0, "type": "zoom_in", "value": 1.2}]})
     write_json(A / "synv3/captions.json", {"video_id": "synv3", "resolution": res, "label": S.SYNTHETIC_LABEL, "items": [
         {"start": 1.45, "end": 2.5, "role": "situation", "text": "t", "bbox": [0, 0, 1, 1], "motion_in": "pop"}]})
-    yield {"root": root, "lib": lib, "bank": bank, "oracle": oracle, "truths": truths, "results": results}
+    # restore SHORTKIT_ROOT before handing the project out: tests get it per test through ``project_env``;
+    # left set for the whole session it pointed every LATER test directory (tests/typography looks fonts up
+    # under the project root) at this temp project -> 'font not found' when the suites run together
     mp.undo()
+    yield {"root": root, "lib": lib, "bank": bank, "oracle": oracle, "truths": truths, "results": results}
 
 
 @pytest.fixture
