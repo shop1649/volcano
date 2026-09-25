@@ -389,6 +389,19 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   lists keys read only on a code path no tracked run exercises (e.g. `audio.bgm.loop_xfade_s`); each link is proven by a test that
   drives the reader and checks the Preset access log.
 
+### 12.6 Output checks for every style key (wave 5)
+- `preset audit --test` = no_code 0 / no_qa 0: every style key is read by production code and compared in the final MP4 by at least
+  one QA row (declarations are exact keys; a row that does not read a listed key drops it into `keys_not_compared`).
+- New/extended rows: caption.style (+ shadow_px/shadow_color via the shared drop-shadow estimator, box pad/colour with regression
+  alpha), caption.motion (+ slide_up offset), caption.timing:dialogue_lead_ref, caption.quote (+ dialogue_ref), caption.tone:emoji
+  (+ emoji_ref, colour-glyph detection), video.zoom (+ recenter), video.transitions (+ flash scope), decor.style (+ arrow ratios and
+  outline, measured with `reference.motion.detect_decorations` on the output), canvas.video_region:fit, canvas.background:blur,
+  audio.bgm:level (required), audio.silence/ducking/original ramp rows (same ramp functions as the reference analyzers, applied to the
+  planned signal so window blur cancels), structure rows report the output position vs the reference median.
+- Tolerances of these rows are engineering values validated on synthetic renders only (shadow ±1 px, pad ±2 px, slide offset
+  max(3 px, 10 %) + 1 frame, dialogue lead 0.1 s + 1 frame, ramps ±(0.01 s + 15 %), BGM level tolerance_lu + 0.3 dB, blur
+  ±max(2, 15 %), recenter 5 %/10 % of the region's short side). Re-check them against reference noise once references exist.
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
