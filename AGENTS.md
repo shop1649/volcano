@@ -158,10 +158,14 @@ python -m shortkit episode new <ep-id> --mode production --format <F?> --index 1
 #    - 원음은 기본 OFF. 살릴 구간만 timeline[].original_audio.keep + reason. 원본 음악 여부 has_embedded_music 기록.
 #    - 효과음은 사건(event t/desc)이 있을 때만, 사건과 ±0.3초, 포맷 관측 범위 안의 개수·종류.
 #    - clean 블록은 `clean plan` 결과를 붙인다.
+#    - sources[].watched(누가 언제 처음부터 끝까지 보고 들었는지), 얼굴·손·물체가 없으면 protected_reviewed 로 명시.
+#    - 반전이 없으면 reveal: {none: true, reason: ...}. 잘리면 안 되는 중요한 동작은 actions 에 기록(컷이 가르면 오류).
+#    - 일부러 다시 보여 주는 구간은 replay_of/replay_reason, 의미 뒤 꼬리를 남길 이유가 있으면 tail_reason.
+#    - 프리셋 고정 스타일(확대·정지·전환 길이·깜빡임·게인·BGM 구간 등)을 plan 에서 바꾸면 production 오류(요청 변경은 requested_changes.yaml).
 python -m shortkit episode validate <ep-id>
 python -m shortkit episode proposal <ep-id>        # 첫 편 승인용: 소재·구간 시트·표지 문구·제목 후보 3종·효과음 배치표
 #  ▶ 사용자 승인 후에만:
-python -m shortkit episode approve <ep-id> --by <승인자>
+python -m shortkit episode approve <ep-id> --by <승인자>   # 검증 오류가 있으면 거부. 승인본은 episodes/<id>/approvals/<sha>/ 에 보존
 python -m shortkit episode render <ep-id>          # 마스터 MP4 (미측정 프리셋·미승인·미해결 효과음이면 거부)
 python -m shortkit episode export <ep-id>          # 편집 프로젝트: MLT(Shotcut/Kdenlive, melt 렌더로 검증), FCPXML, OTIO, captions.ass/srt
 python -m shortkit qa run --episode <ep-id> --reference presets/joshuamagazine/reference/videos/<대표영상>.mp4 --reference-id <id>
@@ -170,7 +174,8 @@ python -m shortkit qa gate --episode <ep-id> --production
 ```
 
 - 첫 편에서 고친 스타일은 프리셋(요청 변경이면 requested_changes.yaml, 측정 오류면 재측정)에 반영하고 후속편은 같은 프리셋으로 만든다.
-- 후속편(`--index 2..`)은 승인 없이 지정 포맷·편수까지 진행한다. 이미 승인된 기획의 수정은 재승인하지 않는다.
+- 후속편(`--index 2..`)은 승인 없이 지정 포맷·편수까지 진행한다(단, 같은 프리셋의 첫 편이 승인·렌더되어 있어야 함).
+  이미 승인된 기획의 수정은 재승인하지 않는다(바뀐 부분은 제안서와 렌더 기록에 표시).
 - 검수표의 "다르다" 중 요청하지 않은 차이는 고친 뒤 다시 검사한다. "못 잼"은 완료로 올리지 않는다.
 - 에이전트는 소리를 듣지 못한다. 오디오는 기계 측정만 기록하고 "사람 청취 필요"를 남긴다.
 

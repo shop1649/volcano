@@ -326,6 +326,30 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   clean_block, *, sha256, used_ranges, visible, tol_px) -> list` (blocking codes: uncovered, no_record, source_missing,
   record_stale). `residual_score` also reports `max_tile_ncc`, `ocr_partial_hits` (thresholds tile_ncc 0.6, partial OCR conf).
 
+### 12.3 Review-fix additions (wave 2: plan validation)
+- **New plan fields**: `sources[].watched` (who watched/listened the whole source, when), `sources[].protected_reviewed`
+  (explicit "no faces/hands/key objects" review), `sources[].test_fingerprint` (test mode only: decoded-video md5 + speech spans;
+  production always requires sha256); `timeline[].replay_of` / `replay_reason` (a deliberate replay; unmarked repeats are errors),
+  `timeline[].tail_reason` (keeps a tail past the last meaning mark); `captions[].foreign_terms`; top-level `actions`
+  (important actions that cuts must not split); `reveal.none` + `reveal.reason` when an episode has no twist.
+- **Approval evidence**: approval counts only with the approved plan sha + an `approve` row (with proposal_sha256) in
+  approval_log.jsonl + snapshots `episodes/<id>/approvals/<sha>/{proposal.md, plan.json}` (`plan.approval_evidence`).
+  `episode approve` refuses plans with validate errors (other than the missing approval). Series rule: a production plan with
+  `episode_index > 1` needs an approved, rendered first episode of the same preset (`plan.series_first_episode`).
+- **Style overrides**: a plan value that differs from the preset's fixed style (zoom, freeze hold, transition durations, speed,
+  decoration blink, caption `pos` outside speaker, SFX / kept-original / BGM gain, BGM section/tempo) is `style_override`
+  (error in production, warning in test).
+- **Audio checks** (`shortkit/edit/audio_checks.py`): embedded music measured by a sustained-chord detector; kept ranges must be
+  ≥ 50 % detected speech and BGM ducks only under detected speech (IR `OriginalAudio.speech`, `speech_status`); a vocals stem needs a
+  passing quality.json for the same source; a BGM file equal to a reference stem (sha256 or waveform) is refused. Thresholds are
+  engineering rules (validated only on synthetic audio), not reference measurements.
+- **SFX**: production requires `emotion` (checked against the catalog), catalog screen-event / previous-caption-role rules,
+  `event.source` + `event.src_t`; an explicit SFX file must match its type's catalog fingerprint; an event on a cut is an error
+  unless a planned non-cut screen event happens at that moment.
+- **Sources**: exclusions re-checked on every validate with the canonical `url_key` and the reference-account row;
+  `clean.crop` checked against the face track; `shortkit.clean.coverage` enforced; `presence.*` enforced (absent-but-used →
+  error in production). `episode test-source` records the content fingerprint and tool versions in truth.json.
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
