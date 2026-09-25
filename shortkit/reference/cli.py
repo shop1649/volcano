@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from .. import paths
-from .common import DEFAULT_PRESET, analysis_dir, resolve_ids, say, video_path, warn
+from .common import DEFAULT_PRESET, SET_NAMES, analysis_dir, resolve_ids, say, video_path, warn
 
 
 def _ids(args) -> list[str]:
@@ -37,7 +37,7 @@ def analyze_video(preset: str, vid: str, video: Path, fps: float = 5.0, only: se
                   max_seconds: float | None = None) -> dict:
     from ..config import load_preset
     from . import motion, shots, textboxes
-    from .common import detect_video_region
+    from .common import detect_video_region, region_evidence
 
     pr = load_preset(preset)
     role_fonts = {r: pr.get(f"text.roles.{r}.font_name") for r in pr.section("text.roles").keys()}
@@ -45,6 +45,7 @@ def analyze_video(preset: str, vid: str, video: Path, fps: float = 5.0, only: se
     out_dir = analysis_dir(preset, vid)
     out_dir.mkdir(parents=True, exist_ok=True)
     region = detect_video_region(video, max_seconds=max_seconds)
+    region["evidence"] = region_evidence(preset, vid, video, region)     # stored in layout.json region_detection
     res = {"region": region}
     only = only or {"shots", "text", "motion"}
     if "shots" in only:
@@ -101,9 +102,9 @@ def cmd_analyze(args) -> int:
 
 def cmd_classify_prepare(args) -> int:
     from .classify import prepare
-    ids = _ids(args) or resolve_ids(args.preset, set_name="analyzed")
+    ids = _ids(args)
     if not ids:
-        warn("검토 자료를 만들 영상이 없습니다.")
+        warn("검토 자료를 만들 영상이 없습니다(포맷 분류는 최신 100편 스냅샷 구성원 기준 — `shortkit ref collect` 결과 확인).")
         return 3
     prepare(args.preset, ids)
     return 0
@@ -135,11 +136,24 @@ def cmd_trace(args) -> int:
     return 0 if r["traced_now"] else 3
 
 
+def cmd_high_views_report(args) -> int:
+    from .high_views import build_report
+    r = build_report(args.preset)
+    return 0 if r["status"] == "measured" else (3 if not r["videos"] else 4)
+
+
+def cmd_transcribe(args) -> int:
+    from .transcribe import transcribe_many
+    r = transcribe_many(args.preset, _ids(args), model=args.model, language=args.language, force=args.force)
+    return 0 if any(x["status"] in ("measured", "cached") for x in r["results"]) else 3
+
+
 def _sel(p: argparse.ArgumentParser, default_set: str | None = "latest100") -> None:
     p.add_argument("--preset", default=DEFAULT_PRESET)
     p.add_argument("--ids", default=None, help="영상 id 쉼표 구분")
-    p.add_argument("--set", default=default_set, choices=["latest100", "high_views", "all_videos", "downloaded", "analyzed"],
-                   help="대상 묶음(--ids 가 없을 때)")
+    p.add_argument("--set", default=default_set, choices=list(SET_NAMES),
+                   help="대상 묶음(--ids 가 없을 때): latest100=고정 스냅샷(제작 측정 기준), high_views=조회수 기준 이상 전부, "
+                        "high_views_outside=그중 스냅샷 밖(참고용), reference=latest100∪high_views∪downloaded")
     p.add_argument("--limit", type=int, default=None)
 
 
@@ -172,14 +186,16 @@ def register(p) -> None:
 
     k = sub.add_parser("classify", help="포맷 분류: prepare(검토 자료·라벨 파일) / build(formats.yaml)")
     ks = k.add_subparsers(dest="classify_cmd", required=True)
-    kp = ks.add_parser("prepare", help="영상별 검토 자료(1초 밀착 인화·자막 타임라인·컷·모션·오디오) + 라벨 파일 행")
-    _sel(kp, default_set="analyzed")
+    kp = ks.add_parser("prepare", help="영상별 검토 자료(1초 밀착 인화·자막 타임라인·컷·모션·오디오) + 라벨 파일 행 "
+                                       "(기본: 최신 100편 스냅샷 — 포맷 표는 스냅샷 구성원만으로 만든다)")
+    _sel(kp, default_set="latest100")
     kp.set_defaults(func=cmd_classify_prepare)
     kb = ks.add_parser("build", help="본 사람이 채운 라벨로 formats.yaml 생성(라벨 없으면 못 잼 유지)")
     kb.add_argument("--preset", default=DEFAULT_PRESET)
     kb.set_defaults(func=cmd_classify_build)
 
-    g = sub.add_parser("aggregate", help="영상별 측정 → measurements/visual_*.json (전체·포맷별 n/p10/p50/p90)")
+    g = sub.add_parser("aggregate", help="영상별 측정 → measurements/visual_*.json (전체·포맷별 n/p10/p50/p90). "
+                                        "최신 100편 스냅샷 구성원만 사용(그 밖의 영상은 basis.excluded_non_snapshot 에 기록)")
     _sel(g, default_set=None)
     g.add_argument("--include-long", action="store_true", help="긴 영상(kind=video)도 포함(기본: 쇼츠만)")
     g.set_defaults(func=cmd_aggregate)
@@ -192,12 +208,27 @@ def register(p) -> None:
     mg.add_argument("--include-long", action="store_true", help="긴 영상(kind=video) 관찰도 포함")
     mg.set_defaults(func=cmd_manual_aggregate)
 
-    t = sub.add_parser("trace", help="레퍼런스 소재 출처 추적(설명란·워터마크 OCR·렌즈용 키프레임) → warehouse/")
-    _sel(t)
+    t = sub.add_parser("trace", help="레퍼런스 소재 출처 추적(설명란·자막 대본·화면 출처 OCR·렌즈용 키프레임·지문) → warehouse/. "
+                                    "기본 대상 = latest100 ∪ high_views ∪ downloaded; 채널 전체 영상 주소는 항상 제외 목록에")
+    _sel(t, default_set="reference")
     t.add_argument("--ocr-fps", type=float, default=0.5)
     t.add_argument("--no-ocr", action="store_true")
     t.add_argument("--no-lens", action="store_true")
     t.set_defaults(func=cmd_trace)
+
+    hv = sub.add_parser("high-views-report",
+                        help="조회수 기준 이상 영상 전부의 분석 범위(받기·시각·오디오·추적)와 참고용 요약 → "
+                             "reference/high_views_report.{json,md} (제작 측정과 섞지 않음)")
+    hv.add_argument("--preset", default=DEFAULT_PRESET)
+    hv.set_defaults(func=cmd_high_views_report)
+
+    tr = sub.add_parser("transcribe", help="(선택) 음성 인식(faster-whisper 가 설치돼 있을 때만) → analysis/<id>/audio/"
+                                           "transcript.json. 없으면 아무 파일도 쓰지 않고 못 잼으로 보고; 대본 추적은 자막(captions.json)을 씀")
+    _sel(tr, default_set="reference")
+    tr.add_argument("--model", default="small", help="faster-whisper 모델 이름(가중치는 미리 받아 둬야 함)")
+    tr.add_argument("--language", default="ko")
+    tr.add_argument("--force", action="store_true")
+    tr.set_defaults(func=cmd_transcribe)
 
     for modname in ("typography", "audio_cli"):
         try:

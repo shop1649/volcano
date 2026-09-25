@@ -167,3 +167,35 @@ def test_scrub_keeps_urls_removes_machine_paths(proj):
     assert str(proj) not in t and "/home/bob" not in t and "/tmp/y.mp4" not in t
     assert "warehouse/sources/a.mp4" in t
     assert "https://example.com/home/page" in t and "https://x.org/tmp/v" in t
+
+
+def test_empty_listing_from_broken_extractor_is_error_not_ok(net, proj, monkeypatch, capsys):
+    """S5-12: tiktok:tag / instagram:user are marked not working by yt-dlp; an EMPTY listing from them is not
+    'ok, 0 results' (SYNTHETIC empty listings; extractor status forced so the test does not depend on the
+    installed yt-dlp version)."""
+    from shortkit.cli import main
+    from shortkit.sourcing import warehouse
+    from shortkit.util.jsonio import read_jsonl
+
+    monkeypatch.setattr(platforms, "extractor_status", lambda url: (
+        ("tiktok:tag", False) if "/tag/" in url else ("instagram:user", False) if "instagram.com/some" in url
+        else ("x", True)))
+    net.extract["https://www.tiktok.com/tag/funnycats"] = {"_type": "playlist", "entries": []}
+    res = tiktok.search("funny cats", limit=5)
+    assert res.access["platform_status"] == "error"
+    assert "tiktok:tag" in res.access["note"] and "@계정" in res.access["note"] and "add-url" in res.access["note"]
+    (proj / "cookies_ig.txt").write_text("# Netscape HTTP Cookie File (synthetic)\n")
+    (proj / "local.yaml").write_text("sourcing:\n  cookies:\n    instagram: cookies_ig.txt\n")
+    net.extract["https://www.instagram.com/some.user/"] = {"_type": "playlist", "entries": []}
+    res = instagram.search("@some.user", limit=5)
+    assert res.access["platform_status"] == "error" and "instagram:user" in res.access["note"]
+    # a working extractor with an empty listing is a real 'ok, 0 results'
+    net.extract["https://www.tiktok.com/@nobody"] = {"_type": "playlist", "entries": []}
+    assert tiktok.search("@nobody", limit=5).access["platform_status"] == "ok"
+    # CLI: not counted as success; the search log says error
+    assert main(["source", "search", "-q", "funny cats", "--platform", "tiktok"]) == 1
+    out = capsys.readouterr().out
+    assert "오류" in out and "결과 0건" in out
+    log = read_jsonl(proj / "warehouse" / "search_log.jsonl")
+    assert log[-1]["access"]["platform_status"] == "error"
+    assert warehouse.read_log("tiktok")[-1]["result_count"] == 0

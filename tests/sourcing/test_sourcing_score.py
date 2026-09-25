@@ -58,8 +58,9 @@ def test_recency_labels_old_viral_is_never_recent():
 
 
 def _good_review(**kw):
+    # original_upload: the reviewer answered "this is the original upload" (needed before 'recent', S5-04)
     r = {"watched_by": "tester", "watched_at": _iso(0), "intensity": 4, "reversal": 3, "format_fit": 5,
-         "notes": "3초에 차가 미끄러지고 8초에 반전", "watermark": "absent"}
+         "notes": "3초에 차가 미끄러지고 8초에 반전", "watermark": "absent", "original_upload": "yes"}
     r.update(kw)
     return r
 

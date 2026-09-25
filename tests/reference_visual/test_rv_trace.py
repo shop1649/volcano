@@ -166,8 +166,10 @@ def test_no_videos_writes_unmeasured_with_collect_blocker(proj):
     ref = keywords.reference_derived()
     assert ref["status"] == "unmeasured" and ref["queries"] == [] and ref["accounts"] == []
     assert "403 Forbidden" in ref["note"]
-    assert not (proj / "warehouse/exclusions.jsonl").exists() or \
-        (proj / "warehouse/exclusions.jsonl").read_text("utf-8").strip() == ""
+    # nothing traced -> no footage / URL rows; the only row is the reference channel itself, which comes from
+    # the preset (the user-given channel), not from any traced data
+    ex = [json.loads(x) for x in (proj / "warehouse/exclusions.jsonl").read_text("utf-8").splitlines() if x.strip()]
+    assert [e["kind"] for e in ex] == ["account"] and ex[0]["handle"] == "@joshuamagazine"
 
 
 def test_source_accounts_shape_is_read_by_sourcing(ref_video):

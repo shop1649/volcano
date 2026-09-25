@@ -30,7 +30,8 @@ def register(p: argparse.ArgumentParser) -> None:
     ls.add_argument("--platform", choices=[*PLATFORMS, "other"], default=None)
     ls.add_argument("--sort", choices=SORTS, default="views")
     ls.add_argument("--status", choices=warehouse.STATUSES, default=None)
-    ls.add_argument("--limit", type=int, default=50)
+    ls.add_argument("--limit", type=int, default=50,
+                    help="표시할 수(--sort views: 플랫폼마다, 그 외: 전체)")
     ls.add_argument("--json", action="store_true")
     ls.set_defaults(func=cmd_list)
 
@@ -47,6 +48,11 @@ def register(p: argparse.ArgumentParser) -> None:
     rv.add_argument("--notes", required=True, help="본 내용(무슨 일이 몇 초에 일어나는지 등)")
     rv.add_argument("--watermark", choices=["present", "absent"], default=None, help="워터마크/출처 표기 확인 결과")
     rv.add_argument("--format-id", default=None, help="맞는 포맷(프리셋 formats.yaml 의 id)")
+    rv.add_argument("--original-upload", choices=["yes", "no", "unknown"], default=None,
+                    help="이 게시물이 원본 업로드인가(재업로드가 아닌가)? yes 여야 게시일로 '최근' 판정. "
+                         "no 면 재업로드 → --original-published-at 으로 원본 게시일")
+    rv.add_argument("--watermark-handle", default=None,
+                    help="화면에 박힌 워터마크 계정(@handle). 업로더와 다르면 재업로드 근거로 기록")
     rv.add_argument("--original-published-at", default=None,
                     help="재업로드일 때 확인한 원본 게시일(YYYY-MM-DD 또는 ISO) — 최근성은 이 날짜로 판정")
     rv.add_argument("--preset", default="joshuamagazine", help="포맷 표를 읽을 프리셋")
@@ -99,7 +105,25 @@ def register(p: argparse.ArgumentParser) -> None:
     au.add_argument("--file", default=None, help="사용자가 직접 확보한 영상 파일(창고로 복사됨)")
     au.add_argument("--keyword", action="append", default=[])
     au.add_argument("--note", default=None)
+    g = au.add_argument_group("직접 확인한 출처 정보(플랫폼이 막혀 메타데이터가 없을 때; --observed-by 필수, 플랫폼 값과 따로 기록)")
+    g.add_argument("--observed-by", default=None, help="아래 정보를 직접 본 사람")
+    g.add_argument("--uploader", default=None, help="게시 계정(플랫폼 메타데이터가 있으면 그 값이 우선)")
+    g.add_argument("--original-author", default=None, help="원작자(크레딧·렌즈 등으로 확인)")
+    g.add_argument("--original-url", default=None, help="원본 게시물 URL")
+    g.add_argument("--published-at", default=None, help="이 게시물의 게시일(YYYY-MM-DD 또는 ISO)")
+    g.add_argument("--original-published-at", default=None, help="원본 게시일(재업로드일 때)")
+    g.add_argument("--views", type=int, default=None, help="게시 페이지에서 본 조회수/재생수(좋아요 아님)")
+    g.add_argument("--views-checked-at", default=None, help="그 조회수를 본 날짜(필수)")
     au.set_defaults(func=cmd_add_url)
+
+    lo = sub.add_parser("link-original",
+                        help="깨끗한 원본 연결: CLEAN_ID 가 DIRTY_ID 와 같은 녹화의 오버레이 없는 원본임을 기록(clean plan 이 원본 교체에 씀)")
+    lo.add_argument("dirty_id", help="워터마크·자막이 붙은 후보 ID")
+    lo.add_argument("clean_id", help="같은 녹화의 깨끗한 원본 후보 ID(add-url/search 로 창고에 넣은 것)")
+    lo.add_argument("--by", required=True, help="두 영상을 보고 같은 녹화임을 확인한 사람")
+    lo.add_argument("--note", required=True, help="확인 방법(예: '두 파일 모두 봄, 3초 차 미끄러짐 장면 동일')")
+    lo.add_argument("--unlink", action="store_true", help="연결 해제")
+    lo.set_defaults(func=cmd_link_original)
 
     lg = sub.add_parser("log", help="검색 기록(검색어·플랫폼·시각·결과 수·접속 상태)")
     lg.add_argument("--platform", default=None)
@@ -119,6 +143,9 @@ def register(p: argparse.ArgumentParser) -> None:
 def _views_txt(c: dict) -> str:
     if score.views_confirmed(c):
         return f"{c['views']:,} ({str(c.get('views_checked_at'))[:10]})"
+    if score.views_manual(c):
+        m = score.views_manual(c)
+        return f"{m['views']:,} ({str(m['checked_at'])[:10]} 수동)"
     if c.get("reddit_score") is not None:
         return f"모름(Reddit 비공개; 점수 {c['reddit_score']}는 조회수 아님)"
     return "모름"
@@ -210,9 +237,8 @@ def cmd_list(args) -> int:
         rows = score.rank_by_views(cands)
         items = [(r["rank"], r["candidate"], r["flags"]) for r in rows]
     elif args.sort == "recent":
-        def _age(c):
-            r = score.recency_for(c)
-            a = r["age_days"] if r["label"] != "unknown" else None
+        def _age(c):               # this upload's age (the label says whether it counts as recent)
+            a = score.recency_for(c).get("upload_age_days")
             return (a is None, a if a is not None else 0.0)
         items = [(None, c, []) for c in sorted(cands, key=_age)]
     elif args.sort == "score":
@@ -222,18 +248,38 @@ def cmd_list(args) -> int:
                  for i, (c, s) in enumerate(ranked, 1)] + [(None, c, ["검토 없음/제외"]) for c in rest]
     else:
         items = [(None, c, []) for c in sorted(cands, key=lambda c: c.get("first_seen_at") or "")]
-    items = items[: args.limit]
+    hidden: dict[str, int] = {}
+    if args.sort == "views":
+        # per platform: one platform with many candidates must not hide the other platforms' rankings
+        kept, n_pf = [], {}
+        for it in items:
+            pf = it[1].get("platform") or "?"
+            n_pf[pf] = n_pf.get(pf, 0) + 1
+            if n_pf[pf] <= args.limit:
+                kept.append(it)
+            else:
+                hidden[pf] = hidden.get(pf, 0) + 1
+        items = kept
+    else:
+        if len(items) > args.limit:
+            hidden["*"] = len(items) - args.limit
+        items = items[: args.limit]
     if args.json:
         print(json.dumps([{"rank": r, "id": c["id"], "flags": f, "views": c.get("views"),
                            "views_checked_at": c.get("views_checked_at"), "status": c.get("status")}
                           for r, c, f in items], ensure_ascii=False, indent=1))
         return 0
     pf = None
-    for rank, c, flags in items:
+    for i, (rank, c, flags) in enumerate(items):
         if args.sort == "views" and c.get("platform") != pf:
             pf = c.get("platform")
             print(f"\n== {pf} (확인된 조회수 순위; 조회수 모름은 순위 없이 뒤에) ==")
         print(_row(rank, c, flags))
+        nxt = items[i + 1][1].get("platform") if i + 1 < len(items) else None
+        if args.sort == "views" and nxt != pf and hidden.get(pf or "?"):
+            print(f"  … {pf} 후보 {hidden[pf or '?']}건 더 있음(플랫폼마다 {args.limit}건 표시, --limit 로 늘리기)")
+    if hidden.get("*"):
+        print(f"… {hidden['*']}건 더 있음(--limit 로 늘리기)")
     return 0
 
 
@@ -256,6 +302,8 @@ def cmd_review(args) -> int:
     r = {"watched_by": args.watched_by.strip(), "watched_at": now_iso(), "intensity": args.intensity,
          "reversal": args.reversal, "format_fit": args.format_fit, "notes": args.notes.strip(),
          "watermark": args.watermark, "format_id": args.format_id,
+         "original_upload": args.original_upload,
+         "watermark_handle": (args.watermark_handle or "").strip() or None,
          "watched_file_sha256": c.get("sha256")}
     probs = score.validate_review(r)
     if args.original_published_at and score.parse_time(args.original_published_at) is None:
@@ -277,6 +325,10 @@ def cmd_review(args) -> int:
     warehouse.put(c)
     print(f"{c['id']}: 검토 기록 저장 (본 사람 {r['watched_by']}, 강도 {r['intensity']}, 반전 {r['reversal']}, "
           f"형식 적합 {r['format_fit']})")
+    rc = score.recency_for(c)
+    print(f"  최근성: {rc['label_ko']}" + (f" — {rc['method']}" if rc["label"] == "unknown" else ""))
+    if c.get("reposter"):
+        print(f"  원작자 {c.get('original_author') or '모름'} / 재업로더 {c['reposter']} ({c.get('original_author_basis')})")
     if r.get("format_id_check"):
         print(f"  포맷 id: {r['format_id_check']}")
     if not c.get("sha256"):
@@ -409,15 +461,60 @@ def cmd_exclude_add(args) -> int:
 
 
 def cmd_add_url(args) -> int:
+    manual = {k: getattr(args, k) for k in warehouse.MANUAL_FIELDS}
+    if any(v not in (None, "") for v in manual.values()) and not (args.observed_by or "").strip():
+        print("거부: 직접 확인한 출처 정보에는 --observed-by 가 필요합니다")
+        return 2
     rec, row = warehouse.intake_url(args.url, keywords=args.keyword, note=args.note)
     st = row["access"]["platform_status"]
+    if any(v not in (None, "") for v in manual.values()):
+        try:
+            rec, msgs = warehouse.apply_manual_provenance(rec, by=args.observed_by, fields=manual, note=args.note)
+        except ValueError as e:
+            print(f"수동 출처 정보 거부: {e} (후보는 메타데이터 없이 저장됨)")
+            return 2
+        warehouse.put(rec)
+        for m in msgs:
+            print(f"  참고: {m}")
     print(f"{rec['id']}: 메타데이터 접속 {ACCESS_KO.get(st, st)} (조회수 {_views_txt(rec)})")
+    print(f"  업로더 {rec.get('uploader') or '모름'} · 원작자 {rec.get('original_author') or '모름'} "
+          f"({rec.get('original_author_basis')})" + (f" · 재업로더 {rec['reposter']}" if rec.get("reposter") else ""))
     if st != "ok":
         print(f"    오류 원문: {row['access']['note'][:300]}")
     if args.file:
         rec = dl.attach_local_file(rec["id"], args.file, note=args.note)
         print(f"  파일 연결: {rec['download_path']} sha256={rec['sha256'][:16]}…")
         _print_check({**rec["reference_overlap"], "matched_ref_video_id": rec["reference_overlap"].get("matched_video_id")})
+    return 0
+
+
+def cmd_link_original(args) -> int:
+    try:
+        dirty, clean = warehouse.link_original(args.dirty_id, args.clean_id, by=args.by, note=args.note,
+                                               unlink=args.unlink)
+    except KeyError as e:
+        print(e.args[0])
+        return 1
+    except (ValueError, warehouse.SelectionError) as e:
+        print(f"거부: {e}")
+        return 1
+    if args.unlink:
+        print(f"{dirty['id']}: 원본 연결 해제 ← {clean['id']}")
+        return 0
+    print(f"{dirty['id']}: 깨끗한 원본 연결 → {clean['id']} (확인: {args.by})")
+    steps = []
+    if not clean.get("download_path"):
+        steps.append(f"python -m shortkit source download {clean['id']}      # 원본 파일 받기(또는 add-url --file)")
+    src = clean.get("download_path") or "warehouse/sources/<원본 파일>"
+    steps.append(f"python -m shortkit clean detect --source {src}   # 원본도 오버레이 검사(깨끗한지 확인)")
+    steps.append(f"python -m shortkit clean plan --source {dirty.get('download_path') or '<더러운 소스>'}"
+                 "   # 원본이 깨끗하면 '원본 교체' 블록(path/sha256/warehouse_id)을 출력")
+    if clean.get("status") not in ("selected", "used"):
+        steps.append(f"python -m shortkit source review {clean['id']} --watched-by ... && "
+                     f"python -m shortkit source select {clean['id']} --by ...   # plan 의 warehouse_id 는 선택된 후보여야 함")
+    print("다음 단계:")
+    for st in steps:
+        print(f"  {st}")
     return 0
 
 

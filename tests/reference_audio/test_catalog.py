@@ -6,6 +6,7 @@ import json
 import pytest
 
 from .conftest import PRESET, no_abs_paths
+import synthref as S
 from shortkit.reference import sfx_catalog as C
 from shortkit.reference.sfx_events import sfx_events_path
 
@@ -111,8 +112,12 @@ def test_emotion_only_from_watched_labels(project_env):
 def test_no_analyzed_videos_is_unmeasured(tmp_project):
     cat = C.build_catalog(PRESET)                                       # no snapshot at all here
     assert cat["status"] == "unmeasured" and cat["types"] == [] and cat["blocker"]
-    cat2 = C.build_catalog(PRESET, video_ids=["a", "b"])
+    cat2 = C.build_catalog(PRESET, video_ids=["a", "b"])        # no snapshot: nothing is a production member
+    assert cat2["status"] == "unmeasured" and cat2["basis"]["excluded_non_snapshot"] == ["a", "b"]
+    S.write_snapshot(tmp_project, ["a", "b"])
+    cat2 = C.build_catalog(PRESET, video_ids=["a", "b", "old_hv"])  # SYNTHETIC ids; old_hv is not a member
     assert cat2["status"] == "unmeasured" and cat2["basis"]["missing"] == ["a", "b"]
+    assert cat2["basis"]["excluded_non_snapshot"] == ["old_hv"]
     saved = json.loads((tmp_project / "presets/joshuamagazine/sfx_catalog.json").read_text())
     assert saved["status"] == "unmeasured" and saved["schema"] == "shortkit.sfx_catalog/1"
 

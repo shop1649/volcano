@@ -80,6 +80,7 @@ def emit_project(tmp_path_factory):
     fd = read_yaml(fy, {}) or {}
     fd["assignments"] = {s.video_id: s.format_id for s in SPECS}
     write_yaml(fy, fd)
+    S.write_snapshot(root, VIDS)
     yield {"root": root, "res": res}
     mp.undo()
 
@@ -219,6 +220,7 @@ def test_loudness_of_known_sine(tmp_project):
     fd = read_yaml(fy, {}) or {}
     fd["assignments"] = {"sine20": "F1", "sine26": "F2"}
     write_yaml(fy, fd)
+    S.write_snapshot(tmp_project, ["sine20", "sine26"])
     r = O.aggregate_measurements(PRESET)                   # default set: the downloaded reference files
     assert r["videos"] == ["sine20", "sine26"]
     items = {i["key"]: i for i in r["items"]}

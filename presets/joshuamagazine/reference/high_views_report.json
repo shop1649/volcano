@@ -1,0 +1,63 @@
+{
+  "schema": "shortkit.high_views_report/1",
+  "preset_id": "joshuamagazine-v1",
+  "generated_at": "2026-09-25T03:06:17+00:00",
+  "status": "unmeasured",
+  "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai; high_views.json status=blocked: https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+  "threshold": 800000,
+  "high_views_checked_at": "2026-09-24T17:56:07+00:00",
+  "high_views_status": "blocked",
+  "reference_only": true,
+  "rule": "참고용 보고서: 조회수 기준 이상 영상 전부의 분석 결과. 제작 측정(measurements/*.json)은 최신 100편 스냅샷 구성원만 쓰며 이 보고서의 값(특히 스냅샷 밖 영상)은 섞지 않는다",
+  "missing": {
+    "downloaded": [],
+    "visual": [],
+    "audio": [],
+    "trace": []
+  },
+  "unverified": [],
+  "summary": {
+    "n_high_views": 0,
+    "n_in_latest100": 0,
+    "n_outside_latest100": 0,
+    "coverage": {
+      "downloaded": 0,
+      "visual": 0,
+      "audio": 0,
+      "trace": 0
+    },
+    "outside_latest100_reference_only": {
+      "n": 0,
+      "n_with_visual": 0,
+      "n_with_audio": 0,
+      "duration_s": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "cuts_per_10s": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "captions": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "bgm_presence": {},
+      "original_audio_presence": {},
+      "sfx_per_video": {
+        "n": 0,
+        "p10": null,
+        "p50": null,
+        "p90": null
+      },
+      "note": "참고용(스냅샷 밖 고조회 영상) — 제작 설정에 쓰지 않음"
+    }
+  },
+  "videos": []
+}

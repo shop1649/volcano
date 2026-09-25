@@ -162,6 +162,8 @@ def test_realistic_path_aac_mp4_without_stems(project_env, tmp_path):
     assert o["speech"]["confidence"] == "low"
     assert abs(o["ducking"]["depth_db"]["p50"] - spec.duck_db) <= 1.5
     r = E.analyze_sfx_events(PRESET, "synaac")
+    # speech intervals were NOT measured (no vocals stem): the file is partial, never 'measured' (S4-05)
+    assert r["status"] == "partial" and "Demucs" in r["blocker"] and r["unmeasured_coverage"]["intervals"]
     got = [e for e in r["events"] if e.get("class") != "intentional_silence"]
     truth = _truth_times(d["truth"])
     for x in d["truth"]["sfx"]:

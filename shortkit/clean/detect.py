@@ -50,7 +50,7 @@ from ..util.media import FFMPEG, MediaError, iter_frames, probe, read_frames
 os.environ.setdefault("OMP_THREAD_LIMIT", "1")
 
 SCHEMA = "shortkit.overlays/1"
-ALGO = "shortkit.clean.detect/1"
+ALGO = "shortkit.clean.detect/2"   # /2: word fragments of one text line are joined (S6-9)
 OVERLAYS_DIR = "warehouse/overlays"
 KINDS = ("logo", "watermark", "source_overlay", "burned_subtitle")
 KIND_KO = {"logo": "로고", "watermark": "워터마크", "source_overlay": "출처 오버레이", "burned_subtitle": "원어 자막(번인)"}
@@ -556,6 +556,11 @@ def detect_overlays(src: str | Path, params: DetectParams | None = None) -> dict
             continue
         overlays.append(rec)
 
+    # ---- one text line tracked as several word fragments: join them (also the fragments that were not
+    #      confirmed on their own), so the planned removal covers the whole line (S6-9: 'R IT' / 'st' left)
+    overlays = _join_line_fragments(overlays, [review, rejected], interval, len(samples), s_times, W, H, full_frame,
+                                    prm)
+
     # ---- merge co-timed adjacent lines (multi-line subtitles / two-line watermarks)
     overlays = _merge_lines(overlays, interval)
 
@@ -577,6 +582,17 @@ def detect_overlays(src: str | Path, params: DetectParams | None = None) -> dict
                   if 0 <= i < len(s_times) and shot_of.get(s_times[i]) in present_shots
                   and not (start <= s_times[i] <= end)]
         ext = _refine_extent(src, u, rec["line_h"], times_in, W, H, full_frame, prm.grad_thr, absent)
+        # the tracked text itself is always part of the overlay: low-contrast letters (white text over a
+        # light wall) can be missing from the ink/difference masks
+        ext["rect"] = rect_clip(rect_union([ext["rect"], rect_pad(u, 0.15 * rec["line_h"] + 2)]), W, H)
+        if prm.ocr and ext["rect"]["w"] > u["w"] + rec["line_h"]:
+            # the extent followed the line past the tracked words: read the whole line (residual checks
+            # match OCR pieces against this text)
+            cr = rect_clip(ext["rect"], W, H)
+            fr = full_frame(rec["t_mid"])
+            o2 = ocr_text(fr[cr["y"]:cr["y"] + cr["h"], cr["x"]:cr["x"] + cr["w"]], prm.ocr_lang)
+            if ocr_confirmed(o2, prm.ocr_word_conf) and o2.get("n_alnum", 0) > rec["ocr"].get("n_alnum", 0):
+                rec["ocr"] = o2
         coverage_t = (end - start) / max(dur, 1e-6)
         static = coverage_t >= prm.static_coverage and not rec.get("moving_group")
         text = rec["ocr"].get("text", "") if rec["ocr"].get("available") else ""
@@ -604,7 +620,8 @@ def detect_overlays(src: str | Path, params: DetectParams | None = None) -> dict
                          "hits": rec["hits"], "shots": rec["shots"], "ocr": {k: rec["ocr"].get(k) for k in
                                                                               ("text", "conf", "max_word_conf", "variant")},
                          "rect_text": {k: int(round(v)) for k, v in u.items()}, "extent": ext["how"],
-                         "timing": rec.get("timing") or "sample_grid"},
+                         "timing": rec.get("timing") or "sample_grid",
+                         **({"fragments": rec["fragments"]} if rec.get("fragments") else {})},
             "t_ref": rec["t_mid"],
         })
 
@@ -721,6 +738,104 @@ def _ring_changes(src, u: dict, s_times: list[float], W: int, H: int, full_frame
     return d > 12.0
 
 
+LINE_GAP_FACTOR = 2.5      # max horizontal gap between fragments of one text line, in line heights
+
+
+def _same_line(a: dict, b: dict) -> bool:
+    """Two text blobs on one text line: similar height, vertical overlap >= half the smaller one,
+    horizontal gap <= LINE_GAP_FACTOR line heights (words of a subtitle / parts of a handle)."""
+    ra, rb = a["rect_text"], b["rect_text"]
+    ha, hb = max(a["line_h"], 1e-6), max(b["line_h"], 1e-6)
+    if not 0.5 <= ha / hb <= 2.0:
+        return False
+    yov = min(ra["y"] + ra["h"], rb["y"] + rb["h"]) - max(ra["y"], rb["y"])
+    if yov < 0.5 * min(ra["h"], rb["h"]):
+        return False
+    gap = max(ra["x"], rb["x"]) - min(ra["x"] + ra["w"], rb["x"] + rb["w"])
+    return gap <= LINE_GAP_FACTOR * max(ha, hb)
+
+
+def _co_timed(a: dict, b: dict, interval: float, n_samples: int) -> bool:
+    """Same kind of timing (both whole-clip or both timed) and time overlap >= half the shorter span."""
+    def whole(r):
+        return r["i_first"] == 0 and r["i_last"] == n_samples - 1
+
+    if whole(a) != whole(b):
+        return False
+    a0, a1 = a["t_first"], a["t_last"] + interval
+    b0, b1 = b["t_first"], b["t_last"] + interval
+    return min(a1, b1) - max(a0, b0) >= 0.5 * min(a1 - a0, b1 - b0)
+
+
+def _join_line_fragments(overlays: list[dict], pools: list[list[dict]], interval: float, n_samples: int,
+                         s_times: list[float], W: int, H: int, full_frame, prm: "DetectParams") -> list[dict]:
+    """Join the word fragments of one text line into one overlay.
+
+    The tracker follows stroke blobs, so one subtitle line ("WAIT FOR IT...") or one handle
+    ("@fake_repost" over a changing background) can become several tracks, and a fragment that is
+    too short for OCR on its own ("OR", "repost") is rejected or sent to review.  Removing only
+    the confirmed fragments leaves the rest of the line on screen.  A confirmed overlay therefore
+    absorbs every co-timed fragment on the same line (confirmed, review or rejected); the joined
+    line is OCR'd again as a whole.  ``pools`` lists are edited in place."""
+    recs = [dict(r) for r in overlays]
+    changed = True
+    while changed:
+        changed = False
+        for a in recs:
+            for src in [recs, *pools]:
+                for b in list(src):
+                    if b is a or not _same_line(a, b) or not _co_timed(a, b, interval, n_samples):
+                        continue
+                    _absorb(a, b)
+                    src.remove(b)
+                    changed = True
+                if changed:
+                    break
+            if changed:
+                break
+    for r in recs:
+        if not r.get("fragments"):
+            continue
+        # a time where the whole joined line is on screen, OCR'd as one line
+        mid = (r["t_first"] + r["t_last"]) / 2
+        r["t_mid"] = min((t for t in s_times if r["t_first"] <= t <= r["t_last"]), key=lambda t: abs(t - mid),
+                         default=r["t_mid"])
+        if prm.ocr:
+            u = r["rect_text"]
+            cr = rect_clip(rect_pad(u, int(round(0.35 * r["line_h"])) + 2), W, H)
+            fr = full_frame(r["t_mid"])
+            o = ocr_text(fr[cr["y"]:cr["y"] + cr["h"], cr["x"]:cr["x"] + cr["w"]], prm.ocr_lang)
+            if ocr_confirmed(o, prm.ocr_word_conf):
+                r["ocr"] = o
+                r["confirmed_by"] = "ocr"
+                r["confidence"] = max(r["confidence"], round(min(0.95, 0.5 + o["max_word_conf"] / 200), 2))
+    return recs
+
+
+def _absorb(a: dict, b: dict) -> None:
+    """Merge fragment ``b`` into line ``a`` (same line, co-timed)."""
+    left, right = (a, b) if a["rect_text"]["x"] <= b["rect_text"]["x"] else (b, a)
+    ta = (left["ocr"].get("text") or "").strip()
+    tb = (right["ocr"].get("text") or "").strip()
+    a_ocr = dict(a["ocr"])
+    a_ocr["text"] = " ".join(t for t in (ta, tb) if t)
+    if b["ocr"].get("max_word_conf", 0) > a_ocr.get("max_word_conf", 0):
+        a_ocr["max_word_conf"] = b["ocr"]["max_word_conf"]
+    a_ocr["n_alnum"] = int(a["ocr"].get("n_alnum", 0)) + int(b["ocr"].get("n_alnum", 0))
+    a["ocr"] = a_ocr
+    a["rect_text"] = rect_union([a["rect_text"], b["rect_text"]])
+    a["line_h"] = max(a["line_h"], b["line_h"])
+    for k, f in (("t_first", min), ("i_first", min), ("t_last", max), ("i_last", max), ("hits", max)):
+        a[k] = f(a[k], b[k])
+    a["shots"] = sorted(set(a.get("shots") or []) | set(b.get("shots") or []))
+    if b.get("confirmed_by") == "ocr" and a.get("confirmed_by") != "ocr":
+        a["confirmed_by"] = "ocr"
+    a["confidence"] = max(a.get("confidence") or 0.0, b.get("confidence") or 0.0)
+    a.setdefault("fragments", []).append({"track": b.get("track"), "text": b["ocr"].get("text"),
+                                          "was": b.get("confirmed_by") or "unconfirmed",
+                                          "rect_text": {k: round(v, 1) for k, v in b["rect_text"].items()}})
+
+
 def _merge_lines(recs: list[dict], interval: float) -> list[dict]:
     recs = sorted(recs, key=lambda r: (r["rect_text"]["y"]))
     merged: list[dict] = []
@@ -810,6 +925,50 @@ def _refine_boundary(src, rec: dict, s_times: list[float], fps: float, W: int, H
     return round(last, 4) if last is not None else fallback
 
 
+LINE_GROW_GAP = 1.0        # a component joins the text line when its gap to the line is <= this many line heights
+LINE_WIN = 8.0             # extent search window: this many line heights left/right of the tracked text
+
+
+def _grow_line(stats: np.ndarray, keep: np.ndarray, band: tuple[float, float], line_h: float) -> np.ndarray:
+    """Add connected components that continue the text line horizontally.
+
+    The blob tracker misses letters that do not look like a word on their own (a single tall
+    'I', 'T', 'IT', dots), so the tracked rect can stop in the middle of a subtitle.  Starting
+    from the kept components, a component joins when it lies in the line's band (>= 70 % of its
+    height), is text-sized (0.2..1.6 line heights tall) and its horizontal gap to the line is
+    <= LINE_GROW_GAP line heights.  Long thin scene lines and tall scene edges fail the size test."""
+    keep = keep.copy()
+    if not keep.any():
+        return keep
+    b0, b1 = band
+
+    def ext():
+        idx = np.nonzero(keep)[0]
+        x0 = min(int(stats[i, 0]) for i in idx)
+        x1 = max(int(stats[i, 0] + stats[i, 2]) for i in idx)
+        return x0, x1
+
+    changed = True
+    while changed:
+        changed = False
+        x0, x1 = ext()
+        for i in range(1, len(keep)):
+            if keep[i]:
+                continue
+            x, y, w, h = (int(v) for v in stats[i, :4])
+            if not (0.2 * line_h <= h <= 1.6 * line_h):
+                continue
+            inside = max(0, min(y + h, b1) - max(y, b0))
+            if inside < 0.7 * h:
+                continue
+            gap = max(x - x1, x0 - (x + w))
+            if gap <= LINE_GROW_GAP * line_h:
+                keep[i] = True
+                changed = True
+                x0, x1 = min(x0, x), max(x1, x + w)
+    return keep
+
+
 def _refine_extent(src, u: dict, line_h: float, times: list[float], W: int, H: int, full_frame, thr: int,
                    absent_times: list[float] | None = None) -> dict:
     """Overlay extent at source resolution.
@@ -817,14 +976,16 @@ def _refine_extent(src, u: dict, line_h: float, times: list[float], W: int, H: i
     Timed overlays with a frame of the same shot where the overlay is absent: the persistent
     difference present-vs-absent around the text (exact in static shots).  Otherwise: the
     persistent text ink (+ outline) components belonging to the text rect and, when present,
-    the straight edges of a box/plate drawn behind it.
+    the plate/box drawn behind it (straight persistent edges, or a brightness step with a
+    constant ratio all along its sides -- a semi-transparent plate).  In both cases the extent
+    follows the text line beyond the tracked rect (:func:`_grow_line`).
     """
     import cv2
 
     if not times:
         return {"rect": rect_clip(rect_pad(u, 0.2 * line_h + 3), W, H), "how": "text_rect_padded"}
     ts = sorted({times[int(round(q * (len(times) - 1)))] for q in (0.2, 0.5, 0.8)})
-    win = rect_clip({"x": u["x"] - 3 * line_h, "y": u["y"] - 1.5 * line_h, "w": u["w"] + 6 * line_h,
+    win = rect_clip({"x": u["x"] - LINE_WIN * line_h, "y": u["y"] - 1.5 * line_h, "w": u["w"] + 2 * LINE_WIN * line_h,
                      "h": u["h"] + 3 * line_h}, W, H)
 
     def crop(t):
@@ -835,20 +996,27 @@ def _refine_extent(src, u: dict, line_h: float, times: list[float], W: int, H: i
                               0.25 * line_h), win["w"], win["h"])
     core_m = np.zeros(grays[0].shape, bool)
     core_m[core["y"]:core["y"] + core["h"], core["x"]:core["x"] + core["w"]] = True
+    # scene-change guard region: the old +-3 line-height neighbourhood (independent of the wider search window)
+    near = rect_clip({"x": u["x"] - 3 * line_h - win["x"], "y": 0, "w": u["w"] + 6 * line_h, "h": win["h"]},
+                     win["w"], win["h"])
+    near_m = np.zeros(grays[0].shape, bool)
+    near_m[near["y"]:near["y"] + near["h"], near["x"]:near["x"] + near["w"]] = True
+    band = (u["y"] - win["y"] - 0.25 * line_h, u["y"] - win["y"] + u["h"] + 0.25 * line_h)
     k3 = np.ones((3, 3), np.uint8)
     for ta in absent_times or []:
         ga = crop(ta).astype(np.int16)
         d = np.logical_and.reduce([np.abs(g.astype(np.int16) - ga) > 30 for g in grays])
-        outside = d & ~core_m
-        if outside.sum() > 0.15 * max(1, (~core_m).sum()):
+        outside = d & ~core_m & near_m
+        if outside.sum() > 0.15 * max(1, (near_m & ~core_m).sum()):
             continue          # the scene itself changed: difference is not the overlay
         dd = cv2.dilate(d.astype(np.uint8), k3)
-        n, lab, _st, _c = cv2.connectedComponentsWithStats(dd, connectivity=8)
+        n, lab, st, _c = cv2.connectedComponentsWithStats(dd, connectivity=8)
         keep = np.zeros(n, bool)
         for i in range(1, n):
             comp = lab == i
             if (comp & core_m).sum() >= 0.5 * comp.sum():
                 keep[i] = True
+        keep = _grow_line(st, keep, band, line_h)
         sel = keep[lab] & d
         ys, xs = np.nonzero(sel)
         if xs.size >= 10:
@@ -857,29 +1025,116 @@ def _refine_extent(src, u: dict, line_h: float, times: list[float], W: int, H: i
             return {"rect": rect_clip(r, W, H), "how": "difference_vs_absent_frame"}
     ink = np.logical_and.reduce([stroke_mask(g, thr) for g in grays])
     di = cv2.dilate(ink.astype(np.uint8), k3)
-    n, lab, _st, _c = cv2.connectedComponentsWithStats(di, connectivity=8)
+    n, lab, st, _c = cv2.connectedComponentsWithStats(di, connectivity=8)
     keep = np.zeros(n, bool)
     for i in range(1, n):
         comp = lab == i
         if (comp & core_m).sum() >= 0.5 * comp.sum():
             keep[i] = True
+    keep = _grow_line(st, keep, band, line_h)
     ys, xs = np.nonzero(keep[lab] & ink)
     if xs.size >= 10:
         ib = {"x": int(xs.min()), "y": int(ys.min()), "w": int(xs.max() - xs.min() + 1), "h": int(ys.max() - ys.min() + 1)}
     else:
         ib = {"x": u["x"] - win["x"], "y": u["y"] - win["y"], "w": u["w"], "h": u["h"]}
-    edges = np.logical_and.reduce([cv2.Canny(g, 30, 90) > 0 for g in grays])
+    # persistent edges, tolerant to the 1-px jitter of compressed video between frames
+    edges = np.logical_and.reduce([cv2.dilate((cv2.Canny(g, 30, 90) > 0).astype(np.uint8), k3) > 0 for g in grays])
     box = _find_box(edges, ib, line_h)
     how = "ink"
+    if box is None:
+        box = _find_plate(grays, ib, line_h)
+        how_box = "ink+plate"
+    else:
+        how_box = "ink+box"
     r = dict(ib)
     if box is not None:
         r = rect_union([r, box])
-        how = "ink+box"
+        how = how_box
     pad = 2 if box is not None else max(3.0, 0.12 * line_h)
     r = rect_pad(r, pad)
     r["x"] += win["x"]
     r["y"] += win["y"]
     return {"rect": rect_clip(r, W, H), "how": how}
+
+
+PLATE_MIN_LIGHT = 40       # px level a side must have outside the plate to see its darkening (or 255-level: lightening)
+PLATE_RATIO_TOL = 0.12     # per-column inside/outside ratio must stay within this of the side's median ratio
+PLATE_SIDE_SCORE = 0.7     # share of measurable columns/rows that must agree for a plate side
+
+
+def _find_plate(grays: list[np.ndarray], ib: dict, line_h: float) -> dict | None:
+    """Semi-transparent plate behind text (e.g. ``drawbox color=black@0.55``): along each side the
+    picture is darkened (or lightened) by the SAME ratio on the inside, whatever the background.
+
+    For each side, candidate lines within reach of the ink box are scored by the share of
+    measurable columns (rows) whose inside/outside ratio stays within PLATE_RATIO_TOL of the median
+    ratio in every frame, with a median ratio <= 0.8 (darkening) or, on the inverted image,
+    lightening.  Among the lines that pass, the strongest step wins and, on a tie, the outermost
+    (the 2-px sample bands skip the boundary, so several neighbouring lines see the same step);
+    the returned edge is the outer bound, so the plate is never under-covered.  A plate needs top
+    and bottom plus a vertical side with one sign; the missing vertical side falls back to the ink
+    edge.  Returns a rect in ``grays`` px or None."""
+    Hh, Ww = grays[0].shape
+    x0, x1 = int(ib["x"]), int(ib["x"] + ib["w"])
+    y0, y1 = int(ib["y"]), int(ib["y"] + ib["h"])
+    reach_v = int(max(4, 1.0 * line_h))
+    reach_h = int(max(6, 2.5 * line_h))
+    fs = [g.astype(np.float64) for g in grays]
+
+    def side_score(fr: np.ndarray, pos: int, horizontal: bool, inside_after: bool, lo: int, hi: int,
+                   invert: bool) -> tuple[float, float] | None:
+        # mean of 2 px on each side of the boundary, skipping the 2 px around it (edge blur)
+        a0, a1, b0, b1 = pos - 3, pos - 1, pos + 1, pos + 3
+        if a0 < 0 or b1 > (Hh if horizontal else Ww) or hi <= lo:
+            return None
+        if horizontal:
+            out_, in_ = fr[a0:a1, lo:hi].mean(axis=0), fr[b0:b1, lo:hi].mean(axis=0)
+        else:
+            out_, in_ = fr[lo:hi, a0:a1].mean(axis=1), fr[lo:hi, b0:b1].mean(axis=1)
+        if not inside_after:
+            out_, in_ = in_, out_
+        if invert:
+            out_, in_ = 255.0 - out_, 255.0 - in_
+        ok = out_ >= PLATE_MIN_LIGHT
+        if ok.sum() < max(4, 0.5 * ok.size):
+            return None
+        ratio = (in_[ok] + 1.0) / (out_[ok] + 1.0)
+        med = float(np.median(ratio))
+        if med > 0.8:
+            return 0.0, med
+        return float((np.abs(ratio - med) <= PLATE_RATIO_TOL).mean()), med
+
+    best_plate = None
+    for invert in (False, True):
+        found: dict[str, int] = {}
+        # the inside samples must stay off the ink (a plate within 2 px of the ink is covered by the ink pad)
+        for name, cands, horizontal, inside_after, lo, hi in (
+                ("top", range(y0 - 3, y0 - reach_v - 3, -1), True, True, max(0, x0), min(Ww, x1)),
+                ("bottom", range(y1 + 3, y1 + reach_v + 3), True, False, max(0, x0), min(Ww, x1)),
+                ("left", range(x0 - 3, x0 - reach_h - 3, -1), False, True, max(0, y0), min(Hh, y1)),
+                ("right", range(x1 + 3, x1 + reach_h + 3), False, False, max(0, y0), min(Hh, y1))):
+            chosen, min_med = None, None
+            for pos in cands:                       # inner -> outer
+                res = [side_score(fr, pos, horizontal, inside_after, lo, hi, invert) for fr in fs]
+                if any(v is None for v in res):
+                    continue
+                sc = min(v[0] for v in res)
+                med = float(np.mean([v[1] for v in res]))
+                if sc < PLATE_SIDE_SCORE:
+                    continue
+                if min_med is None or med <= min_med + 0.03:
+                    chosen = pos
+                    min_med = med if min_med is None else min(min_med, med)
+            if chosen is not None:
+                # outer bound of the boundary: top/left plate starts at >= pos-1, bottom/right ends at <= pos
+                found[name] = chosen - 1 if name in ("top", "left") else chosen
+        if "top" in found and "bottom" in found and ({"left", "right"} & set(found)):
+            bx0 = found.get("left", x0)
+            bx1 = found.get("right", x1)
+            plate = {"x": bx0, "y": found["top"], "w": bx1 - bx0 + 1, "h": found["bottom"] - found["top"] + 1}
+            if best_plate is None or plate["w"] * plate["h"] > best_plate["w"] * best_plate["h"]:
+                best_plate = plate
+    return best_plate
 
 
 def _group_moving(recs: list[dict], s_times: list[float], interval: float, full_frame, W: int, H: int) -> None:

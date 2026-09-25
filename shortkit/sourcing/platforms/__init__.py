@@ -268,6 +268,20 @@ def broken_extractor_note(url: str) -> str | None:
     return None
 
 
+# working routes to suggest when a listing extractor is marked broken (yt-dlp 2026.08.19: tiktok:tag, instagram:user)
+BROKEN_ALTERNATIVES = {
+    "tiktok": "대안: 레퍼런스 추적 계정 `@계정` 검색(yt-dlp tiktok:user) 또는 찾은 영상 URL 을 `source add-url` 로 직접 입력",
+    "instagram": "대안: 해시태그 검색(`#태그`, 로그인 쿠키 필요) 또는 게시물/릴스 URL 을 `source add-url` 로 직접 입력",
+}
+
+
+def broken_listing_access(platform: str, broken: str, mode: str) -> dict:
+    """Access for an EMPTY listing from an extractor yt-dlp marks as not working: an empty result there does
+    not mean 'no videos', so it is recorded as ``error`` (never 'ok, 0 results')."""
+    return access(ERROR, f"{broken} — {mode} 목록이 비어 있음: 작동 안 하는 추출기라 '결과 0건'으로 볼 수 없음(못 잼). "
+                         + BROKEN_ALTERNATIVES.get(platform, "대안: 영상 URL 을 `source add-url` 로 직접 입력"))
+
+
 # ----------------------------------------------------------------------------- field helpers
 def int_or_none(v: Any) -> int | None:
     if isinstance(v, bool):
@@ -432,6 +446,34 @@ def url_key(url: str | None) -> str | None:
 
 _TRACKING_PARAMS = {"si", "feature", "t", "lang", "is_from_webapp", "sender_device", "igsh", "igshid",
                     "share_id", "ref", "ref_src", "context"}
+
+_IG_RESERVED = {"p", "reel", "reels", "tv", "explore", "stories", "accounts", "direct", "about", "developer"}
+
+
+def handle_from_url(url: str | None) -> str | None:
+    """The posting account named in a platform URL path ('@handle'), or None.
+
+    tiktok.com/@user/video/<id>, youtube.com/@handle[/shorts|/videos], instagram.com/<user>/(reel|p)/<code>,
+    instagram.com/<user>/, reddit.com/(user|u)/<name>.  A YouTube /shorts/<id> or instagram /reel/<code> URL
+    without a user segment names no account (None)."""
+    if not url or not isinstance(url, str):
+        return None
+    sp = urllib.parse.urlsplit(url.strip() if "://" in url else "https://" + url.strip())
+    host = (sp.hostname or "").lower()
+    parts = [x for x in (sp.path or "").split("/") if x]
+    if not parts:
+        return None
+    if host.endswith("tiktok.com") or host.endswith("youtube.com"):
+        if parts[0].startswith("@") and len(parts[0]) > 1:
+            return "@" + urllib.parse.unquote(parts[0][1:])
+        return None
+    if host.endswith("instagram.com"):
+        if parts[0].lower() not in _IG_RESERVED and re.fullmatch(r"[A-Za-z0-9_.]{1,30}", parts[0]):
+            return "@" + parts[0]
+        return None
+    if host.endswith("reddit.com") and len(parts) >= 2 and parts[0].lower() in ("user", "u"):
+        return "u/" + parts[1]
+    return None
 
 
 def get_adapter(platform: str):

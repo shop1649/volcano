@@ -6,12 +6,15 @@
              (video_id, intro_type, structure_type, notes, labeled_by, watched) with ``watched=no``
              and EMPTY labels.  The labels are filled ONLY by someone who actually watched and
              listened to the video; nothing here guesses a label.
-``build``    reads the labels (rows with ``watched=yes``, a ``structure_type`` and ``labeled_by``)
+``build``    reads the labels (rows with ``watched=yes``, a ``structure_type`` and ``labeled_by``) of
+             MEMBERS of the fixed latest-N snapshot only (labels of other videos are kept apart under
+             ``outside_snapshot_labels`` and never create a format or change a share)
              and writes ``formats.yaml``: one format per distinct development structure; intro-only
              differences are ``intro_variants`` inside the format; per format n, share, members and
              a representative video = medoid of per-video feature vectors (z-scored, NaN-aware
              Euclidean) among the members, ties -> higher view count, with the reason.  Without any
-             valid label the file stays ``status: unmeasured`` with a blocker.
+             valid label the file stays ``status: unmeasured`` with a blocker; ``measured`` requires every
+             snapshot member labelled AND a representative for every format (else ``partial``).
 """
 from __future__ import annotations
 
@@ -23,8 +26,8 @@ import numpy as np
 from .. import paths
 from ..config import load_preset
 from ..util.jsonio import now_iso, read_json, read_yaml, write_json, write_yaml
-from .common import (ROLE_KO, ROLES, analysis_dir, load_snapshot, read_csv_rows, say, snapshot_blocker, video_path,
-                     views_of, warn, write_csv_rows)
+from .common import (ROLE_KO, ROLES, analysis_dir, load_snapshot, read_csv_rows, say, snapshot_blocker,
+                     snapshot_members, video_path, views_of, warn, write_csv_rows)
 
 LABEL_HEADER = ["video_id", "intro_type", "structure_type", "notes", "labeled_by", "watched"]
 FORMATS_SCHEMA = "shortkit.formats/1"
@@ -262,19 +265,32 @@ def build(preset: str) -> dict:
                           "notes": (r.get("notes") or "").strip(), "labeled_by": by})
         elif st or (r.get("intro_type") or "").strip():
             rejected.append({"video_id": vid, "reason": "watched=yes 와 labeled_by 가 모두 있어야 함"})
-    snap_ids = [v["video_id"] for v in snap.get("videos") or []]
+    snap_ids, _ = snapshot_members(preset)
+    mset = set(snap_ids)
+    outside = [v for v in valid if v["video_id"] not in mset]
+    valid = [v for v in valid if v["video_id"] in mset]
     basis = {"snapshot_file": paths.relp(paths.preset_dir(preset) / "reference" / "latest100.json"),
              "captured_at": snap.get("captured_at"), "snapshot_status": snap.get("status"),
              "n_videos": len(snap_ids), "labeled": len(valid), "labels_file": paths.relp(lp),
-             "rejected_labels": len(rejected)}
+             "rejected_labels": len(rejected), "outside_snapshot_labels": len(outside),
+             "missing_members": [m.get("video_id") for m in snap.get("missing_members") or [] if isinstance(m, dict)],
+             "rule": "포맷 표·비율·대표 영상은 고정된 최신 100편 스냅샷 구성원의 라벨만으로 만든다(그 밖의 라벨은 참고로만 보관)"}
+    outside_rows = [{"video_id": v["video_id"], "structure_type": v["structure_type"], "intro_type": v["intro_type"],
+                     "labeled_by": v["labeled_by"], "reason": "최신 100편 스냅샷 밖 영상 — 포맷 표에 넣지 않음(참고용)"}
+                    for v in outside]
     if not valid:
         why = ("본 사람이 채운 라벨 없음(format_labels.csv: watched=yes·structure_type·labeled_by)"
                if rows else "라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함")
+        if outside and snap_ids:
+            why = f"스냅샷 구성원의 라벨 없음(스냅샷 밖 영상 라벨 {len(outside)}개는 포맷 표에 쓰지 않음)"
+        elif not snap_ids:
+            why = "고정된 최신 100편 스냅샷이 없어 포맷 표를 만들 수 없음(포맷은 스냅샷 구성원으로만)"
         base = old.get("blocker") if (old.get("status") == "unmeasured" and old.get("blocker")) else \
             snapshot_blocker(preset)
         out = {"schema": FORMATS_SCHEMA, "preset_id": pr.preset_id, "status": "unmeasured",
                "blocker": base if why in base else f"{base}; {why}",
-               "basis": basis, "rule": FORMAT_RULE, "table": [], "assignments": {}, "built_at": now_iso()}
+               "basis": basis, "rule": FORMAT_RULE, "table": [], "assignments": {},
+               "outside_snapshot_labels": outside_rows, "built_at": now_iso()}
         write_yaml(fpath, out)
         say("포맷 표: 라벨이 없어 '못 잼(unmeasured)' 상태로 유지했습니다.")
         return out
@@ -312,15 +328,21 @@ def build(preset: str) -> dict:
         for m in mem:
             assignments[m] = fid
     unlabeled = [v for v in snap_ids if v not in assignments]
-    status = "measured" if snap_ids and not unlabeled else "partial"
+    no_rep = [row["format_id"] for row in table if not (row.get("representative") or {}).get("video_id")]
+    status = "measured" if snap_ids and not unlabeled and not no_rep else "partial"
+    why = []
+    if unlabeled:
+        why.append(f"최신 스냅샷 {len(snap_ids)}편 중 라벨 없는 영상 {len(unlabeled)}편")
+    if no_rep:
+        why.append(f"대표 영상을 정하지 못한 포맷 {', '.join(no_rep)}(구성원 분석 파일 없음 — 못 잼)")
     out = {"schema": FORMATS_SCHEMA, "preset_id": pr.preset_id, "status": status,
-           "blocker": None if status == "measured" else
-           (f"최신 스냅샷 {len(snap_ids)}편 중 라벨 없는 영상 {len(unlabeled)}편" if snap_ids
-            else "latest100 스냅샷 없음 — 라벨된 영상만으로 분류함"),
+           "blocker": None if status == "measured" else "; ".join(why),
            "basis": basis, "rule": FORMAT_RULE, "table": table, "assignments": assignments,
-           "unlabeled": unlabeled[:200], "rejected_labels": rejected, "built_at": now_iso()}
+           "unlabeled": unlabeled[:200], "rejected_labels": rejected, "outside_snapshot_labels": outside_rows,
+           "formats_without_representative": no_rep, "built_at": now_iso()}
     write_yaml(fpath, out)
-    say(f"포맷 표: {len(table)}개 포맷, 라벨 {total}편, 상태 {status} → {paths.relp(fpath)}")
+    say(f"포맷 표: {len(table)}개 포맷, 라벨 {total}편(스냅샷 밖 라벨 {len(outside)}개 제외), 상태 {status} → "
+        f"{paths.relp(fpath)}" + (f" — {out['blocker']}" if out["blocker"] else ""))
     return out
 
 

@@ -11,7 +11,10 @@ and never used as views.  TikTok has no server-side date filter: ``recent_only``
 published date is known to be older than the recency window (unknown dates are kept, labelled).
 
 Not live-tested on the build machine (tiktok.com blocked by network policy).  Note: yt-dlp
-2026.08.19 marks ``tiktok:tag`` as not working (``_WORKING=False``); the search log says so.
+2026.08.19 marks ``tiktok:tag`` as not working (``_WORKING=False``), and TikTok has no keyword search in
+yt-dlp at all (keywords go through the hashtag page).  When a broken extractor returns an EMPTY listing the
+platform status is ``error`` (not 'ok, 0 results'), with the working routes in the note: ``@account``
+(``tiktok:user``) and direct video URLs (``source add-url``).
 """
 from __future__ import annotations
 
@@ -76,6 +79,9 @@ def search(query: str, limit: int = 10, recent_only: bool = False) -> SearchResu
             res.access["note"] = (res.access["note"] + " | " + broken)[:base.NOTE_MAX]
         return res.done()
     entries = [e for e in (listing or {}).get("entries") or [] if isinstance(e, dict)][: int(limit)]
+    if not entries and broken:
+        res.access = base.broken_listing_access(PLATFORM, broken, mode)
+        return res.done()
     for e in entries:
         item_url = e.get("webpage_url") or e.get("url")
         if e.get("view_count") is not None and e.get("timestamp") and not e.get("_type") == "url":

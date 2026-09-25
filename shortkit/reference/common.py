@@ -394,7 +394,8 @@ def detect_video_region(video: str | Path, fps: float = 4.0, width: int = 216,
                 note = f"영상 밖 영역이 정지해 있으나 단색이 아님(단색 비율 {share:.2f}) → 이미지 배경?"
     return {"resolution": [W, H], "video_region": None if full else region,
             "video_region_full_frame": bool(full), "background": bg_type, "background_color": bg_color,
-            "note": note, "method": _REGION_METHOD, "sampled_fps": fps, "analysis_width": width}
+            "note": note, "method": _REGION_METHOD, "sampled_fps": fps, "analysis_width": width,
+            "sampled_seconds": round((n + 1) / fps, 3)}
 
 
 MEDIAN_MAX_FRAMES = 160
@@ -445,6 +446,46 @@ def _longest_run(mask: np.ndarray) -> tuple[int, int] | None:
                 best = (start, i - 1)
             start = None
     return best
+
+
+def region_evidence(preset: str, video_id: str, video: Path | None, region: dict,
+                    duration: float | None = None) -> dict:
+    """Representative evidence (time + saved frame) for the video-region / background measurement.
+
+    The region is a temporal statistic (activity / temporal median over the sampled span), so the
+    representative time is the middle of the sampled span (``sampled_seconds`` or the duration, capped at
+    the detector's 120 s window); the frame at that time is saved to ``analysis/<id>/frames/region_<ms>.jpg``
+    (overlay: the detected rectangle) so a person can check the rectangle.  -> {"t", "frame", "span_s",
+    "note"}; ``frame`` is None when the video file is missing."""
+    span = float(region.get("sampled_seconds") or duration or 0.0) or None
+    if span is None and video is not None:
+        from ..util.media import probe
+        span = float(probe(video).duration or 0.0) or None
+    span = min(span, 120.0) if span else None
+    t = round(span / 2.0, 3) if span else 0.0
+    out = {"t": t, "frame": None, "span_s": [0.0, span] if span else None,
+           "note": "영역·배경은 표본 구간 전체(시간 통계)에서 측정 — 대표 시각 = 표본 구간의 가운데"}
+    if video is None:
+        out["note"] += "; 영상 파일 없음 → 대표 프레임 저장 못 함"
+        return out
+    try:
+        import cv2
+
+        from ..util.media import read_frames
+
+        fr = read_frames(video, [t])[0]
+        img = cv2.cvtColor(fr, cv2.COLOR_RGB2BGR).copy()
+        r = region.get("video_region")
+        if r:
+            cv2.rectangle(img, (int(r["x"]), int(r["y"])), (int(r["x"] + r["w"]) - 1, int(r["y"] + r["h"]) - 1),
+                          (0, 255, 255), max(2, img.shape[1] // 270))
+        p = analysis_dir(preset, video_id) / "frames" / f"region_{int(round(t * 1000)):06d}.jpg"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        cv2.imwrite(str(p), img, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        out["frame"] = paths.relp(p)
+    except Exception as e:  # noqa: BLE001 - evidence frame is best effort, the time is still recorded
+        out["note"] += f"; 대표 프레임 저장 실패({type(e).__name__})"
+    return out
 
 
 def get_region(preset: str, video_id: str, video: Path) -> dict:

@@ -554,7 +554,13 @@ def analyze_sfx_events(preset_name: str, video_id: str, audio_path: str | os.Pat
                                    "n_candidates": n_unm,
                                    "note": "보컬 stem 없음 → 이 구간의 효과음은 못 잼(개수는 하한값)"}
                                   if vocals is None and speech else None)
-    out.update({"status": "measured", "blocker": None, "residual_method": method, "limitations": lim,
+    # SFX under speech can only be told apart from the speech with a Demucs vocals stem: without it, the
+    # speech intervals are NOT measured, so the video is 'partial' (counts are lower bounds), never 'measured'
+    partial = bool(out["unmeasured_coverage"])
+    blocker = (f"Demucs 분리 없음(보컬 stem 없음): 대사 구간 {len(speech)}곳 밑의 효과음 못 잼 — 후보 {n_unm}개 판정 불가, "
+               "이 영상의 효과음 개수는 하한값" if partial else None)
+    out.update({"status": "partial" if partial else "measured", "blocker": blocker,
+                "residual_method": method, "limitations": lim,
                 "detector": info, "speech_status": speech_status,
                 "mix_check_rule": {"mix_share_min": MIX_SHARE_MIN, "mix_rise_min_db": MIX_RISE_MIN_DB,
                                    "mix_share_dominant": MIX_SHARE_DOMINANT, "artifact_corr_max": ARTIFACT_CORR_MAX,

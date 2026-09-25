@@ -4,26 +4,40 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-24T20:28:30+00:00",
+  "generated_at": "2026-09-25T03:06:17+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
     "video_ids": [],
     "excluded_long_form": [],
+    "excluded_non_snapshot": [],
     "formats_assigned": 0,
     "canvas_resolution": [
       1080,
       1920
-    ]
+    ],
+    "scaled_to": {
+      "resolution": [
+        1080,
+        1920
+      ],
+      "source": "preset (provisional)",
+      "note": "캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계"
+    },
+    "snapshot_status": "blocked",
+    "captured_at": "2026-09-24T17:56:07+00:00",
+    "n_members": 0,
+    "missing_members": [],
+    "rule": "제작 측정 = 고정된 최신 100편 스냅샷(latest100.json) 구성원만. 그 밖의 영상(80만+ 과거 영상 등)은 참고용 보고서(reference/high_views_report.json)에만 쓰고 제작 측정에 섞지 않음"
   },
   "items": [
     {
       "key": "structure.duration_s.p10",
       "unit": "s",
       "resolution": null,
-      "method": "분석한 영상 파일의 길이 → p10",
+      "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p10",
       "value_rule": "p10",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -34,15 +48,15 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
       "key": "structure.duration_s.p50",
       "unit": "s",
       "resolution": null,
-      "method": "분석한 영상 파일의 길이 → p50",
+      "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -53,15 +67,15 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
       "key": "structure.duration_s.p90",
       "unit": "s",
       "resolution": null,
-      "method": "분석한 영상 파일의 길이 → p90",
+      "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -72,15 +86,15 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
       "key": "structure.duration_s.n",
       "unit": "videos",
       "resolution": null,
-      "method": "분석한 영상 파일의 길이 → 표본 수",
+      "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → 표본 수",
       "value_rule": "p50",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -91,7 +105,7 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
       "key": "structure.first_caption_at_s",
@@ -99,7 +113,7 @@
       "resolution": null,
       "method": "영상별 첫 시간제 자막(제목·설명 제외) 시작 시각",
       "value_rule": "p50",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -110,7 +124,7 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     }
   ]
 }

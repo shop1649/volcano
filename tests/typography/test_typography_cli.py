@@ -155,6 +155,10 @@ def _synthetic_reference(root, font="Gothic A1 Black", video_id="synthvid01"):
     (root / "presets" / "joshuamagazine" / "reference" / "downloads.jsonl").write_text(
         json.dumps({"video_id": video_id, "path": f"presets/joshuamagazine/reference/videos/{video_id}.mp4",
                     "format": "synthetic"}) + "\n", encoding="utf-8")
+    # SYNTHETIC fixed snapshot: font identification uses snapshot members only
+    write_json(root / "presets" / "joshuamagazine" / "reference" / "latest100.json", {
+        "schema": "shortkit.ref_snapshot/1", "status": "ok", "captured_at": "2026-01-01T00:00:00+00:00",
+        "method": "SYNTHETIC", "videos": [{"rank": 1, "video_id": video_id, "kind": "short"}]})
     return out
 
 
@@ -178,6 +182,8 @@ def test_ref_fonts_end_to_end_on_synthetic_reference(tmp_root, capsys):
     assert title["candidate_ranking"][0]["font"] == "Gothic A1 Black"
     assert title["verdict"] == "identical", title["candidate_ranking"][0]["reasons"]
     assert title["status"] == "measured"
+    # coverage: the snapshot has one video with titles -> one video is required and sampled
+    assert title["coverage"]["videos_available"] == 1 and title["coverage"]["videos_scored"] == 1
     assert ident["roles"]["situation"]["status"] == "unmeasured"      # no crops for that role
     assert ident["status"] == "partial" and rep["status"].startswith("partial")
     meas = read_json(tmp_root / "presets" / "joshuamagazine" / "measurements" / "font_identity.json")

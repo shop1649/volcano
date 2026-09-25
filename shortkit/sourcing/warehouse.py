@@ -7,8 +7,11 @@ One record per candidate, upserted by (platform, platform_id).  Field rules:
   - ``likes`` (and Reddit ``reddit_score``) are stored separately and are never converted to views.
   - ``published_at`` is the platform publish time; ``first_seen_at`` is when WE first saw it (never used
     for recency).
-  - ``original_author`` vs ``reposter``: from metadata + description credits ('출처', 'credit', 'via', '@');
-    ``original_author_basis`` says how it was decided.
+  - ``original_author`` vs ``reposter``: from metadata + description credits ('출처', 'credit', 'via', '@')
+    (``authorship_base``), then repost evidence (:func:`refresh_provenance`): a burned-in watermark handle of
+    ANOTHER account (download OCR hint, ``clean detect`` overlays, a reviewer's ``watermark_handle``) marks the
+    upload as a repost, and a reviewer's ``original_upload`` answer (yes/no) is applied;
+    ``original_author_basis`` says how it was decided, ``repost_evidence[]`` keeps the evidence.
   - all stored paths are root-relative.
 """
 from __future__ import annotations
@@ -20,8 +23,8 @@ from .. import paths
 from ..util.hashing import short_id
 from ..util.jsonio import append_jsonl, now_iso, read_jsonl, write_jsonl
 from . import exclusions
-from .platforms import (PLATFORMS, SearchResult, access, classify_error, detect_platform, get_adapter, scrub,
-                        url_key)
+from .platforms import (PLATFORMS, SearchResult, access, classify_error, detect_platform, get_adapter,
+                        handle_from_url, scrub, url_key)
 
 CANDIDATES = "warehouse/candidates.jsonl"
 SEARCH_LOG = "warehouse/search_log.jsonl"
@@ -192,6 +195,144 @@ def authorship(item: dict, credits: list[dict]) -> dict:
             "reposter": reposter}
 
 
+# ----------------------------------------------------------------------------- repost evidence
+_WM_HANDLE_RE = re.compile(r"@\s?([A-Za-z0-9_][A-Za-z0-9_.]{1,40})(?: ([A-Za-z0-9_.]{2,24}))?")
+ORIGINAL_UPLOAD = ("yes", "no", "unknown")
+
+
+def _alnum(s: Any) -> str:
+    return re.sub(r"[^0-9a-z가-힣]", "", str(s or "").lower())
+
+
+def handles_in_text(text: str | None) -> list[dict]:
+    """'@handle' marks in OCR text: ``[{handle, variants}]``.  OCR may split one handle into two words
+    ('@fake repost'), so the following word is kept as a variant ('@fakerepost'), never as the handle."""
+    out = []
+    for line in str(text or "").splitlines():
+        for m in _WM_HANDLE_RE.finditer(line):
+            first = m.group(1).rstrip(".")
+            if len(_alnum(first)) < 3:
+                continue
+            variants = ["@" + first] + (["@" + first + m.group(2).rstrip(".")] if m.group(2) else [])
+            out.append({"handle": "@" + first, "variants": variants})
+    return out
+
+
+def same_account(handle: str | list[str], rec: dict) -> bool | None:
+    """Is ``handle`` (or any of its OCR variants) the uploader's account?  None when the uploader is
+    unknown.  OCR-tolerant: equal after removing punctuation, one contained in the other (>= 4 chars),
+    or similarity >= 0.8."""
+    import difflib
+
+    names = [n for n in (_alnum(rec.get(k)) for k in ("uploader", "uploader_id", "channel")) if n]
+    if not names:
+        return None
+    for v in ([handle] if isinstance(handle, str) else list(handle)):
+        h = _alnum(v)
+        for n in names:
+            if h == n or (min(len(h), len(n)) >= 4 and (h in n or n in h)):
+                return True
+            if difflib.SequenceMatcher(None, h, n).ratio() >= 0.8:
+                return True
+    return False
+
+
+def _overlay_doc(sha: str | None) -> dict | None:
+    if not sha:
+        return None
+    try:
+        from ..clean.detect import load_overlays
+
+        return load_overlays(sha)
+    except Exception:  # noqa: BLE001 - clean area unavailable: read the agreed file directly
+        from ..util.jsonio import read_json
+
+        return read_json(paths.absp(f"warehouse/overlays/{sha}.json"))
+
+
+def repost_evidence(rec: dict) -> list[dict]:
+    """Burned-in account marks seen in the file: ``[{kind: watermark_handle, handle, sources[], where,
+    same_as_uploader: True|False|None}]`` from the download OCR hint (``quality.watermark_hint``), the
+    ``clean detect`` overlay record (warehouse/overlays/<sha256>.json) and reviewers' ``watermark_handle``."""
+    found: list[dict] = []
+
+    def add(h: dict, source: str, where: Any = None, text: Any = None) -> None:
+        for e in found:
+            if _alnum(e["handle"]) == _alnum(h["handle"]):
+                if source not in e["sources"]:
+                    e["sources"].append(source)
+                e["variants"] = list(dict.fromkeys(e["variants"] + h["variants"]))
+                return
+        found.append({"kind": "watermark_handle", "handle": h["handle"], "variants": list(h["variants"]),
+                      "sources": [source], "where": where, "text": text})
+
+    for t in ((rec.get("quality") or {}).get("watermark_hint") or {}).get("texts") or []:
+        for h in handles_in_text(t.get("text")):
+            add(h, "download_ocr_hint", t.get("corner"), t.get("text"))
+    doc = _overlay_doc(rec.get("sha256"))
+    for o in (doc or {}).get("overlays") or []:
+        if o.get("kind") in ("watermark", "source_overlay") and not o.get("ignored"):
+            for h in handles_in_text(o.get("text")):
+                add(h, f"clean_detect:{o.get('id')}", o.get("corner") or o.get("band"), o.get("text"))
+    for r in rec.get("reviews") or []:
+        if isinstance(r, dict) and r.get("watermark_handle"):
+            h = "@" + str(r["watermark_handle"]).strip().lstrip("@")
+            add({"handle": h, "variants": [h]}, f"review:{r.get('watched_by')}", None, None)
+    for e in found:
+        e["same_as_uploader"] = same_account(e["variants"], rec)
+    return found
+
+
+def original_upload_answer(rec: dict) -> tuple[str | None, dict | None]:
+    """Latest reviewer answer to 'is this upload the original (not a re-upload)?': yes | no | None."""
+    for r in reversed(rec.get("reviews") or []):
+        if isinstance(r, dict) and r.get("original_upload") in ("yes", "no") and str(r.get("watched_by") or "").strip():
+            return r["original_upload"], r
+    return None, None
+
+
+_UPLOADER_IS_AUTHOR = ("uploader(", "unknown(")
+
+
+def refresh_provenance(rec: dict) -> dict:
+    """original_author / reposter = description/metadata authorship (``authorship_base``) + repost evidence.
+
+    - a reviewer who watched says the upload is the original (``original_upload: yes``): the uploader is the
+      original author, unless the description itself credits another account (kept as it is);
+    - a watermark handle of ANOTHER account burned into the picture, with no credit saying otherwise:
+      re-upload -> ``reposter`` = uploader, ``original_author`` = the handle (basis says the handle's
+      authorship itself is unverified);
+    - a reviewer says it is NOT the original (``original_upload: no``): re-upload even without a watermark.
+    Recency of a re-upload is then judged by the original's publish date (score.recency_for)."""
+    base = rec.get("authorship_base") or {k: rec.get(k) for k in ("original_author", "original_author_basis",
+                                                                  "reposter")}
+    rec["authorship_base"] = {k: base.get(k) for k in ("original_author", "original_author_basis", "reposter")}
+    oa, basis, reposter = base.get("original_author"), base.get("original_author_basis"), base.get("reposter")
+    uploader = rec.get("uploader") or rec.get("uploader_id")
+    ev = repost_evidence(rec)
+    rec["repost_evidence"] = ev
+    ans, rv = original_upload_answer(rec)
+    uploader_basis = reposter is None and str(basis or "").startswith(_UPLOADER_IS_AUTHOR)
+    other = [e for e in ev if e["same_as_uploader"] is False]
+    if ans == "yes" and uploader_basis:
+        oa = uploader or oa
+        basis = f"review_original_upload({rv.get('watched_by')}: 원본 업로드라고 확인" + \
+            (f"; 다른 계정 워터마크 {', '.join(e['handle'] for e in other)} 있음" if other else "") + ")"
+    elif ans != "yes" and uploader_basis and other:
+        e = other[0]
+        oa = e["handle"]
+        basis = (f"watermark_ocr(화면에 박힌 다른 계정 워터마크 {e['handle']}({', '.join(e['sources'])}) ≠ 업로더 "
+                 f"{uploader} → 재업로드로 봄; 이 계정이 원작자인지는 미확인)")
+        reposter = uploader
+    if ans == "no" and reposter is None and uploader:
+        reposter = uploader
+        if _alnum(oa) == _alnum(uploader):
+            oa = None
+        basis = f"review_not_original({rv.get('watched_by')}: 재업로드라고 확인" + (f", 원작자 {oa}" if oa else ", 원작자 모름") + ")"
+    rec.update({"original_author": oa, "original_author_basis": basis, "reposter": reposter})
+    return rec
+
+
 # ----------------------------------------------------------------------------- records
 def orientation(w: Any, h: Any) -> str | None:
     from .score import orientation as _o
@@ -210,13 +351,15 @@ def _overlap_unchecked() -> dict:
 
 def compact_scores(s: dict) -> dict:
     keys = ("recency", "intensity", "reversal", "quality", "format_fit", "total", "recency_label", "age_days",
-            "recency_basis", "recency_threshold_days", "checked_at", "unmeasured", "review_by", "format_facts")
+            "recency_basis", "recency_threshold_days", "checked_at", "unmeasured", "review_by", "format_facts",
+            "upload_age_days", "originality")
     return {k: s.get(k) for k in keys}
 
 
 def refresh_scores(rec: dict) -> dict:
     from .score import compute_scores
 
+    refresh_provenance(rec)
     rec["scores"] = compact_scores(compute_scores(rec))
     return rec
 
@@ -240,6 +383,7 @@ def build_record(item: dict, *, keywords: Iterable[str] = (), acc: dict | None =
         "uploader_url": it.get("uploader_url"),
         "channel": it.get("channel"),
         **authorship(it, credits),
+        "authorship_base": authorship(it, credits),
         "credits": credits,
         "keywords": sorted({k for k in keywords if k}),
         "views": views if views is not None and it.get("views_source") == "platform_metadata" else None,
@@ -291,8 +435,11 @@ def merge_record(old: dict, item: dict, *, keywords: Iterable[str] = (), acc: di
     it = _clean_item(item)
     rec = dict(old)
     acc = acc or item.get("_item_access") or access("ok")
+    stub = bool((it.get("extra") or {}).get("manual_intake"))
     for k in _META_FIELDS:
         if it.get(k) not in (None, "", []):
+            if stub and rec.get(k) not in (None, "", []):
+                continue              # a blocked re-intake (URL stub) never overwrites what is already known
             rec[k] = it[k]
     rec["orientation"] = orientation(rec.get("width"), rec.get("height"))
     if it.get("views") is not None and it.get("views_source") == "platform_metadata":
@@ -315,8 +462,11 @@ def merge_record(old: dict, item: dict, *, keywords: Iterable[str] = (), acc: di
     rec["keywords"] = sorted(set(rec.get("keywords") or []) | {k for k in keywords if k})
     credits = extract_credits(rec.get("title"), rec.get("description"))
     rec["credits"] = credits
-    rec.update(authorship({**rec, "original_url": it.get("original_url") or old.get("original_url"),
-                           "original_author_hint": it.get("original_author_hint")}, credits))
+    base = authorship({**rec, "original_url": it.get("original_url") or old.get("original_url"),
+                       "original_author_hint": it.get("original_author_hint") or old.get("original_author_hint")},
+                      credits)
+    rec["authorship_base"] = base
+    rec.update(base)
     rec["last_checked_at"] = now
     rec["access"] = {**acc, "checked_at": now}
     if it.get("extra"):
@@ -431,15 +581,78 @@ def stub_from_url(url: str, platform: str, acc: dict) -> dict:
     """Minimal item for a URL whose metadata could not be fetched (views unknown, never guessed)."""
     k = url_key(url) or url
     pid = k.split(":", 1)[1] if ":" in k and not k.startswith("http") else short_id(k)
+    handle = handle_from_url(url)       # the posting account is part of the canonical URL on some platforms
     return {"platform": platform, "platform_id": pid, "url": url, "title": None, "description": None,
-            "uploader": None, "views": None, "views_source": "unavailable",
+            "uploader": handle, "uploader_id": handle, "views": None, "views_source": "unavailable",
             "views_note": f"메타데이터를 받지 못함({acc.get('platform_status')}) → 조회수 모름",
             "likes": None, "published_at": None, "_item_access": acc,
-            "extra": {"manual_intake": True}}
+            "extra": {"manual_intake": True, **({"uploader_source": "url_path"} if handle else {})}}
+
+
+MANUAL_FIELDS = ("uploader", "original_author", "original_url", "published_at", "original_published_at", "views",
+                 "views_checked_at")
+
+
+def apply_manual_provenance(rec: dict, *, by: str, fields: dict, note: str | None = None) -> tuple[dict, list[str]]:
+    """Provenance a person saw on the platform page or elsewhere (a blocked platform's metadata, a credit
+    found by Lens, ...).  Kept apart from platform metadata: every entry goes to ``manual_provenance[]``
+    with who/when; platform metadata stays authoritative for the fields it has (uploader, published_at);
+    ``views`` stays platform-only -- a seen view count goes to ``views_manual`` {views, checked_at,
+    observed_by, where} (needs its check date; likes are never views).  Returns (record, Korean notes)."""
+    from .score import parse_time
+
+    by = str(by or "").strip()
+    f = {k: v for k, v in (fields or {}).items() if k in MANUAL_FIELDS and v not in (None, "")}
+    if not f:
+        return rec, []
+    if not by:
+        raise ValueError("수동 출처 정보에는 --observed-by(직접 확인한 사람)가 필요함")
+    for k in ("published_at", "original_published_at", "views_checked_at"):
+        if k in f and parse_time(str(f[k])) is None:
+            raise ValueError(f"--{k.replace('_', '-')} 날짜 형식 오류: {f[k]}")
+    if ("views" in f) != ("views_checked_at" in f):
+        raise ValueError("--views 와 --views-checked-at(조회수를 본 날짜)은 함께 줘야 함")
+    if "views" in f:
+        v = f["views"]
+        if not (isinstance(v, int) and not isinstance(v, bool) and v >= 0):
+            raise ValueError("--views 는 0 이상의 정수(조회수/재생수만, 좋아요 아님)")
+    now = now_iso()
+    msgs: list[str] = []
+    src = f"manual_observation:{by}"
+    if "uploader" in f:
+        if rec.get("uploader") and _alnum(rec["uploader"]) != _alnum(f["uploader"]) and \
+                (rec.get("extra") or {}).get("uploader_source") != "url_path":
+            msgs.append(f"업로더: 플랫폼 메타데이터 '{rec['uploader']}' 유지(수동 입력 '{f['uploader']}' 은 기록만)")
+        else:
+            rec["uploader"] = f["uploader"]
+            rec.setdefault("extra", {})["uploader_source"] = src
+    if "published_at" in f:
+        if rec.get("published_at") and rec.get("published_at_source") and \
+                not str(rec.get("published_at_source")).startswith("manual_observation"):
+            msgs.append(f"게시일: 플랫폼 메타데이터 {rec['published_at']} 유지(수동 입력 {f['published_at']} 은 기록만)")
+        else:
+            rec["published_at"], rec["published_at_source"] = str(f["published_at"]), src
+    if "original_url" in f:
+        rec["original_url"] = f["original_url"]
+    if "original_published_at" in f:
+        rec["original_published_at"] = str(f["original_published_at"])
+        rec["original_published_at_source"] = src
+    if "original_author" in f:
+        rec["original_author_hint"] = {"name": f["original_author"], "basis": f"manual_observation({by})",
+                                       "url": f.get("original_url") or rec.get("original_url")}
+    if "views" in f:
+        rec["views_manual"] = {"views": f["views"], "checked_at": str(f["views_checked_at"]), "observed_by": by,
+                               "where": rec.get("url"), "note": "사람이 직접 본 조회수(플랫폼 메타데이터 아님)"}
+    rec.setdefault("manual_provenance", []).append({"at": now, "by": by, "fields": f, "note": note})
+    base = authorship(rec, rec.get("credits") or [])
+    rec["authorship_base"] = base
+    rec.update(base)
+    return refresh_scores(rec), msgs
 
 
 def intake_url(url: str, *, keywords: Iterable[str] = (), note: str | None = None) -> tuple[dict, dict]:
-    """Manual intake of one URL: fetch metadata (if reachable) and upsert. Returns (record, log row)."""
+    """Manual intake of one URL: fetch metadata (if reachable) and upsert. Returns (record, log row).
+    Provenance a person knows (blocked platform) is added with :func:`apply_manual_provenance`."""
     platform = detect_platform(url) or "other"
     if platform in PLATFORMS:
         try:
@@ -482,6 +695,7 @@ def select(cid: str, *, by: str = "user", accept: Iterable[str] | None = None,
     from . import score
 
     c = get(cid)
+    refresh_provenance(c)            # overlay records / reviews added since the last save count too
     s = score.compute_scores(c)
     hard, soft = score.selection_blockers(c, s)
     msgs: list[str] = []
@@ -505,6 +719,46 @@ def select(cid: str, *, by: str = "user", accept: Iterable[str] | None = None,
     set_status(c, "selected", by, c["selection_reason"])
     put(c)
     return True, c, [f"{c['id']} 선택됨", f"선택 이유: {c['selection_reason']}"]
+
+
+def find_by_url(url: str | None, rows: list[dict] | None = None) -> list[dict]:
+    """Records whose own URL is the same item as ``url`` (canonical url_key equality)."""
+    k = url_key(url)
+    if not k:
+        return []
+    return [r for r in (rows if rows is not None else load()) if url_key(r.get("url")) == k]
+
+
+def link_original(dirty_id: str, clean_id: str, *, by: str, note: str, unlink: bool = False) -> tuple[dict, dict]:
+    """Record that ``clean_id`` is a clean original (same content, no burned-in overlay) of ``dirty_id``:
+    ``dirty.alternates[] = {id, linked_by, linked_at, note, basis}`` and ``clean.alternate_of[]``.
+
+    ``shortkit clean plan`` on the dirty source then checks the clean file with its own overlay
+    detection and, when it is clean at the dirty overlays' positions, plans a source replacement
+    (step 1 of the required order: clean original -> crop -> local restoration).  ``by`` and ``note``
+    are required: the link is a person's statement that both files show the same recording."""
+    if dirty_id == clean_id:
+        raise ValueError("같은 후보를 자기 자신의 원본으로 연결할 수 없음")
+    if not str(by or "").strip() or not str(note or "").strip():
+        raise ValueError("--by(확인한 사람)와 --note(어떻게 같은 녹화임을 확인했는지)가 필요함")
+    rows = load()
+    dirty, clean = get(dirty_id, rows), get(clean_id, rows)
+    now = now_iso()
+    alts = [a for a in (dirty.get("alternates") or [])
+            if (a if isinstance(a, str) else (a.get("id") or a.get("warehouse_id"))) != clean_id]
+    back = [x for x in (clean.get("alternate_of") or []) if x != dirty_id]
+    if not unlink:
+        if clean.get("status") in ("excluded", "rejected") or (clean.get("reference_overlap") or {}).get("excluded") is True:
+            raise SelectionError(f"{clean_id} 는 상태가 {clean.get('status')} (레퍼런스와 같은 녹화/탈락) 라서 원본으로 쓸 수 없음")
+        alts.append({"id": clean_id, "linked_by": by.strip(), "linked_at": now, "note": note.strip(),
+                     "basis": "manual_same_content"})
+        back.append(dirty_id)
+    dirty["alternates"] = alts
+    clean["alternate_of"] = back
+    dirty.setdefault("provenance_log", []).append({"at": now, "by": by.strip(), "action": "unlink_original" if unlink
+                                                   else "link_original", "other": clean_id, "note": note.strip()})
+    save(rows)
+    return dirty, clean
 
 
 def mark_used(cid: str, episode_id: str, by: str = "user") -> dict:

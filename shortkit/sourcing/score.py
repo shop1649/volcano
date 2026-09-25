@@ -5,9 +5,16 @@ its check time).  Candidates whose views are unknown are listed after the ranked
 (``views_unknown``); they are never given a guessed number.  Likes / Reddit score are never views.
 
 Stage 2 -- final selection uses:
-  recency     age of ``published_at`` at check time (label recent|old|unknown). The label depends ONLY
-              on the publish date, so an old viral video is never labelled recent, however many views
-              it has or however recently we first saw it.
+  recency     age of the publish date at check time (label recent|old|unknown).  Views and the date we
+              first saw a video never make it recent.  A re-upload is judged by the ORIGINAL's publish
+              date: a re-upload is any candidate with a credit to another account, a separate original
+              URL, a burned-in watermark handle of another account (download OCR hint / ``clean detect``
+              overlays / reviewer) or a reviewer's ``original_upload: no``; without the original's date
+              it is 'unknown', never 'recent'.  An uncredited clip WITHOUT such marks cannot be told apart
+              from an uncredited re-upload of an old viral by metadata alone, so 'recent' also needs a
+              reviewer who watched it to answer ``original_upload: yes``; until then a recent upload
+              date is 'unknown' ("최근 게시 — 원본 업로드인지 미확인").  An old upload date is 'old'
+              either way (the original is at least as old).
   intensity   event intensity 1-5   \
   reversal    reversal/twist 1-5     > from a review entry by someone who WATCHED the video
   format_fit  format fit 1-5        /  (watched_by + notes required); otherwise 'unmeasured'
@@ -120,22 +127,50 @@ def recency(published_at: str | None, checked_at: str | None = None, days: float
             **({"note": note} if note else {})}
 
 
+def originality(c: dict) -> tuple[str, str]:
+    """(state, why): 'confirmed_original' (a reviewer answered original_upload yes), 'repost' (reviewer
+    answered no, or repost evidence: reposter set / original URL elsewhere), 'unconfirmed' otherwise."""
+    for r in reversed(c.get("reviews") or []):
+        if isinstance(r, dict) and r.get("original_upload") in ("yes", "no") and str(r.get("watched_by") or "").strip():
+            if r["original_upload"] == "no":
+                return "repost", f"검토({r['watched_by']}): 재업로드"
+            if c.get("reposter"):
+                break                     # the description itself credits another account: keep the repost
+            return "confirmed_original", f"검토({r['watched_by']}): 원본 업로드"
+    if c.get("reposter"):
+        return "repost", f"원작자 {c.get('original_author') or '모름'} ≠ 업로더 {c.get('reposter')} " \
+                         f"({c.get('original_author_basis')})"
+    if c.get("original_url") and c.get("original_url") != c.get("url"):
+        return "repost", f"원본 URL 따로 있음({c.get('original_url')})"
+    return "unconfirmed", "원본 업로드인지 확인 안 됨(크레딧·워터마크·검토 답 없음)"
+
+
 def recency_for(c: dict, checked_at: str | None = None, days: float | None = None) -> dict:
-    """Recency of a candidate.  A known repost (reposter set / original_url elsewhere) is judged by the
-    ORIGINAL's publish date (``original_published_at``, e.g. from a review); if that is unknown the label is
-    'unknown' -- a re-upload of an old viral clip must not look recent because the re-upload is new."""
+    """Recency of a candidate (see the module docstring).  A known repost is judged by the ORIGINAL's
+    publish date (``original_published_at``, e.g. from a review); if that is unknown the label is
+    'unknown'.  A recent upload whose originality nobody confirmed is 'unknown' as well.
+    ``upload_age_days`` is always the age of this upload (for sorting)."""
     if c.get("original_published_at"):
         r = recency(c["original_published_at"], checked_at, days)
         r["basis"] = "original_published_at"
+        r["upload_age_days"] = recency(c.get("published_at"), checked_at, days)["age_days"]
         return r
-    repost = bool(c.get("reposter")) or bool(c.get("original_url") and c.get("original_url") != c.get("url"))
+    state, why = originality(c)
     r = recency(c.get("published_at"), checked_at, days)
     r["basis"] = "published_at"
-    if repost and r["label"] != "old":
+    r["originality"] = state
+    r["upload_age_days"] = r["age_days"]
+    if state == "repost" and r["label"] != "old":
         r.update({"label": "unknown", "label_ko": "재업로드: 원본 게시일 모름", "score": None,
-                  "method": "재업로드로 보임(원작자≠업로더 또는 원본 URL 따로 있음) → 원본 게시일을 확인해야 최근성 판정 "
+                  "method": f"재업로드로 보임({why}) → 원본 게시일을 확인해야 최근성 판정 "
                             f"(재업로드 {r['age_days']}일 전; 검토 시 --original-published-at 으로 입력)",
                   "basis": "repost_without_original_date"})
+    elif state == "unconfirmed" and r["label"] == "recent":
+        r.update({"label": "unknown", "label_ko": "최근 게시 — 원본 업로드인지 미확인", "score": None,
+                  "method": f"게시 {r['age_days']}일 전이지만 {why} → 옛 바이럴의 재업로드일 수 있어 최근으로 보지 않음. "
+                            "영상을 본 검토자가 `source review ... --original-upload yes` (재업로드면 no + "
+                            "--original-published-at) 로 답해야 판정",
+                  "basis": "recent_upload_originality_unconfirmed"})
     return r
 
 
@@ -146,12 +181,33 @@ def views_confirmed(c: dict) -> bool:
             and c.get("views_source") == "platform_metadata" and bool(c.get("views_checked_at")))
 
 
+def views_manual(c: dict) -> dict | None:
+    """A view count a named person saw on the platform page, with its check date (``views_manual``)."""
+    m = c.get("views_manual") or {}
+    v = m.get("views")
+    if isinstance(v, int) and not isinstance(v, bool) and v >= 0 and m.get("checked_at") and m.get("observed_by"):
+        return m
+    return None
+
+
+def effective_views(c: dict) -> tuple[int | None, str | None, str | None]:
+    """(views, source, checked_at) for ranking: platform metadata first, else a dated manual observation."""
+    if views_confirmed(c):
+        return c["views"], "platform_metadata", c.get("views_checked_at")
+    m = views_manual(c)
+    if m:
+        return m["views"], "manual_observation", m["checked_at"]
+    return None, None, None
+
+
 def rank_by_views(cands: Iterable[dict], platform: str | None = None) -> list[dict]:
     """Per-platform ranking rows ``{platform, rank, id, views, views_checked_at, flags, candidate}``.
 
     Confirmed views first (desc; ties -> more recent check first), then unknown views (rank None,
     flag 'views_unknown'), ordered by first_seen_at. Ranks restart per platform because view counts
-    of different platforms are not comparable."""
+    of different platforms are not comparable.  A view count a named person saw on the platform page
+    (``views_manual``, dated) is confirmed too and ranked with the others, flagged
+    'views_manual_observation'; ``views`` itself stays platform-metadata only."""
     rows: list[dict] = []
     by_pf: dict[str, list[dict]] = {}
     for c in cands:
@@ -160,13 +216,15 @@ def rank_by_views(cands: Iterable[dict], platform: str | None = None) -> list[di
         by_pf.setdefault(c.get("platform") or "?", []).append(c)
     for pf in sorted(by_pf):
         items = by_pf[pf]
-        conf = [c for c in items if views_confirmed(c)]
-        unk = [c for c in items if not views_confirmed(c)]
-        conf.sort(key=lambda c: (-c["views"], _neg_ts(c.get("views_checked_at")), c.get("id", "")))
+        conf = [c for c in items if effective_views(c)[0] is not None]
+        unk = [c for c in items if effective_views(c)[0] is None]
+        conf.sort(key=lambda c: (-effective_views(c)[0], _neg_ts(effective_views(c)[2]), c.get("id", "")))
         unk.sort(key=lambda c: (c.get("first_seen_at") or "", c.get("id", "")))
         for i, c in enumerate(conf, 1):
-            rows.append({"platform": pf, "rank": i, "id": c.get("id"), "views": c["views"],
-                         "views_checked_at": c.get("views_checked_at"), "flags": [], "candidate": c})
+            v, src, at = effective_views(c)
+            rows.append({"platform": pf, "rank": i, "id": c.get("id"), "views": v, "views_checked_at": at,
+                         "flags": [] if src == "platform_metadata" else ["views_manual_observation"],
+                         "candidate": c})
         for c in unk:
             flags = ["views_unknown"]
             if c.get("reddit_score") is not None:
@@ -195,6 +253,8 @@ def validate_review(r: dict) -> list[str]:
             probs.append(f"{k}({REVIEW_KO[k]}) 1-5 정수 아님")
     if r.get("watermark") not in (None, "present", "absent"):
         probs.append("watermark 는 present/absent 만 가능")
+    if r.get("original_upload") not in (None, "yes", "no", "unknown"):
+        probs.append("original_upload 는 yes/no/unknown 만 가능")
     return probs
 
 
@@ -404,6 +464,7 @@ def compute_scores(c: dict, checked_at: str | None = None) -> dict:
     s: dict[str, Any] = {
         "recency": rec["score"], "recency_label": rec["label"], "age_days": rec["age_days"],
         "recency_basis": rec.get("basis"), "recency_note": rec["method"] if rec["label"] == "unknown" else None,
+        "upload_age_days": rec.get("upload_age_days"), "originality": rec.get("originality"),
         "intensity": rv.get("intensity") if rv else None,
         "reversal": rv.get("reversal") if rv else None,
         "format_fit": rv.get("format_fit") if rv else None,
@@ -470,6 +531,10 @@ def selection_reason(c: dict, scores: dict, accepted: list[dict] | None = None) 
     if views_confirmed(c):
         parts.append(f"조회수 {_fmt_int(c['views'])}회({(c.get('views_checked_at') or '')[:10]} 확인, "
                      f"{c.get('platform')} 메타데이터)")
+    elif views_manual(c):
+        m = views_manual(c)
+        parts.append(f"조회수 {_fmt_int(m['views'])}회({str(m['checked_at'])[:10]} {m['observed_by']} 가 직접 확인, "
+                     "플랫폼 메타데이터 아님)")
     else:
         extra = f", Reddit 점수 {c['reddit_score']}(조회수 아님)" if c.get("reddit_score") is not None else ""
         parts.append(f"조회수 확인 불가({c.get('views_source') or 'unavailable'}{extra})")
@@ -477,10 +542,14 @@ def selection_reason(c: dict, scores: dict, accepted: list[dict] | None = None) 
         parts.append(f"좋아요 {_fmt_int(c['likes'])}(조회수와 별개)")
     if scores.get("recency_label") in ("recent", "old"):
         what = "원본 게시" if scores.get("recency_basis") == "original_published_at" else "게시"
-        parts.append(f"{what} {scores['age_days']:.0f}일 전({RECENCY_KO[scores['recency_label']]}, "
+        conf = ", 검토자가 원본 업로드로 확인" if scores.get("recency_label") == "recent" and \
+            scores.get("recency_basis") == "published_at" else ""
+        parts.append(f"{what} {scores['age_days']:.0f}일 전({RECENCY_KO[scores['recency_label']]}{conf}, "
                      f"기준 {scores['recency_threshold_days']:g}일, {scores['checked_at'][:10]} 확인)")
     elif scores.get("recency_basis") == "repost_without_original_date":
         parts.append("재업로드로 보이며 원본 게시일 모름(최근성 못 잼)")
+    elif scores.get("recency_basis") == "recent_upload_originality_unconfirmed":
+        parts.append(f"게시 {scores.get('upload_age_days') or 0:.0f}일 전이지만 원본 업로드인지 미확인(최근성 못 잼)")
     else:
         parts.append("게시일 모름(최근성 못 잼)")
     ff = scores.get("format_facts") or {}
@@ -520,8 +589,9 @@ def selection_reason(c: dict, scores: dict, accepted: list[dict] | None = None) 
         parts.append("못 잼 항목을 알고 선택: " + "; ".join(
             f"{a['key']} — 사유: {a['reason']} (영향: {a.get('impact') or UNMEASURED_IMPACT.get(a['key'], '?')})"
             for a in accepted))
-    if c.get("original_author") and c.get("reposter"):
-        parts.append(f"원작자 {c['original_author']} / 재업로더 {c['reposter']}")
+    if c.get("reposter"):
+        parts.append(f"원작자 {c.get('original_author') or '모름'} / 재업로더 {c['reposter']} "
+                     f"(근거: {c.get('original_author_basis')})")
     return " · ".join(parts)
 
 

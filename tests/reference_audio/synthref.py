@@ -56,6 +56,20 @@ def make_project(root: Path) -> None:
             shutil.copy(src, pd / f)
 
 
+def write_snapshot(root: Path, ids: list[str]) -> None:
+    """SYNTHETIC fixed latest-N snapshot whose members are ``ids`` (production audio measurements use snapshot
+    members only).  Publish times descend in list order."""
+    import json
+
+    ref = root / "presets" / "joshuamagazine" / "reference"
+    ref.mkdir(parents=True, exist_ok=True)
+    (ref / "latest100.json").write_text(json.dumps({
+        "schema": "shortkit.ref_snapshot/1", "status": "ok", "captured_at": "2026-01-01T00:00:00+00:00",
+        "method": "SYNTHETIC", "note": SYNTHETIC_LABEL,
+        "videos": [{"rank": i + 1, "video_id": v, "kind": "short", "published_at": f"2025-12-{28 - i:02d}T00:00:00+00:00"}
+                   for i, v in enumerate(ids)]}, ensure_ascii=False), encoding="utf-8")
+
+
 def make_library(root: Path, with_index: bool = True) -> dict[str, Path]:
     """Clean-music library (22.05 kHz mono copies of the generated beds) + index.yaml."""
     lib = root / "assets" / "library" / "music"

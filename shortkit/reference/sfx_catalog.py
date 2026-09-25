@@ -317,19 +317,26 @@ def build_catalog(preset_name: str = DEFAULT_PRESET, video_ids: list[str] | None
                   latest_n: int | None = None, write: bool = True) -> dict:
     pr = load_preset(preset_name)
     window = float(pr.get("audio.sfx.max_event_offset_s"))
+    excluded: list[str] = []
     if video_ids is None:
         video_ids, target_n, snap_blocker = newest_video_ids(preset_name, latest_n)
         basis_note = f"스냅샷 최신 {target_n}편"
     else:
-        target_n, snap_blocker = len(video_ids), None
-        basis_note = "지정한 영상 목록"
+        # an explicit list is still restricted to snapshot members (production basis); others are recorded
+        from .common import production_basis
+
+        pb = production_basis(preset_name, list(video_ids))
+        excluded = pb["excluded_non_snapshot"] + pb["excluded_long_form"]
+        video_ids = pb["ids"]
+        target_n, snap_blocker = len(video_ids), (pb["blocker"] if not video_ids else None)
+        basis_note = "지정한 영상 목록(스냅샷 구성원만)"
     out: dict = {"schema": SCHEMA, "preset_id": pr.preset_id, "generated_at": now_iso(),
                  "params": {"sim_threshold": SIM_THRESHOLD, "edit_xcorr": EDIT_XCORR, "event_window_s": window,
                             "clustering": "agglomerative average-linkage, 1 - fingerprint similarity"}}
     analyzed, missing, per_video = [], [], {}
     for vid in video_ids:
         d = read_json(sfx_events_path(preset_name, vid))
-        if d and d.get("status") == "measured":
+        if d and d.get("status") in ("measured", "partial"):     # partial = speech intervals not measured
             analyzed.append(vid)
             per_video[vid] = d
         else:
@@ -339,7 +346,7 @@ def build_catalog(preset_name: str = DEFAULT_PRESET, video_ids: list[str] | None
     partial = sorted(v for v, d in per_video.items() if d.get("unmeasured_coverage"))
     out["basis"] = {"videos": analyzed, "n_videos": len(analyzed), "target_n": target_n, "selection": basis_note,
                     "missing": missing, "separator": ", ".join(seps) if seps else None,
-                    "videos_with_unmeasured_intervals": partial}
+                    "videos_with_unmeasured_intervals": partial, "excluded_non_snapshot": excluded}
     if not analyzed:
         out.update({"status": "unmeasured", "types": [],
                     "blocker": snap_blocker or "분석된 레퍼런스 영상 없음(sfx_events.json 전무)"})
@@ -431,10 +438,18 @@ def build_catalog(preset_name: str = DEFAULT_PRESET, video_ids: list[str] | None
         for f in fp_dir.glob("*.npy"):
             if f.stem.removesuffix("_wave") not in keep:
                 f.unlink()
-    complete = not missing
-    out.update({"status": "measured" if complete else "unmeasured",
-                "blocker": None if complete else f"부분 분석 {len(analyzed)}/{target_n}편 — 누락: {', '.join(missing[:10])}"
-                + ("…" if len(missing) > 10 else ""),
+    # the catalog is 'measured' only when every target video was analysed AND no analysed video has intervals
+    # where SFX could not be measured (no Demucs vocals stem -> SFX under speech unmeasured, counts are lower
+    # bounds); the production gate (episode validate) treats anything else as unmeasured
+    blockers = []
+    if missing:
+        blockers.append(f"부분 분석 {len(analyzed)}/{target_n}편 — 누락: {', '.join(missing[:10])}"
+                        + ("…" if len(missing) > 10 else ""))
+    if partial:
+        blockers.append(f"Demucs 분리 없음: 대사 밑 효과음 못 잼({len(partial)}편: {', '.join(partial[:10])}"
+                        + ("…" if len(partial) > 10 else "") + ") — 종류별 편당 개수는 하한값")
+    out.update({"status": "unmeasured" if blockers else "measured", "blocker": "; ".join(blockers) or None,
+                "counts_are_lower_bounds": bool(partial),
                 "types": types, "xcorr_samples": pair_logs[:30]})
     if write:
         write_json(catalog_path(preset_name), out)

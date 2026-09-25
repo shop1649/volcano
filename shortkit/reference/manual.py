@@ -6,13 +6,15 @@
 A row is an observation made by a person who WATCHED the reference video at time ``t``:
   * ``watched`` must be yes (yes/y/true/1/예/네/o) and ``observed_by`` non-empty, otherwise the row is
     ignored (listed under ``rows_ignored`` with the reason) -- never counted, never "filled in";
-  * ``video_id`` must be in the fixed reference snapshot (reference/latest100.json or high_views.json);
-    long-form uploads (kind: video) are skipped unless ``--include-long``;
+  * ``video_id`` must be a member of the fixed reference snapshot (reference/latest100.json) -- older
+    high-view videos are reference-only (reference/high_views_report.json) and never enter production
+    measurements; long-form uploads (kind: video) are skipped unless ``--include-long``;
   * ``t`` = seconds into that video where the observation can be checked (the evidence time);
   * ``key`` must be one of ``MANUAL_KEYS``; ``value`` is parsed by the key's type:
       color  '#RRGGBB'          px     number, in the REFERENCE VIDEO's own pixels (as downloaded /
-      ratio  number 0..2               analysed); scaled to the canvas like every other coordinate
-      hz     number >= 0 (0 = no blink)      (canvas.width / video width; same aspect ratio only)
+      ratio  number 0..2               analysed); scaled like every other coordinate to the MEASURED
+      hz     number >= 0 (0 = no blink)      canvas when canvas.width/height are measured, else the preset
+                                             canvas (``scaled_to``; same aspect ratio only), native values kept
       bool   yes/no              enum   one of the listed values
 
 Items use the measurement format of docs/CONTRACT.md section 2: numeric -> ``{n, p10, p50, p90}``
@@ -175,14 +177,11 @@ def read_observations(preset: str, include_long: bool = False) -> tuple[list[dic
     """(accepted rows, ignored rows with reasons).  Accepted rows carry parsed ``value`` (CSV unit)."""
     snap = load_snapshot(preset) or {}
     known: dict[str, str | None] = {}
-    for name in ("latest100", "high_views"):
-        d = load_reference_list(preset, name) or {}
-        if d.get("status") in (None, "ok", "partial"):
-            for v in d.get("videos") or []:
-                if v.get("video_id"):
-                    known.setdefault(v["video_id"], v.get("kind"))
-    if snap.get("status") not in ("ok", "partial"):
-        known = {}
+    if snap.get("status") in ("ok", "partial"):
+        for v in snap.get("videos") or []:
+            if v.get("video_id"):
+                known.setdefault(v["video_id"], v.get("kind"))
+    outside = {v.get("video_id") for v in (load_reference_list(preset, "high_views") or {}).get("videos") or []}
     ok, bad = [], []
     for i, r in enumerate(read_csv_rows(csv_path(preset)), start=2):     # row 1 = header
         r = {k: (v or "").strip() if isinstance(v, str) else v for k, v in r.items()}
@@ -195,7 +194,8 @@ def read_observations(preset: str, include_long: bool = False) -> tuple[list[dic
         elif key not in MANUAL_KEYS:
             why = f"수동 관찰 대상 키가 아님: {key!r} (허용: {', '.join(MANUAL_KEYS)})"
         elif r.get("video_id") not in known:
-            why = "고정 스냅샷(latest100/high_views)에 없는 영상"
+            why = ("최신 100편 스냅샷(latest100) 밖 영상(조회수 기준 이상 과거 영상 — 참고용, 제작 측정에 섞지 않음)"
+                   if r.get("video_id") in outside else "고정 스냅샷(latest100)에 없는 영상")
         elif known.get(r["video_id"]) == "video" and not include_long:
             why = "긴 영상(kind=video) — --include-long 없이는 제외"
         t = None
@@ -245,8 +245,8 @@ def _num_stats(vals: list[float], digits: int = 3) -> dict:
     return st
 
 
-def _item(key: str, per_video: list[dict], blocker: str, canvas: list[int]) -> dict:
-    """per_video rows: {video_id, format_id, value, t, evidence:[...]}."""
+def _item(key: str, per_video: list[dict], blocker: str, canvas: list[int], scaled_to: dict | None = None) -> dict:
+    """per_video rows: {video_id, format_id, value, t, evidence:[...], native?, native_res?}."""
     from ..util.stats import categorical
 
     spec = MANUAL_KEYS[key]
@@ -254,6 +254,8 @@ def _item(key: str, per_video: list[dict], blocker: str, canvas: list[int]) -> d
     it: dict[str, Any] = {"key": key, "unit": {"px": "px", "ratio": "ratio", "hz": "Hz", "color": "rgb_hex"}.get(t),
                           "resolution": canvas if t == "px" else None, "method": _method(key),
                           "measured_at": now_iso(), "howto": HOWTO.get(key)}
+    if t == "px" and scaled_to:
+        it["scaled_to"] = scaled_to
     vals = [r for r in per_video if r["value"] is not None]
     if not vals:
         empty = ({"n": 0, "p10": None, "p50": None, "p90": None} if t in ("px", "ratio", "hz") else
@@ -287,6 +289,11 @@ def _item(key: str, per_video: list[dict], blocker: str, canvas: list[int]) -> d
     it.update({"status": "measured", "value": value, "value_rule": _rule(t), "overall": ov, "by_format": byf,
                "evidence": ev[:20], "evidence_total": len(ev), "blocker": None,
                "sources": dict(Counter(r["source"] for r in vals))})
+    if t == "px":
+        from .aggregate import native_stats
+        nat = native_stats(vals, "p50", 1)
+        if nat:
+            it["native"] = nat
     return it
 
 
@@ -306,20 +313,28 @@ def _method(key: str) -> str:
     return base
 
 
+def _target_canvas(pr, preset: str) -> tuple[list[int], dict]:
+    """Same target canvas as `ref aggregate`: measured canvas.width/height (visual_canvas.json) else the preset."""
+    from .aggregate import target_canvas
+
+    vc = read_json(paths.preset_dir(preset) / "measurements" / "visual_canvas.json") or {}
+    items = {i.get("key"): i for i in vc.get("items") or [] if isinstance(i, dict)}
+    return target_canvas(pr, items)
+
+
 def aggregate_manual(preset: str, include_long: bool = False, ids: list[str] | None = None) -> dict:
     pr = load_preset(preset)
-    canvas = [int(pr.get("canvas.width")), int(pr.get("canvas.height"))]
+    canvas, scaled_to = _target_canvas(pr, preset)
     from .classify import load_membership
-    from .common import resolve_ids
+    from .common import basis_record, production_basis
 
     membership = load_membership(preset)
     snap = load_snapshot(preset) or {}
     snap_ok = snap.get("status") in ("ok", "partial")
     ensure_template(preset)
     obs, ignored = read_observations(preset, include_long)
-    kinds = {v["video_id"]: v.get("kind") for v in snap.get("videos") or [] if v.get("video_id")}
-    ids = ids if ids is not None else resolve_ids(preset, set_name="analyzed")
-    ids = [v for v in ids if include_long or kinds.get(v) != "video"]
+    pb = production_basis(preset, ids, include_long=include_long)
+    ids = pb["ids"]
     auto = auto_decoration_rows(preset, ids) if snap_ok else []
     res_cache: dict[str, list[int] | None] = {}
 
@@ -340,11 +355,13 @@ def aggregate_manual(preset: str, include_long: bool = False, ids: list[str] | N
     for (vid, key), rows in sorted(by.items()):
         t = MANUAL_KEYS[key]["type"]
         vals = [r["value"] for r in rows]
+        native = None
         if t == "px":
             f = factor(vid)
             if f is None:
                 unscaled.append({"video_id": vid, "key": key, "reason": "영상 해상도를 모르거나 캔버스와 종횡비가 다름"})
                 continue
+            native = round(float(np.median([float(v) for v in vals])), 3)
             vals = [float(v) * f for v in vals]
         if t in ("px", "ratio", "hz"):
             v = round(float(np.median(vals)), 3)
@@ -357,8 +374,11 @@ def aggregate_manual(preset: str, include_long: bool = False, ids: list[str] | N
         ev = [{"video_id": vid, "t": r["t"], "value": r["value"], "frame": None, "source": r["source"],
                "observed_by": r.get("observed_by"), "note": r.get("note") or None,
                **({"csv_row": r["row"]} if r.get("row") else {})} for r in rows]
-        per_key[key].append({"video_id": vid, "format_id": membership.get(vid), "value": v, "t": rows[0]["t"],
-                             "evidence": ev, "source": rows[0]["source"]})
+        row = {"video_id": vid, "format_id": membership.get(vid), "value": v, "t": rows[0]["t"],
+               "evidence": ev, "source": rows[0]["source"]}
+        if native is not None and res_cache.get(vid):
+            row.update(native=native, native_res=f"{res_cache[vid][0]}x{res_cache[vid][1]}")
+        per_key[key].append(row)
     items = []
     for key in MANUAL_KEYS:
         if not snap_ok:
@@ -368,13 +388,14 @@ def aggregate_manual(preset: str, include_long: bool = False, ids: list[str] | N
                    f"'{key.split('.')[1]}' 가 검출된 분석 영상 없음")
         else:
             blk = f"{CSV_NAME} 에 이 키의 관찰 행(watched=yes, observed_by) 없음 — 영상을 본 사람이 채워야 함"
-        items.append(_item(key, per_key[key], blk, canvas))
+        items.append(_item(key, per_key[key], blk, canvas, scaled_to))
     out = {"schema": SCHEMA, "group": GROUP, "preset_id": pr.preset_id, "source_snapshot": snap.get("captured_at"),
            "source_snapshot_status": snap.get("status"), "generated_at": now_iso(),
            "generated_by": "shortkit ref manual-aggregate",
            "observations_file": paths.relp(csv_path(preset)), "csv_header": MANUAL_HEADER,
            "rows_used": len(obs), "rows_ignored": ignored, "px_rows_not_scaled": unscaled,
-           "auto_decoration_rows": len(auto), "canvas_resolution": canvas,
+           "auto_decoration_rows": len(auto), "canvas_resolution": canvas, "scaled_to": scaled_to,
+           "basis": basis_record(pb),
            "instructions": ("영상을 실제로 본 사람만 한 줄에 한 관찰을 적는다: video_id(스냅샷 영상), t(그 관찰을 확인할 수 있는 "
                             "초), key(아래 keys), value, observed_by(이름), watched=yes, note. px 는 레퍼런스 영상 자체 픽셀."),
            "keys": {k: {**MANUAL_KEYS[k], "howto": HOWTO.get(k)} for k in MANUAL_KEYS},

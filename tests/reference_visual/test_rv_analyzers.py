@@ -38,6 +38,13 @@ def analyzed(mock_truth, tmp_path_factory):
     shutil.copy(repo / "shortkit.root", root / "shortkit.root")
     (root / "presets/joshuamagazine").mkdir(parents=True)
     shutil.copy(repo / "presets/joshuamagazine/preset.yaml", root / "presets/joshuamagazine/preset.yaml")
+    # SYNTHETIC fixed snapshot with the mock as its only member (production measurements use snapshot members
+    # only); no downloads record -> the canvas size stays unmeasured
+    (root / "presets/joshuamagazine/reference").mkdir(parents=True)
+    (root / "presets/joshuamagazine/reference/latest100.json").write_text(json.dumps({
+        "schema": "shortkit.ref_snapshot/1", "status": "ok", "captured_at": "2026-01-01T00:00:00+00:00",
+        "method": "SYNTHETIC", "videos": [{"rank": 1, "video_id": "mockref_a", "kind": "short", "duration": 20.0,
+                                           "title": "SYNTHETIC mock"}]}), encoding="utf-8")
     old = os.environ.get("SHORTKIT_ROOT")
     os.environ["SHORTKIT_ROOT"] = str(root)
     try:
@@ -243,8 +250,17 @@ def test_aggregate_single_mock_video_scaled_to_canvas(analyzed, monkeypatch):
     assert sm["value"] == pytest.approx(2 * left_truth, abs=8)
     top_truth = min(e["bbox"][1] for e in truth["events"])
     assert items["canvas.safe_margin.top"]["value"] == pytest.approx(2 * top_truth, abs=8)
-    # no snapshot / downloads in this fixture: the canvas size cannot be measured
+    # no downloads record in this fixture: the canvas size cannot be measured -> coordinates are scaled to the
+    # PRESET canvas and say so; the native (540x960) values are kept
     assert items["canvas.width"]["status"] == "unmeasured" and items["canvas.width"]["blocker"]
+    assert t["scaled_to"]["source"].startswith("preset") and t["scaled_to"]["resolution"] == [1080, 1920]
+    assert list(t["native"]["by_resolution"]) == ["540x960"]
+    assert t["native"]["by_resolution"]["540x960"]["p50"] == pytest.approx(t["value"] / 2, rel=0.02)
+    # region / background evidence carries a representative time and a saved frame (S1-18)
+    reg_ev = items["canvas.video_region.y"]["evidence"][0]
+    assert reg_ev["t"] is not None and reg_ev["t"] > 0
+    assert (out["root"] / reg_ev["frame"]).is_file() and "/frames/region_" in reg_ev["frame"]
+    assert items["canvas.background.type"]["evidence"][0]["frame"] == reg_ev["frame"]
     ev = items["text.roles.title.size_px"]["evidence"][0]
     assert ev["video_id"] == "mockref_a" and ev["frame"].startswith("presets/joshuamagazine/analysis/mockref_a/frames/")
 

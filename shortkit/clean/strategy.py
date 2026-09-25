@@ -1,7 +1,8 @@
 """Decide how each detected overlay is removed, in the user's order:
 
-1. a clean original exists (warehouse record ``alternates``: same content without the overlay,
-   verified by its own overlay detection) -> use that file instead;
+1. a clean original exists (warehouse record ``alternates``, linked with ``shortkit source link-original``:
+   same content without the overlay, verified by its own overlay detection) -> use that file instead
+   (``replace_source`` carries path, sha256 AND warehouse_id of the replacement);
 2. crop -- only when the overlay sits in a frame margin, the crop keeps every protected region
    (faces, plan-protected people/objects) whole, keeps the important motion, and the remaining
    frame still fills the target video region (crop aspect = region aspect, so ``cover`` and

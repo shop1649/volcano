@@ -7,7 +7,8 @@
     ref sfx-events     효과음 이벤트 추출(BGM·보컬 제거 잔여 + 믹스 대조) -> audio/sfx_events.json
     ref sfx-catalog    최신 N편 효과음 카탈로그 -> sfx_catalog.json
     ref sfx-map        카탈로그 종류 ↔ 사용자 효과음 창고 매칭 -> sfx_map.yaml
-    ref audio-analyze  위 영상별 단계를 순서대로(separate → bgm → original → sfx-events → loudness)
+    ref audio-analyze  위 영상별 단계를 순서대로(separate → bgm → original → sfx-events → loudness);
+                       --set latest100 (제작 측정 기준) | high_views (참고 보고서) | ..., --all = 카탈로그용 최신 N편
     ref audio-measure  영상별 결과를 measurements/audio.json 으로 집계(audio.loudness.*, audio.bgm.* 반복 포함,
                        audio.ducking.*, audio.original.keep_gain_db/fade_s, audio.silence.fade_s,
                        audio.sfx.gain_db_default)
@@ -78,9 +79,11 @@ def register(sub) -> None:
     p.add_argument("--threshold", type=float, default=None, help="유사도 기준(기본 0.80)")
     p.set_defaults(func=cmd_sfx_map)
 
-    p = sub.add_parser("audio-measure", help="영상별 음량/bgm/original/효과음 결과 -> measurements/audio.json (프리셋 audio.* 측정값)")
+    p = sub.add_parser("audio-measure", help="영상별 음량/bgm/original/효과음 결과 -> measurements/audio.json (프리셋 audio.* "
+                                             "측정값 + presence.bgm/original_audio/ducking/intentional_silence). 최신 100편 "
+                                             "스냅샷 구성원만(그 밖은 basis.excluded_non_snapshot)")
     p.add_argument("--preset", default=DEFAULT_PRESET)
-    p.add_argument("--videos", help="쉼표로 구분한 video_id 목록(생략 시 분석된 모든 영상)")
+    p.add_argument("--videos", help="쉼표로 구분한 video_id 목록(생략 시 분석·다운로드된 스냅샷 영상 전부; 스냅샷 밖 id 는 제외)")
     p.set_defaults(func=cmd_audio_measure)
 
     p = sub.add_parser("audio-analyze", help="영상별 오디오 분석 일괄: separate → bgm-identify → original → sfx-events → 음량")
@@ -91,9 +94,15 @@ def register(sub) -> None:
 
 def _video_args(p: argparse.ArgumentParser, allow_all: bool = False) -> None:
     if allow_all:
+        from .common import SET_NAMES
+
         g = p.add_mutually_exclusive_group(required=True)
         g.add_argument("--video")
-        g.add_argument("--all", action="store_true", help="스냅샷 최신 N편(sfx_catalog_latest_n) 전부")
+        g.add_argument("--set", choices=list(SET_NAMES),
+                       help="영상 묶음: latest100(제작 측정 기준 = BGM·원음·덕킹·음량) / high_views(조회수 기준 이상 전부, "
+                            "참고 보고서) / reference / downloaded ...")
+        g.add_argument("--all", action="store_true",
+                       help="효과음 카탈로그 기준 = 스냅샷 최신 N편(sfx_catalog_latest_n)만. BGM·원음 측정은 --set latest100")
     else:
         p.add_argument("--video", required=True)
     p.add_argument("--audio", help="레퍼런스 원본 파일 경로(생략 시 reference/videos 에서 찾음)")
@@ -206,9 +215,11 @@ def cmd_sfx_events(a) -> int:
 
 
 def _print_sfx(r: dict) -> None:
-    if r["status"] != "measured":
+    if r["status"] not in ("measured", "partial"):
         print(f"[효과음] {r['video_id']}: 못 잼 — {r.get('blocker')}")
         return
+    if r["status"] == "partial":
+        print(f"[효과음] {r['video_id']}: 일부만 측정(대사 구간 못 잼) — {r.get('blocker')}")
     ev = r["events"]
     n_sfx = sum(1 for e in ev if e.get("class") != "intentional_silence")
     print(f"[효과음] {r['video_id']}: 이벤트 {n_sfx}개, 의도적 정적 {len(ev) - n_sfx}개, 믹스 대조 탈락 {len(r['rejected'])}개")
@@ -255,7 +266,8 @@ def cmd_audio_measure(a) -> int:
 
     vids = [v.strip() for v in a.videos.split(",") if v.strip()] if a.videos else None
     r = aggregate_measurements(a.preset, vids)
-    print(f"[측정 집계] 영상 {len(r['videos'])}편 -> measurements/audio.json")
+    ex = (r.get("basis") or {}).get("excluded_non_snapshot") or []
+    print(f"[측정 집계] 스냅샷 영상 {len(r['videos'])}편(스냅샷 밖 제외 {len(ex)}편) -> measurements/audio.json")
     for it in r["items"]:
         n = (it.get("overall") or {}).get("n", 0)
         blk = str(it.get("blocker") or "")
@@ -277,10 +289,18 @@ def cmd_audio_analyze(a) -> int:
         if not vids:
             print(f"[오디오 분석] 대상 영상 없음 — {blocker}")
             return 0
+    elif getattr(a, "set", None):
+        from .common import resolve_ids
+
+        vids = resolve_ids(a.preset, set_name=a.set)
+        if not vids:
+            print(f"[오디오 분석] '{a.set}' 묶음에 영상 없음 — `shortkit ref collect`/`ref download` 결과 확인")
+            return 3
+        print(f"[오디오 분석] '{a.set}' {len(vids)}편")
     else:
         vids = [a.video]
     for vid in vids:
-        audio = a.audio if not a.all else None
+        audio = a.audio if a.video else None
         if a.no_separate:
             from .separation import load_cached_stems
 

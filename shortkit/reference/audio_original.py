@@ -755,7 +755,8 @@ def _video_ids_with_audio(preset_name: str) -> list[str]:
 
 
 def _video_ids_for_measure(preset_name: str) -> list[str]:
-    """Analysed videos + downloaded reference files (long-form uploads of the snapshot excluded)."""
+    """Analysed videos + downloaded reference files (long-form uploads of the snapshot excluded).
+    ``aggregate_measurements`` further restricts this to snapshot members (``common.production_basis``)."""
     from .. import paths
     from ..util.jsonio import read_jsonl
     from .separation import AUDIO_EXT
@@ -814,10 +815,13 @@ def aggregate_measurements(preset_name: str, video_ids: list[str] | None = None,
     from .sfx_catalog import video_formats
     from .sfx_events import sfx_events_path
 
+    from .common import basis_record, production_basis
+
     pr = load_preset(preset_name)
-    vids = video_ids if video_ids is not None else _video_ids_for_measure(preset_name)
+    pb = production_basis(preset_name, video_ids if video_ids is not None else _video_ids_for_measure(preset_name))
+    vids = pb["ids"]
     fmts = video_formats(preset_name)
-    no_ref = snapshot_blocker(preset_name) if not vids else None
+    no_ref = (pb["blocker"] or snapshot_blocker(preset_name)) if not vids else None
 
     def blk(specific: str) -> str:
         return no_ref or specific
@@ -1040,13 +1044,102 @@ def aggregate_measurements(preset_name: str, video_ids: list[str] | None = None,
                          blk("BGM 이 파형 정렬된 영상에서 의도적 정적(BGM 끊김)을 찾지 못함")))
     # ------------------------------------------------------------ SFX level at the programme loudness
     items.append(_sfx_gain_item(preset_name, pr, vids, fmts, loud, numeric_conv, unmeasured, blk))
+    # ------------------------------------------------------------ channel-level presence (tri-state)
+    items += audio_presence_items(preset_name, vids, fmts, bgm, orig, blk)
+    for it in items:
+        src = _key_source(it["key"])
+        it["basis"] = {"set": "latest100 스냅샷 구성원(쇼츠)", "source_files": src,
+                       "videos_considered": len(vids),
+                       "videos_with_data": ((it.get("overall") or {}).get("n", 0) if it["key"].startswith("presence.")
+                                            else len({e.get("video_id") for e in it.get("evidence") or []
+                                                      if e.get("video_id")}))}
     snap = read_json(paths.absp(pr.get("reference.snapshot_file"))) or {}
     out = {"schema": "shortkit.measurement/1", "group": "audio",
            "source_snapshot": snap.get("captured_at") if isinstance(snap, dict) else None,
-           "videos": vids, "generated_at": now_iso(), "items": items}
+           "source_snapshot_status": snap.get("status") if isinstance(snap, dict) else None,
+           "videos": vids, "basis": {**basis_record(pb), "videos": vids,
+                                     "sfx_catalog_basis": "효과음 종류·편당 개수(sfx_catalog.json)만 최신 N편"
+                                                          "(reference.sfx_catalog_latest_n); 나머지 audio.* 는 위 videos 전부"},
+           "generated_at": now_iso(), "items": items}
     if write:
         write_json(paths.absp(f"presets/{preset_name}/measurements/audio.json"), out)
     return out
+
+
+_KEY_SOURCES = (("audio.loudness.", "analysis/<id>/audio/loudness.json"),
+                ("audio.bgm.", "analysis/<id>/audio/bgm.json"),
+                ("audio.ducking.", "analysis/<id>/audio/original.json (ducking)"),
+                ("audio.original.", "analysis/<id>/audio/original.json"),
+                ("audio.silence.", "analysis/<id>/audio/original.json (silences)"),
+                ("audio.sfx.", "analysis/<id>/audio/sfx_events.json + sfx_catalog.json + sfx_map.yaml + loudness.json"),
+                ("presence.bgm", "analysis/<id>/audio/bgm.json (presence)"),
+                ("presence.original_audio", "analysis/<id>/audio/original.json (original_audio.presence)"),
+                ("presence.ducking", "analysis/<id>/audio/original.json (ducking.presence)"),
+                ("presence.intentional_silence", "analysis/<id>/audio/original.json (silences) + sfx_events.json"))
+
+
+def _key_source(key: str) -> str | None:
+    return next((src for pre, src in _KEY_SOURCES if key.startswith(pre)), None)
+
+
+PRESENCE_AUDIO_KEYS = ("presence.bgm", "presence.original_audio", "presence.ducking", "presence.intentional_silence")
+
+
+def _silence_presence(o: dict | None, sfx: dict | None) -> tuple[str, float | None, str | None]:
+    """Per-video intentional silence (mix silence AND BGM cut): present / absent / unmeasured."""
+    for e in (sfx or {}).get("events") or []:
+        if e.get("class") == "intentional_silence":
+            return "present", round(float(e["t"]), 3), "sfx_events.json intentional_silence"
+    sil = (o or {}).get("silences") or {}
+    if sil.get("status") != "measured":
+        return "unmeasured", None, str(sil.get("blocker") or "original.json silences 없음")
+    items = sil.get("items") or []
+    if any(i.get("bgm_cut") is True for i in items):
+        i0 = next(i for i in items if i.get("bgm_cut") is True)
+        return "present", round(float(i0["start"]), 3), "믹스 정적 + BGM 끊김"
+    if any(i.get("bgm_cut") is None for i in items):
+        return "unmeasured", None, "믹스 정적은 있으나 BGM 끊김 여부를 판정 못 함(BGM 미정렬)"
+    return "absent", 0.0, ("믹스 정적 없음" if not items else "정적은 있으나 BGM 이 끊기지 않음")
+
+
+def audio_presence_items(preset_name: str, vids: list[str], fmts: dict, bgm: dict, orig: dict, blk) -> list[dict]:
+    """Channel-level tri-state items presence.{bgm, original_audio, ducking, intentional_silence} from the
+    per-video audio analysis (same rule and shape as `ref aggregate`'s visual presence items)."""
+    from .aggregate import presence_item
+    from .sfx_events import sfx_events_path
+
+    rows: dict[str, list[dict]] = {k: [] for k in PRESENCE_AUDIO_KEYS}
+    for v in vids:
+        base = {"video_id": v, "format_id": fmts.get(v), "frame": None}
+        b = bgm.get(v)
+        if b:
+            pv = b.get("presence") if b.get("presence") in ("present", "absent") else "unmeasured"
+            m = b.get("match") or {}
+            t = ((m.get("used_range_ref_s") or {}).get("value") or [None])[0] if pv == "present" else 0.0
+            rows["presence.bgm"].append({**base, "value": pv, "t": t,
+                                         "note": None if pv != "unmeasured" else str(b.get("blocker") or "BGM 판정 못 함")[:160]})
+        else:
+            rows["presence.bgm"].append({**base, "value": "unmeasured", "t": None, "note": "bgm.json 없음"})
+        o = orig.get(v)
+        for key, fld, seg_key in (("presence.original_audio", "original_audio", "segments"),
+                                  ("presence.ducking", "ducking", "per_segment")):
+            d = (o or {}).get(fld) or {}
+            pv = d.get("presence") if d.get("presence") in ("present", "absent") else "unmeasured"
+            segs = d.get(seg_key) or []
+            t = (round(float(segs[0].get("start")), 3) if segs and segs[0].get("start") is not None else None) \
+                if pv == "present" else (0.0 if pv == "absent" else None)
+            rows[key].append({**base, "value": pv, "t": t,
+                              "note": None if pv != "unmeasured" else
+                              str(d.get("blocker") or ("original.json 없음" if not o else "판정 못 함"))[:160]})
+        pv, t, note = _silence_presence(o, read_json(sfx_events_path(preset_name, v)))
+        rows["presence.intentional_silence"].append({**base, "value": pv, "t": t, "note": note})
+    methods = {"presence.bgm": "bgm.json presence(깨끗한 음원 라이브러리 대조·음악 검출)",
+               "presence.original_audio": "original.json original_audio.presence(대사 ∪ BGM 제거 잔여 0.5 s 이상)",
+               "presence.ducking": "original.json ducking.presence(대사 구간 BGM 이득 하강)",
+               "presence.intentional_silence": "믹스 정적(바닥 이하 0.3 s 이상) AND BGM 끊김(original.json silences "
+                                               "bgm_cut / sfx_events intentional_silence)"}
+    return [presence_item(k, rows[k], methods[k], blk(f"'{k.split('.', 1)[1]}' 있다/없다가 측정된 스냅샷 영상 없음"))
+            for k in PRESENCE_AUDIO_KEYS]
 
 
 def _sfx_gain_item(preset_name, pr, vids, fmts, loud, numeric_conv, unmeasured, blk) -> dict:

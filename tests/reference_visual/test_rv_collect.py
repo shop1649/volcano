@@ -89,10 +89,10 @@ def test_latest100_ordering_and_high_views(proj, monkeypatch):
     got = {v["video_id"] for v in hv["videos"]}
     assert all(v["view_count"] >= 800_000 for v in hv["videos"])
     assert all(v["view_count_checked_at"] for v in hv["videos"])
-    # videos that only have approximate (flat) counts are listed separately, never as exact
-    fetched = set(expected) | {v for v, d in vids.items() if d["tab"] == "videos"}
-    assert got == {v for v in exp_hv if v in fetched}
-    assert all(u["video_id"] not in got for u in hv["unverified"])
+    # every channel video >= 800k has an exact count from its own metadata (high-view candidates outside
+    # the newest 100 are queried too), nothing is left unverified
+    assert got == exp_hv
+    assert hv["unverified"] == [] and hv["status"] == "ok"
     # per-video metadata for trace
     meta = json.loads((proj / f"presets/joshuamagazine/reference/meta/{expected[0]}.json").read_text("utf-8"))
     assert "출처" in meta["description"]
@@ -114,11 +114,13 @@ def test_snapshot_is_fixed_unless_refresh(proj, monkeypatch):
     assert _read(proj, "latest100") == first            # baseline untouched
     allv = _read(proj, "all_videos")
     assert allv["n"] == len(vids)                          # reference listing refreshed
-    # latest100 wins on conflicts in all_videos
+    # latest100 wins on the STABLE fields in all_videos; the snapshot-time view count is kept apart
     snap_v = {v["video_id"]: v for v in first["videos"]}
     for v in allv["videos"]:
         if v["video_id"] in snap_v:
-            assert v["view_count"] == snap_v[v["video_id"]]["view_count"]
+            for k in ("url", "title", "published_at", "upload_date", "duration", "kind"):
+                assert v[k] == snap_v[v["video_id"]][k]
+            assert v["view_count_at_snapshot"] == snap_v[v["video_id"]]["view_count"]
     r = C.collect("joshuamagazine", method="ytdlp", refresh_snapshot=True)
     new = _read(proj, "latest100")
     assert new["videos"][0]["video_id"].startswith("n0004")

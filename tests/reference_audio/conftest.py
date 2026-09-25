@@ -61,6 +61,7 @@ def synth_project(tmp_path_factory):
         e = sfx_events.analyze_sfx_events(PRESET, spec.video_id, ctx=ctx)
         truths[spec.video_id] = d["truth"] | {"format_id": spec.format_id}
         results[spec.video_id] = {"bgm": b, "original": o, "sfx": e}
+    S.write_snapshot(root, [s.video_id for s in S.DEFAULT_SPECS])
     # formats + SYNTHETIC visual analysis files (captions/shots/motion) for the catalog
     fy = root / "presets" / PRESET / "formats.yaml"
     fd = read_yaml(fy, {}) or {}

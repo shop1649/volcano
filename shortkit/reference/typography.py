@@ -14,7 +14,10 @@ high the IoU of the NEAREST OTHER fonts gets under the same degradation (``discr
 Verdicts (``identify``)
 -----------------------
 ``identical``  IoU >= ceiling p10 of that font under these conditions AND the margin over the
-               best other candidate > measured noise AND the per-glyph check passes.
+               best other SCORED candidate > measured noise (no scored alternative -> never identical)
+               AND the per-glyph check passes AND the scored crops come from >= min(3, available)
+               distinct reference videos (``require_video_coverage``; crops are sampled round-robin
+               across the snapshot's videos and formats, see ``collect_reference_crops``).
 ``similar``    not excluded, but not proven (e.g. a near-duplicate weight within noise).
 ``different``  IoU < ceiling p10 - noise: below what the same font reaches 90 % of the time.
 Only ``identical`` may be written to a preset as a measured ``font_name``; ``similar`` stays
@@ -53,6 +56,7 @@ from ..util.stats import pstats
 UPSAMPLE = 4               # candidate rendered at 4x -> translation search step 0.25 px
 SCALE_RANGE = 0.15         # +-15 % around the ink-height matched size
 GLYPH_PASS_SHARE = 0.5     # share of glyphs that must reach the per-glyph ceiling p10 (and none below the fence)
+MIN_IDENTICAL_VIDEOS = 3   # an 'identical' verdict must rest on crops from >= min(this, videos available) videos
 
 # Korean caption-like strings used for ceiling experiments (no reference content).
 DEFAULT_STRINGS = [
@@ -1086,6 +1090,11 @@ def rank_candidates(per: dict[str, list[dict]], ceilings: dict[str, dict]) -> di
                     if gfloor is not None and g["iou"] < gfloor]
             gpass = gshare >= GLYPH_PASS_SHARE and not weak
         verdict, reasons = _verdict(agg[n], rank == 1, margin, gpass, ceil)
+        if verdict == "identical" and not others:
+            # the margin test needs a scored alternative: against nothing, "better than the runner-up by more
+            # than the noise" is vacuous (a --candidates X run, or every other candidate missing / unscorable)
+            verdict = "similar"
+            reasons.append("점수를 매긴 다른 후보가 없음 → 차순위 대비 구별을 확인할 수 없어 동일 확정 불가(유사)")
         if weak:
             reasons.append(f"글자별 하한({gfloor:.2f})보다 나쁜 글자: "
                            + ", ".join(f"{w['ch']}({w['iou']:.2f})" for w in weak[:6])
@@ -1115,6 +1124,49 @@ def rank_candidates(per: dict[str, list[dict]], ceilings: dict[str, dict]) -> di
     n_crops = max((len(r) for r in per.values()), default=0)
     return {"n_crops": n_crops, "ranked": out_rows, "summary": summary,
             "top": top["font"] if top else None, "top_verdict": top["verdict"] if top else None}
+
+
+def require_video_coverage(idr: dict, per: dict[str, list[dict]], vid_of: dict[str, str], videos_available: int,
+                           minimum: int = MIN_IDENTICAL_VIDEOS) -> dict:
+    """An 'identical' verdict is a statement about the CHANNEL: it must rest on scored crops from at least
+    ``min(minimum, videos_available)`` distinct reference videos, else it is downgraded to 'similar'."""
+    top = idr["ranked"][0] if idr.get("ranked") else None
+    scored = sorted({vid_of.get(r.get("id")) for r in per.get(top["font"], []) if vid_of.get(r.get("id"))}) if top else []
+    need = max(1, min(int(minimum), int(videos_available or 0))) if videos_available else int(minimum)
+    out = dict(idr, videos_scored=len(scored), videos_required=need)
+    if top and top["verdict"] == "identical" and len(scored) < need:
+        top = dict(top, verdict="similar", verdict_ko=VERDICT_KO["similar"],
+                   reasons=list(top["reasons"]) + [f"근거 영상 {len(scored)}편 < 필요 {need}편(자막이 있는 스냅샷 영상 "
+                                                   f"{videos_available}편 중) → 채널 전체 동일 확정 불가"])
+        out["ranked"] = [top] + list(idr["ranked"][1:])
+        out["top_verdict"] = "similar"
+        out["summary"] = (f"동일 확정 불가: {top['font']} 는 근거 영상 {len(scored)}편뿐(필요 {need}편) — '유사' "
+                          "(--max-crops 를 늘리거나 더 많은 영상 분석 필요)")
+    return out
+
+
+def per_format_verdicts(its: Sequence[dict], per: dict[str, list[dict]], ceilings: dict[str, dict],
+                        fmt_of: dict[str, str], snap_fmts: Sequence[str], cov: dict) -> dict:
+    """Verdict per format from that format's own crops (with the same video-coverage rule).  Every format of
+    the snapshot gets an entry: one without crops is ``unmeasured`` (value None) -- the channel-wide verdict
+    is never copied into a format it was not measured on."""
+    vid_of = {i["id"]: i["video_id"] for i in its}
+    out = {}
+    for fmt in sorted(set(snap_fmts) | ({fmt_of.get(i["video_id"]) for i in its} - {None})):
+        ids = {i["id"] for i in its if fmt_of.get(i["video_id"]) == fmt}
+        avail = int(((cov.get("formats_available") or {}).get(fmt)) or 0)
+        if not ids:
+            out[fmt] = {"n": 0, "top": None, "verdict": "unmeasured", "value": None,
+                        "summary": ("이 포맷의 자막 crop 없음 → 포맷별 판정 못 잼(전체 판정을 이 포맷에 옮겨 쓰지 않음)"
+                                    if avail == 0 else "이 포맷 영상의 crop 이 표본에 없음 → --max-crops 를 늘려 다시")}
+            continue
+        sub = require_video_coverage(
+            rank_candidates({n: [r for r in rows if r["id"] in ids] for n, rows in per.items()}, ceilings),
+            per, vid_of, avail)
+        out[fmt] = {"n": len(ids), "top": sub["top"], "verdict": sub["top_verdict"], "summary": sub["summary"],
+                    "videos_scored": sub.get("videos_scored"),
+                    "value": sub["top"] if sub["top_verdict"] == "identical" else None}
+    return out
 
 
 def identify_many(items: Sequence[dict], candidates: Sequence[FontRef | str], ceilings: dict[str, dict],
@@ -1466,24 +1518,48 @@ def _video_formats(preset) -> dict[str, str]:
     return out
 
 
+def _interleave_by_format(vids: list[str], fmt_of: dict[str, str]) -> list[str]:
+    """Videos ordered so that consecutive picks alternate between formats (unassigned = its own group)."""
+    groups: dict[str, list[str]] = {}
+    for v in sorted(vids):
+        groups.setdefault(fmt_of.get(v) or "", []).append(v)
+    order: list[str] = []
+    keys = sorted(groups)
+    for i in range(max((len(g) for g in groups.values()), default=0)):
+        for k in keys:
+            if i < len(groups[k]):
+                order.append(groups[k][i])
+    return order
+
+
 def collect_reference_crops(preset_name: str, roles: Sequence[str] | None = None, max_per_role: int = 12,
-                            min_ocr_conf: float = 60.0) -> dict:
+                            min_ocr_conf: float = 60.0, fmt_of: dict[str, str] | None = None,
+                            ids: Sequence[str] | None = None) -> dict:
     """Single-line caption crops from analysis/<id>/captions.json + the downloaded reference videos.
 
-    Uses each item's ``lines[]`` (text + bbox per line) when present, else the item box; the frame
+    Only members of the fixed latest-N snapshot are used (``common.production_basis``; other analysed
+    videos are listed under ``basis.excluded_non_snapshot``).  Crops are sampled ROUND-ROBIN: videos are
+    interleaved across formats and each round takes the next line of every video, so ``max_per_role``
+    crops spread over as many videos (and formats) as possible instead of filling up from the first
+    video.  Uses each item's ``lines[]`` (text + bbox per line) when present, else the item box; the frame
     is read at ``t_rep`` (else the middle of start..end).  Lines whose OCR confidence is below
     ``min_ocr_conf`` are skipped (a wrong text would fail the per-glyph check for every font).
-    -> {"items": {role: [item...]}, "videos": {video_id: probe summary}, "skipped": [...]}"""
+    -> {"items": {role: [item...]}, "videos": {video_id: probe summary}, "skipped": [...],
+        "coverage": {role: {videos_available, videos_sampled, crops_per_video, formats_available,
+        formats_sampled}}, "basis": {...}}"""
     from ..util.media import read_frames
+    from .common import basis_record, production_basis
 
     pdir = paths.preset_dir(preset_name)
-    items: dict[str, list[dict]] = {}
+    fmt_of = fmt_of or {}
+    analysed = sorted(p.parent.name for p in (pdir / "analysis").glob("*/captions.json"))
+    pb = production_basis(preset_name, analysed if ids is None else list(ids))
     videos: dict[str, dict] = {}
     video_paths: dict[str, Path] = {}       # runtime only (never stored)
     skipped: list[dict] = []
-    for cj in sorted((pdir / "analysis").glob("*/captions.json")):
-        cap = read_json(cj, {}) or {}
-        vid = str(cap.get("video_id") or cj.parent.name)
+    cand: dict[str, dict[str, list[dict]]] = {}
+    for vid in pb["ids"]:
+        cap = read_json(pdir / "analysis" / vid / "captions.json", {}) or {}
         res = cap.get("resolution")
         video = _reference_video(pdir, vid)
         if video is None:
@@ -1508,10 +1584,7 @@ def collect_reference_crops(preset_name: str, roles: Sequence[str] | None = None
             if t is None:
                 t = (float(it.get("start", 0)) + float(it.get("end", it.get("start", 0)))) / 2.0
             lines = it.get("lines") or [{"text": it.get("text"), "bbox": it.get("bbox"), "ocr_conf": it.get("ocr_conf")}]
-            frame = None
             for li, ln in enumerate(lines):
-                if len(items.get(role, [])) >= max_per_role:
-                    break
                 text = (ln.get("text") or "").strip()
                 bbox = ln.get("bbox")
                 if not text or not bbox:
@@ -1521,28 +1594,65 @@ def collect_reference_crops(preset_name: str, roles: Sequence[str] | None = None
                 if conf is not None and float(conf) < min_ocr_conf:
                     skipped.append({"video_id": vid, "item": k, "line": li, "reason": f"OCR 신뢰도 낮음({conf})"})
                     continue
-                if frame is None:
-                    try:
-                        frame = read_frames(video, [float(t)])[0]
-                    except Exception as e:  # noqa: BLE001 - report every failure
-                        skipped.append({"video_id": vid, "item": k, "reason": f"프레임 읽기 실패: {e}"})
-                        break
-                x, y, w, h = [float(v) for v in bbox]
-                x, y, w, h = x * sx, y * sy, w * sx, h * sy
-                m = max(4.0, 0.15 * h)
-                x0, y0 = max(0, int(x - m)), max(0, int(y - m))
-                x1 = min(frame.shape[1], int(math.ceil(x + w + m)))
-                y1 = min(frame.shape[0], int(math.ceil(y + h + m)))
-                size = st["size_px"] * sy if st["size_px"] else None
-                items.setdefault(role, []).append({
-                    "id": f"{vid}#{k}.{li}", "video_id": vid, "t": round(float(t), 3), "crop": frame[y0:y1, x0:x1].copy(),
-                    "start": float(it.get("start", t)), "end": float(it.get("end", t)),
-                    "text": text, "size_hint_px": size, "fill_rgb": st["fill"], "outline_rgb": st["edge"],
-                    "highlight_rgb": st["highlight"],
-                    "outline_color": st["outline"], "outline_px": st["outline_px"] * sy if st["outline_px"] else None,
-                    "ink_h": (ln.get("ink_h") or st["ink_h"] or 0) * sy or None, "bg_rgb": st["bg"],
-                    "bbox": [x0, y0, x1 - x0, y1 - y0], "resolution": [info.width, info.height]})
-    return {"items": items, "videos": videos, "video_paths": video_paths, "skipped": skipped}
+                cand.setdefault(role, {}).setdefault(vid, []).append(
+                    {"k": k, "li": li, "t": float(t), "it": it, "ln": ln, "text": text, "bbox": bbox, "st": st,
+                     "sx": sx, "sy": sy, "info": info})
+    items: dict[str, list[dict]] = {}
+    coverage: dict[str, dict] = {}
+    frames: dict[tuple[str, float], Any] = {}
+    for role, byvid in cand.items():
+        order = _interleave_by_format(list(byvid), fmt_of)
+        picks: list[tuple[str, dict]] = []
+        rnd = 0
+        while len(picks) < max_per_role and any(rnd < len(byvid[v]) for v in order):
+            for v in order:
+                if rnd < len(byvid[v]) and len(picks) < max_per_role:
+                    picks.append((v, byvid[v][rnd]))
+            rnd += 1
+        for vid, c in picks:
+            key = (vid, round(c["t"], 3))
+            if key not in frames:
+                try:
+                    frames[key] = read_frames(video_paths[vid], [c["t"]])[0]
+                except Exception as e:  # noqa: BLE001 - report every failure
+                    frames[key] = None
+                    skipped.append({"video_id": vid, "item": c["k"], "reason": f"프레임 읽기 실패: {e}"})
+            frame = frames[key]
+            if frame is None:
+                continue
+            st, sx, sy, info, it = c["st"], c["sx"], c["sy"], c["info"], c["it"]
+            x, y, w, h = [float(v) for v in c["bbox"]]
+            x, y, w, h = x * sx, y * sy, w * sx, h * sy
+            m = max(4.0, 0.15 * h)
+            x0, y0 = max(0, int(x - m)), max(0, int(y - m))
+            x1 = min(frame.shape[1], int(math.ceil(x + w + m)))
+            y1 = min(frame.shape[0], int(math.ceil(y + h + m)))
+            size = st["size_px"] * sy if st["size_px"] else None
+            items.setdefault(role, []).append({
+                "id": f"{vid}#{c['k']}.{c['li']}", "video_id": vid, "t": round(c["t"], 3),
+                "crop": frame[y0:y1, x0:x1].copy(),
+                "start": float(it.get("start", c["t"])), "end": float(it.get("end", c["t"])),
+                "text": c["text"], "size_hint_px": size, "fill_rgb": st["fill"], "outline_rgb": st["edge"],
+                "highlight_rgb": st["highlight"],
+                "outline_color": st["outline"], "outline_px": st["outline_px"] * sy if st["outline_px"] else None,
+                "ink_h": (c["ln"].get("ink_h") or st["ink_h"] or 0) * sy or None, "bg_rgb": st["bg"],
+                "bbox": [x0, y0, x1 - x0, y1 - y0], "resolution": [info.width, info.height],
+                "format_id": fmt_of.get(vid)})
+        per_video: dict[str, int] = {}
+        for i in items.get(role, []):
+            per_video[i["video_id"]] = per_video.get(i["video_id"], 0) + 1
+        fav: dict[str, int] = {}
+        for v in byvid:
+            fav[fmt_of.get(v) or "미분류"] = fav.get(fmt_of.get(v) or "미분류", 0) + 1
+        fsm: dict[str, int] = {}
+        for i in items.get(role, []):
+            fsm[i["format_id"] or "미분류"] = fsm.get(i["format_id"] or "미분류", 0) + 1
+        coverage[role] = {"videos_available": len(byvid), "videos_sampled": len(per_video),
+                          "crops_per_video": per_video, "formats_available": fav, "formats_sampled": fsm,
+                          "sampling": "포맷을 번갈아 영상 순서를 정하고, 영상마다 한 줄씩 돌아가며(round-robin) 최대 "
+                                      f"{max_per_role}개"}
+    return {"items": items, "videos": videos, "video_paths": video_paths, "skipped": skipped, "coverage": coverage,
+            "basis": basis_record(pb)}
 
 
 def _safe_rel(p: Path) -> str:
@@ -1734,8 +1844,10 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
             n = pr.get(f"text.roles.{r}.font_name")
             if n and n not in cands:
                 cands.append(n)
-    crops = collect_reference_crops(preset_name, role_names, max_per_role)
+    fmt_of = _video_formats(pr)
+    crops = collect_reference_crops(preset_name, role_names, max_per_role, fmt_of=fmt_of)
     ident = _unmeasured_identification(pr, _no_crops_blocker(preset_name))
+    ident["basis"] = crops.get("basis")
     ident["roles"] = {r: v for r, v in ident["roles"].items() if r in role_names}
     ident["skipped"] = crops["skipped"]
     ident["videos"] = crops["videos"]
@@ -1747,7 +1859,12 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
         return ident
     cond = conditions_from_videos(crops["videos"], canvas)
     refs, missing = resolve_candidates(cands)
-    fmt_of = _video_formats(pr)
+    from .common import snapshot_members
+
+    members = set(snapshot_members(preset_name)[0])
+    # every format of the snapshot gets an explicit per-format verdict (a format without crops is 'unmeasured',
+    # never silently covered by the channel-wide verdict)
+    snap_fmts = sorted({f for v, f in fmt_of.items() if f and v in members})
     ident.update({"status": "partial", "label_ko": "일부 측정", "blocker": None, "conditions": cond.to_dict(),
                   "candidates_missing": missing, "candidates_not_acquired": _not_acquired()})
     for role in role_names:
@@ -1789,15 +1906,14 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
         res = _pmap(_font_job, args, jobs, progress)
         ceilings = {r["font"]: r["ceiling"] for r in res}
         per, _, failed_crops = score_crops(its, refs, color_mode)
-        idr = rank_candidates(per, ceilings)
+        cov = dict((crops.get("coverage") or {}).get(role) or {})
+        vid_of = {i["id"]: i["video_id"] for i in its}
+        idr = require_video_coverage(rank_candidates(per, ceilings), per, vid_of, cov.get("videos_available", 0))
         top = idr["ranked"][0] if idr["ranked"] else None
         identical = bool(top and top["verdict"] == "identical")
-        by_format = {}
-        for fmt in sorted({fmt_of.get(i["video_id"]) for i in its} - {None}):
-            ids = {i["id"] for i in its if fmt_of.get(i["video_id"]) == fmt}
-            sub = rank_candidates({n: [r for r in rows if r["id"] in ids] for n, rows in per.items()}, ceilings)
-            by_format[fmt] = {"n": len(ids), "top": sub["top"], "verdict": sub["top_verdict"], "summary": sub["summary"],
-                              "value": sub["top"] if sub["top_verdict"] == "identical" else None}
+        cov["videos_scored"] = idr.get("videos_scored")
+        cov["videos_required_for_identical"] = idr.get("videos_required")
+        by_format = per_format_verdicts(its, per, ceilings, fmt_of, snap_fmts, cov)
         ident["roles"][role].update({
             "status": "measured" if identical else "unmeasured",
             "label_ko": "측정" if identical else "못 잼",
@@ -1805,6 +1921,7 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
                                             "resolution": i["resolution"], "text": i["text"]} for i in its],
             "candidate_ranking": [{k: v for k, v in r.items() if k != "per_crop"} for r in idr["ranked"]],
             "verdict": top["verdict"] if top else None, "summary": idr["summary"], "failed_crops": failed_crops,
+            "coverage": cov,
             "by_format": by_format or None,
             "by_format_note": None if by_format else "포맷 분류 없음(formats.yaml 미측정) → 포맷별 판정 못 잼",
             "ceiling_conditions": rcond.to_dict(), "caption_qp": qp, "ceiling_ink_heights_px_canvas": ink_canvas,
@@ -1812,7 +1929,7 @@ def identify_reference(preset_name: str, roles: Sequence[str] | None = None, max
             "ceilings": {n: {k: v for k, v in c.items() if k not in ("rows", "conditions")} for n, c in ceilings.items()}})
         evidence = [{"video_id": i["video_id"], "t": i["t"], "value": None, "bbox": i["bbox"]} for i in its[:10]]
         mi = {"key": f"text.roles.{role}.font_name", "unit": None, "resolution": list(rcond.ref_resolution),
-              "method": FONT_METHOD, "measured_at": now_iso(), "evidence": evidence,
+              "method": FONT_METHOD, "measured_at": now_iso(), "evidence": evidence, "coverage": cov,
               "overall": {**(top["iou_stats"] if top else {"n": 0, "p10": None, "p50": None, "p90": None}),
                           "top": top["font"] if top else None, "margin": top["margin"] if top else None},
               "by_format": {f: {"n": v["n"], "value": v["value"], "verdict": v["verdict"]} for f, v in by_format.items()}}

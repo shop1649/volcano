@@ -10,7 +10,9 @@ Hashtag / account listings need a logged-in session.  Without a cookies file con
 network request.  Views are taken only if the metadata provides them (``view_count`` /
 ``play_count``); likes stay likes.
 
-Not live-tested on the build machine (instagram.com blocked by network policy).
+Not live-tested on the build machine (instagram.com blocked by network policy).  yt-dlp 2026.08.19 marks
+``instagram:user`` (account listing) as not working: an EMPTY listing from it is recorded as ``error``, not as
+'ok, 0 results'.
 """
 from __future__ import annotations
 
@@ -69,8 +71,13 @@ def search(query: str, limit: int = 10, recent_only: bool = False) -> SearchResu
         listing = base.ytdlp_extract(url, flat=True, cookie=cookie, playlistend=int(limit))
     except Exception as e:  # noqa: BLE001
         res.access = classify_error(e)
+        if broken:
+            res.access["note"] = (res.access["note"] + " | " + broken)[:base.NOTE_MAX]
         return res.done()
     entries = [e for e in (listing or {}).get("entries") or [] if isinstance(e, dict)][: int(limit)]
+    if not entries and broken:
+        res.access = base.broken_listing_access(PLATFORM, broken, mode)
+        return res.done()
     for e in entries:
         item_url = e.get("webpage_url") or e.get("url")
         try:

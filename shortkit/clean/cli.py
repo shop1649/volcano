@@ -44,6 +44,12 @@ def register(p: argparse.ArgumentParser) -> None:
     pl.add_argument("--out", default=None, help="계획 JSON 저장 위치(기본 warehouse/overlays/<sha256>.plan.json)")
     pl.set_defaults(func=cmd_plan)
 
+    cv = sub.add_parser("coverage", help="plan.yaml 의 clean 블록이 기록된 오버레이를 모두 덮는지 검사(빠진 오버레이 = 오류)")
+    cv.add_argument("--plan", required=True, help="episodes/<id>/plan.yaml (또는 clean 블록 JSON/YAML)")
+    cv.add_argument("--source-id", default=None, help="plan.yaml 의 sources[].id (생략 시 전부)")
+    cv.add_argument("--all-time", action="store_true", help="타임라인이 쓰는 구간만이 아니라 소스 전체 시간 검사")
+    cv.set_defaults(func=cmd_coverage)
+
     ap = sub.add_parser("apply", help="clean 블록 적용(inpaint→delogo→blur→crop) 후 잔여 검사")
     ap.add_argument("--source", required=True)
     ap.add_argument("--plan", default=None, help="계획 JSON(기본 warehouse/overlays/<sha256>.plan.json)")
@@ -87,11 +93,14 @@ def _rel(p: Path) -> str | None:
 
 
 def _ensure_overlays(src: Path, sha: str) -> dict:
-    from .detect import detect_overlays, load_overlays
+    from .detect import ALGO, detect_overlays, load_overlays
 
     doc = load_overlays(sha)
     if doc is None or not doc.get("algo"):
         print("오버레이 기록이 없어 검출을 먼저 실행합니다…")
+        doc = detect_overlays(src)
+    elif doc.get("algo") != ALGO:
+        print(f"오버레이 기록이 이전 검출 알고리즘({doc.get('algo')})으로 만들어져 다시 검출합니다({ALGO})…")
         doc = detect_overlays(src)
     return doc
 
@@ -123,20 +132,70 @@ def _ensure_faces(src: Path, sha: str, sample_fps: float, max_samples: int = 24)
     return doc
 
 
+def _candidates() -> list[dict]:
+    return read_jsonl(paths.absp(CANDIDATES))
+
+
+def record_by_sha(sha: str, rows: list[dict] | None = None) -> dict | None:
+    """Warehouse candidate record whose downloaded file has this sha256."""
+    return next((r for r in (rows if rows is not None else _candidates()) if r.get("sha256") == sha), None)
+
+
 def find_alternates(sha: str) -> list[dict]:
     """``alternates`` of the warehouse record whose sha256 is ``sha``: clean originals of the
-    same content (list of {path, sha256} or candidate ids)."""
-    rows = read_jsonl(paths.absp(CANDIDATES))
+    same content, linked with ``shortkit source link-original`` (entries: candidate id strings or
+    ``{id, linked_by, ...}``; legacy ``{path, sha256}`` dicts are accepted).  Path/sha256 come from
+    the linked record when the entry names a candidate."""
+    rows = _candidates()
     by_id = {r.get("id"): r for r in rows}
-    rec = next((r for r in rows if r.get("sha256") == sha), None)
+    rec = record_by_sha(sha, rows)
     out = []
     for a in (rec or {}).get("alternates") or []:
         if isinstance(a, str):
-            r = by_id.get(a) or {}
-            out.append({"warehouse_id": a, "path": r.get("download_path"), "sha256": r.get("sha256")})
-        elif isinstance(a, dict):
-            out.append({"warehouse_id": a.get("id") or a.get("warehouse_id"),
-                        "path": a.get("path") or a.get("download_path"), "sha256": a.get("sha256")})
+            a = {"id": a}
+        if not isinstance(a, dict):
+            continue
+        wid = a.get("id") or a.get("warehouse_id")
+        r = by_id.get(wid) or {}
+        out.append({"warehouse_id": wid, "path": a.get("path") or r.get("download_path"),
+                    "sha256": a.get("sha256") or r.get("sha256"), "status": r.get("status"),
+                    "linked_by": a.get("linked_by")})
+    return out
+
+
+def original_suggestions(sha: str, doc: dict) -> list[str]:
+    """How to reach step 1 (a clean original) when the source has overlays and no linked original."""
+    if not [o for o in doc.get("overlays", []) if not o.get("ignored")]:
+        return []
+    rows = _candidates()
+    rec = record_by_sha(sha, rows)
+    if rec is None:
+        return ["이 파일은 창고 기록(candidates.jsonl)에 없음 → 출처·원본을 추적할 수 없음. "
+                "`python -m shortkit source add-url <게시 URL> --file <이 파일>` 로 먼저 등록"]
+    if find_alternates(sha):
+        return []
+    out = []
+    ou = rec.get("original_url")
+    if ou:
+        try:
+            from ..sourcing.platforms import url_key
+        except Exception:  # noqa: BLE001
+            url_key = None
+        hit = [r for r in rows if url_key and url_key(r.get("url")) == url_key(ou) and r.get("id") != rec["id"]]
+        if hit:
+            out.append(f"원본 URL({ou}) 후보가 창고에 있음: {hit[0]['id']} → 같은 녹화인지 보고 "
+                       f"`python -m shortkit source link-original {rec['id']} {hit[0]['id']} --by <이름> --note '...'`")
+        else:
+            out.append(f"원본 URL 이 기록됨({ou}) → `python -m shortkit source add-url {ou}` 후 받아서 "
+                       f"`python -m shortkit source link-original {rec['id']} <원본 ID> --by <이름> --note '...'`")
+    handles = sorted({h.get("handle") for h in (rec.get("repost_evidence") or []) if h.get("handle")})
+    oa = rec.get("original_author")
+    if not ou and (oa or handles) and (oa != rec.get("uploader") or handles):
+        who = ", ".join([x for x in [oa, *handles] if x])
+        out.append(f"원작자/워터마크 계정({who})의 원본 게시물을 찾으면 add-url 로 넣고 `source link-original` 로 연결")
+    if not out:
+        out.append("깨끗한 원본 후보 없음(원본 URL·원작자 기록 없음) → 원본을 찾으면 add-url 후 "
+                   f"`python -m shortkit source link-original {rec['id']} <원본 ID> --by <이름> --note '...'`")
     return out
 
 
@@ -175,7 +234,32 @@ def cmd_detect(args) -> int:
     else:
         print(summary_ko(doc))
         print(f"기록: {doc.get('_path')}")
+    _refresh_warehouse_record(doc["source"]["sha256"], quiet=args.json)
     return 0
+
+
+def _refresh_warehouse_record(sha: str, quiet: bool = False) -> None:
+    """A watermark handle of another account found here is repost evidence for the warehouse record of this
+    file (original author / reposter / recency are recomputed and saved)."""
+    try:
+        from ..sourcing import warehouse
+    except Exception:  # noqa: BLE001 - sourcing area unavailable
+        return
+    rows = warehouse.load()
+    rec = next((r for r in rows if r.get("sha256") == sha), None)
+    if rec is None:
+        return
+    before = (rec.get("original_author"), rec.get("reposter"))
+    warehouse.refresh_scores(rec)
+    warehouse.put(rec)
+    if quiet:
+        return
+    other = [e for e in rec.get("repost_evidence") or [] if e.get("same_as_uploader") is False]
+    if other:
+        print(f"창고 후보 {rec['id']}: 워터마크 {', '.join(e['handle'] for e in other)} ≠ 업로더 {rec.get('uploader')} "
+              f"→ 재업로드로 기록(원작자 {rec.get('original_author')}, 최근성은 원본 게시일로 판정)")
+    elif (rec.get("original_author"), rec.get("reposter")) != before:
+        print(f"창고 후보 {rec['id']}: 원작자/재업로더 갱신 → {rec.get('original_author')} / {rec.get('reposter')}")
 
 
 def cmd_faces(args) -> int:
@@ -223,11 +307,10 @@ def cmd_plan(args) -> int:
     for a in find_alternates(sha):
         adoc = None
         if a.get("sha256"):
-            adoc = load_overlays(a["sha256"])
-            if adoc is None and a.get("path") and paths.absp(a["path"]).is_file():
-                from .detect import detect_overlays
-
-                adoc = detect_overlays(paths.absp(a["path"]))
+            if a.get("path") and paths.absp(a["path"]).is_file():
+                adoc = _ensure_overlays(paths.absp(a["path"]), a["sha256"])
+            else:
+                adoc = load_overlays(a["sha256"])
         afaces = None
         if adoc is not None and a.get("path") and paths.absp(a["path"]).is_file() and not args.no_faces:
             afaces = _ensure_faces(paths.absp(a["path"]), a["sha256"], args.face_sample_fps)
@@ -245,14 +328,79 @@ def cmd_plan(args) -> int:
                          "replace_source": plan.get("replace_source"),
                          "decisions": [{k: d.get(k) for k in ("overlay_id", "action", "reason")} for d in plan["decisions"]]})
     print(strategy.summary_ko(plan))
-    print("\n# plan.yaml sources[] 에 붙여 넣을 블록 (원본 px/시간, 해상도 "
-          f"{doc['source']['resolution'][0]}x{doc['source']['resolution'][1]})")
-    blk = {"clean": plan["clean"], "protected": plan["protected"]}
-    if plan.get("replace_source"):
-        blk = {"path": plan["replace_source"]["path"], "sha256": plan["replace_source"]["sha256"], **blk}
+    rs = plan.get("replace_source")
+    if rs:
+        blk_path, blk_sha, wid = rs.get("path"), rs.get("sha256"), rs.get("warehouse_id")
+        res_ = (plan.get("source") or {}).get("resolution") or doc["source"]["resolution"]
+    else:
+        rec = record_by_sha(sha)
+        blk_path, blk_sha, wid = _rel(src), sha, (rec or {}).get("id")
+        res_ = doc["source"]["resolution"]
+    print("\n# plan.yaml sources[] 에 붙여 넣을 블록 (path·sha256·warehouse_id 를 함께 바꿀 것; 원본 px/시간, 해상도 "
+          f"{res_[0]}x{res_[1]})")
+    blk = {"path": blk_path, "sha256": blk_sha, "warehouse_id": wid, "clean": plan["clean"], "protected": plan["protected"]}
     print(_yaml_block(blk))
+    if rs:
+        alt = next((a for a in find_alternates(sha) if a.get("warehouse_id") == wid), {})
+        if wid and alt.get("status") not in ("selected", "used"):
+            print(f"! 교체 원본 {wid} 의 창고 상태가 {alt.get('status')!r} → production 에서는 선택된 후보만 쓸 수 있음: "
+                  f"`python -m shortkit source review {wid} ...` 후 `python -m shortkit source select {wid} --by ...`")
+        if not wid:
+            print("! 교체 원본에 창고 ID 가 없음 → `source add-url <원본 URL> --file <원본 파일>` 로 등록 후 link-original")
+    else:
+        if wid is None:
+            print("! 이 소스는 창고 기록이 없어 warehouse_id 를 비워 둠 → production validate 에서 오류(provenance_missing)")
+        for tip in original_suggestions(sha, doc):
+            print(f"  원본 찾기(1순위 깨끗한 원본): {tip}")
+    # self-check: the printed block removes every recorded overlay of the file it names
+    from .plan_coverage import coverage_report, summary_ko as cov_ko
+
+    cov_src = paths.absp(blk_path) if blk_path else src
+    rep = coverage_report(cov_src, plan["clean"], sha256=blk_sha)
+    bad = [e for e in rep["uncovered"] if e.get("blocking")]
+    print("덮개 검사(clean coverage): " + ("통과 — 기록된 오버레이를 모두 덮음" if not bad else "실패"))
+    if rep["uncovered"]:
+        print(cov_ko(rep["uncovered"]))
     print(f"계획 저장: {_rel(out) or out.name}")
-    return 0
+    return 0 if not bad else 1
+
+
+def _plan_sources(arg: str, source_id: str | None) -> list[dict]:
+    p = paths.absp(arg)
+    data = read_yaml(p) if p.suffix in (".yaml", ".yml") else read_json(p)
+    if isinstance(data, dict) and "sources" in data:
+        srcs = [s for s in data["sources"] if source_id is None or s.get("id") == source_id]
+        tl = data.get("timeline") or []
+        for s in srcs:
+            s["_used"] = [[float(t["src_in"]), float(t["src_out"])] for t in tl if t.get("source") == s.get("id")
+                          and t.get("src_in") is not None and t.get("src_out") is not None]
+        return srcs
+    return [{"id": source_id, "path": None, "clean": data, "_used": []}]
+
+
+def cmd_coverage(args) -> int:
+    from .plan_coverage import coverage_report, summary_ko as cov_ko
+
+    srcs = _plan_sources(args.plan, args.source_id)
+    if not srcs:
+        print("검사할 소스가 없습니다(--source-id 확인)")
+        return 2
+    n_bad = 0
+    for s in srcs:
+        if not s.get("path"):
+            print(f"[{s.get('id')}] path 없음 — plan.yaml 을 주세요")
+            n_bad += 1
+            continue
+        used = None if args.all_time or not s.get("_used") else s["_used"]
+        rep = coverage_report(s["path"], s.get("clean"), sha256=s.get("sha256"), used_ranges=used)
+        bad = [e for e in rep["uncovered"] if e.get("blocking")]
+        n_bad += len(bad)
+        scope = "소스 전체 시간" if used is None else f"타임라인 구간 {used}"
+        print(f"[{s.get('id')}] {s['path']} ({scope}) 기록={rep.get('record')} → "
+              + ("통과" if not bad else f"덮지 못한 오버레이 {len(bad)}개"))
+        if rep["uncovered"]:
+            print(cov_ko(rep["uncovered"]))
+    return 0 if n_bad == 0 else 1
 
 
 def cmd_apply(args) -> int:

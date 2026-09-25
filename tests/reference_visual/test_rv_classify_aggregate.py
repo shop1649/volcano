@@ -190,6 +190,7 @@ def test_registry_reads_aggregate_blockers(proj):
     """The provenance registry (shortkit.config) must pick the items up (shared format)."""
     from shortkit import config
     make_video(proj, "vid0000001", 30, 2.0)
+    write_snapshot(proj, [("vid0000001", 10)])        # production measurements use snapshot members only
     A.aggregate("joshuamagazine")
     reg = config.sync_registry("joshuamagazine", access_logs=[], qa_declarations={})
     e = reg["entries"]["text.roles.situation.size_px"]

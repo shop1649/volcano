@@ -9,6 +9,13 @@ data are written as ``status: unmeasured`` with a ``blocker`` -- never a default
 
 Unit of observation: one value per video (the video's median / mode / max for the role, as the
 method says), so long videos do not dominate; ``n`` = number of videos contributing.
+
+Basis: ONLY members of the fixed latest-N snapshot (``common.production_basis``); other analysed videos
+(older high-view videos ...) are listed in ``basis.excluded_non_snapshot`` and never enter a value.
+Coordinates: every px item keeps the per-video values in their own pixels (``native.by_resolution``)
+and is scaled to ``scaled_to`` = the MEASURED canvas (canvas.width/height mode) when measured, else the
+preset canvas (recorded as such).  ``visual_presence.json`` holds channel-level tri-state items
+``presence.{zoom,freeze,speed_change,flash,crossfade,decorations}``.
 """
 from __future__ import annotations
 
@@ -25,7 +32,8 @@ from ..config import load_preset
 from ..util.jsonio import now_iso, read_json, write_json
 from ..util.stats import categorical, pstats
 from .classify import load_membership
-from .common import ROLES, analysis_dir, color_mode, load_snapshot, resolve_ids, say, snapshot_blocker
+from .common import (ROLES, analysis_dir, basis_record, color_mode, load_snapshot, production_basis, region_evidence,
+                     say, snapshot_blocker, video_path)
 
 SCHEMA = "shortkit.measurement/1"
 NARRATION_ROLES = ("title", "description", "situation", "reaction")
@@ -62,9 +70,25 @@ def num_item(key: str, rows: list[dict], unit: str | None, method: str, blocker:
                                           and r.get("value") is not None], rule, digits, as_int)
         it.update({"status": "measured", "value": ov.pop("value"), "overall": ov, "by_format": byf,
                    "evidence": _evidence(rows), "blocker": None})
+        nat = native_stats(rows, rule, digits)
+        if nat:
+            it["native"] = nat
     if extra:
         it.update(extra)
     return it
+
+
+def native_stats(rows: list[dict], rule: str = "p50", digits: int = 3) -> dict | None:
+    """Coordinates / sizes in each video's OWN pixels (before scaling to the canvas), grouped by that
+    native resolution: {"WxH": {n, p10, p50, p90, value}} -- the stored value is the scaled one; this
+    keeps the measurement with the resolution it was taken at (AGENTS.md rule 3)."""
+    nat = [r for r in rows if r.get("native") is not None and r.get("native_res")]
+    if not nat:
+        return None
+    out = {}
+    for res in sorted({r["native_res"] for r in nat}):
+        out[res] = _stats_with_value([float(r["native"]) for r in nat if r["native_res"] == res], rule, digits, False)
+    return {"by_resolution": out, "note": "각 영상 자체 해상도(환산 전)의 값 — 해상도별 분포"}
 
 
 def cat_item(key: str, rows: list[dict], method: str, blocker: str, extra: dict | None = None) -> dict:
@@ -282,6 +306,7 @@ def safe_margin_rows(videos: dict[str, dict], scale: Callable) -> dict[str, list
             e = min(ext, key=val)
             it = e[4]
             rows[side].append({"video_id": vid, "format_id": d["format_id"], "value": round(val(e) * s_, 1),
+                               "native": round(float(val(e)), 1), "native_res": f"{W}x{H}",
                                "t": it.get("t_rep", it.get("start")), "frame": it.get("frame"),
                                "note": f"{it.get('role')} 자막 '{str(it.get('text') or '')[:20]}'"})
     return rows
@@ -495,63 +520,193 @@ def _load_videos(preset: str, ids: list[str], membership: dict[str, str]) -> dic
     return out
 
 
+# ============================================================================= channel-level presence
+# Keys emitted here before the preset/config owner adds them (presence.* leaves) or reclassifies them from
+# 'rule' to a measured style key (the two per-video count limits) -- review-fix wave 2.  Tests allow exactly
+# these, nothing else.
+PRESENCE_VISUAL_KEYS = tuple(f"presence.{k}" for k in ("zoom", "freeze", "speed_change", "flash", "crossfade",
+                                                       "decorations"))
+PENDING_PRESET_KEYS = PRESENCE_VISUAL_KEYS
+PENDING_STYLE_KEYS = ("motion.zoom.max_consecutive", "motion.freeze.max_per_video")
+PRESENCE_RULE = ("영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, "
+                 "측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 "
+                 "(n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)")
+
+
+def _presence_summary(rows: list[dict]) -> dict:
+    meas = [r for r in rows if r.get("value") in ("present", "absent")]
+    n_p = sum(1 for r in meas if r["value"] == "present")
+    n = len(meas)
+    return {"n": n, "n_present": n_p, "n_absent": n - n_p, "n_unmeasured": len(rows) - n,
+            "share": round(n_p / n, 4) if n else None,
+            "value": "present" if n_p else ("absent" if n else None)}
+
+
+def presence_item(key: str, rows: list[dict], method: str, blocker: str, extra: dict | None = None) -> dict:
+    """Channel-level tri-state measurement item (present|absent; unmeasured when no video was measured).
+
+    rows: one per video {video_id, format_id, value: present|absent|unmeasured, t, frame, note}."""
+    ov = _presence_summary(rows)
+    byf = {f: _presence_summary([r for r in rows if r.get("format_id") == f])
+           for f in sorted({r["format_id"] for r in rows if r.get("format_id")})}
+    it: dict[str, Any] = {"key": key, "unit": "tri_state", "resolution": None, "method": method,
+                          "value_rule": PRESENCE_RULE, "measured_at": now_iso(), "overall": ov, "by_format": byf}
+    ev = [r for r in rows if r.get("value") == "present"] or [r for r in rows if r.get("value") == "absent"]
+    evidence = [{"video_id": r["video_id"], "t": r.get("t"), "value": r["value"], "frame": r.get("frame"),
+                 **({"note": r["note"]} if r.get("note") else {})} for r in ev[:5]]
+    if ov["value"] is None:
+        why = Counter(str(r.get("note") or "못 잼") for r in rows)
+        it.update({"status": "unmeasured", "value": None, "presence": "unmeasured", "evidence": [],
+                   "blocker": blocker + (" (영상별 사유: " + "; ".join(f"{k} {v}편" for k, v in why.most_common(3)) + ")"
+                                         if rows else "")})
+    else:
+        it.update({"status": "measured", "value": ov["value"], "presence": ov["value"], "evidence": evidence,
+                   "blocker": None})
+    if extra:
+        it.update(extra)
+    return it
+
+
+def _first_t(events: list[dict], pred) -> float | None:
+    ts = [float(e["t"]) for e in events if pred(e) and e.get("t") is not None]
+    return round(min(ts), 3) if ts else None
+
+
+def visual_presence_rows(videos: dict[str, dict], manual_deco: dict[str, list[dict]]) -> dict[str, list[dict]]:
+    """Per-video tri-states for presence.{zoom, freeze, speed_change, flash, crossfade, decorations}."""
+    out: dict[str, list[dict]] = {k: [] for k in ("zoom", "freeze", "speed_change", "flash", "crossfade",
+                                                  "decorations")}
+    for vid, d in videos.items():
+        mot, shots = d.get("motion"), d.get("shots")
+        base = {"video_id": vid, "format_id": d["format_id"], "frame": None}
+        mev = (mot or {}).get("events") or []
+        cuts = (shots or {}).get("cuts") or []
+        mp = (mot or {}).get("presence") or {}
+        sp = (shots or {}).get("presence") or {}
+        no_rec = "presence 기록 없음(이전 형식 분석 — `ref analyze` 재실행 필요)"
+        spec = [("zoom", mp.get("zoom") if mot else None, _first_t(mev, lambda e: str(e.get("type", "")).startswith("zoom")),
+                 no_rec if mot else "motion.json 없음"),
+                ("freeze", mp.get("freeze") if mot else None, _first_t(mev, lambda e: e.get("type") == "freeze"),
+                 no_rec if mot else "motion.json 없음"),
+                ("speed_change", mp.get("speed") if mot else None, _first_t(mev, lambda e: e.get("type") == "speed"),
+                 no_rec if mot else "motion.json 없음"),
+                ("flash", sp.get("flash") if shots else (mp.get("flash") if mot else None),
+                 _first_t(cuts or mev, lambda c: c.get("type") == "flash"), no_rec if (shots or mot) else "shots.json 없음"),
+                ("crossfade", sp.get("crossfade") if shots else None,
+                 _first_t(cuts, lambda c: c.get("type") == "crossfade"), no_rec if shots else "shots.json 없음")]
+        for k, val, t, missing in spec:
+            val = val if val in ("present", "absent", "unmeasured") else None
+            note = None
+            if val is None:
+                val, note = "unmeasured", missing
+            elif val == "unmeasured":
+                note = ("프레임 복제식이 아닌 속도 변화는 검출 못 함(못 찾으면 못 잼)" if k == "speed_change"
+                        else "검출기가 이 영상에서 판정 못 함")
+            elif val == "absent":
+                note, t = "영상 전체를 검사해 찾지 못함(검출기 기준)", 0.0
+            out[k].append({**base, "value": val, "t": t, "note": note})
+        # decorations: the automatic detector is EXPERIMENTAL -> it can confirm presence, never absence
+        items = ((mot or {}).get("decorations") or {}).get("items") or []
+        man = manual_deco.get(vid) or []
+        if items:
+            it0 = min(items, key=lambda i: float(i.get("t") or 0))
+            out["decorations"].append({**base, "value": "present", "t": it0.get("frame_t", it0.get("t")),
+                                       "note": f"자동 검출 {it0.get('kind')} (실험 기능)"})
+        elif man:
+            r0 = min(man, key=lambda r: r["t"])
+            out["decorations"].append({**base, "value": "present", "t": r0["t"],
+                                       "note": f"사람 관찰 {r0['key']} ({r0.get('observed_by')})"})
+        else:
+            out["decorations"].append({**base, "value": "unmeasured", "t": None,
+                                       "note": "장식 자동 검출기는 실험 기능이라 '없다'를 확정하지 못함(사람 관찰 필요)"})
+    return out
+
+
+PRESENCE_VISUAL_METHOD = {
+    "zoom": "analysis/<id>/motion.json presence.zoom (ORB 유사변환 누적 배율; 원본 카메라 줌과 구분 못 함)",
+    "freeze": "motion.json presence.freeze (프레임 반복 + 앞뒤 움직임)",
+    "speed_change": "motion.json presence.speed (프레임 복제율 변화; 보간식 슬로모션은 검출 못 해 '없다' 대신 못 잼)",
+    "flash": "shots.json presence.flash (밝기 급등 전환)",
+    "crossfade": "shots.json presence.crossfade (블렌드 가중치 0→1 전환)",
+    "decorations": ("motion.json decorations(실험 자동 검출: 화살표·원·네모) 또는 manual_observations.csv 의 decorations.* "
+                    "관찰 행 → 있다; 자동 검출기로는 '없다'를 확정할 수 없어 나머지는 못 잼"),
+}
+
+
+# ============================================================================= per-video counts (S1-12)
+def _segments_zoomed(shots: dict, events: list[dict], duration: float | None) -> list[bool]:
+    """Shots (between transitions: cut / flash / crossfade) in order -> does a zoom_in/zoom_out start in it."""
+    bounds = sorted({float(c["t"]) for c in shots.get("cuts") or [] if c.get("t") is not None})
+    edges = [0.0] + bounds + [float(duration) if duration else float("inf")]
+    zt = [float(e["t"]) for e in events if str(e.get("type", "")).startswith("zoom")]
+    return [any(a <= t < b for t in zt) for a, b in zip(edges[:-1], edges[1:]) if b > a]
+
+
+def _longest_run(flags: list[bool]) -> int:
+    run = best = 0
+    for f in flags:
+        run = run + 1 if f else 0
+        best = max(best, run)
+    return best
+
+
+def count_rows(videos: dict[str, dict]) -> tuple[list[dict], list[dict]]:
+    """(freeze count per video, longest run of consecutive zoomed shots per video)."""
+    fr, zc = [], []
+    for vid, d in videos.items():
+        mot, shots = d.get("motion") or {}, d.get("shots")
+        pres = mot.get("presence") or {}
+        ev = mot.get("events") or []
+        if pres.get("freeze") in ("present", "absent"):
+            fz = [e for e in ev if e.get("type") == "freeze"]
+            fr.append({"video_id": vid, "format_id": d["format_id"], "value": len(fz),
+                       "t": round(float(fz[0]["t"]), 3) if fz else 0.0, "frame": None,
+                       "note": None if fz else "영상 전체에서 0회"})
+        if pres.get("zoom") in ("present", "absent") and shots:
+            dur = shots.get("duration") or mot.get("duration")
+            flags = _segments_zoomed(shots, ev, dur)
+            best = _longest_run(flags)
+            zt = [float(e["t"]) for e in ev if str(e.get("type", "")).startswith("zoom")]
+            zc.append({"video_id": vid, "format_id": d["format_id"], "value": best,
+                       "t": round(min(zt), 3) if zt else 0.0, "frame": None,
+                       "note": f"샷 {len(flags)}개 중 확대 샷 {sum(flags)}개, 최장 연속 {best}개"})
+    return fr, zc
+
+
+# ============================================================================= target canvas (S1-09)
+def target_canvas(pr, canvas_items: dict[str, dict]) -> tuple[list[int], dict]:
+    """Canvas the coordinates are scaled to: the MEASURED canvas (canvas.width / canvas.height mode of the
+    snapshot's downloads) when both are measured, else the preset canvas (provisional).  -> ([W, H], scaled_to)."""
+    w, h = canvas_items.get("canvas.width") or {}, canvas_items.get("canvas.height") or {}
+    if w.get("status") == "measured" and h.get("status") == "measured" and w.get("value") and h.get("value"):
+        res = [int(w["value"]), int(h["value"])]
+        return res, {"resolution": res, "source": "measured",
+                     "note": "측정한 캔버스(canvas.width/height = 스냅샷 다운로드 해상도 최빈값)로 환산"}
+    res = [int(pr.get("canvas.width")), int(pr.get("canvas.height"))]
+    return res, {"resolution": res, "source": f"preset ({pr.origin('canvas.width')})",
+                 "note": "캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계"}
+
+
 def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = False) -> dict:
     """``include_long``: also use long-form (``kind: video``) uploads; by default only Shorts (and
-    videos whose kind is unknown) are measured, because this preset reproduces Shorts editing."""
+    videos whose kind is unknown) are measured, because this preset reproduces Shorts editing.
+
+    Only members of the fixed latest-N snapshot are used (``production_basis``): any other video
+    (older high-view videos, whole-channel analyses) is listed under ``basis.excluded_non_snapshot`` and
+    reported only in ``reference/high_views_report.json``."""
     pr = load_preset(preset)
-    Wc, Hc = int(pr.get("canvas.width")), int(pr.get("canvas.height"))
     roles = [r for r in pr.section("text.roles").keys()]
     membership = load_membership(preset)
     snap = load_snapshot(preset) or {}
-    ids = ids if ids is not None else resolve_ids(preset, set_name="analyzed")
-    kinds = {v["video_id"]: v.get("kind") for v in snap.get("videos") or []}
-    excluded_long = [v for v in ids if kinds.get(v) == "video"] if not include_long else []
-    ids = [v for v in ids if v not in excluded_long]
-    videos = _load_videos(preset, ids, membership)
-    no_data = snapshot_blocker(preset) if not videos else None
-    canvas_res = [Wc, Hc]
+    pb = production_basis(preset, ids, include_long=include_long)
+    videos = _load_videos(preset, pb["ids"], membership)
+    no_data = (pb["blocker"] or snapshot_blocker(preset)) if not videos else None
 
     def blk(specific: str) -> str:
         return no_data or specific
 
-    def scale(d: dict) -> tuple[float, float] | None:
-        res = d.get("resolution")
-        if not res:
-            return None
-        W, H = res
-        if abs(W / H - Wc / Hc) > 0.01:
-            return None           # different aspect ratio: coordinates cannot be mapped
-        return Wc / W, Hc / H
-
     groups: dict[str, list[dict]] = {"visual_canvas": [], "visual_text": [], "visual_tone": [], "visual_motion": [],
-                                     "visual_structure": []}
-    # ---------------------------------------------------------------- canvas
-    rows: dict[str, list[dict]] = {k: [] for k in ("x", "y", "w", "h", "type", "color")}
-    for vid, d in videos.items():
-        lay = d.get("layout") or {}
-        sc = scale(d)
-        vr = lay.get("video_region")
-        ev = {"video_id": vid, "format_id": d["format_id"], "t": None, "frame": None}
-        if vr and sc:
-            for k, s in (("x", sc[0]), ("y", sc[1]), ("w", sc[0]), ("h", sc[1])):
-                rows[k].append({**ev, "value": round(vr[k] * s, 1)})
-        if lay.get("background") not in (None, "unmeasured"):
-            rows["type"].append({**ev, "value": lay["background"]})
-            if lay["background"] == "color" and lay.get("background_color"):
-                rows["color"].append({**ev, "value": lay["background_color"]})
-    m_reg = "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산"
-    for k in ("x", "y", "w", "h"):
-        groups["visual_canvas"].append(num_item(f"canvas.video_region.{k}", rows[k], "px", m_reg,
-                                                blk("영상 영역을 찾은 영상 없음"), canvas_res, digits=1, as_int=True))
-    groups["visual_canvas"].append(cat_item("canvas.background.type", rows["type"],
-                                            "영상 밖 영역: 정지+단색 → color, 변하지만 흐림 → blur_source",
-                                            blk("배경이 보이는 영상 없음")))
-    groups["visual_canvas"].append(color_item("canvas.background.color", rows["color"], "영상 밖 정지 영역의 중앙값 색",
-                                              blk("단색 배경 영상 없음")))
-    groups["visual_canvas"].append(unmeasured("canvas.video_region.fit", blk(
-        "결과 화면만으로는 원본 비율을 알 수 없어 cover/contain 판정 불가(원본 추적 후 비교 필요)")))
-    groups["visual_canvas"].append(unmeasured("canvas.background.blur_sigma", blk(
-        "흐림 배경의 흐림 정도를 원본 없이 역산하는 방법 없음")))
+                                     "visual_structure": [], "visual_presence": []}
     # ---------------------------------------------------------------- canvas size / fps (downloads + probe)
     crow, cexcl, aspect = canvas_resolution_rows(preset, snap, include_long, membership)
     if snap.get("status") not in ("ok", "partial"):
@@ -562,24 +717,83 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
     else:
         cblk = "스냅샷 쇼츠 중 받은 영상 없음(`shortkit ref download --set latest100` 필요)"
     cextra = {"aspect": aspect, "excluded": cexcl}
+    csize = {}
     for key, rk, unit, what, digits in (("canvas.width", "width", "px", "너비", 0),
                                         ("canvas.height", "height", "px", "높이", 0),
                                         ("canvas.fps", "fps", "fps", "프레임률", 3)):
-        groups["visual_canvas"].append(num_item(key, crow[rk], unit, CANVAS_SIZE_METHOD.format(what=what), cblk,
-                                                rule="mode", digits=digits, as_int=(digits == 0), extra=cextra))
+        csize[key] = num_item(key, crow[rk], unit, CANVAS_SIZE_METHOD.format(what=what), cblk,
+                              rule="mode", digits=digits, as_int=(digits == 0), extra=cextra)
+    canvas_res, scaled_to = target_canvas(pr, csize)
+    Wc, Hc = canvas_res
+    sx_extra = {"scaled_to": scaled_to}
+
+    def scale(d: dict) -> tuple[float, float] | None:
+        res = d.get("resolution")
+        if not res:
+            return None
+        W, H = res
+        if abs(W / H - Wc / Hc) > 0.01:
+            return None           # different aspect ratio: coordinates cannot be mapped
+        return Wc / W, Hc / H
+
+    def nres(d: dict) -> str | None:
+        r = d.get("resolution")
+        return f"{int(r[0])}x{int(r[1])}" if r else None
+
+    # ---------------------------------------------------------------- canvas region / background
+    rows: dict[str, list[dict]] = {k: [] for k in ("x", "y", "w", "h", "type", "color")}
+    for vid, d in videos.items():
+        lay = d.get("layout") or {}
+        sc = scale(d)
+        vr = lay.get("video_region")
+        rd = lay.get("region_detection") or {}
+        evd = rd.get("evidence")
+        if not evd:            # analysis made before the evidence frame was stored: add it now
+            dur = (d.get("shots") or {}).get("duration") or (d.get("captions") or {}).get("duration")
+            try:
+                vfile = video_path(preset, vid)
+            except ValueError:
+                vfile = None
+            evd = region_evidence(preset, vid, vfile, {"video_region": vr, **rd}, dur)
+        ev = {"video_id": vid, "format_id": d["format_id"], "t": evd.get("t"), "frame": evd.get("frame"),
+              "note": evd.get("note")}
+        if vr and sc:
+            for k, s in (("x", sc[0]), ("y", sc[1]), ("w", sc[0]), ("h", sc[1])):
+                rows[k].append({**ev, "value": round(vr[k] * s, 1), "native": vr[k], "native_res": nres(d)})
+        if lay.get("background") not in (None, "unmeasured"):
+            rows["type"].append({**ev, "value": lay["background"]})
+            if lay["background"] == "color" and lay.get("background_color"):
+                rows["color"].append({**ev, "value": lay["background_color"]})
+    m_reg = "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산"
+    for k in ("x", "y", "w", "h"):
+        groups["visual_canvas"].append(num_item(f"canvas.video_region.{k}", rows[k], "px", m_reg,
+                                                blk("영상 영역을 찾은 영상 없음"), canvas_res, digits=1, as_int=True,
+                                                extra=sx_extra))
+    groups["visual_canvas"].append(cat_item("canvas.background.type", rows["type"],
+                                            "영상 밖 영역: 정지+단색 → color, 변하지만 흐림 → blur_source",
+                                            blk("배경이 보이는 영상 없음")))
+    groups["visual_canvas"].append(color_item("canvas.background.color", rows["color"], "영상 밖 정지 영역의 중앙값 색",
+                                              blk("단색 배경 영상 없음")))
+    groups["visual_canvas"].append(unmeasured("canvas.video_region.fit", blk(
+        "결과 화면만으로는 원본 비율을 알 수 없어 cover/contain 판정 불가(원본 추적 후 비교 필요)")))
+    groups["visual_canvas"].append(unmeasured("canvas.background.blur_sigma", blk(
+        "흐림 배경의 흐림 정도를 원본 없이 역산하는 방법 없음")))
+    groups["visual_canvas"] += list(csize.values())
     # ---------------------------------------------------------------- safe margins
     smr = safe_margin_rows(videos, scale)
     for side in ("left", "right", "top", "bottom"):
         groups["visual_canvas"].append(num_item(f"canvas.safe_margin.{side}", smr[side], "px", SAFE_MARGIN_METHOD,
                                                 blk("자막(역할 판정됨)이 검출된, 캔버스와 종횡비가 같은 영상 없음"),
-                                                canvas_res, rule="p10", digits=1))
+                                                canvas_res, rule="p10", digits=1, extra=sx_extra))
     # ---------------------------------------------------------------- text roles
     for role in roles:
         R: dict[str, list[dict]] = {}
 
-        def add(k, vid, d, value, t=None, frame=None):
-            R.setdefault(k, []).append({"video_id": vid, "format_id": d["format_id"], "value": value, "t": t,
-                                        "frame": frame})
+        def add(k, vid, d, value, t=None, frame=None, native=None):
+            row = {"video_id": vid, "format_id": d["format_id"], "value": value, "t": t, "frame": frame}
+            if native is not None:
+                row.update(native=native, native_res=nres(d))
+            R.setdefault(k, []).append(row)
 
         present = 0
         for vid, d in videos.items():
@@ -591,23 +805,16 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
             evd = (lay.get("evidence") or [{}])[0]
             t, fr = evd.get("t"), evd.get("frame")
             if sc:
-                if lay.get("size_px") is not None:
-                    add("size_px", vid, d, round(lay["size_px"] * sc[1], 2), t, fr)
-                if lay.get("anchor", {}).get("x") is not None:
-                    add("anchor.x", vid, d, round(lay["anchor"]["x"] * sc[0], 1), t, fr)
-                if lay.get("anchor", {}).get("y") is not None:
-                    add("anchor.y", vid, d, round(lay["anchor"]["y"] * sc[1], 1), t, fr)
-                if lay.get("outline_px") is not None:
-                    add("outline_px", vid, d, round(lay["outline_px"] * sc[1], 2), t, fr)
-                if lay.get("shadow_px") is not None:
-                    add("shadow_px", vid, d, round(lay["shadow_px"] * sc[1], 2), t, fr)
-                bx = lay.get("box") or {}
-                if bx.get("pad_x") is not None:
-                    add("box.pad_x", vid, d, round(bx["pad_x"] * sc[0], 1), t, fr)
-                if bx.get("pad_y") is not None:
-                    add("box.pad_y", vid, d, round(bx["pad_y"] * sc[1], 1), t, fr)
-                if lay.get("max_width_px") is not None:
-                    add("max_width_px", vid, d, round(lay["max_width_px"] * sc[0], 1), t, fr)
+                for k, raw, s_, dg in (("size_px", lay.get("size_px"), sc[1], 2),
+                                       ("anchor.x", (lay.get("anchor") or {}).get("x"), sc[0], 1),
+                                       ("anchor.y", (lay.get("anchor") or {}).get("y"), sc[1], 1),
+                                       ("outline_px", lay.get("outline_px"), sc[1], 2),
+                                       ("shadow_px", lay.get("shadow_px"), sc[1], 2),
+                                       ("box.pad_x", (lay.get("box") or {}).get("pad_x"), sc[0], 1),
+                                       ("box.pad_y", (lay.get("box") or {}).get("pad_y"), sc[1], 1),
+                                       ("max_width_px", lay.get("max_width_px"), sc[0], 1)):
+                    if raw is not None:
+                        add(k, vid, d, round(raw * s_, dg), t, fr, native=raw)
             if lay.get("align") not in (None, "unmeasured"):
                 add("anchor.align", vid, d, lay["align"], t, fr)
             if lay.get("valign") not in (None, "unmeasured"):
@@ -640,7 +847,7 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
             if mi.get("scale_from") is not None:
                 add("motion_in.scale_from", vid, d, mi["scale_from"], t, fr)
             if mi.get("offset_px") is not None and sc:
-                add("motion_in.offset_px", vid, d, round(mi["offset_px"] * sc[1], 1), t, fr)
+                add("motion_in.offset_px", vid, d, round(mi["offset_px"] * sc[1], 1), t, fr, native=mi["offset_px"])
             if mo.get("type"):
                 add("motion_out.type", vid, d, mo["type"], t, fr)
             if mo.get("dur_s") is not None:
@@ -657,12 +864,14 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         G = groups["visual_text"]
         m = "영상별 역할 중앙값 → 영상 간 분포"
         G.append(num_item(pre + "size_px", R.get("size_px", []), "px",
-                          "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, " + m, rb, canvas_res, digits=2))
+                          "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, " + m, rb, canvas_res, digits=2,
+                          extra=sx_extra))
         G.append(num_item(pre + "anchor.x", R.get("anchor.x", []), "px",
-                          "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, " + m, rb, canvas_res, digits=1))
+                          "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, " + m, rb, canvas_res, digits=1,
+                          extra=sx_extra))
         G.append(num_item(pre + "anchor.y", R.get("anchor.y", []), "px",
                           "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), " + m, rb,
-                          canvas_res, digits=1))
+                          canvas_res, digits=1, extra=sx_extra))
         G.append(cat_item(pre + "anchor.valign", R.get("anchor.valign", []),
                           "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)", blk(
                               f"'{role}': 한 줄과 여러 줄 자막이 모두 있는 영상 없음")))
@@ -675,11 +884,11 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                             blk(f"'{role}': 강조색 사용 사례 없음(검출 {present}편)")))
         G.append(num_item(pre + "outline_px", R.get("outline_px", []), "px",
                           "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, " + m,
-                          blk(f"'{role}': 외곽선을 배경과 구분할 수 있는 사례 없음"), canvas_res, digits=2))
+                          blk(f"'{role}': 외곽선을 배경과 구분할 수 있는 사례 없음"), canvas_res, digits=2, extra=sx_extra))
         G.append(color_item(pre + "outline_color", R.get("outline_color", []), "채움 바로 바깥 1~2px 고리의 중앙값 색",
                             blk(f"'{role}': 보이는 외곽선 사례 없음")))
         G.append(num_item(pre + "shadow_px", R.get("shadow_px", []), "px", "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
-                          blk(f"'{role}': 배경이 복잡해 그림자 판정 불가"), canvas_res, digits=2))
+                          blk(f"'{role}': 배경이 복잡해 그림자 판정 불가"), canvas_res, digits=2, extra=sx_extra))
         G.append(color_item(pre + "shadow_color", R.get("shadow_color", []), "그림자 영역 중앙값 색",
                             blk(f"'{role}': 그림자 사례 없음")))
         G.append(cat_item(pre + "box.enabled", R.get("box.enabled", []), "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
@@ -689,9 +898,9 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         G.append(num_item(pre + "box.alpha", R.get("box.alpha", []), "ratio",
                           "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)", blk(f"'{role}': 박스 투명도 회귀 가능한 사례 없음")))
         G.append(num_item(pre + "box.pad_x", R.get("box.pad_x", []), "px", "박스 가장자리 - 잉크 가장자리(좌우 평균)",
-                          blk(f"'{role}': 박스 사례 없음"), canvas_res, digits=1))
+                          blk(f"'{role}': 박스 사례 없음"), canvas_res, digits=1, extra=sx_extra))
         G.append(num_item(pre + "box.pad_y", R.get("box.pad_y", []), "px", "박스 가장자리 - 잉크 가장자리(위아래 평균)",
-                          blk(f"'{role}': 박스 사례 없음"), canvas_res, digits=1))
+                          blk(f"'{role}': 박스 사례 없음"), canvas_res, digits=1, extra=sx_extra))
         G.append(num_item(pre + "line_spacing", R.get("line_spacing", []), "ratio",
                           "여러 줄 자막의 줄 중심 간격 / size_px", blk(f"'{role}': 여러 줄 자막 사례 없음"), digits=3))
         G.append(num_item(pre + "max_chars_per_line", R.get("max_chars_per_line", []), "chars",
@@ -699,7 +908,7 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         G.append(num_item(pre + "max_lines", R.get("max_lines", []), "lines", "영상별 최대 줄 수 → 영상 간 p90", rb,
                           rule="p90", as_int=True))
         G.append(num_item(pre + "max_width_px", R.get("max_width_px", []), "px", "영상별 최대 잉크 폭 → 영상 간 p90", rb,
-                          canvas_res, rule="p90", digits=1))
+                          canvas_res, rule="p90", digits=1, extra=sx_extra))
         G.append(cat_item(pre + "motion_in.type", R.get("motion_in.type", []),
                           "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈", blk(
                               f"'{role}': 등장 모션을 볼 수 있는 사례 없음")))
@@ -708,7 +917,8 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         G.append(num_item(pre + "motion_in.scale_from", R.get("motion_in.scale_from", []), "ratio",
                           "pop 첫 프레임 크기 / 정지 크기", blk(f"'{role}': pop 등장 사례 없음"), digits=3))
         G.append(num_item(pre + "motion_in.offset_px", R.get("motion_in.offset_px", []), "px",
-                          "slide 첫 프레임 위치 차이", blk(f"'{role}': slide 등장 사례 없음"), canvas_res, digits=1))
+                          "slide 첫 프레임 위치 차이", blk(f"'{role}': slide 등장 사례 없음"), canvas_res, digits=1,
+                          extra=sx_extra))
         G.append(cat_item(pre + "motion_out.type", R.get("motion_out.type", []), "퇴장 궤적 분류 → 영상별 최빈",
                           blk(f"'{role}': 퇴장 모션을 볼 수 있는 사례 없음")))
         G.append(num_item(pre + "motion_out.dur_s", R.get("motion_out.dur_s", []), "s", "정지 상태 → 마지막 보이는 프레임",
@@ -798,6 +1008,17 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                       "화면 중심 쪽으로 이동 → true(렌더러 recenter=true: 목표점이 같은 ease 로 중심으로 이동). 중심 근처 확대는 "
                       "두 방식 결과가 같아 제외. 한계: 목표점이 중심 가까이 있던 recenter=true 확대도 '영역 안 고정점'으로 보임",
                       blk("고정점을 판정할 수 있는 확대(중심에서 떨어진 확대)가 검출된 영상 없음"), extra={"basis": zst}))
+    fr_rows, zc_rows = count_rows(videos)
+    G.append(num_item("motion.zoom.max_consecutive", zc_rows, "segments",
+                      "영상별로 전환(cut/flash/crossfade) 사이 샷을 순서대로 보고 확대(zoom_in/zoom_out) 사건이 시작되는 샷이 "
+                      "연속되는 최대 개수(episode validate 의 zoom_stacked·QA video.zoom 과 같은 정의: 연속 세그먼트의 줌) → "
+                      "영상 간 p90(value_rule=p90, 정수; 확대 판정이 있다/없다로 측정된 영상만, 0 포함). 한계: 원본 카메라 줌도 확대로 보임",
+                      blk("컷(shots.json)과 확대 판정(motion.json presence.zoom 있다/없다)이 모두 있는 영상 없음"),
+                      rule="p90", as_int=True))
+    G.append(num_item("motion.freeze.max_per_video", fr_rows, "count",
+                      "영상별 정지 화면(프레임 반복, 앞뒤 움직임 있음) 횟수 → 영상 간 p90(value_rule=p90, 정수; 정지 판정이 "
+                      "있다/없다로 측정된 영상만, 0회 포함; episode validate 의 freeze_count 와 같은 단위)",
+                      blk("정지 판정(motion.json presence.freeze 있다/없다)이 측정된 영상 없음"), rule="p90", as_int=True))
     G.append(num_item("motion.freeze.hold_s", M.get("motion.freeze.hold_s", []), "s",
                       "영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값", blk("정지 화면이 검출된 영상 없음"), digits=3))
     G.append(num_item("motion.speed.slowmo_factor", M.get("motion.speed.slowmo_factor", []), "ratio",
@@ -816,6 +1037,21 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                       blk("플래시가 검출되고 영상 영역 밖이 보이는 영상 없음")))
     G.append(num_item("motion.transitions.crossfade.dur_s", M.get("motion.transitions.crossfade.dur_s", []), "s",
                       "섞임 구간(블렌드 가중치 0→1) 길이 중앙값", blk("크로스페이드가 검출된 영상 없음"), digits=3))
+    # ---------------------------------------------------------------- channel-level presence (tri-state)
+    try:
+        from .manual import read_observations
+        obs, _ = read_observations(preset, include_long)
+    except Exception:  # noqa: BLE001 - a broken CSV must not stop the visual aggregate
+        obs = []
+    mdeco: dict[str, list[dict]] = {}
+    for r in obs:
+        if str(r.get("key", "")).startswith("decorations."):
+            mdeco.setdefault(r["video_id"], []).append(r)
+    prow = visual_presence_rows(videos, mdeco)
+    for k in ("zoom", "freeze", "speed_change", "flash", "crossfade", "decorations"):
+        groups["visual_presence"].append(presence_item(
+            f"presence.{k}", prow[k], PRESENCE_VISUAL_METHOD[k],
+            blk(f"'{k}' 있다/없다가 측정된 스냅샷 영상 없음")))
     # ---------------------------------------------------------------- structure
     S: list[dict] = []
     snap_ok = snap.get("status") in ("ok", "partial")
@@ -826,14 +1062,9 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
             if v.get("duration") is not None:
                 S.append({"video_id": v["video_id"], "format_id": membership.get(v["video_id"]),
                           "value": float(v["duration"]), "t": None, "frame": None})
-    else:
-        for vid, d in videos.items():
-            dur = (d.get("shots") or {}).get("duration") or (d.get("captions") or {}).get("duration")
-            if dur:
-                S.append({"video_id": vid, "format_id": d["format_id"], "value": float(dur), "t": None, "frame": None})
+    dmethod = "latest100 스냅샷의 영상 길이(플랫폼 메타데이터)"
+    dblk = (pb["blocker"] or snapshot_blocker(preset)) if not S else ""
     # the preset stores the distribution itself (structure.duration_s.{n,p10,p50,p90}): one item per leaf
-    dmethod = ("latest100 스냅샷의 영상 길이(플랫폼 메타데이터)" if snap_ok else "분석한 영상 파일의 길이")
-    dblk = snapshot_blocker(preset) if not S else ""
     for leaf in ("p10", "p50", "p90"):
         groups["visual_structure"].append(num_item(f"structure.duration_s.{leaf}", S, "s", dmethod + f" → {leaf}",
                                                    dblk, rule=leaf, digits=2))
@@ -858,9 +1089,10 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
     mdir = paths.preset_dir(preset) / "measurements"
     written = {}
     basis = {"n_videos_analyzed": len(videos), "video_ids": sorted(videos)[:200],
-             "excluded_long_form": excluded_long,
+             "excluded_long_form": pb["excluded_long_form"],
+             "excluded_non_snapshot": pb["excluded_non_snapshot"],
              "formats_assigned": sum(1 for d in videos.values() if d["format_id"]),
-             "canvas_resolution": canvas_res}
+             "canvas_resolution": canvas_res, "scaled_to": scaled_to, **basis_record(pb)}
     for group, items in groups.items():
         out = {"schema": SCHEMA, "group": group, "preset_id": pr.preset_id,
                "source_snapshot": snap.get("captured_at"), "source_snapshot_status": snap.get("status"),
@@ -869,13 +1101,15 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         written[group] = {"items": len(items), "measured": sum(i["status"] == "measured" for i in items)}
     tot = sum(v["items"] for v in written.values())
     meas = sum(v["measured"] for v in written.values())
-    say(f"측정 집계: 영상 {len(videos)}편, 항목 {tot}개 중 측정 {meas}개 / 못 잼 {tot - meas}개 → {paths.relp(mdir)}/visual_*.json")
+    say(f"측정 집계: 스냅샷 영상 {len(videos)}편(스냅샷 밖 제외 {len(pb['excluded_non_snapshot'])}편), 항목 {tot}개 중 측정 "
+        f"{meas}개 / 못 잼 {tot - meas}개 → {paths.relp(mdir)}/visual_*.json (좌표 환산 캔버스 {canvas_res[0]}x{canvas_res[1]}, "
+        f"{scaled_to['source']})")
     # manual.json holds the decoration keys, whose automatic detector output lives in the same
     # analysis files: refresh it together so it never lags behind the analysis
     from .manual import aggregate_manual
     man = aggregate_manual(preset, include_long=include_long, ids=list(videos))
     written["manual"] = {"items": man["items"], "measured": man["measured"]}
-    return {"videos": len(videos), "groups": written}
+    return {"videos": len(videos), "groups": written, "excluded_non_snapshot": pb["excluded_non_snapshot"]}
 
 
 _ = (ROLES, Callable, Path)

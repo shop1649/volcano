@@ -1,0 +1,167 @@
+{
+  "schema": "shortkit.measurement/1",
+  "group": "visual_presence",
+  "preset_id": "joshuamagazine-v1",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "source_snapshot_status": "blocked",
+  "generated_at": "2026-09-25T03:06:17+00:00",
+  "generated_by": "shortkit ref aggregate",
+  "basis": {
+    "n_videos_analyzed": 0,
+    "video_ids": [],
+    "excluded_long_form": [],
+    "excluded_non_snapshot": [],
+    "formats_assigned": 0,
+    "canvas_resolution": [
+      1080,
+      1920
+    ],
+    "scaled_to": {
+      "resolution": [
+        1080,
+        1920
+      ],
+      "source": "preset (provisional)",
+      "note": "캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계"
+    },
+    "snapshot_status": "blocked",
+    "captured_at": "2026-09-24T17:56:07+00:00",
+    "n_members": 0,
+    "missing_members": [],
+    "rule": "제작 측정 = 고정된 최신 100편 스냅샷(latest100.json) 구성원만. 그 밖의 영상(80만+ 과거 영상 등)은 참고용 보고서(reference/high_views_report.json)에만 쓰고 제작 측정에 섞지 않음"
+  },
+  "items": [
+    {
+      "key": "presence.zoom",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "analysis/<id>/motion.json presence.zoom (ORB 유사변환 누적 배율; 원본 카메라 줌과 구분 못 함)",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    },
+    {
+      "key": "presence.freeze",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "motion.json presence.freeze (프레임 반복 + 앞뒤 움직임)",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    },
+    {
+      "key": "presence.speed_change",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "motion.json presence.speed (프레임 복제율 변화; 보간식 슬로모션은 검출 못 해 '없다' 대신 못 잼)",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    },
+    {
+      "key": "presence.flash",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "shots.json presence.flash (밝기 급등 전환)",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    },
+    {
+      "key": "presence.crossfade",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "shots.json presence.crossfade (블렌드 가중치 0→1 전환)",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    },
+    {
+      "key": "presence.decorations",
+      "unit": "tri_state",
+      "resolution": null,
+      "method": "motion.json decorations(실험 자동 검출: 화살표·원·네모) 또는 manual_observations.csv 의 decorations.* 관찰 행 → 있다; 자동 검출기로는 '없다'를 확정할 수 없어 나머지는 못 잼",
+      "value_rule": "영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, 측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 (n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)",
+      "measured_at": "2026-09-25T03:06:17+00:00",
+      "overall": {
+        "n": 0,
+        "n_present": 0,
+        "n_absent": 0,
+        "n_unmeasured": 0,
+        "share": null,
+        "value": null
+      },
+      "by_format": {},
+      "status": "unmeasured",
+      "value": null,
+      "presence": "unmeasured",
+      "evidence": [],
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+    }
+  ]
+}

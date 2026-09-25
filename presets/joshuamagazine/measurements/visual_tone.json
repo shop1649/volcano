@@ -4,17 +4,31 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-24T20:28:30+00:00",
+  "generated_at": "2026-09-25T03:06:17+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
     "video_ids": [],
     "excluded_long_form": [],
+    "excluded_non_snapshot": [],
     "formats_assigned": 0,
     "canvas_resolution": [
       1080,
       1920
-    ]
+    ],
+    "scaled_to": {
+      "resolution": [
+        1080,
+        1920
+      ],
+      "source": "preset (provisional)",
+      "note": "캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계"
+    },
+    "snapshot_status": "blocked",
+    "captured_at": "2026-09-24T17:56:07+00:00",
+    "n_members": 0,
+    "missing_members": [],
+    "rule": "제작 측정 = 고정된 최신 100편 스냅샷(latest100.json) 구성원만. 그 밖의 영상(80만+ 과거 영상 등)은 참고용 보고서(reference/high_views_report.json)에만 쓰고 제작 측정에 섞지 않음"
   },
   "items": [
     {
@@ -23,7 +37,7 @@
       "resolution": null,
       "method": "주 자막(제목·설명·상황·반응) 마지막 어절의 종결 어미 분류(합쇼체/해요체/음슴체/반말/명사형) → 영상별 최빈 종결(60% 이상이면 그 말투, 아니면 혼합) → 영상 간 최빈값. OCR 오인식 영향 있음",
       "value_rule": "mode",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -33,7 +47,7 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai",
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
       "ending_counts": {}
     },
     {
@@ -41,7 +55,7 @@
       "unit": null,
       "resolution": null,
       "method": "종결 어미(마지막 두 글자) 빈도 상위 8개",
-      "measured_at": "2026-09-24T20:28:30+00:00",
+      "measured_at": "2026-09-25T03:06:17+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -49,7 +63,7 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     }
   ]
 }

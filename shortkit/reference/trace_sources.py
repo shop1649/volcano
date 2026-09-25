@@ -1,24 +1,37 @@
 """Trace where the reference channel's footage comes from, and fence it off for sourcing.
 
-Per reference video:
+Default targets (`ref trace`): latest100 ∪ high_views ∪ downloaded.  Per reference video:
   * description credits: lines with 출처/원본/source/credit/cr./via/©, @handles, u/ r/ names,
     URLs (platform + account parsed from tiktok/instagram/reddit/youtube/x/facebook URLs), hashtags;
-  * burned-in watermark handles: static overlay lines inside the footage region (caption line
-    detector) read with tesseract ``eng --psm 7``
-    (TikTok / Instagram / Reddit style ``@user``, ``u/user``), kept when seen in >= 2 frames or with
-    confidence >= 70;
-  * transcript keywords when ``analysis/<id>/audio/transcript.json`` exists (else noted as missing);
+    EVERY URL that is not the reference channel itself goes to the URL exclusions (YouTube included;
+    ``credit_line`` recorded as a field, never used as a filter);
+  * script: the reference's own on-screen caption text (``analysis/<id>/captions.json`` from `ref analyze`
+    -- for these captioned shorts the captions ARE the script) and, when present,
+    ``analysis/<id>/audio/transcript.json`` (`ref transcribe`, optional faster-whisper ASR);
+  * on-screen credits: static overlay lines over the WHOLE frame (credits are often printed in the
+    bands around the footage) read with tesseract ``eng --psm 7`` (TikTok / Instagram / Reddit style
+    ``@user``, ``u/user``), kept when seen in >= 2 frames or with confidence >= 70, plus handle /
+    credit lines found in the reference's captions.json;
   * keyframes for a manual Google Lens search: ``analysis/<id>/lens/*.jpg`` + ``lens_queries.md``
-    + ``lens_results.csv`` (filled by the person who ran the search; rows with ``checked_by`` are
-    read back as traced original URLs).  Lens itself is not automated (and is blocked here).
+    + ``lens_results.csv`` (filled by the person who ran the search; rows with ``checked_by`` count
+    as searched, a filled ``original_url`` is read back as a traced original).  Lens itself is not
+    automated (and is blocked here).
+Every upload of the reference channel (all_videos.json) becomes a URL exclusion, and an ``account`` row
+names the reference channel itself (sourcing rejects the channel's own uploads).
 
 Aggregates ``warehouse/source_accounts.json`` (shape read by
 ``shortkit.sourcing.keywords.reference_derived``)::
 
     {"status": "measured|unmeasured", "blocker", "traced_at",
+     "stage": {"status", "blocker", "channels": {description|script|on_screen|lens|fingerprint:
+               {covered, target, missing}}, "impact", "state", "exclusion_fingerprints"},
      "accounts": [{"platform", "handle", "url", "count", "evidence": [{"ref_video_id", "t", ...}],
                    "verified_by_text"}],
      "keywords": [{"keyword", "platforms", "count", "evidence": [{"ref_video_id", "t", ...}]}]}
+
+``status`` says the listed accounts / keywords are measured results (sourcing uses them); whether the
+reverse-trace STAGE is complete is ``stage.status`` (every channel over every target video) --
+``stage_status()`` gives the row for `shortkit preset unresolved`.
 
 ``count`` = number of distinct reference videos; ``t`` = time in the reference video (null for
 description text, which has no time).  With no traced video the file is still written, as
@@ -376,7 +389,8 @@ def export_lens(preset: str, vid: str, video: Path, region: dict, shots: dict | 
           "1. 아래 이미지를 https://lens.google.com 에 하나씩 올립니다(자막을 뺀 영상 영역만 잘라 둠).",
           "2. TikTok·Instagram·Reddit·YouTube 등에서 **같은 장면의 원본 게시물**을 찾으면 주소를 확인합니다.",
           "3. `lens_results.csv` 에 image, original_url, platform, account 를 적고 **checked_by(확인한 사람)**, "
-          "checked_at 을 채웁니다. 확인하지 않은 추측은 적지 않습니다.",
+          "checked_at 을 채웁니다. 확인하지 않은 추측은 적지 않습니다. 검색했지만 원본을 못 찾았으면 original_url 을 비우고 "
+          "checked_by·checked_at·notes(못 찾음)만 채웁니다(검색한 사실이 '렌즈' 경로 범위로 집계됨).",
           "4. `shortkit ref trace` 를 다시 실행하면 확인된 주소가 warehouse/exclusions.jsonl 과 source_accounts.json 에 반영됩니다.",
           "", f"- 레퍼런스 영상: {(snap_rec or {}).get('url') or vid}", f"- 제목(검색어 힌트): {title}", "",
           "| 이미지 | 시각(초) |", "|---|---:|"]
@@ -398,9 +412,9 @@ def transcript_keywords(preset: str, vid: str, k: int = 10) -> dict:
     """Most frequent words of ``analysis/<id>/audio/transcript.json`` (``times``: first segment start
     per word when the transcript has timed segments)."""
     tj = read_json(analysis_dir(preset, vid) / "audio" / "transcript.json")
-    if not tj:
-        return {"status": "unmeasured", "note": "전사 파일 없음(analysis/<id>/audio/transcript.json)", "keywords": [],
-                "times": {}}
+    if not tj or tj.get("status") not in (None, "measured"):
+        return {"status": "unmeasured", "note": "전사 파일 없음(analysis/<id>/audio/transcript.json — 선택 단계 "
+                                                "`shortkit ref transcribe`, faster-whisper 필요)", "keywords": [], "times": {}}
     segs = [sg for sg in tj.get("segments") or [] if isinstance(sg, dict)]
     text = tj.get("text") or " ".join(sg.get("text", "") for sg in segs)
     words = [w for w in re.findall(r"[0-9A-Za-z가-힣]{2,}", text) if w.lower() not in STOP]
@@ -420,9 +434,91 @@ def _lens_t(image: str | None) -> float | None:
     return int(m.group(1)) / 1000.0 if m else None
 
 
+# ============================================================================= script (on-screen captions) / credits
+SCRIPT_ROLES = ("title", "description", "situation", "speaker", "dialogue", "reaction", "unknown")
+
+
+def caption_script(preset: str, vid: str, own: set[str], k: int = 10) -> dict:
+    """The reference's own on-screen caption text (``analysis/<id>/captions.json`` from `ref analyze`) IS its
+    script for these captioned shorts: most frequent words (with the first caption time that shows each)
+    plus handle / credit lines found in any caption (inside or outside the footage region).  The channel's
+    own identity marks (role ``identity_mark`` or an own handle) are skipped."""
+    cj = read_json(analysis_dir(preset, vid) / "captions.json")
+    if not cj:
+        return {"status": "unmeasured", "note": "자막 분석 없음(analysis/<id>/captions.json — `shortkit ref analyze` 필요)",
+                "keywords": [], "times": {}, "credits": [], "n_items": 0}
+    items = [c for c in cj.get("items") or [] if c.get("role") in SCRIPT_ROLES and (c.get("text") or "").strip()]
+    words: list[str] = []
+    first_t: dict[str, float] = {}
+    credits: list[dict] = []
+    for c in items:
+        txt = str(c.get("text") or "")
+        for w in re.findall(r"[0-9A-Za-z가-힣]{2,}", txt):
+            if w.lower() in STOP or _is_own(w, own):
+                continue
+            words.append(w)
+            first_t.setdefault(w, round(float(c.get("start") or 0.0), 3))
+        for line in txt.splitlines():
+            hs = [m.group(1).rstrip(".:") for m in _HANDLE_IN_TEXT.finditer(line)]
+            hs = [h for h in hs if not _is_own(h, own)]
+            if hs or CREDIT_RE.search(line):
+                credits.append({"text": line.strip()[:200], "handles": hs, "t": round(float(c.get("start") or 0.0), 3),
+                                "role": c.get("role"), "bbox": c.get("bbox"), "platform": _platform_hint(line)})
+    top = [w for w, _ in Counter(words).most_common(k)]
+    return {"status": "measured", "keywords": top, "times": {w: first_t.get(w) for w in top}, "credits": credits,
+            "n_items": len(items), "source": "analysis/<id>/captions.json (레퍼런스 화면 자막 = 대본)"}
+
+
+def _own_video_ids(preset: str) -> set[str]:
+    ids: set[str] = set()
+    for name in ("all_videos", "latest100", "high_views"):
+        for v in (read_json(reference_dir(preset) / f"{name}.json") or {}).get("videos") or []:
+            if v.get("video_id"):
+                ids.add(str(v["video_id"]))
+    return ids
+
+
+def _own_channel_ids(preset: str) -> set[str]:
+    pr = load_preset(preset)
+    out = {str(pr.get("reference.channel_id_hint", "") or "")}
+    for f in (reference_dir(preset) / "meta").glob("*.json") if (reference_dir(preset) / "meta").is_dir() else []:
+        m = read_json(f) or {}
+        if m.get("channel_id"):
+            out.add(str(m["channel_id"]))
+    return {x for x in out if x}
+
+
+def is_own_profile_url(url: str, own: set[str], own_channel_ids: set[str]) -> bool:
+    """A link to the reference channel ITSELF (profile / channel page), not to footage."""
+    plat, acc = platform_of_url(url)
+    if plat != "youtube":
+        return False
+    if acc and _is_own(acc, own):
+        return True
+    return any(cid and cid in url for cid in own_channel_ids)
+
+
+def lens_checked(preset: str, vid: str) -> list[dict]:
+    """Lens rows signed by the person who searched (``checked_by``), whether or not an original was found."""
+    rows = read_csv_rows(analysis_dir(preset, vid) / "lens" / "lens_results.csv")
+    return [r for r in rows if (r.get("checked_by") or "").strip()]
+
+
 # ============================================================================= main
 def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True, lens: bool = True) -> dict:
+    """Trace ``ids`` (default CLI set = latest100 ∪ high_views ∪ downloaded) and fence the reference off:
+
+    * every reference-channel upload in all_videos.json becomes a URL exclusion (plus an ``account`` row
+      naming the channel itself, for sourcing to reject the channel's own uploads);
+    * every non-own URL in a traced description becomes a URL exclusion (YouTube included; ``credit_line``
+      is recorded, not used as a filter); credited URLs are also the fingerprint entry's ``original_urls``;
+    * on-screen credits: handle OCR over the WHOLE reference frame (credits are often printed in the bands
+      around the footage) + handle/credit lines of the reference's own captions (captions.json);
+    * script: the reference's caption text (captions.json) and, when present, audio/transcript.json;
+    * fingerprints of the footage region (keyframe pHash) through the sourcing API."""
     own = own_identity(preset)
+    own_ch = _own_channel_ids(preset)
+    own_vids = _own_video_ids(preset)
     snap = load_snapshot(preset) or {}
     by_id: dict[str, dict] = {}
     for name in ("all_videos", "high_views"):             # reference only; latest100 wins below
@@ -435,35 +531,80 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
     have_urls = {url_key(r.get("url")) for r in existing if r.get("kind") == "url"}
     have_urls.discard(None)
     per_video, url_rows, n_fp = [], [], 0
+
+    def add_url(u: str | None, reason: str, vid: str | None, **extra) -> None:
+        k = url_key(u) if u else None
+        if u and k and k not in have_urls:
+            url_rows.append({"kind": "url", "url": u, "reason": reason, "ref_video_id": vid, "added_at": now_iso(),
+                             "added_by": ADDED_BY, **extra})
+            have_urls.add(k)
+
+    # the reference channel's own uploads (whole listing) and the channel itself
+    for vid_all, v in sorted(by_id.items()):
+        add_url(v.get("url") or f"https://www.youtube.com/watch?v={vid_all}", "레퍼런스 채널 자체 업로드(all_videos)",
+                vid_all, source="all_videos")
+    pr = load_preset(preset)
+    if not any(e.get("kind") == "account" and e.get("added_by") == ADDED_BY for e in existing):
+        url_rows.append({"kind": "account", "platform": "youtube", "handle": pr.get("reference.channel_handle", None),
+                         "channel_url": pr.get("reference.channel_url", None), "channel_ids": sorted(own_ch),
+                         "reason": "레퍼런스 채널 자체 — 이 채널의 업로드는 소재 후보가 될 수 없음(재게시 포함)",
+                         "added_at": now_iso(), "added_by": ADDED_BY})
     for vid in ids:
         rec = by_id.get(vid) or {}
-        meta = read_json(reference_dir(preset) / "meta" / f"{vid}.json") or {}
-        ref_url = rec.get("url") or (f"https://www.youtube.com/watch?v={vid}" if meta else None)
+        meta_path = reference_dir(preset) / "meta" / f"{vid}.json"
+        meta = read_json(meta_path) or {}
+        ref_url = rec.get("url") or (f"https://www.youtube.com/watch?v={vid}" if (meta or vid in own_vids) else None)
         desc = parse_description(meta.get("description") or "", own)
         examined: list[str] = []
-        if meta.get("description"):
-            examined.append("description")
+        if meta_path.is_file():
+            examined.append("description")             # metadata read (an empty description is a result too)
         found: dict = {"video_id": vid, "ref_url": ref_url,
-                       "description": {"available": bool(meta.get("description")), **desc}}
+                       "description": {"available": bool(meta.get("description")), "metadata_read": meta_path.is_file(),
+                                       **desc}}
         accs = [{"platform": a["platform"] or "unknown", "account": a["account"], "kind": a["kind"],
                  "t": None, "text": a["text"], "url": a.get("url")} for a in desc["accounts"]]
         kws = [{"keyword": t, "kind": "hashtag", "t": None} for t in desc["hashtags"]]
+        # script: the reference's own caption text + optional ASR transcript
+        cs = caption_script(preset, vid, own)
+        found["script_captions"] = {k: v for k, v in cs.items() if k != "credits"}
         tk = transcript_keywords(preset, vid)
         found["transcript"] = tk
+        if cs["status"] == "measured" or tk["status"] == "measured":
+            examined.append("script")
         if tk["status"] == "measured":
             examined.append("transcript")
+        kws += [{"keyword": w, "kind": "caption_script", "t": cs["times"].get(w)} for w in cs["keywords"]]
         kws += [{"keyword": w, "kind": "transcript", "t": tk["times"].get(w)} for w in tk["keywords"]]
+        # on-screen credits from the reference's captions (anywhere on the frame, incl. the bands around the footage)
+        found["caption_credits"] = cs["credits"]
+        for c in cs["credits"]:
+            for h in c["handles"]:
+                accs.append({"platform": ("reddit" if re.match(r"[ur]/", h) else (c.get("platform") or "unknown")),
+                             "account": h, "kind": "on_screen_caption", "t": c["t"], "text": c["text"], "url": None,
+                             "verified": False})
+        # description URLs: every non-own URL is fenced off (credit line or not); credited ones are originals
+        original_urls = []
+        for u in desc["urls"]:
+            if is_own_profile_url(u["url"], own, own_ch):
+                continue
+            add_url(u["url"], f"레퍼런스 {vid} 설명란 주소" + (" (출처 줄)" if u["credit_line"] else ""), vid,
+                    credit_line=bool(u["credit_line"]), platform=u.get("platform"), source="description")
+            if u["credit_line"]:
+                original_urls.append(u["url"])
         video = video_path(preset, vid)
-        original_urls = [u["url"] for u in desc["urls"] if u["credit_line"] and u["platform"] not in ("youtube",)]
         if video is not None:
             info = probe(video)
             region, reg_info = footage_region(preset, vid, video)
             found["footage_region"] = reg_info
             view = region_or_full({"video_region": region}, int(info.width), int(info.height))
+            full = {"x": 0, "y": 0, "w": int(info.width), "h": int(info.height)}
             shots = read_json(analysis_dir(preset, vid) / "shots.json")
             if do_ocr:
-                wm = ocr_watermarks(video, view, ocr_fps, own)
+                # credits / reposter handles can sit anywhere: OCR the WHOLE frame (the footage-region crop is
+                # used for fingerprinting only)
+                wm = ocr_watermarks(video, full, ocr_fps, own)
                 found["watermarks"] = wm
+                found["watermark_ocr_area"] = "full_frame"
                 examined.append("watermark_ocr")
                 accs += [{"platform": a["platform"], "account": a["account"], "kind": "watermark_ocr",
                           "t": a["frames"][0], "text": a["text"], "verified": False, "url": None} for a in wm]
@@ -471,12 +612,16 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
                 found["watermarks"] = None
             if lens:
                 found["lens"] = export_lens(preset, vid, video, view, shots, rec)
-            checked = lens_results(preset, vid)
-            if checked:
+            signed = lens_checked(preset, vid)
+            if signed:
                 examined.append("lens_manual")
-            for r in checked:
-                ou = r["original_url"].strip()
+            found["lens_checked_rows"] = len(signed)
+            for r in signed:
+                ou = (r.get("original_url") or "").strip()
+                if not ou:
+                    continue                      # searched, nothing found (recorded by the person)
                 original_urls.append(ou)
+                add_url(ou, f"레퍼런스 {vid} 의 원본(렌즈 확인: {r['checked_by']})", vid, source="lens_manual")
                 plat, acc = platform_of_url(ou)
                 if acc and not _is_own(acc, own):
                     accs.append({"platform": r.get("platform") or plat or "unknown", "account": r.get("account") or acc,
@@ -490,17 +635,15 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
             n_fp += fp["status"] == "added"
             found["fingerprint"] = fp
             found["phash_count"] = fp["n_phash"]
-            if not fp["n_phash"]:
+            if fp["n_phash"]:
+                examined.append("fingerprint")
+            else:
                 warn(f"{vid}: 쓸 수 있는 키프레임 없음 → 같은 녹화 판정 못 함(URL 규칙만 적용)")
         else:
-            found["note"] = "영상 파일 없음 → 워터마크 OCR·렌즈 키프레임·지문(phash) 못 함(못 잼)"
-        for u in ([ref_url] if ref_url else []) + sorted(set(original_urls)):
-            k = url_key(u)
-            if u and k and k not in have_urls:
-                url_rows.append({"kind": "url", "url": u, "reason": "레퍼런스 영상" if u == ref_url else
-                                 f"레퍼런스 {vid} 의 원본(추적)", "ref_video_id": vid, "added_at": now_iso(),
-                                 "added_by": ADDED_BY})
-                have_urls.add(k)
+            found["note"] = "영상 파일 없음 → 화면 출처 OCR·렌즈 키프레임·지문(phash) 못 함(못 잼)"
+        add_url(ref_url, "레퍼런스 영상", vid, source="reference")
+        for u in sorted(set(original_urls)):
+            add_url(u, f"레퍼런스 {vid} 의 원본(추적)", vid, source="traced_original")
         found["original_urls"] = sorted(set(original_urls))
         found["accounts_found"] = accs
         found["keywords_found"] = kws
@@ -510,50 +653,138 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
     if url_rows:
         append_jsonl(paths.absp(X.EXCLUSIONS), url_rows)
     out = build_source_accounts(preset, ocr_fps)
-    st = "측정" if out["status"] == "measured" else "못 잼"
-    say(f"출처 추적({st}): 이번 {len(per_video)}편(누적 {out['videos_traced']}편), 계정 {len(out['accounts'])}개, "
-        f"키워드 {len(out['keywords'])}개, 제외 목록에 새 지문 {n_fp}건·새 URL {len(url_rows)}건 → warehouse/")
-    if out["status"] != "measured":
-        warn(f"source_accounts.json = 못 잼: {out['blocker']}")
+    stg = out.get("stage") or {}
+    say(f"출처 추적: 이번 {len(per_video)}편(누적 {out['videos_traced']}편), 계정 {len(out['accounts'])}개, "
+        f"키워드 {len(out['keywords'])}개, 제외 목록에 새 지문 {n_fp}건·새 주소/계정 {len(url_rows)}건 → warehouse/")
+    say(f"  단계 상태: {'측정' if stg.get('status') == 'measured' else '못 잼(일부만)'} — "
+        + ", ".join(f"{CHANNEL_KO[c]} {v['covered']}/{v['target']}" for c, v in (stg.get("channels") or {}).items()))
+    if stg.get("status") != "measured":
+        warn(f"출처 추적 단계 = 못 잼: {stg.get('blocker')}")
     out["traced_now"] = len(per_video)
     return out
 
 
+CHANNEL_KO = {"description": "설명란", "script": "대본(자막·전사)", "on_screen": "화면 출처 OCR",
+              "lens": "렌즈(수동)", "fingerprint": "지문"}
+REQUIRED_CHANNELS = tuple(CHANNEL_KO)
+
+
 def _examined(d: dict) -> list[str]:
     if "sources_examined" in d:
-        return list(d["sources_examined"] or [])
-    ex = []                                  # trace.json written before sources_examined existed
-    if (d.get("description") or {}).get("available"):
-        ex.append("description")
-    if d.get("watermarks") is not None:
-        ex.append("watermark_ocr")
-    if (d.get("transcript") or {}).get("status") == "measured":
-        ex.append("transcript")
+        ex = list(d["sources_examined"] or [])
+    else:
+        ex = []                                  # trace.json written before sources_examined existed
+        if (d.get("description") or {}).get("available"):
+            ex.append("description")
+        if d.get("watermarks") is not None:
+            ex.append("watermark_ocr")
+        if (d.get("transcript") or {}).get("status") == "measured":
+            ex.append("transcript")
+    if d.get("phash_count") and "fingerprint" not in ex:
+        ex.append("fingerprint")
     return ex
+
+
+def _channels_of(d: dict) -> set[str]:
+    ex = set(_examined(d))
+    ch = set()
+    if "description" in ex:
+        ch.add("description")
+    if "script" in ex or "transcript" in ex:
+        ch.add("script")
+    if "watermark_ocr" in ex and d.get("watermark_ocr_area") == "full_frame":
+        ch.add("on_screen")
+    if "lens_manual" in ex:
+        ch.add("lens")
+    if "fingerprint" in ex:
+        ch.add("fingerprint")
+    return ch
+
+
+def trace_stage(preset: str, traced: dict[str, set[str]], n_fp_entries: int, n_accounts: int, n_keywords: int) -> dict:
+    """Per-channel coverage over the videos that must be traced (latest100 ∪ high_views): the stage is
+    ``measured`` only when EVERY channel covers EVERY target video."""
+    from .common import resolve_ids
+
+    target = resolve_ids(preset, set_name="latest100")
+    for v in resolve_ids(preset, set_name="high_views"):
+        if v not in target:
+            target.append(v)
+    snap = load_snapshot(preset) or {}
+    chans = {}
+    for c in REQUIRED_CHANNELS:
+        cov = [v for v in target if c in traced.get(v, set())]
+        chans[c] = {"covered": len(cov), "target": len(target),
+                    "missing": [v for v in target if v not in cov][:50]}
+    complete = bool(target) and all(v["covered"] == v["target"] for v in chans.values())
+    missing_ch = [c for c, v in chans.items() if v["covered"] < v["target"]]
+    if not target:
+        blocker = snapshot_blocker(preset) if (snap.get("status") == "blocked" or not snap) else \
+            "추적 대상(최신 100편·조회수 기준 이상 영상) 목록이 비어 있음"
+    elif missing_ch:
+        blocker = "추적이 덜 된 경로: " + ", ".join(f"{CHANNEL_KO[c]} {chans[c]['covered']}/{chans[c]['target']}"
+                                                  for c in missing_ch)
+    else:
+        blocker = None
+    impact = []
+    if chans["fingerprint"]["covered"] < len(target) or not target:
+        impact.append(f"레퍼런스 촬영본 지문 제외가 {chans['fingerprint']['covered']}/{len(target)}편만 적용"
+                      f"(제외 목록 지문 항목 {n_fp_entries}건) → 나머지 레퍼런스 촬영본을 같은 녹화로 걸러내지 못함")
+    if any(chans[c]["covered"] < len(target) for c in ("description", "script", "on_screen", "lens")) or not target:
+        impact.append(f"새 소재 검색어/계정이 일부 경로에서만 추적됨(계정 {n_accounts}개, 키워드 {n_keywords}개)")
+    if snap.get("status") == "blocked" or not snap:
+        state = "blocked_network"
+    elif complete:
+        state = "resolved"
+    elif missing_ch == ["lens"]:
+        state = "open_manual_lens"
+    else:
+        state = "open"
+    return {"status": "measured" if complete else "unmeasured", "blocker": blocker, "channels": chans,
+            "target_set": "latest100 ∪ high_views", "n_target": len(target), "exclusion_fingerprints": n_fp_entries,
+            "impact": "; ".join(impact) or "없음", "state": state,
+            "rule": "경로(설명란·대본·화면 출처 OCR(화면 전체)·렌즈 수동 확인·지문)마다 대상 영상 전부가 확인되어야 '측정'"}
+
+
+def stage_status(preset: str) -> dict:
+    """Row for `shortkit preset unresolved` (item, status, impact, state, evidence) computed from
+    warehouse/source_accounts.json ``stage`` -- never from 'any account found'."""
+    acc = read_json(paths.absp("warehouse/source_accounts.json")) or {}
+    stg = acc.get("stage") or {}
+    ch = stg.get("channels") or {}
+    ev = ", ".join(f"{CHANNEL_KO.get(c, c)} {v.get('covered')}/{v.get('target')}" for c, v in ch.items())
+    return {"item": "레퍼런스 소재 출처·반복 계정·키워드 역추적",
+            "status": stg.get("status") or "unmeasured",
+            "impact": stg.get("impact") or "새 소재 검색어/계정 목록이 없음, 레퍼런스 촬영본 제외 목록이 비어 있음",
+            "state": stg.get("state") or "blocked_network",
+            "evidence": (f"warehouse/source_accounts.json stage: {ev or '추적 기록 없음'}; 제외 지문 "
+                         f"{stg.get('exclusion_fingerprints', 0)}건; accounts={len(acc.get('accounts') or [])}")}
 
 
 def build_source_accounts(preset: str, ocr_fps: float = 0.5) -> dict:
     """Write ``warehouse/source_accounts.json`` from every ``analysis/*/trace.json`` (so tracing a
     subset of videos never drops what earlier runs found).
 
-    ``status: measured`` when at least one reference video had a source actually examined
-    (description text, watermark OCR, transcript or a signed Lens result); otherwise
-    ``unmeasured`` with the blocker (the ``ref collect`` block when the snapshot is blocked).  An
-    existing measured file is never replaced by an unmeasured one."""
+    ``status`` (read by sourcing): ``measured`` when at least one reference video had a source actually
+    examined -- the accounts / keywords listed ARE measured, but that says nothing about completeness.
+    ``stage`` = completeness of the reverse-trace STAGE: per channel (description / script / on-screen /
+    Lens / fingerprint) coverage over latest100 ∪ high_views; ``stage.status`` is measured only when every
+    channel covers every target video (this is what the unresolved table must report).  An existing
+    measured file is never replaced by an unmeasured one."""
     pr = load_preset(preset)
     acc_ev: dict[tuple[str, str], list[dict]] = defaultdict(list)
     acc_url: dict[tuple[str, str], str] = {}
     kw_ev: dict[str, list[dict]] = defaultdict(list)
     kw_plat: dict[str, set[str]] = defaultdict(set)
     traced, examined, coverage = [], [], Counter()
+    chan_of: dict[str, set[str]] = {}
     for tj in sorted((paths.preset_dir(preset) / "analysis").glob("*/trace.json")):
         d = read_json(tj) or {}
         vid = d.get("video_id") or tj.parent.name
         traced.append(vid)
         ex = _examined(d)
         coverage.update(ex)
-        if d.get("phash_count"):
-            coverage["fingerprint"] += 1
+        chan_of[vid] = _channels_of(d)
         if ex:
             examined.append(vid)
         plats = set()
@@ -576,7 +807,8 @@ def build_source_accounts(preset: str, ocr_fps: float = 0.5) -> dict:
         vids = {e["ref_video_id"] for e in evs}
         accounts.append({"platform": plat, "handle": acc, "url": acc_url.get((plat, acc)), "count": len(vids),
                          "mentions": len(evs),
-                         "verified_by_text": any(e.get("kind") != "watermark_ocr" for e in evs),
+                         "verified_by_text": any(e.get("kind") not in ("watermark_ocr", "on_screen_caption")
+                                                 for e in evs),
                          "evidence": evs[:20]})
     accounts.sort(key=lambda a: (-a["count"], -a["mentions"], a["handle"].lower()))
     keywords = [{"keyword": k, "platforms": sorted(kw_plat[k]), "count": len({e["ref_video_id"] for e in evs}),
@@ -586,25 +818,35 @@ def build_source_accounts(preset: str, ocr_fps: float = 0.5) -> dict:
     if examined:
         blocker = None
     elif traced:
-        blocker = (f"추적한 레퍼런스 {len(traced)}편 모두 설명란(reference/meta)·워터마크 OCR·전사·서명된 렌즈 결과가 "
-                   "없음(`shortkit ref collect` 로 설명란, `ref download` 후 OCR 포함 `ref trace` 필요)")
+        blocker = (f"추적한 레퍼런스 {len(traced)}편 모두 설명란(reference/meta)·자막 대본·화면 출처 OCR·전사·서명된 렌즈 "
+                   "결과가 없음(`shortkit ref collect` 로 설명란, `ref analyze` 로 자막, `ref download` 후 OCR 포함 "
+                   "`ref trace` 필요)")
         if snap.get("status") == "blocked" or not snap:
             blocker += f" — {snapshot_blocker(preset)}"
     elif snap.get("status") == "blocked" or not snap:
         blocker = snapshot_blocker(preset)
     else:
         blocker = "추적한 레퍼런스 영상 없음(`shortkit ref trace` 미실행 또는 대상 영상 없음)"
+    n_fp_entries = sum(1 for e in X.load() if e.get("kind") == "reference_footage" and e.get("phash"))
+    stage = trace_stage(preset, chan_of, n_fp_entries, len(accounts), len(keywords[:100]))
     out = {"status": "measured" if examined else "unmeasured", "blocker": blocker, "traced_at": now_iso(),
+           "status_meaning": "status = 아래 계정·키워드가 실제로 확인된 결과인지(소재 검색에 사용). 역추적 단계가 "
+                             "끝났는지는 stage.status(경로별 범위)",
+           "stage": stage,
            "accounts": accounts, "keywords": keywords[:100],
            "schema": SOURCE_ACCOUNTS_SCHEMA, "preset_id": pr.preset_id,
            "source_snapshot": snap.get("captured_at"), "source_snapshot_status": snap.get("status"),
            "videos_traced": len(traced), "videos_examined": len(examined), "video_ids": traced[:500],
            "coverage": dict(coverage),
-           "methods": {"description": "설명란 출처 줄·@핸들·URL·해시태그(채널 자체 핸들 제외)",
-                       "watermark_ocr": f"영상 영역의 정지 오버레이 줄(자막 줄 검출기) → tesseract eng psm 7, {ocr_fps} fps, "
-                                        "2프레임 이상 또는 신뢰도 70 이상, 비슷한 판독은 병합(검색 단서, 미확인)",
-                       "transcript": "analysis/<id>/audio/transcript.json 이 있을 때만",
-                       "lens": "수동(lens_results.csv 에 checked_by 가 있는 행만 반영)",
+           "methods": {"description": "설명란 출처 줄·@핸들·URL·해시태그(채널 자체 핸들 제외); 채널 자체가 아닌 모든 URL 은 "
+                                      "제외 목록(출처 줄 여부는 credit_line 으로 기록)",
+                       "script": "레퍼런스 화면 자막(analysis/<id>/captions.json, `ref analyze`)의 단어 빈도 = 대본 키워드; "
+                                 "audio/transcript.json(`ref transcribe`, 선택 음성 인식)이 있으면 함께",
+                       "on_screen": f"화면 전체의 정지 오버레이 줄(자막 줄 검출기) → tesseract eng psm 7, {ocr_fps} fps, "
+                                    "2프레임 이상 또는 신뢰도 70 이상, 비슷한 판독은 병합(검색 단서, 미확인) + 레퍼런스 자막 "
+                                    "중 @핸들·출처 줄",
+                       "lens": "수동(lens_results.csv 에 checked_by 가 있는 행: 찾은 원본 주소 또는 '못 찾음')",
+                       "fingerprint": "영상 영역 키프레임 pHash(shortkit.sourcing.exclusions)",
                        "count": "그 계정/키워드가 나온 레퍼런스 영상 수",
                        "t": "레퍼런스 영상 안 시각(초). 설명란 텍스트는 시각이 없어 null"}}
     wh = paths.ensure_dir("warehouse")
