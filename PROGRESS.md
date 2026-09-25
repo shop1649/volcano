@@ -40,6 +40,17 @@
 - 저장소 전체 테스트 993개 통과(느린 테스트 포함). `preset audit --test`: no_code 0 · no_qa 0 · 미측정 266.
 - 기록: docs/validation/final_restore_log.md, docs/VALIDATION.md, docs/DELIVERABLES.md.
 
+## 네트워크 개방 후 (2026-09-25 저녁)
+- doctor --network: youtube·googlevideo·tiktok·instagram·reddit·Demucs 가중치 호스트 접속됨. torch 2.14.0+cpu + demucs 4.1.0 설치,
+  htdemucs 가중치 로드 확인.
+- `ref collect`: 채널 Shorts 510편 목록, 최신 100편 고정(partial — 80편 메타데이터가 YouTube "Sign in to confirm you're not a bot"
+  로 막힘), 80만+ 정확 198편·미확인 124편. 커밋 c9320ba.
+- 영상 받기(`ref download`)와 개별 메타데이터: 같은 봇 확인으로 막힘. 단순 재시도·JS 런타임(node) 설정으로도 같음.
+  봇 확인을 피하는 우회(다른 클라이언트 흉내 등)는 하지 않음 → **로그인 쿠키(cookies.txt)** 가 있어야 진행.
+- 소재 검색 실접속: YouTube 목록 ok(개별 메타데이터는 봇 확인), TikTok 태그 검색은 yt-dlp 추출기 고장, Instagram 로그인 필요,
+  Reddit 403 Blocked.
+- 효과음: 사용자가 알려 준 `W:\내 드라이브\효과음` 은 Drive 커넥터에서 보이지 않음(동기화 전일 수 있음).
+
 ## 남은 일 (이 환경에서 할 수 없는 것 — 사용자/네트워크 필요)
 1. 레퍼런스: youtube.com·googlevideo.com 허용(또는 `YOUTUBE_API_KEY` 로 목록·조회수만) → AGENTS.md 5장 A.
 2. 사용자 자산: 깨끗한 효과음·음악 창고(`assets/library/`), "별도로 지정한 변경"(requested_changes.yaml).
