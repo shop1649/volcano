@@ -31,20 +31,22 @@
 - 뒤이은 수정: QA 출력 검사 61개 키 추가(`preset audit --test`: no_code 0 · no_qa 0), 공용 그림자 추정기, 슬라이드 어휘,
   lead_s 정의 통일(27fb18b), 테스트 기대값 정리(e4a30b6).
 
-## 깨끗한 폴더 복원 검증 (2026-09-25)
-- 1차(번들 17e4e0a): 복원·setup·doctor·새 에피소드 test-restore-001(MP4·편집 프로젝트·melt 대조 통과)·QA·pytest 까지 실행.
-  기록: docs/validation/final_restore_log.md. 찾은 문제 7가지를 모두 고침:
-  QA 오탐 2(80ca995), 깨끗한 복원 테스트 7개(e9245b6), 보호 영역 위 국소 복원 검사·zoom 경고 시간 창·dirty-source --out·
-  번들 mockloop 스크립트·속도 행(d9b6b63).
-- 고친 코드로 QA 재측정: test-pipeline-001 184/0/89(관문 통과·완료 아님), test-coverage-001 151/0/75(G2 6),
-  test-restore-001 164/0/85(G2 12: 사람 확인 필요 — 반전, 글자 없는 로고, 손 위 복원).
+## 깨끗한 폴더 복원 검증 (2026-09-25, 완료)
+- 1차(번들 17e4e0a): 복원·setup·doctor·새 에피소드 test-restore-001(MP4·편집 프로젝트·melt 대조 통과)·QA·pytest.
+  찾은 문제 7가지를 모두 고침: QA 오탐 2(80ca995), 깨끗한 복원 테스트 7개(e9245b6), 보호 영역 위 국소 복원 검사·zoom 경고 시간 창·
+  dirty-source --out·번들 mockloop 스크립트·속도 행(d9b6b63).
+- 2차(번들 c9fa60e, 364개): 복원 바이트 일치, setup·doctor 통과, test-restore-001 재렌더 MP4 가 1차와 sha256 까지 같음,
+  melt 대조 통과, QA 164/0/85. pytest 실패 2(번들에 없는 예제 MP4 요구) → b214659 에서 건너뛰게 고침.
+- 저장소 전체 테스트 993개 통과(느린 테스트 포함). `preset audit --test`: no_code 0 · no_qa 0 · 미측정 266.
+- 기록: docs/validation/final_restore_log.md, docs/VALIDATION.md, docs/DELIVERABLES.md.
 
-## 진행 중
-- 전체 pytest(느린 테스트 포함) → preset sync/audit --test → PRESET_BUNDLE.md 다시 생성 → 2차 복원 검증
-  (scratchpad fr2/run2.sh: 복원 블록 그대로 → 바이트 대조 → setup → doctor → 테스트 자산 → pytest not slow →
-  test-restore-001 재렌더·sha256 대조·export·QA·gate) → VALIDATION.md 4절 2차·final_restore_log.md 2차 기록 → 커밋·푸시.
+## 남은 일 (이 환경에서 할 수 없는 것 — 사용자/네트워크 필요)
+1. 레퍼런스: youtube.com·googlevideo.com 허용(또는 `YOUTUBE_API_KEY` 로 목록·조회수만) → AGENTS.md 5장 A.
+2. 사용자 자산: 깨끗한 효과음·음악 창고(`assets/library/`), "별도로 지정한 변경"(requested_changes.yaml).
+3. 사람 확인: 테스트 에피소드의 반전·글자 없는 로고·손 위 복원(qa human-check), 청취.
+4. 첫 편 기획안: A·B 가 끝난 뒤 `episode proposal` → 승인 → 렌더.
 
 ## 재개 방법
-- `git log --oneline | head` 로 마지막 커밋 확인 → 위 "진행 중"의 첫 항목부터.
+- `git log --oneline | head` 로 마지막 커밋 확인 → 위 "남은 일".
 - 네트워크가 열린 환경이면: `python -m shortkit doctor --network` → AGENTS.md 5장 A(레퍼런스 분석)부터.
 - 테스트 전체: `OMP_THREAD_LIMIT=1 python -m pytest -q` (느린 테스트 제외: `-m "not slow"`).

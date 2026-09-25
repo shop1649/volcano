@@ -131,6 +131,28 @@
 - NLE: FCPXML·OTIO 를 편집기에서 열어 보지 않았다. Shotcut GUI 도 확인하지 않았다.
 - 청취 없음. 사람 확인 12건이 남아 있다(반전 1, 코너 로고 10, 손 번짐 1).
 
-## 2차 검증 (고친 번들)
+## 2차 검증 (고친 번들, 2026-09-25 15:13–15:36 UTC)
 
-(아래 절에 기록)
+검증한 번들은 커밋 c9fa60e 의 `PRESET_BUNDLE.md`(파일 364개)다. 1차에서 고친 것이 모두 들어 있다.
+이번에는 에이전트 대신 스크립트가 단계마다 명령·종료 코드·출력을 기록했다(scratchpad `fr2/commands.md`, `fr2/out/*.txt`).
+
+| 단계 | 결과 |
+|---|---|
+| 복원 | MD 첫 줄이 읽으라는 1–436 행 안의 첫 bash 블록(38–56 행)을 뽑아 **수정 없이** 실행: 종료 0, 파일 364개, 저장소 파일과 바이트 차이 0 |
+| `setup.sh` | 종료 0 |
+| `doctor --network` | 필수 미충족 0 (차단 호스트는 1차와 같음) |
+| 테스트 자산 | synth · fetch-video `--local-dir` · test-source · dirty-source(기본) · dirty-source `--out dirty_source_facewalk` 모두 종료 0. facewalk sha256 `b861fc2d…` — 1차와 같은 파일 |
+| `pytest -m "not slow"` (선행 조건을 손으로 만들지 않음) | 827 passed / **2 failed** / 2 skipped / 162 deselected (664 s) |
+| test-restore-001 validate | 오류 0 · 경고 19. 새 경고 `clean_overlaps_protected`: 자막 inpaint 가 '남성 두 손' 의 60% 를 원본 5.30–6.08 s 동안 덮음 |
+| resolve + render | 종료 0. **MP4 sha256 `6a1cd845…` — 1차 복원에서 만든(저장소에 커밋된) MP4 와 바이트 단위로 같음** |
+| export + melt 대조 | 통과: SSIM 0.9942(최저 1초 0.9885), 소리 상관 0.9998, 프레임 555/555 |
+| QA | 249행 같다 164 / 다르다 0 / 못 잼 85 — 저장소에서 잰 값과 같음 |
+| 관문 | 불합격: G2 필수 못 잼 12건. 사람 확인 필요 — 반전 1, 글자 없는 로고 10, 손 위 복원 1 |
+
+- pytest 실패 2건(`test_every_style_compare_reads_every_key_it_lists[test-pipeline-001/test-coverage-001]`)의 원인:
+  - 예제 에피소드의 출력 MP4 는 번들에 넣지 않는다(다시 만들 수 있는 미디어). 테스트가 그 MP4 를 요구했다.
+  - 커밋 b214659 에서 MP4 가 없으면 다시 만드는 명령과 함께 건너뛰게 고쳤다.
+  - 고친 테스트 파일을 같은 복원 폴더에서 돌린 결과: 22 passed, 4 skipped(이유 표시).
+- 환경: Ubuntu 24.04.4 LTS, 커널 6.18.44, Python 3.11.15, ffmpeg 6.1.1, melt 7.22.0, tesseract 5.3.4.
+- 이 뒤의 번들은 위 테스트 고침과 문서(VALIDATION·이 기록·PROGRESS)만 달라진다. 최종 번들은 복원 블록·바이트 대조·그 테스트 파일만
+  다시 확인했다(아래 3절).
