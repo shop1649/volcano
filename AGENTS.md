@@ -82,6 +82,11 @@ cp local.example.yaml local.yaml     # 효과음/음악 창고, 쿠키 경로
 먼저 `python -m shortkit doctor --network` 로 youtube.com·googlevideo.com 접속을 확인한다. 막혀 있으면 A 는 진행하지 말고
 그 사실을 기록한다(성공한 척 금지).
 
+- 목록·게시일·조회수만 필요한 단계(`ref collect`)는 공식 YouTube Data API v3 로도 된다. 환경 변수 `YOUTUBE_API_KEY` 가 있으면
+  `--method auto` 가 API 를 쓴다. 키는 사람이 발급해 환경 변수로 넣는다(채팅·저장소에 적지 않음).
+  2026-09-25 첫 작업 환경에서는 `www.googleapis.com` 이 접속되었고 키가 없어 403 PERMISSION_DENIED 였다.
+  영상 받기(`ref download`)는 API 로 할 수 없어 youtube.com·googlevideo.com 허용이 따로 필요하다.
+
 ```bash
 python -m shortkit ref collect                     # 최신 100편·게시일·조회수 고정 → reference/latest100.json (이미 ok 스냅샷이면 유지)
                                                    #   + all_videos.json(참고), high_views.json(조회수 ≥ 800,000, 확인일 포함)

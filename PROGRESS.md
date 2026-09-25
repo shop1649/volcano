@@ -5,6 +5,9 @@
   v.redd.it, lens.google.com, www.google.com, namu.wiki, open.subsub.io, youtube-rank.com, freesound.org, pixabay.com,
   dl.fbaipublicfiles.com(Demucs 가중치), huggingface.co, archive.org 를 403 으로 차단. WebFetch 도 같은 정책으로 차단.
 - 허용: github.com / raw.githubusercontent.com(공개 저장소 읽기), pypi, npm, Ubuntu apt.
+- 2026-09-25 확인: www.googleapis.com(YouTube Data API v3)은 접속됨 — 키가 없어 403 PERMISSION_DENIED.
+  `YOUTUBE_API_KEY` 를 환경 변수로 넣으면 `ref collect` 가 최신 100편 목록·게시일·조회수(80만+ 목록 포함)를 API 로 고정할 수 있음.
+  영상 받기는 여전히 youtube.com·googlevideo.com 허용이 필요.
 - 결과: 레퍼런스 영상 목록·게시일·조회수·영상/음성 원본을 한 건도 확보하지 못함 → 모든 스타일 값은 임시값(못 잼).
   `ref collect` 실행 기록: presets/joshuamagazine/reference/latest100.json (status blocked, yt-dlp 403 원문).
 - WebSearch 스니펫만 확인(미검증): presets/joshuamagazine/reference/web_search_observations.md.

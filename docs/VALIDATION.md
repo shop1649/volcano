@@ -30,7 +30,7 @@
 | 그 밖 | fpcalc 1.5.1, espeak-ng 1.51, sox 14.4.2, Noto Sans CJK KR |
 | 파이썬 패키지 | numpy 2.4.6, opencv 5.0.0, scipy 1.17.1, pillow 12.3.0, PyYAML 6.0.1(libyaml 없음 → 순수 파이썬 로더로 동작), jsonschema 4.26.0, yt-dlp 2026.08.19, opentimelineio 0.18.1 |
 | 설치 안 됨 | torch, demucs(가중치 호스트 차단), faster-whisper |
-| 네트워크 | youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com, reddit.com, lens.google.com, dl.fbaipublicfiles.com(Demucs 가중치), huggingface.co, archive.org 등이 정책으로 403. github.com 의 git clone, pypi, Ubuntu apt 는 허용. GitHub 의 `raw/` 파일 직접 받기(`testassets fetch-video`)도 403 → git clone 한 폴더를 `--local-dir` 로 넘겨서 받음 |
+| 네트워크 | youtube.com, googlevideo.com, i.ytimg.com, tiktok.com, instagram.com, reddit.com, lens.google.com, dl.fbaipublicfiles.com(Demucs 가중치), huggingface.co, archive.org 등이 정책으로 403. github.com 의 git clone, pypi, Ubuntu apt 는 허용. GitHub 의 `raw/` 파일 직접 받기(`testassets fetch-video`)도 403 → git clone 한 폴더를 `--local-dir` 로 넘겨서 받음. `www.googleapis.com`(YouTube Data API v3)은 접속되지만 API 키가 없어 403 PERMISSION_DENIED — 키가 있으면 `ref collect --method api` 로 목록·조회수는 받을 수 있음(영상은 못 받음) |
 
 ### 검증하지 않은 환경
 
