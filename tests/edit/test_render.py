@@ -21,8 +21,12 @@ def test_render_end_to_end(root, plan, capsys):
     from shortkit.cli import main
     from shortkit.util.media import probe, read_audio
 
+    from .conftest import sha
+
     plan["timeline"][0]["zoom"] = {"center": [160, 90], "start": 0.3}
-    plan["timeline"][0]["original_audio"] = {"keep": True, "reason": "테스트 음(사인파)", "ranges": [[1.0, 2.0]]}
+    # source a = the synthetic speech-like clip (same picture, a speech-like line at 1.0-2.6 s): ducking follows speech
+    plan["sources"][0].update(path=f"{M}/src_speech.mp4", sha256=sha(root / M / "src_speech.mp4"))
+    plan["timeline"][0]["original_audio"] = {"keep": True, "reason": "합성 말소리(테스트)", "ranges": [[1.0, 2.0]]}
     plan["decorations"] = [{"id": "d1", "kind": "circle", "start": 0.5, "end": 1.5,
                             "keyframes": [{"t": 0, "x": 300, "y": 900, "w": 120, "h": 120}]}]
     plan["bgm"]["silences"] = [{"start": 3.0, "end": 3.4, "reason": "정지 강조"}]

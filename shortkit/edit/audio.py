@@ -350,6 +350,29 @@ def kept_levels(kept: list[dict]) -> dict[int, dict]:
     return out
 
 
+def kept_speech(path: str, src_start: float, src_end: float) -> dict:
+    """Speech spans (SOURCE s) of a kept audio file inside [src_start, src_end] (``audio_checks.speech_spans``)."""
+    from .audio_checks import speech_spans
+
+    sp = speech_spans(path)
+    if sp["status"] != "measured":
+        return {"status": "unmeasured", "spans": [], "reason": sp.get("reason")}
+    spans = [[round(max(a, src_start), 4), round(min(b, src_end), 4)] for a, b in sp["spans"]
+             if min(b, src_end) > max(a, src_start)]
+    return {"status": "measured", "spans": spans, "reason": None}
+
+
+def duck_pieces(originals: list[OriginalAudio]) -> list[tuple[float, float]]:
+    out = []
+    for o in originals:
+        if o.speech_status != "measured":
+            out.append((o.out_start, o.out_end))
+            continue
+        for a, b in o.speech:
+            out.append((round(o.out_start + (a - o.src_start) / o.speed, 6), round(o.out_start + (b - o.src_start) / o.speed, 6)))
+    return out
+
+
 def bgm_loop_xfade_s(preset: config.Preset) -> float | None:
     """audio.bgm.loop_xfade_s (rule key: equal-power crossfade at the BGM loop point), None when the
     preset does not define it -- callers turn that into an error, never into a default."""
@@ -420,11 +443,15 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
                                  f"보존 원음 음량(L_src)을 잴 수 없어 이득을 정할 수 없습니다: {lv['reason']} "
                                  "(audio.original.keep_gain_db = 프로그램 음량 대비 LU)", k["where"]))
             continue
+        sp = kept_speech(k["path"], k["src_start"], k["src_end"])
         originals.append(OriginalAudio(
             clip_id=k["clip_id"], path=k["path"], stem=k["stem"], src_start=k["src_start"], src_end=k["src_end"],
             out_start=k["out_start"], out_end=k["out_end"], speed=k["clip"].speed,
-            gain_db=round(target_lufs + k["rel_lu"] - lv["lufs"], 3), fade_s=fade_s, reason=k["reason"]))
-    duck_ranges = merge_ranges([(o.out_start, o.out_end) for o in originals])
+            gain_db=round(target_lufs + k["rel_lu"] - lv["lufs"], 3), fade_s=fade_s, reason=k["reason"],
+            speech=sp["spans"], speech_status=sp["status"]))
+    # ducking only under kept SPEECH (user rule): the detected speech inside each kept range, mapped to output time;
+    # a kept range whose speech could not be measured ducks whole (validate reports it), one without speech not at all
+    duck_ranges = merge_ranges(duck_pieces(originals))
 
     # --- BGM
     bcfg = a["bgm"]
@@ -456,15 +483,19 @@ def build_audio_plan(plan: dict, preset: config.Preset, clips: list[Clip], durat
         section_p, tempo_p = float(bcfg["section_start_s"]), float(bcfg["tempo_ratio"])
         section = float(pb["section_start_s"]) if pb.get("section_start_s") is not None else section_p
         tempo = float(pb["tempo_ratio"]) if pb.get("tempo_ratio") is not None else tempo_p
-        for key, got, want, unit in (("section_start_s", section, section_p, "s"), ("tempo_ratio", tempo, tempo_p, "")):
+        gain_p = float(bcfg["gain_db"])
+        gain = float(pb["gain_db"]) if pb.get("gain_db") is not None else gain_p
+        # a plan override of the reference's music section / speed / level is a style deviation: error in production
+        ov_sev = "error" if plan["mode"] == "production" else "warn"
+        for key, got, want, unit in (("section_start_s", section, section_p, "s"), ("tempo_ratio", tempo, tempo_p, ""),
+                                     ("gain_db", gain, gain_p, " dB")):
             if pb.get(key) is not None and abs(got - want) > 1e-3:
                 org = preset.origin(f"audio.bgm.{key}")
-                issues.append(_issue("warn", f"bgm_{key}_override",
+                issues.append(_issue(ov_sev, f"bgm_{key}_override",
                                      f"plan.bgm.{key}={got}{unit} 가 프리셋 audio.bgm.{key}={want}{unit}"
                                      f"({'임시값·못 잼' if org == 'provisional' else org}) 와 다릅니다: 같은 곡의 "
-                                     "다른 구간/속도는 레퍼런스 음악과 일치가 아님(의도한 변경이면 requested_changes 로)",
+                                     "다른 구간/속도/크기는 레퍼런스 음악과 일치가 아님(의도한 변경이면 requested_changes 로)",
                                      f"bgm.{key}"))
-        gain = float(pb["gain_db"]) if pb.get("gain_db") is not None else float(bcfg["gain_db"])
         fi, fo = float(bcfg["fade_in_s"]), float(bcfg["fade_out_s"])
         if tempo <= 0:
             issues.append(_issue("error", "bgm_tempo", "tempo_ratio 는 0보다 커야 합니다", "bgm.tempo_ratio"))

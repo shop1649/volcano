@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from .conftest import load_preset, write_plan
+from .conftest import M, load_preset, write_plan
 
 
 def test_envelope_ducks_only_kept_ranges():
@@ -43,23 +43,33 @@ def test_close_ranges_merge_instead_of_pumping():
 
 
 def test_audio_plan_from_plan(root, plan):
-    """Kept original range -> duck range in OUTPUT time; SFX and cuts never create ducking."""
+    """Kept original range -> duck range in OUTPUT time, only under the SPEECH detected in it (S4-02);
+    SFX and cuts never create ducking."""
     from shortkit.edit.resolve import resolve_context
 
-    plan["timeline"][2]["original_audio"] = {"keep": False}
-    plan["timeline"][1]["original_audio"] = {"keep": True, "reason": "말하는 사람", "ranges": [[2.8, 3.3]]}
+    from .conftest import sha
+
+    # s3: the synthetic speech-like source (speech 1.0-2.6 s), shown from source 0.5 s at output 3.25 s
+    plan["sources"].append({"id": "sp", "path": f"{M}/src_speech.mp4", "sha256": sha(root / M / "src_speech.mp4"),
+                            "warehouse_id": None, "has_embedded_music": False, "clean": {}, "protected": []})
+    plan["timeline"][2] = {"id": "s3", "source": "sp", "src_in": 0.5, "src_out": 3.5,
+                           "transition_in": {"type": "crossfade", "dur": 0.25},
+                           "original_audio": {"keep": True, "reason": "말하는 사람", "ranges": [[0.8, 2.8]]}}
     plan["bgm"]["silences"] = [{"start": 0.5, "end": 0.8, "reason": "강조"}]
     write_plan(root, plan)
     ctx = resolve_context(plan, load_preset())
     a = ctx.resolved.audio
-    assert [(o.out_start, o.out_end) for o in a.originals] == [(pytest.approx(2.3), pytest.approx(2.8))]
-    assert a.bgm.duck_ranges == [(pytest.approx(2.3), pytest.approx(2.8))]
+    assert [(o.out_start, o.out_end) for o in a.originals] == [(pytest.approx(3.55), pytest.approx(5.55))]
+    o = a.originals[0]
+    assert o.speech_status == "measured"
+    (d0, d1), = a.bgm.duck_ranges
+    assert d0 == pytest.approx(3.25 + 0.5, abs=0.1) and d1 == pytest.approx(3.25 + 2.1, abs=0.15)
     from shortkit.edit.audio import envelope_db_at
 
-    # around the SFX (t=1.0) and every cut boundary the BGM is not ducked
+    # around the SFX (t=1.0) and every cut boundary the BGM is not ducked; nor over the kept non-speech 3.55-3.65
     for t in (1.0, 1.05, 2.0, 3.25, 3.5):
         assert envelope_db_at(a.bgm.envelope, t) == 0.0, t
-    assert envelope_db_at(a.bgm.envelope, 2.5) == pytest.approx(-load_preset().get("audio.ducking.depth_db"))
+    assert envelope_db_at(a.bgm.envelope, 4.5) == pytest.approx(-load_preset().get("audio.ducking.depth_db"))
     assert envelope_db_at(a.bgm.envelope, 0.6) <= -119
     pr = load_preset()
     assert a.target_lufs == pr.get("audio.loudness.integrated_lufs")

@@ -66,7 +66,8 @@ def _print_summary(rep: dict) -> None:
         print(f"     △ {w['rule']} {w['message']}")
     d = rep.get("defects") or {}
     if d and "error" not in d:
-        print(f"[qa] 결함: 열림 {d.get('open')} / 새로 {d.get('new')} / 해결 확인 {d.get('verified_now')} / 재발 {d.get('reopened')}")
+        print(f"[qa] 결함: 열림 {d.get('open')} / 새로 {d.get('new')} / 고침 확인 {d.get('verified_now')} / 재발 {d.get('reopened')} / "
+              f"고침 기록 필요 {d.get('needs_record')}")
     elif d:
         print(f"[qa] 결함 기록 실패: {d['error']}")
     print(f"[qa] 보고서: episodes/{rep['episode_id']}/qa/report.md, 시트: {', '.join(rep.get('sheets') or []) or '없음'}")
@@ -118,10 +119,10 @@ def cmd_sheet(args) -> int:
 
 
 def cmd_defects_list(args) -> int:
-    from .defects import ACTIVE, load
+    from .defects import ACTIVE, NEEDS_RECORD, load
 
     items = load(args.episode)
-    shown = [d for d in items if args.all or d["status"] in ACTIVE]
+    shown = [d for d in items if args.all or d["status"] in ACTIVE + NEEDS_RECORD]
     if not shown:
         print(f"[qa] {args.episode}: 열린 결함 없음 (전체 {len(items)}건)")
         return 0

@@ -13,11 +13,25 @@ Every *leaf* key of the effective preset has an entry in ``settings_registry.yam
     -> QA checks (who verifies it in the output MP4).
 ``code`` is filled automatically from access traces (`Preset.get` records the caller) and
 ``qa_checks`` from the QA check declarations, so the registry cannot silently drift from the code.
+
+Code links are rebuilt ONLY from the tracked access-log archive ``presets/<name>/access_logs/`` (every
+episode command's log is copied there by ``preset sync``), each caller with a fingerprint of its function's
+code: a link whose function changed since the log was recorded is ``stale`` (not counted as a link), a link
+whose function is gone is dropped -- so a fresh clone gives the same audit and a consumer that stopped
+reading a key cannot keep the key looking linked.
+
+Status of a key: measured | requested_change | not_applicable (meta/infra) | fixed_by_rule |
+not_applicable_given (does not apply given ANOTHER measured value, e.g. box colour when box.enabled is
+measured false; the reason and the governing key are recorded) | unmeasured.  ``resolution_state`` is derived
+from what blocks the key (never a sticky default): see ``RESOLUTION_STATES``.
 """
 from __future__ import annotations
 
+import ast
 import copy
 import fnmatch
+import hashlib
+import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -112,9 +126,16 @@ def classify_key(key: str) -> str | None:
 
 
 def impact_of(key: str) -> str:
-    for pat, txt in IMPACT.items():
-        if _match(key, pat):
-            return txt
+    """The most specific matching IMPACT entry (exact key, then the longest pattern), whatever the dict order."""
+    n = key.count(".") + 1
+
+    def spec(pat: str) -> tuple:
+        segs = pat.split(".")
+        return (pat == key, len(segs) == n, sum("*" not in sg for sg in segs), len(pat.replace("*", "")))
+
+    hits = [(spec(pat), i, txt) for i, (pat, txt) in enumerate(IMPACT.items()) if _match(key, pat)]
+    if hits:
+        return max(hits, key=lambda h: (h[0], -h[1]))[2]          # most specific; ties: first in IMPACT
     return "레퍼런스와의 일치 여부를 판정할 수 없음"
 
 
@@ -176,12 +197,20 @@ def _caller() -> str:
         f = f.f_back
     if f is None:
         return "?"
-    fn = Path(f.f_code.co_filename)
+    code = f.f_code
+    fn = Path(code.co_filename)
     try:
         rel = paths.relp(fn)
     except Exception:
         rel = fn.name
-    return f"{rel}:{f.f_code.co_name}"
+    name = code.co_name
+    if name.startswith("<") and name != "<module>":
+        # comprehension / lambda / generator: name the enclosing function (Python >= 3.11 co_qualname), so the
+        # link can be checked against that function's code (Python 3.12 inlines comprehensions anyway)
+        named = [p for p in str(getattr(code, "co_qualname", "")).split(".") if p and not p.startswith("<")]
+        if named:
+            name = named[-1]
+    return f"{rel}:{name}"
 
 
 class TrackedMapping(Mapping):
@@ -258,10 +287,16 @@ class Preset:
         return TrackedMapping(v, key, self.log)
 
     def origin(self, key: str) -> str:
-        """requested_change | measured | provisional | rule | infra | meta"""
+        """requested_change | measured | provisional | rule | infra | meta
+
+        A key that the measurement marks explicitly unmeasured for THIS format (``by_format[F].value`` None,
+        e.g. a font verdict that is only 'similar' in F2) is not measured here, even when the channel-wide
+        value is: the format does not inherit it (``measured.yaml`` ``by_format_unmeasured``)."""
         cat = classify_key(key)
         if get_path(self.requested.get("changes") or {}, key, _ABSENT) is not _ABSENT:
             return "requested_change"
+        if self.format_id and key in format_unmeasured_keys(self.measured, self.format_id):
+            return cat or "provisional"
         fmt_over = (self.measured.get("by_format") or {}).get(self.format_id or "", {}) or {}
         if get_path(fmt_over, key, _ABSENT) is not _ABSENT or \
                 get_path(self.measured.get("common") or {}, key, _ABSENT) is not _ABSENT:
@@ -271,12 +306,28 @@ class Preset:
     def requested_keys(self) -> list[str]:
         return sorted(flatten(self.requested.get("changes") or {}).keys())
 
+    def not_applicable(self, key: str) -> dict | None:
+        """Why ``key`` does not apply given another MEASURED (or requested) value, or None (``APPLICABILITY``)."""
+        return not_applicable_given(self, key)
+
     def unmeasured_keys(self) -> list[str]:
-        return sorted(k for k in flatten(self.data) if self.origin(k) == "provisional")
+        """Provisional style keys that production would really use: keys that do not apply given another
+        measured value (``not_applicable``) are not counted -- the QA gate P1 and the registry agree."""
+        return sorted(k for k in flatten(self.data)
+                      if self.origin(k) == "provisional" and self.not_applicable(k) is None)
+
+    def canvas_resolution(self) -> list[int]:
+        """[width, height] of the effective canvas: every px value of this preset refers to it."""
+        return [int(self.get("canvas.width")), int(self.get("canvas.height"))]
 
     def save_access_log(self, path: str | Path) -> None:
+        reads = self.log.to_dict()
+        cache: dict = {}
+        callers = sorted({c for cs in reads.values() for c in cs})
         write_json(path, {"preset_id": self.preset_id, "format_id": self.format_id, "saved_at": now_iso(),
-                          "reads": self.log.to_dict()})
+                          "reads": reads,
+                          # code fingerprint of every reader at the time of the read (registry staleness check)
+                          "callers": {c: {"fp": code_fingerprint(c, cache)} for c in callers}})
 
     def assert_same_preset(self, other_preset_id: str, what: str) -> None:
         """Guard against mixing presets from other projects into this channel."""
@@ -300,11 +351,40 @@ def load_preset(name: str, format_id: str | None = None) -> Preset:
         pid = layer.get("preset_id")
         if pid and pid != base["preset_id"]:
             raise PresetMixError(f"{lname} is for preset '{pid}', not '{base['preset_id']}'")
-    eff = deep_merge(base, measured.get("common"))
-    if format_id:
-        eff = deep_merge(eff, (measured.get("by_format") or {}).get(format_id))
-    eff = deep_merge(eff, requested.get("changes"))
+    eff = merge_layers(base, measured, requested, format_id)
     return Preset(name=name, data=eff, base=base, measured=measured, requested=requested, format_id=format_id)
+
+
+def merge_layers(base: dict, measured: Mapping, requested: Mapping, format_id: str | None = None) -> dict:
+    """Effective values: base <- measured.common <- measured.by_format[F] <- requested.changes.  A key that is
+    explicitly unmeasured in format F (``by_format_unmeasured``) does NOT inherit the channel-wide measured value
+    in F (it keeps the base value; origin provisional)."""
+    eff = deep_merge(base, (measured or {}).get("common"))
+    if format_id:
+        eff = deep_merge(eff, ((measured or {}).get("by_format") or {}).get(format_id))
+        for k in format_unmeasured_keys(measured, format_id):
+            bv = get_path(base, k, _ABSENT)
+            if bv is not _ABSENT:
+                _set_path(eff, k, copy.deepcopy(bv))
+    return deep_merge(eff, (requested or {}).get("changes"))
+
+
+def format_unmeasured_keys(measured: Mapping, format_id: str | None) -> set[str]:
+    """Keys whose measurement is explicitly unmeasured for ``format_id`` (``measured.yaml`` by_format_unmeasured)."""
+    if not format_id:
+        return set()
+    return set(((measured or {}).get("by_format_unmeasured") or {}).get(format_id) or [])
+
+
+def _set_path(d: dict, dotted: str, value: Any) -> None:
+    parts = dotted.split(".")
+    cur = d
+    for p in parts[:-1]:
+        nxt = cur.get(p)
+        if not isinstance(nxt, dict):
+            nxt = cur[p] = {}
+        cur = nxt
+    cur[parts[-1]] = value
 
 
 def preset_name_for_id(preset_id: str) -> str:
@@ -321,19 +401,82 @@ class MeasurementConflict(RuntimeError):
     pass
 
 
+def preset_identity(preset_dir: Path) -> dict:
+    """{preset_id, snapshot_captured_at, snapshot_status} of the preset in ``preset_dir`` (all None when the
+    folder has no preset.yaml).  The fixed latest-N snapshot is the only production basis, so its
+    ``captured_at`` identifies which measurements belong to this preset."""
+    out = {"preset_id": None, "snapshot_captured_at": None, "snapshot_status": None, "snapshot_file": None}
+    pdir = Path(preset_dir)
+    if not (pdir / "preset.yaml").is_file():
+        return out
+    try:
+        pr = load_preset(pdir.name) if paths.preset_dir(pdir.name).resolve() == pdir.resolve() else None
+    except Exception:
+        pr = None
+    if pr is None:
+        base = read_yaml(pdir / "preset.yaml", {}) or {}
+        pid, snap_rel = base.get("preset_id"), get_path(base, "reference.snapshot_file", None)
+    else:
+        pid, snap_rel = pr.preset_id, pr.peek("reference.snapshot_file")
+    # stored paths are relative to the root that holds this preset folder (<root>/presets/<name>)
+    own_root = pdir.parent.parent if pdir.parent.name == "presets" else paths.project_root()
+    snap_path = own_root / snap_rel if snap_rel else pdir / "reference" / "latest100.json"
+    snap = read_json(snap_path, {}) or {}
+    out.update({"preset_id": pid, "snapshot_file": snap_rel,
+                "snapshot_captured_at": snap.get("captured_at") if isinstance(snap, dict) else None,
+                "snapshot_status": snap.get("status") if isinstance(snap, dict) else None})
+    return out
+
+
+def measurement_file_refusal(header: Mapping, ident: Mapping, fname: str) -> str | None:
+    """Why a measurement file cannot be used for this preset (None = it belongs here).
+
+    Raises ``PresetMixError`` when the file names ANOTHER preset.  A file whose source snapshot is not this
+    preset's fixed snapshot (older / foreign basis), or whose origin cannot be established at all (no preset_id
+    and no matching snapshot), is refused: its measured values are not used (they become unmeasured with this
+    reason) -- never silently applied."""
+    pid = ident.get("preset_id")
+    if not pid:                                  # no preset identity to compare against (bare test folder)
+        return None
+    fpid, fsnap = header.get("preset_id"), header.get("source_snapshot")
+    if fpid and fpid != pid:
+        raise PresetMixError(f"measurements/{fname} 은(는) 프리셋 '{fpid}' 의 측정 파일입니다 — '{pid}' 에 섞을 수 없습니다 "
+                             "(다른 프로젝트의 프리셋 혼합 금지: 파일을 치우거나 이 프리셋에서 다시 측정)")
+    snap_at = ident.get("snapshot_captured_at")
+    if snap_at:
+        if not fsnap:
+            return (f"measurements/{fname}: source_snapshot 없음 — 고정 스냅샷({snap_at})의 측정인지 확인할 수 없어 "
+                    "사용 안 함(다시 측정)")
+        if fsnap != snap_at:
+            return (f"measurements/{fname}: source_snapshot {fsnap} ≠ 현재 고정 스냅샷 {snap_at} — 다른(이전) 기준 표본의 "
+                    "측정이라 사용 안 함(다시 측정)")
+        return None                              # snapshot of THIS preset: belongs here (preset_id may be absent)
+    if fpid != pid:
+        return (f"measurements/{fname}: preset_id 없음 + 이 프리셋의 스냅샷 없음 — 어느 프리셋의 측정인지 확인할 수 없어 "
+                "사용 안 함")
+    return None
+
+
 def load_measurement_items(preset_dir: Path, strict: bool = True) -> dict[str, dict]:
     """All measurement items of a preset keyed by preset key (each item gets ``file``).
 
     A key may appear in several files (e.g. a watched observation and an automatic emitter): a
     ``measured`` item always wins over an ``unmeasured`` one; two MEASURED items for the same key are a
     conflict (raised when ``strict``, else the first file wins and ``conflicts`` is recorded on the item).
+
+    Provenance guard (the only loader, so registry sync, apply-measurements and QA share it): a file of
+    another preset raises ``PresetMixError``; a file from another / unknown snapshot is refused
+    (``measurement_file_refusal``) -- its items load as ``unmeasured`` with ``refused`` = the reason.
     """
     out: dict[str, dict] = {}
     d = Path(preset_dir) / "measurements"
     if not d.is_dir():
         return out
+    ident = preset_identity(Path(preset_dir))
     for f in sorted(d.glob("*.json")):
         m = read_json(f)
+        header = m if isinstance(m, dict) else {}
+        refusal = measurement_file_refusal(header, ident, f.name)
         items = m if isinstance(m, list) else m.get("items", [m]) if isinstance(m, dict) else []
         for it in items or []:
             if not (isinstance(it, dict) and it.get("key")):
@@ -343,12 +486,20 @@ def load_measurement_items(preset_dir: Path, strict: bool = True) -> dict[str, d
                 it["file"] = paths.relp(f)
             except ValueError:
                 it["file"] = f.name
+            if refusal:
+                it["refused"] = {"reason": refusal, "status": it.get("status"), "value": it.get("value")}
+                if it.get("status") == "measured":
+                    it.update({"status": "unmeasured", "value": None, "blocker": refusal})
             k = it["key"]
             prev = out.get(k)
             if prev is None:
                 out[k] = it
                 continue
             pm, im = prev.get("status") == "measured", it.get("status") == "measured"
+            for loser, winner in ((prev, it), (it, prev)) if im and not pm else ((it, prev),):
+                if loser.get("refused"):          # keep the refusal visible on the item that is used
+                    winner.setdefault("refused_in", []).append({"file": loser["file"],
+                                                                "reason": loser["refused"]["reason"]})
             if im and not pm:
                 it.setdefault("also_in", []).append(prev["file"])
                 out[k] = it
@@ -371,7 +522,11 @@ def registry_path(name: str) -> Path:
 #   episodes/<id>/build/preset_access.json            resolve_episode (contract §5)
 #   episodes/<id>/build/preset_access_<command>.json  shortkit episode validate|proposal|resolve|render|export|all|...
 #   episodes/<id>/qa/preset_access.json               shortkit qa run
+# episodes/*/build/ is not tracked, so `preset sync` copies every log into the TRACKED archive
+# presets/<name>/access_logs/ and the registry's code links are rebuilt from that archive only.
 ACCESS_LOG_GLOBS = ("episodes/*/build/preset_access*.json", "episodes/*/qa/preset_access.json")
+ACCESS_ARCHIVE_DIR = "access_logs"
+ACCESS_ARCHIVE_SCHEMA = "shortkit.access_log/1"
 
 
 def all_access_logs(root: Path | None = None) -> list[str]:
@@ -385,11 +540,7 @@ def all_access_logs(root: Path | None = None) -> list[str]:
 
 def code_link_alive(link: str, _cache: dict | None = None) -> bool:
     """A registry code link ``<root-relative file>:<function>`` still points at existing code: the file
-    exists in this project and still defines that function (comprehensions/lambdas: the file exists).
-    Links kept from earlier syncs are dropped when they are dead, so a renamed/removed consumer cannot
-    keep a key looking 'linked' (links seen in the current access logs are always kept)."""
-    import re
-
+    exists in this project and still defines that function (comprehensions/lambdas: the file exists)."""
     path, _, func = link.rpartition(":")
     if not path or not func or "/" not in path:
         return False
@@ -407,46 +558,474 @@ def code_link_alive(link: str, _cache: dict | None = None) -> bool:
     return re.search(rf"^\s*(?:async\s+)?(?:def|class)\s+{re.escape(func)}\b", cache[path], re.M) is not None
 
 
+def _source_index(path: str, f: Path, cache: dict) -> tuple | None:
+    """(lines, ast tree, {row: comment column}) of a source file, cached."""
+    ck = ("src", path)
+    if ck not in cache:
+        import io
+        import tokenize
+
+        text = f.read_text(encoding="utf-8", errors="replace")
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
+            cache[ck] = None
+            return None
+        comments: dict[int, int] = {}
+        try:
+            for tok in tokenize.generate_tokens(io.StringIO(text).readline):
+                if tok.type == tokenize.COMMENT:
+                    comments[tok.start[0]] = tok.start[1]
+        except (tokenize.TokenError, SyntaxError):
+            pass
+        cache[ck] = (re.split(r"\r\n|\r|\n", text), tree, comments)   # the line breaks ast/tokenize count
+    return cache[ck]
+
+
+def code_fingerprint(link: str, _cache: dict | None = None) -> str | None:
+    """Fingerprint of the code of a caller ``<root-relative file>:<function>``: sha256 (16 hex) of the source of
+    every def/class of that name in the file, comments removed and whitespace collapsed (independent of line
+    numbers and of the Python version).  None when the file or function cannot be resolved in this project, or
+    for anonymous / module-level callers."""
+    path, _, func = link.rpartition(":")
+    if not path or "/" not in path or not func or func.startswith("<"):
+        return None
+    try:
+        f = paths.absp(path)
+    except Exception:
+        return None
+    if not f.is_file():
+        return None
+    cache = _cache if _cache is not None else {}
+    idx = _source_index(path, f, cache)
+    if idx is None:
+        return None
+    lines, tree, comments = idx
+    nodes = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+             and n.name == func]
+    if not nodes:
+        return None
+    parts = []
+    for n in sorted(nodes, key=lambda n: n.lineno):
+        seg = []
+        for row in range(n.lineno, (getattr(n, "end_lineno", None) or n.lineno) + 1):
+            ln = lines[row - 1] if row - 1 < len(lines) else ""
+            seg.append(ln[:comments[row]] if row in comments else ln)
+        parts.append(" ".join(" ".join(seg).split()))
+    return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()[:16]
+
+
+def code_link_state(link: str, recorded_fp: str | None = None, _cache: dict | None = None) -> str:
+    """ok | stale (the function's code changed since the log recorded the read) | dead (file or function gone)
+    | unverifiable (the file is not in this project, e.g. a bare file name recorded in a temporary root)."""
+    path, _, func = link.rpartition(":")
+    if not path or not func or "/" not in path:
+        return "unverifiable"
+    try:
+        f = paths.absp(path)
+        root = paths.project_root()
+    except Exception:
+        return "unverifiable"
+    if not f.is_file():
+        return "dead" if (root / path.split("/", 1)[0]).is_dir() else "unverifiable"
+    if func.startswith("<"):
+        return "ok"
+    if not code_link_alive(link, _cache):
+        return "dead"
+    if recorded_fp and code_fingerprint(link, _cache) != recorded_fp:
+        return "stale"
+    return "ok"
+
+
+def access_archive_dir(name: str) -> Path:
+    return paths.preset_dir(name) / ACCESS_ARCHIVE_DIR
+
+
+def archive_name(rel: str) -> str:
+    """episodes/<id>/build/preset_access_validate.json -> <id>__build__preset_access_validate.json"""
+    s = rel[len("episodes/"):] if rel.startswith("episodes/") else rel
+    return s.replace("/", "__")
+
+
+def archive_access_log(name: str, src: str | Path, preset_id: str, _cache: dict | None = None) -> Path | None:
+    """Copy one command's access log into the tracked archive ``presets/<name>/access_logs/``.
+
+    The copy is replaced only when the source log is newer (``saved_at``) or its reads differ, so the code
+    fingerprints stay those of the run that made the reads: recorded by ``Preset.save_access_log`` (basis
+    ``recorded``) or, for logs written before fingerprints existed, taken when first archived (``archived``).
+    Logs of another preset are not archived.  -> the archived path (None when not archived)."""
+    ap = paths.absp(src)
+    lg = read_json(ap, {}) or {}
+    if not isinstance(lg, dict) or not lg or lg.get("preset_id") not in (None, preset_id):
+        return None
+    try:
+        rel = paths.relp(ap)
+    except ValueError:                    # a log outside the project (explicit --access-log): name only
+        rel = f"external/{ap.name}"
+    dst = access_archive_dir(name) / archive_name(rel)
+    reads = {k: sorted(set(v)) for k, v in sorted((lg.get("reads") or {}).items())}
+    old = read_json(dst, None) if dst.is_file() else None
+    if old and old.get("reads") == reads and old.get("saved_at") == lg.get("saved_at"):
+        return dst
+    cache = _cache if _cache is not None else {}
+    rec = lg.get("callers") if isinstance(lg.get("callers"), dict) else {}
+    callers: dict[str, dict] = {}
+    for c in sorted({c for v in reads.values() for c in v}):
+        fp = (rec.get(c) or {}).get("fp") if isinstance(rec.get(c), dict) else None
+        if fp:
+            callers[c] = {"fp": fp, "basis": "recorded"}
+        else:
+            fp = code_fingerprint(c, cache)
+            callers[c] = {"fp": fp, "basis": "archived" if fp else "unverifiable"}
+    write_json(dst, {"schema": ACCESS_ARCHIVE_SCHEMA, "preset_id": preset_id, "format_id": lg.get("format_id"),
+                     "source": rel, "saved_at": lg.get("saved_at"), "archived_at": now_iso(),
+                     "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
+                     "reads": reads, "callers": callers})
+    return dst
+
+
+def code_links_from_archive(name: str, preset_id: str) -> tuple[dict[str, set[str]], dict[str, dict], list[str]]:
+    """(key -> live links, key -> {link: {state, logs}} of stale/dead links, source paths of the archived logs)."""
+    live: dict[str, set[str]] = defaultdict(set)
+    bad: dict[str, dict] = defaultdict(dict)
+    sources: list[str] = []
+    d = access_archive_dir(name)
+    cache: dict = {}
+    states: dict[tuple, str] = {}
+    for f in sorted(d.glob("*.json")) if d.is_dir() else []:
+        lg = read_json(f, {}) or {}
+        if not isinstance(lg, dict) or lg.get("preset_id") not in (None, preset_id):
+            continue
+        sources.append(lg.get("source") or f.name)
+        callers = lg.get("callers") if isinstance(lg.get("callers"), dict) else {}
+        for key, cs in (lg.get("reads") or {}).items():
+            for c in cs:
+                fp = (callers.get(c) or {}).get("fp") if isinstance(callers.get(c), dict) else None
+                st = states.get((c, fp))
+                if st is None:
+                    st = states[(c, fp)] = code_link_state(c, fp, cache)
+                if st in ("ok", "unverifiable"):
+                    live[key].add(c)
+                else:
+                    b = bad[key].setdefault(c, {"state": st, "logs": []})
+                    b["logs"].append(f.name)
+    for key in list(bad):
+        for c in list(bad[key]):
+            if c in live.get(key, ()):              # a newer log with the current code confirms the link
+                del bad[key][c]
+        if not bad[key]:
+            del bad[key]
+    return live, bad, sorted(set(sources))
+
+
+# ----------------------------------------------------------------------------- applicability (S1-10)
+# A style key that does not APPLY given another MEASURED (or user-requested) value is not a 못 잼 blocker:
+# status ``not_applicable_given`` with the governing key/value and what production does instead.
+#   keys     : dependent key patterns ({role} = any caption role, * = any rest)
+#   given    : governing key (its origin must be measured / requested_change), or None for a definition rule
+#   when     : (op, arg) on the governing value -- eq / in / le
+#   neutral  : the dependent value production must hold for the key to be inapplicable (else it IS used)
+#   also     : extra (key, op, arg) conditions on EFFECTIVE values
+APPLICABILITY: list[dict] = [
+    {"keys": ["text.roles.{role}.box.color", "text.roles.{role}.box.alpha", "text.roles.{role}.box.pad_x",
+              "text.roles.{role}.box.pad_y"],
+     "given": "text.roles.{role}.box.enabled", "when": ("eq", False),
+     "reason": "박스 없음(box.enabled=false) → 박스 색·투명도·여백은 그려지지 않음", "use": "박스를 그리지 않음"},
+    {"keys": ["text.roles.{role}.outline_color"], "given": "text.roles.{role}.outline_px", "when": ("le", 0),
+     "reason": "외곽선 없음(outline_px=0) → 외곽선 색은 그려지지 않음", "use": "외곽선 없음"},
+    {"keys": ["text.roles.{role}.shadow_color"], "given": "text.roles.{role}.shadow_px", "when": ("le", 0),
+     "reason": "그림자 없음(shadow_px=0) → 그림자 색은 그려지지 않음", "use": "그림자 없음"},
+    {"keys": ["text.roles.{role}.timing.min_dur_s"], "given": "text.roles.{role}.persist", "when": ("eq", "whole_video"),
+     "reason": "persist=whole_video(영상 전체에 떠 있음) → 최소 표시 시간이 쓰이지 않음", "use": "영상 끝까지 표시"},
+    {"keys": ["text.roles.{role}.motion_in.dur_s"], "given": "text.roles.{role}.motion_in.type", "when": ("eq", "none"),
+     "reason": "등장 모션 없음(motion_in.type=none)", "use": "등장 모션 없이 바로 표시"},
+    {"keys": ["text.roles.{role}.motion_in.scale_from"], "given": "text.roles.{role}.motion_in.type",
+     "when": ("in", ["none", "fade", "slide"]), "reason": "등장 모션이 pop 이 아님 → 시작 배율이 쓰이지 않음",
+     "use": "측정된 등장 모션만 사용"},
+    {"keys": ["text.roles.{role}.motion_in.offset_px"], "given": "text.roles.{role}.motion_in.type",
+     "when": ("in", ["none", "fade", "pop"]), "reason": "등장 모션이 slide 가 아님 → 이동 거리가 쓰이지 않음",
+     "use": "측정된 등장 모션만 사용"},
+    {"keys": ["text.roles.{role}.motion_out.dur_s"], "given": "text.roles.{role}.motion_out.type", "when": ("eq", "none"),
+     "reason": "퇴장 모션 없음(motion_out.type=none)", "use": "퇴장 모션 없이 사라짐"},
+    {"keys": ["text.roles.{role}.line_spacing"], "given": "text.roles.{role}.max_lines", "when": ("le", 1),
+     "reason": "한 줄 자막(max_lines=1) → 줄 간격이 없음", "use": "한 줄만 허용"},
+    {"keys": ["text.roles.{role}.timing.lead_s"], "given": None, "roles_except": ["dialogue"], "neutral": 0.0,
+     "reason": "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음",
+     "use": "0(계획 plan 의 자막 시각 그대로)"},
+    {"keys": ["canvas.background.blur_sigma"], "given": "canvas.background.type", "when": ("eq", "color"),
+     "reason": "단색 배경(background.type=color) → 흐림 정도가 쓰이지 않음", "use": "단색 배경"},
+    {"keys": ["canvas.background.color"], "given": "canvas.background.type", "when": ("eq", "blur_source"),
+     "reason": "흐린 원본 배경(background.type=blur_source) → 배경 단색이 쓰이지 않음", "use": "흐린 원본 배경"},
+    # channel presence (있다/없다/못 잼): an effect the reference never uses -> its style keys do not apply
+    # (episode validate must refuse the effect: presence.* are read there)
+    {"keys": ["motion.zoom.*"], "given": "presence.zoom", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 확대 없음(presence.zoom=absent)", "use": "확대를 쓰지 않음"},
+    {"keys": ["motion.freeze.*"], "given": "presence.freeze", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 정지 없음(presence.freeze=absent)", "use": "정지를 쓰지 않음"},
+    {"keys": ["motion.speed.*"], "given": "presence.speed_change", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 속도 변화 없음(presence.speed_change=absent)", "use": "속도 변화를 쓰지 않음"},
+    {"keys": ["motion.transitions.flash.*"], "given": "presence.flash", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 플래시 전환 없음(presence.flash=absent)", "use": "플래시 전환을 쓰지 않음"},
+    {"keys": ["motion.transitions.crossfade.*"], "given": "presence.crossfade", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 크로스페이드 없음(presence.crossfade=absent)", "use": "크로스페이드를 쓰지 않음"},
+    {"keys": ["decorations.*"], "given": "presence.decorations", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 화살표·원·네모 장식 없음(presence.decorations=absent)", "use": "장식을 쓰지 않음"},
+    {"keys": ["audio.bgm.*", "audio.ducking.*"], "given": "presence.bgm", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 BGM 없음(presence.bgm=absent) → BGM·덕킹 설정이 쓰이지 않음", "use": "BGM 없음"},
+    {"keys": ["audio.ducking.depth_db"], "given": "presence.ducking", "when": ("eq", "absent"), "neutral": 0.0,
+     "reason": "레퍼런스에 덕킹 없음(presence.ducking=absent)", "use": "덕킹 0 dB(하지 않음)"},
+    {"keys": ["audio.ducking.attack_s", "audio.ducking.release_s"], "given": "presence.ducking", "when": ("eq", "absent"),
+     "also": [("audio.ducking.depth_db", "le", 0)],
+     "reason": "레퍼런스에 덕킹 없음(presence.ducking=absent) + depth_db=0", "use": "덕킹하지 않음"},
+    {"keys": ["audio.original.keep_gain_db", "audio.original.fade_s"], "given": "presence.original_audio",
+     "when": ("eq", "absent"), "reason": "레퍼런스에 살린 원음 없음(presence.original_audio=absent)", "use": "원음을 살리지 않음"},
+    {"keys": ["audio.silence.fade_s"], "given": "presence.intentional_silence", "when": ("eq", "absent"),
+     "reason": "레퍼런스에 의도적 정적 없음(presence.intentional_silence=absent)", "use": "의도적 정적을 쓰지 않음"},
+]
+_APPL_RE: list[tuple[re.Pattern, dict, str]] = []
+
+
+def _appl_patterns() -> list[tuple[re.Pattern, dict, str]]:
+    if not _APPL_RE:
+        for rule in APPLICABILITY:
+            for pat in rule["keys"]:
+                rx = re.escape(pat).replace(r"\{role\}", r"(?P<role>[^.]+)").replace(r"\*", r".+")
+                _APPL_RE.append((re.compile(rf"^{rx}$"), rule, pat))
+    return _APPL_RE
+
+
+def _cond(op: str, arg: Any, v: Any) -> bool:
+    if op == "eq":
+        return (isinstance(v, bool) and v is arg) if isinstance(arg, bool) else v == arg
+    if op == "in":
+        return v in arg
+    if op == "le":
+        try:
+            return v is not None and not isinstance(v, bool) and float(v) <= float(arg)
+        except (TypeError, ValueError):
+            return False
+    raise ValueError(op)
+
+
+def not_applicable_given(pr: "Preset", key: str) -> dict | None:
+    """Why ``key`` does not apply given another MEASURED / requested value of ``pr`` (its format), else None."""
+    for rx, rule, pat in _appl_patterns():
+        mt = rx.match(key)
+        if not mt:
+            continue
+        role = mt.groupdict().get("role")
+        if role and role in (rule.get("roles_except") or []):
+            continue
+        if "neutral" in rule:
+            v = pr.peek(key)
+            try:
+                if v is None or abs(float(v) - float(rule["neutral"])) > 1e-9:
+                    continue
+            except (TypeError, ValueError):
+                continue
+        if any(not _cond(op, arg, pr.peek(k)) for k, op, arg in rule.get("also") or []):
+            continue
+        g = rule.get("given")
+        if g is None:
+            return {"given": "정의", "given_value": None, "given_origin": "definition", "reason": rule["reason"],
+                    "production_use": rule["use"], "rule": pat}
+        g = g.replace("{role}", role or "")
+        go = pr.origin(g)
+        if go not in ("measured", "requested_change"):
+            continue
+        gv = pr.peek(g)
+        if _cond(rule["when"][0], rule["when"][1], gv):
+            return {"given": g, "given_value": gv, "given_origin": go, "reason": rule["reason"],
+                    "production_use": rule["use"], "rule": pat}
+    return None
+
+
+# ----------------------------------------------------------------------------- measurement routes (S1-10)
+# How each style key gets measured.  route: automatic | manual_observation.  ``needs``: a user asset besides
+# the reference videos.  A manual route counts as available only when shortkit.reference.manual accepts the key.
+MEASUREMENT_ROUTES: dict[str, dict] = {
+    "canvas.video_region.fit": {
+        "route": "manual_observation",
+        "how": "결과 화면만으로는 원본 비율을 알 수 없어 자동 측정 방법 없음 → 레퍼런스 화면과 역추적한 원 촬영본(ref trace)을 나란히 "
+               "보고, 영상 영역에서 원본 가장자리가 잘렸으면 cover, 여백이 있으면 contain 을 manual_observations.csv 에 기록"},
+    "canvas.background.blur_sigma": {
+        "route": "manual_observation",
+        "how": "흐림 배경(background.type=blur_source)일 때만 필요. 원본 없이 흐림 정도를 역산하는 방법 없음 → 후보 sigma 로 렌더한 "
+               "배경과 레퍼런스 배경을 나란히 보고 가장 가까운 값을 manual_observations.csv 에 기록"},
+    "decorations.*": {"route": "manual_observation",
+                      "how": "manual_observations.csv(영상을 본 사람: watched=yes, observed_by) → ref manual-aggregate "
+                             "(자동 장식 검출은 합성 모의 영상으로만 검증된 실험 기능)"},
+    "text.tone.emoji": {"route": "manual_observation", "how": "manual_observations.csv → ref manual-aggregate"},
+    "cover.*": {"route": "manual_observation", "how": "manual_observations.csv → ref manual-aggregate"},
+    "audio.bgm.*": {"route": "automatic", "needs": "music_library",
+                    "how": "ref audio-analyze → ref bgm-identify(깨끗한 음악 라이브러리와 파형 대조: 곡·버전·속도·구간) → ref audio-measure"},
+    "text.roles.*.font_name": {"route": "automatic", "how": "ref fonts: IoU 상한 → 후보 글꼴 검증(동일 판정만 값)"},
+    "text.roles.*.bold": {"route": "automatic", "how": "ref fonts: 동일 판정된 글꼴의 굵기"},
+}
+DEFAULT_ROUTE = {"route": "automatic",
+                 "how": "AGENTS.md 5장 A: ref collect → download → audio-analyze → analyze → classify → fonts → aggregate "
+                        "→ audio-measure → preset apply-measurements"}
+
+RESOLUTION_STATES: dict[str, str] = {
+    "resolved": "해결(측정·요청 변경·규칙·해당 없음)",
+    "blocked_network": "레퍼런스 스냅샷·영상을 받지 못함(네트워크 차단) — 열린 네트워크에서 5장 A 실행",
+    "needs_manual_observation": "영상을 본 사람의 관찰 기록이 필요(manual_observations.csv → ref manual-aggregate)",
+    "no_method": "자동 측정 방법이 없고 관찰 경로도 아직 구현되지 않음(measurement_route 참고)",
+    "open_user_asset": "사용자 자산 필요(깨끗한 음악 라이브러리 등)",
+    "insufficient_data": "레퍼런스는 있으나 측정할 사례가 없음(blocker 참고)",
+    "remeasure": "측정 파일이 이 프리셋의 현재 고정 스냅샷 것이 아님 → 다시 측정",
+    "no_emitter": "이 키를 내보내는 측정기가 없음",
+    "apply_pending": "측정은 있으나 제작 값(measured.yaml)에 반영 안 됨 → preset apply-measurements (해상도 불일치면 ref aggregate 다시)",
+}
+_NETWORK_RE = re.compile(r"차단|blocked|403|ProxyError|Tunnel connection|login_required")
+
+
+def measurement_route(key: str) -> dict:
+    for pat, r in MEASUREMENT_ROUTES.items():
+        if _match(key, pat):
+            out = dict(r)
+            break
+    else:
+        out = dict(DEFAULT_ROUTE)
+    if out["route"] == "manual_observation":
+        try:
+            from .reference.manual import MANUAL_KEYS
+
+            out["available"] = key in MANUAL_KEYS
+        except Exception:
+            out["available"] = False
+        if not out["available"]:
+            out["missing"] = "shortkit.reference.manual.MANUAL_KEYS 에 이 키가 없어 관찰 기록을 아직 받을 수 없음"
+    return out
+
+
+def _music_library_has_tracks() -> bool:
+    try:
+        from .edit.audio import library_path, music_library_roots
+
+        for root in music_library_roots():
+            idx = read_yaml(library_path(root) / "index.yaml", None)
+            tracks = (idx.get("tracks", idx) if isinstance(idx, dict) else idx) if idx else None
+            if tracks:
+                return True
+    except Exception:
+        return False
+    return False
+
+
+def resolution_state(status: str, m: dict | None, route: dict | None, ident: Mapping, has_music: bool) -> str:
+    """Derived from what actually blocks the key (``RESOLUTION_STATES``)."""
+    if status in ("measured", "requested_change", "fixed_by_rule", "not_applicable", "not_applicable_given"):
+        return "resolved"
+    route = route or DEFAULT_ROUTE
+    if route.get("route") == "manual_observation" and not route.get("available"):
+        return "no_method"
+    if m is not None and m.get("refused"):
+        return "remeasure"
+    if m is None and route.get("route") != "manual_observation":
+        return "no_emitter"
+    snap_ok = ident.get("snapshot_status") in ("ok", "partial")
+    if not snap_ok or _NETWORK_RE.search(str((m or {}).get("blocker") or "")):
+        return "blocked_network"
+    if route.get("route") == "manual_observation":
+        return "needs_manual_observation"
+    if route.get("needs") == "music_library" and not has_music:
+        return "open_user_asset"
+    return "insufficient_data"
+
+
+# ----------------------------------------------------------------------------- px coordinates (S1-09, S1-19)
+def px_axis(key: str) -> str | None:
+    """Axis a px key scales with: 'x' | 'y' | 'size' (sizes follow the vertical scale, as the analyzers do);
+    None for keys that are not canvas coordinates (canvas.width/height ARE the resolution)."""
+    if key in ("canvas.width", "canvas.height"):
+        return None
+    if key.startswith("canvas.safe_margin."):
+        return "x" if key.endswith((".left", ".right")) else "y"
+    if key.endswith((".x", ".w", "pad_x", "max_width_px")):
+        return "x"
+    if key.endswith((".y", ".h", "pad_y")):
+        return "y"
+    if key.endswith("_px"):
+        return "size"
+    return None
+
+
+class ResolutionMismatch(ValueError):
+    pass
+
+
+def rescale_px(value: Any, key: str, src: list[int] | tuple, dst: list[int] | tuple) -> Any:
+    """A canvas-px value measured at resolution ``src`` expressed at ``dst`` (same aspect ratio only)."""
+    if value is None or isinstance(value, bool):
+        return value
+    sw, sh, dw, dh = float(src[0]), float(src[1]), float(dst[0]), float(dst[1])
+    if abs(sw / sh - dw / dh) > 0.01:
+        raise ResolutionMismatch(f"{key}: 종횡비가 다름 {int(sw)}x{int(sh)} → {int(dw)}x{int(dh)}")
+    if (sw, sh) == (dw, dh):
+        return value
+    f = dw / sw if (px_axis(key) or "size") == "x" else dh / sh
+    v = float(value) * f
+    return int(round(v)) if isinstance(value, int) else round(v, 2)
+
+
+def plan_canvas_check(plan: Mapping, preset: "Preset") -> dict:
+    """Plan coordinates (captions[].pos, decorations keyframes) are canvas px of ``plan.canvas_resolution``.
+    -> {status: ok|missing|mismatch, plan, preset, scale, same_aspect, message_ko}.  (Schema + validate side:
+    the plan owner must add ``canvas_resolution`` and refuse / rescale on missing or mismatch.)"""
+    want = preset.canvas_resolution()
+    got = plan.get("canvas_resolution") if isinstance(plan, Mapping) else None
+    if not got:
+        return {"status": "missing", "plan": None, "preset": want, "scale": None, "same_aspect": None,
+                "message_ko": f"plan.canvas_resolution 없음 — 자막 pos·장식 좌표가 어느 캔버스의 픽셀인지 모름(프리셋 캔버스 "
+                              f"{want[0]}x{want[1]})"}
+    got = [int(got[0]), int(got[1])]
+    if got == want:
+        return {"status": "ok", "plan": got, "preset": want, "scale": [1.0, 1.0], "same_aspect": True, "message_ko": None}
+    same = abs(got[0] / got[1] - want[0] / want[1]) <= 0.01
+    return {"status": "mismatch", "plan": got, "preset": want, "scale": [want[0] / got[0], want[1] / got[1]],
+            "same_aspect": same,
+            "message_ko": f"plan 좌표 해상도 {got[0]}x{got[1]} ≠ 프리셋 캔버스 {want[0]}x{want[1]}"
+                          + ("(같은 비율: 좌표 환산 필요)" if same else "(비율이 다름: 좌표 다시 판단 필요)")}
+
+
+# ----------------------------------------------------------------------------- registry sync
 def sync_registry(name: str, access_logs: list[str | Path] | None = None,
                   qa_declarations: dict[str, list[str]] | None = None, *, discover: bool = True) -> dict:
-    """(Re)build settings_registry.yaml from the preset layers, measurement files, access logs
-    and QA check declarations.  Existing hand-written fields (evidence notes, resolution_state
-    notes) are preserved.
+    """(Re)build settings_registry.yaml from the preset layers, measurement files, the tracked access-log
+    archive and QA check declarations.  Hand-written ``resolution_note`` fields are preserved.
 
-    Access logs = the explicitly given ones PLUS (``discover``) every log found by
-    ``all_access_logs`` -- so the registry's code links always cover every command that consumed
-    the preset (validate / proposal / resolve / render / export / QA), whatever list a caller passes."""
+    Access logs = the explicitly given ones PLUS (``discover``) every log found by ``all_access_logs``: each is
+    copied into ``presets/<name>/access_logs/`` (tracked) and code links come ONLY from that archive (never from
+    the previous registry), each checked against its function's current code (``code_link_state``)."""
     pr = load_preset(name)
     reg_file = registry_path(name)
     old = (read_yaml(reg_file, {}) or {}).get("entries", {})
     meas = load_measurement_items(pr.dir)
-    code: dict[str, set[str]] = defaultdict(set)
+    ident = preset_identity(pr.dir)
+    cache: dict = {}
     seen: set[str] = set()
-    used: list[str] = []
     for lp in list(access_logs or []) + (all_access_logs() if discover else []):
         ap = paths.absp(lp)
-        ident = str(ap.resolve())
-        if ident in seen:
+        ident_p = str(ap.resolve())
+        if ident_p in seen or not ap.is_file():
             continue
-        seen.add(ident)
-        lg = read_json(ap, {}) or {}
-        if not lg or lg.get("preset_id") not in (None, pr.preset_id):
-            continue
-        try:
-            used.append(paths.relp(ap))
-        except ValueError:            # a log outside the project (explicit --access-log): name only
-            used.append(ap.name)
-        for k, callers in (lg.get("reads") or {}).items():
-            code[k].update(callers)
+        seen.add(ident_p)
+        archive_access_log(name, ap, pr.preset_id, cache)
+    code, bad_code, sources = code_links_from_archive(name, pr.preset_id)
     if qa_declarations is None:
         qa_declarations = _qa_declarations()
+    has_music = _music_library_has_tracks()
+    canvas = [pr.peek("canvas.width"), pr.peek("canvas.height")]
+    mres = pr.measured.get("canvas_resolution")
+    px_space_moved = bool(mres) and [int(mres[0]), int(mres[1])] != [int(canvas[0]), int(canvas[1])]
     entries: dict[str, dict] = {}
-    src_cache: dict[str, str] = {}
     for key, value in flatten(pr.data).items():
         prev = old.get(key, {})
         cat = classify_key(key)
         origin = pr.origin(key)
         m = meas.get(key)
+        na = not_applicable_given(pr, key) if cat is None else None
         if origin == "requested_change":
             status = "requested_change"
         elif m and m.get("status") == "measured":
@@ -455,14 +1034,11 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             status = "not_applicable"
         elif cat == "rule":
             status = "fixed_by_rule"
+        elif na:
+            status = "not_applicable_given"
         else:
             status = "unmeasured"
-        cur_code = code.get(key, set())
-        named_files = {c.rpartition(":")[0] for c in cur_code if not c.rpartition(":")[2].startswith("<")}
-        # earlier links: dead ones dropped; an anonymous reader (<dictcomp>/<lambda>) of a file whose named
-        # reader is in the current logs is superseded by it
-        prev_code = {c for c in (prev.get("code") or []) if code_link_alive(c, src_cache)
-                     and not (c.rpartition(":")[2].startswith("<") and c.rpartition(":")[0] in named_files)}
+        route = measurement_route(key) if cat is None else None
         e = {
             "scope": "fixed",
             "category": cat or "style",
@@ -470,25 +1046,49 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             "value": value,
             "value_origin": origin,
             "evidence": (m or {}).get("evidence") or prev.get("evidence") or [],
-            "measurement": ({k: m.get(k) for k in ("file", "overall", "by_format", "resolution", "method",
-                                                   "measured_at", "unit") if k in m} if m else None),
-            "code": sorted(prev_code | cur_code),
+            "measurement": ({k: m.get(k) for k in ("file", "overall", "by_format", "resolution", "scaled_to", "method",
+                                                   "measured_at", "unit", "refused", "refused_in") if k in m}
+                            if m else None),
+            "code": sorted(code.get(key, set())),
             "qa_checks": sorted({cid for cid, pats in qa_declarations.items()
                                  if any(_match(key, p) for p in pats)}),
             "impact_if_unmeasured": impact_of(key) if status == "unmeasured" else None,
-            "resolution_state": ("resolved" if status in ("measured", "requested_change", "fixed_by_rule",
-                                                           "not_applicable")
-                                 else prev.get("resolution_state") or "blocked_network"),
+            "resolution_state": resolution_state(status, m, route, ident, has_music),
         }
+        if px_space_moved and origin == "measured" and px_axis(key):
+            # measured.yaml px values were placed on another canvas (e.g. canvas changed by a requested change)
+            e["resolution_state"] = "apply_pending"
+            e["apply_pending"] = True
+            e["apply_note"] = f"measured.yaml 좌표 해상도 {mres} ≠ 유효 캔버스 {canvas} → apply-measurements 다시 실행"
+        if status == "measured" and origin not in ("measured", "requested_change"):
+            # measured in the files but not in measured.yaml (apply-measurements not run, or a px value that could
+            # not be placed on this canvas): production would still use the provisional value
+            e["resolution_state"] = "apply_pending"
+            e["apply_pending"] = True
+        if px_axis(key):
+            e["value_resolution"] = canvas               # the preset value is canvas px of the effective canvas
+        if route:
+            e["measurement_route"] = route
+        if na and status == "not_applicable_given":
+            e["not_applicable"] = na
+        if key in bad_code:
+            e["code_stale"] = [{"link": c, **v} for c, v in sorted(bad_code[key].items())]
         if m and m.get("status") != "measured" and m.get("blocker"):
             e["blocker"] = m["blocker"]
+        if prev.get("resolution_note"):
+            e["resolution_note"] = prev["resolution_note"]
         entries[key] = e
     reg = {"schema": "shortkit.registry/1", "preset_id": pr.preset_id, "synced_at": now_iso(),
-           "access_logs": sorted(set(used)),
+           "access_logs": sources,
+           "access_log_archive": paths.relp(access_archive_dir(name)),
            "legend": {
                "status": {"measured": "레퍼런스에서 측정", "unmeasured": "못 잼(임시값 사용 중)",
                           "requested_change": "사용자 요청 변경", "fixed_by_rule": "사용자 제작 규칙으로 고정",
-                          "not_applicable": "측정 대상 아님(메타/경로)"},
+                          "not_applicable": "측정 대상 아님(메타/경로)",
+                          "not_applicable_given": "다른 측정값 때문에 적용되지 않음(not_applicable.given = 근거 키·값)"},
+               "resolution_state": RESOLUTION_STATES,
+               "code": "access_logs 폴더(추적)의 명령별 접근 기록에서만 만든 읽는 함수. code_stale = 기록 뒤 함수 코드가 바뀌었거나 "
+                       "없어진 링크(링크로 치지 않음 — 에피소드 명령을 다시 실행해 갱신)",
                "chain": "evidence(영상·시각) → measurement(n,p10,p50,p90,해상도) → code(읽는 함수) → qa_checks(출력 검사)"},
            "entries": entries}
     write_yaml(reg_file, reg)
@@ -507,20 +1107,27 @@ def _qa_declarations() -> dict[str, list[str]]:
 def audit(name: str, production: bool = True) -> dict:
     """Return problems that block production use of the preset.
 
-    - style keys still unmeasured (못 잼)            -> blocks production (allowed in test mode)
-    - style keys that no code reads (report-only)    -> always a defect
+    - style keys still unmeasured (못 잼), or measured but not applied (``apply_pending``: production would use
+      the provisional value)                       -> blocks production (allowed in test mode)
+    - style keys that no code reads (report-only)    -> always a defect (``stale_code``: the only links are stale)
     - style keys that no QA check verifies           -> always a defect
+    Keys that do not apply given another measured value (``not_applicable_given``) are not unmeasured.
     """
     reg = read_yaml(registry_path(name), {}) or {}
     problems = {"unmeasured": [], "no_code": [], "no_qa": []}
+    stale, na = [], []
     for key, e in (reg.get("entries") or {}).items():
         if e.get("category") in ("meta", "infra"):
             continue
-        if e.get("status") == "unmeasured":
+        if e.get("status") == "unmeasured" or e.get("apply_pending"):
             problems["unmeasured"].append(key)
+        if e.get("status") == "not_applicable_given":
+            na.append(key)
         if not e.get("code"):
             problems["no_code"].append(key)
+            if e.get("code_stale"):
+                stale.append(key)
         if not e.get("qa_checks") and e.get("category") != "rule":
             problems["no_qa"].append(key)
     ok = not problems["no_code"] and not problems["no_qa"] and (not production or not problems["unmeasured"])
-    return {"ok": ok, "production": production, **problems}
+    return {"ok": ok, "production": production, **problems, "stale_code": stale, "not_applicable_given": na}

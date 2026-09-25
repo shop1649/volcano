@@ -15,7 +15,7 @@ from ..util.stats import TRI_KO
 from .plan import PlanError, approval_rule_key, approval_state, approval_state_for, plan_sha256
 from .resolve import ResolveContext
 from .sfxmap import MAP_STATUS_KO
-from .validate import errors, warehouse_records
+from .validate import distinct_titles, errors, warehouse_records
 
 SHA_LINE = re.compile(r"plan_sha256:\s*`?([0-9a-f]{64})`?")
 ROLE_KO = {"title": "제목", "description": "설명", "situation": "상황", "speaker": "인물", "dialogue": "대사",
@@ -99,9 +99,19 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
             ("불필요(test 모드)" if plan["mode"] != "production" else f"불필요({rule})"))
     if ap.get("rule_error"):
         need += f" — 승인 규칙 오류: {ap['rule_error']}"
-    state = "승인됨" if ap["approved"] else "미승인"
-    L.append(f"- 승인: {need} / 현재 {state}"
-             + (f" ({ap['approved_by']}, {ap['approved_at']})" if ap["approved"] else ""))
+    if ap["approved"] and ap.get("changed_since_approval"):
+        state = (f"승인된 판은 plan_sha256 {str(ap['approved_plan_sha256'])[:12]}… ({ap['approved_by']}, {ap['approved_at']}) — "
+                 "**이 제안서의 plan 은 승인 뒤 바뀜**(재승인은 요구하지 않음, 바뀐 부분은 아래 '승인 뒤 바뀐 부분')")
+    elif ap["approved"]:
+        state = f"승인됨 ({ap['approved_by']}, {ap['approved_at']}, plan_sha256 {str(ap['approved_plan_sha256'])[:12]}…)"
+    elif ap.get("approval_claimed"):
+        state = "미승인 — approval 블록에 승인이 적혀 있으나 증거 없음: " + "; ".join(ap.get("evidence_problems") or [])
+    else:
+        state = "미승인"
+    L.append(f"- 승인: {need} / 현재 {state}")
+    snap = ap.get("snapshot") or {}
+    if ap["approved"] and snap.get("dir"):
+        L.append(f"- 승인한 제안서·plan 사본: `{snap['dir']}/` (승인 당시 그대로 보관)")
     L.append(f"- 승인 방법: `python -m shortkit episode approve {plan['episode_id']} --by 이름` "
              "(승인 뒤 수정은 기록만 하고 다시 승인받지 않음)")
     ne = len(errors(issues))
@@ -110,6 +120,20 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
     if plan.get("notes"):
         L.append(f"- 메모: {plan['notes']}")
     L.append("")
+    if ap["approved"] and ap.get("changed_since_approval"):
+        from .plan import approved_snapshot_plan, plan_diff_sections
+
+        old_plan = approved_snapshot_plan(plan)
+        L.append("## 승인 뒤 바뀐 부분")
+        L.append("")
+        if old_plan is None:
+            L.append(f"- 승인한 plan 사본을 읽지 못해 비교 못 함({MISSING})")
+        else:
+            for d in plan_diff_sections(old_plan, plan):
+                L.append(f"- {d['ko']} (`{d['key']}`)" + (f": {d['detail']}" if d["detail"] else ""))
+        L.append("")
+        L.append("승인자는 위 부분을 보지 않았습니다(재승인은 요구하지 않음 — 렌더 기록에 바뀐 부분이 남음).")
+        L.append("")
 
     # 소재
     L.append("## 소재")
@@ -139,6 +163,19 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
                      f"/ 영향: {ov.get('impact') or '레퍼런스와 같은 녹화를 다시 쓸 위험(사용자 규칙 위반)'}")
         L.append(f"- {s['id']}: 창고 상태 {rec.get('status') or MISSING}, 음악 섞임 "
                  f"{ {True: '있다', False: '없다'}.get(s.get('has_embedded_music'), MISSING) }")
+    L.append("")
+    L.append("### 가리면 안 되는 곳(보호 영역, 원본 px·원본 시각)")
+    L.append("")
+    for s in plan["sources"]:
+        prot = s.get("protected") or []
+        rv = s.get("protected_reviewed") or {}
+        if not prot:
+            L.append(f"- {s['id']}: 보호 영역 없음" + (f" — 확인: {rv.get('by')} {rv.get('at')} ({rv.get('note')})"
+                                                       if rv else f" ({MISSING}: 얼굴·손·핵심 물체를 적지 않음)"))
+            continue
+        for p in prot:
+            tt = "전체" if p.get("start") is None and p.get("end") is None else f"{p.get('start')}~{p.get('end')}s"
+            L.append(f"- {s['id']}: {p['label']} x={p['x']} y={p['y']} w={p['w']} h={p['h']} ({tt})")
     L.append("")
 
     # 구간 시트
@@ -173,7 +210,7 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
     # 제목 후보
     L.append("## 제목 후보 3종")
     L.append("")
-    tc = plan.get("title_candidates") or []
+    tc = distinct_titles(plan.get("title_candidates"))      # duplicates (spacing/case only) are one candidate
     for i in range(3):
         L.append(f"{i + 1}. {tc[i] if i < len(tc) else MISSING + ' (후보 부족)'}")
     L.append("")

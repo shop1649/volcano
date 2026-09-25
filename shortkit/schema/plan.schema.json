@@ -229,6 +229,86 @@
                 }
               }
             }
+          },
+          "watched": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "by",
+              "at"
+            ],
+            "description": "who watched AND listened to this exact file from start to end before writing captions (S3-04); sha256 = the watched file",
+            "properties": {
+              "by": {
+                "type": "string",
+                "minLength": 1
+              },
+              "at": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          },
+          "protected_reviewed": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "by",
+              "at",
+              "note"
+            ],
+            "description": "someone looked for faces/hands/key objects and found none to protect (allows protected: [])",
+            "properties": {
+              "by": {
+                "type": "string",
+                "minLength": 1
+              },
+              "at": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "test_fingerprint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "video_md5"
+            ],
+            "description": "TEST MODE ONLY: content fingerprint of a generated test source whose bytes depend on the ffmpeg/TTS build (decoded video md5 + speech spans); production uses sha256 only",
+            "properties": {
+              "video_md5": {
+                "type": "string"
+              },
+              "speech": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "tools": {
+                "type": "object"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
           }
         }
       }
@@ -424,6 +504,21 @@
                 "description": "why this original sound is kept (important line / person speaking)"
               }
             }
+          },
+          "replay_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "intended replay: id of the earlier segment showing the same source span (S3-07)"
+          },
+          "replay_reason": {
+            "type": "string",
+            "description": "why the replay (required with replay_of)"
+          },
+          "tail_reason": {
+            "type": "string",
+            "description": "why this segment keeps running after its last meaning mark (production: required for a held tail)"
           }
         }
       }
@@ -521,6 +616,13 @@
                 "type": "string"
               }
             }
+          },
+          "foreign_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "non-Korean proper nouns / handles allowed in a narration caption (S3-10)"
           }
         }
       }
@@ -769,7 +871,7 @@
     "reveal": {
       "type": "object",
       "additionalProperties": false,
-      "description": "information-order guard: captions that start before t must not contain these keywords (반전을 미리 설명하지 않는다)",
+      "description": "information-order guard: captions that start before t, the cover and the title candidates must not contain these keywords (반전을 미리 설명하지 않는다); production requires it (or none: true + reason)",
       "properties": {
         "t": {
           "type": "number"
@@ -782,6 +884,47 @@
         },
         "note": {
           "type": "string"
+        },
+        "none": {
+          "type": "boolean",
+          "description": "true = the story has no twist to protect (needs reason; not allowed with a reveal-purpose segment)"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "description": "important actions in SOURCE time that a segment boundary must not cut (S3-06)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "source",
+          "src_start",
+          "src_end",
+          "desc"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "src_start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "src_end": {
+            "type": "number"
+          },
+          "desc": {
+            "type": "string",
+            "minLength": 2
+          }
         }
       }
     }

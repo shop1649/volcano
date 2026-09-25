@@ -38,8 +38,9 @@ def test_cli_new_validate(root, capsys):
     assert rc == 1 and "source_missing" in out          # template points at a TODO source
 
 
-def test_cli_proposal_approve_flow(root, capsys):
+def test_cli_proposal_approve_flow(root, capsys, monkeypatch):
     from shortkit.cli import main
+    from shortkit.edit import cli as edit_cli
     from shortkit.edit.plan import load_plan, plan_sha256
 
     p = base_plan(root, mode="production")
@@ -56,7 +57,18 @@ def test_cli_proposal_approve_flow(root, capsys):
     capsys.readouterr()
     main(["episode", "validate", "ep-b", "--for-render"])
     assert "approval_required" in capsys.readouterr().out
+    # the temp root's production plan still has other errors (unmeasured preset, no provenance): not approvable
+    assert main(["episode", "approve", "ep-b", "--by", "홍길동"]) == 1
+    real = edit_cli.validate
+
+    def only_approval(*a, **k):          # simulate an otherwise clean plan
+        res = real(*a, **k)
+        keep = lambda iss: [i for i in iss if i["code"] == "approval_required" or i["severity"] == "warn"]
+        return (keep(res[0]), res[1]) if isinstance(res, tuple) else keep(res)
+
+    monkeypatch.setattr(edit_cli, "validate", only_approval)
     assert main(["episode", "approve", "ep-b", "--by", "홍길동"]) == 0
+    monkeypatch.setattr(edit_cli, "validate", real)
     plan = load_plan("ep-b")
     ap = plan["approval"]
     assert ap["approved"] is True and ap["approved_by"] == "홍길동" and ap["approved_plan_sha256"] == plan_sha256(plan)

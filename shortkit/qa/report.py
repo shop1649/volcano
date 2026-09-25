@@ -105,18 +105,86 @@ def summarize(rows: list[dict]) -> dict:
                         for k in ("output_vs_plan", "style_vs_reference")}}
 
 
+def _canon_sha(path) -> str | None:
+    """sha256 of a judging-input file: YAML/JSON by their parsed content (comments / formatting do not count),
+    anything else by its bytes; None when the file does not exist."""
+    import hashlib
+
+    from ..util.hashing import sha256_file
+    from ..util.jsonio import read_json, read_yaml
+
+    p = Path(path)
+    if not p.is_file():
+        return None
+    try:
+        if p.suffix in (".yaml", ".yml"):
+            data = read_yaml(p)
+        elif p.suffix == ".json":
+            data = read_json(p)
+        else:
+            return sha256_file(p)
+        return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False, default=str).encode()).hexdigest()
+    except Exception:
+        return sha256_file(p)
+
+
+def input_fingerprints(episode_id: str, preset) -> dict:
+    """{root-relative path: sha256 | None} of every file the QA rows are judged against: the preset layers
+    (preset.yaml, measured.yaml, requested_changes.yaml), formats.yaml (reference choice), the SFX catalog and map,
+    the plan, the resolved edit and its ASS, and the human check records.  The gate (G6) refuses a report whose
+    inputs changed after the run."""
+    from .. import paths
+
+    ep = paths.episode_dir(episode_id)
+    files = [preset.dir / "preset.yaml", preset.dir / "measured.yaml", preset.dir / "requested_changes.yaml"]
+    for key in ("structure.formats_file", "audio.sfx.catalog", "audio.sfx.map"):
+        try:
+            v = preset.get(key)
+        except KeyError:
+            v = None
+        if v:
+            files.append(paths.absp(v))
+    files += [ep / "plan.yaml", ep / "build" / "resolved.json", ep / "build" / "captions.ass",
+              ep / "qa" / "human_checks.jsonl"]
+    out = {}
+    for f in files:
+        try:
+            k = paths.relp(f)
+        except ValueError:
+            k = Path(f).name
+        out[k] = _canon_sha(f)
+    return out
+
+
+def reference_record(ctx: QAContext, sheets: list[str]) -> dict:
+    ri = ctx.reference_info or {}
+    rep = ri.get("representative") or {}
+    return {"path": _safe_rel(ctx.reference_mp4), "video_id": ctx.reference_id,
+            "analysis_files": sorted(ctx.reference_analysis.keys()),
+            "representative": {k: rep.get(k) for k in ("format_id", "video_id", "path", "source", "reason")},
+            "is_representative": bool(ctx.reference_id and rep.get("video_id") == ctx.reference_id),
+            "chosen_by": ri.get("chosen_by"), "override_reason": ri.get("override_reason"),
+            "sheets": list(sheets)}
+
+
 def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: float = 15.0, mp4: str | None = None,
                   reference_id: str | None = None, only: list[str] | None = None, recheck_others: bool = True,
-                  quiet: bool = False, write: bool = True) -> dict:
+                  quiet: bool = False, write: bool = True, reference_override_reason: str | None = None) -> dict:
     from .. import paths
     from ..util.hashing import sha256_file
     from ..util.jsonio import now_iso, write_json
     from . import gate as gate_mod
+    from . import grid as grid_mod
+    from . import human as human_mod
     from .sheet import make_sheets
 
     t0 = time.time()
-    ctx = load_context(episode_id, reference=reference, mp4=mp4, reference_id=reference_id)
+    ctx = load_context(episode_id, reference=reference, mp4=mp4, reference_id=reference_id,
+                       reference_override_reason=reference_override_reason)
     sha = sha256_file(ctx.mp4)
+    ctx.options["mp4_sha256"] = sha
+    ctx.options["human_checks"] = human_mod.load(episode_id)
+    inputs = input_fingerprints(episode_id, ctx.preset)
     fams = families_for(only) if only else {"text", "video", "audio"}
     probes, timing = run_probes(ctx, fams, quiet=quiet)
     rows = build_rows(ctx, probes, only)
@@ -124,10 +192,14 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         return {"episode_id": episode_id, "partial": True, "only": only, "rows": rows,
                 "output": {"path": paths.relp(ctx.mp4), "sha256": sha}}
     sheets = []
+    sheet_error = None
     try:
         sheets = make_sheets(ctx, probes.get("text"), probes.get("audio"), sheet_seconds)
     except Exception as e:
-        probes.setdefault("errors", {})["sheet"] = f"{type(e).__name__}: {e}"
+        sheet_error = f"{type(e).__name__}: {e}"
+        probes.setdefault("errors", {})["sheet"] = sheet_error
+    reference_rec = reference_record(ctx, sheets)
+    grid_mod.sheet_row(ctx, rows, reference_rec, sheet_error)
     probe_files = {}
     pdir = ctx.qa_dir / "probes"
     for name, data in probes.items():
@@ -137,6 +209,7 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         write_json(f, data)
         probe_files[name] = paths.relp(f)
     unmeasured_keys = ctx.preset.unmeasured_keys()
+    deliverable = paths.relp(paths.absp(ctx.resolved.output_path or f"episodes/{episode_id}/output/{episode_id}.mp4"))
     rep = {
         "schema": QA_SCHEMA, "episode_id": episode_id, "preset_id": ctx.resolved.preset_id,
         "preset_name": ctx.resolved.preset_name, "format_id": ctx.resolved.format_id, "mode": ctx.resolved.mode,
@@ -144,16 +217,18 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         "principle": "최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)",
         "output": {"path": paths.relp(ctx.mp4), "sha256": sha, "duration": round(ctx.info.duration, 4),
                    "resolution": [ctx.info.width, ctx.info.height], "fps": ctx.info.fps,
-                   "has_audio": ctx.info.has_audio},
-        "reference": {"path": _safe_rel(ctx.reference_mp4), "video_id": ctx.reference_id,
-                      "analysis_files": sorted(ctx.reference_analysis.keys())},
+                   "has_audio": ctx.info.has_audio, "deliverable": deliverable, "is_deliverable": ctx.deliverable},
+        "reference": reference_rec,
+        "inputs": inputs,
+        "human_checks_used": [h for h in ctx.options.get("human_checks") or [] if h.get("mp4_sha256") == sha],
         "tools": _tools(probes),
         "timing_s": {**timing, "total_s": round(time.time() - t0, 1)},
         "summary": summarize(rows),
         "required_categories": {c: ("있음" if any(r["category"] == c for r in rows) else "해당 없음")
                                 for c in REQUIRED_CATEGORIES},
         "unmeasured": [{"row_id": r["row_id"], "item": r["item"], "required": r["required"], "kind": r["kind"],
-                        "reason": r.get("note") or "", "impact": r.get("impact") or ""}
+                        "reason": r.get("note") or "", "impact": r.get("impact") or "",
+                        "covered_by": r.get("covered_by")}
                        for r in rows if r["status"] == "unmeasured"],
         "stats": measurement_stats(ctx, rows, probes),
         "preset_unmeasured_keys": {"count": len(unmeasured_keys), "keys": unmeasured_keys},
@@ -161,15 +236,21 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
         "probe_errors": {k: v.get("errors") for k, v in probes.items() if isinstance(v, dict) and v.get("errors")},
     }
     rep["gate"] = gate_mod.evaluate(rows, mode=ctx.resolved.mode, mp4_sha_measured=sha, mp4_sha_now=sha,
-                                    unmeasured_preset_keys=unmeasured_keys, plan=ctx.plan)
+                                    unmeasured_preset_keys=unmeasured_keys, plan=ctx.plan, reference=reference_rec,
+                                    measured_path=paths.relp(ctx.mp4), deliverable_path=deliverable,
+                                    inputs_measured=inputs, inputs_now=inputs)
     write_json(ctx.qa_dir / "report.json", rep)
-    try:
-        from . import defects
+    if ctx.deliverable:
+        try:
+            from . import defects
 
-        rep["defects"] = defects.sync(ctx, rep, recheck_others=recheck_others, quiet=quiet)
+            rep["defects"] = defects.sync(ctx, rep, recheck_others=recheck_others, quiet=quiet)
+            write_json(ctx.qa_dir / "report.json", rep)
+        except Exception as e:
+            rep["defects"] = {"error": f"{type(e).__name__}: {e}"}
+    else:
+        rep["defects"] = {"skipped": "납품 MP4 가 아닌 파일(--mp4)의 검수 — 결함 기록·최종 관문에 쓰지 않음"}
         write_json(ctx.qa_dir / "report.json", rep)
-    except Exception as e:
-        rep["defects"] = {"error": f"{type(e).__name__}: {e}"}
     (ctx.qa_dir / "report.md").write_text(render_md(rep), encoding="utf-8")
     # the preset keys this QA run read (-> settings_registry code links; config.ACCESS_LOG_GLOBS collects it).
     # Only full runs write it: a partial re-check (only=..., write=False) returns above without touching it.
@@ -240,10 +321,19 @@ def render_md(rep: dict) -> str:
     L.append("")
     L.append(f"- 측정 대상: `{rep['output']['path']}` (sha256 `{rep['output']['sha256'][:16]}…`, "
              f"{rep['output']['resolution'][0]}x{rep['output']['resolution'][1]}, {rep['output']['duration']:.2f}s)")
+    if rep["output"].get("is_deliverable") is False:
+        L.append(f"- **납품 MP4 가 아님** (납품: `{rep['output'].get('deliverable')}`) — 이 보고서는 결함 기록·최종 관문에 쓰이지 않음")
     L.append(f"- 원칙: {rep['principle']}")
     L.append(f"- 프리셋: {rep['preset_id']} / 포맷 {rep['format_id']} / 모드 **{rep['mode']}**")
     ref = rep["reference"]
-    L.append(f"- 레퍼런스: {ref['path'] or '없음(못 잼)'}" + (f" (분석 파일: {', '.join(ref['analysis_files']) or '없음'})" if ref['path'] else ""))
+    rp = ref.get("representative") or {}
+    L.append(f"- 레퍼런스(같은 절대 시각 비교): {ref.get('video_id') or '없음(못 잼)'}"
+             + (f" `{ref['path']}`" if ref.get("path") else "")
+             + f" (분석 파일: {', '.join(ref.get('analysis_files') or []) or '없음'})")
+    L.append(f"- 포맷 {rp.get('format_id')} 대표 영상(formats.yaml): {rp.get('video_id') or '못 잼'}"
+             + (f" — {rp['reason']}" if rp.get("reason") else "")
+             + ("" if not ref.get("video_id") else (" · 대표 영상과 같음" if ref.get("is_representative") else
+                                                  f" · 대표 영상이 아님(사유: {ref.get('override_reason') or '기록 없음'})")))
     L.append(f"- 측정 시각: {rep['measured_at']} / 도구: OCR={rep['tools'].get('ocr')}, 얼굴검출={rep['tools'].get('face_detector')}")
     L.append("")
     L.append(f"## 최종 관문: **{g['verdict_ko']}**")
@@ -280,7 +370,8 @@ def render_md(rep: dict) -> str:
         for r in rep["rows"]:
             if r["category"] != cat:
                 continue
-            verdict = KO[r["status"]] + ("" if r.get("required") else " (참고)")
+            verdict = KO[r["status"]] + ("" if r.get("required") else
+                                         (f" (참고; 판정은 {r['covered_by']})" if r.get("covered_by") else " (참고)"))
             ic = ("예 — " + _fmt(r.get("change_ref"), 40)) if r.get("intended_change") else "아니오"
             L.append(f"| {_fmt(r['item'], 60)} | {_fmt(r['reference'], 50)} | {_fmt(r['expected'])} | {_fmt(r['observed'])} | "
                      f"{verdict} | {ic} | {_ev(r, base)} |")
@@ -306,15 +397,25 @@ def render_md(rep: dict) -> str:
     if d:
         L.append("")
         L.append("## 결함 기록 (defects.jsonl)")
-        L.append(f"- 열림 {d.get('open', 0)} / 이번에 해결 확인 {d.get('verified_now', 0)} / 재발 {d.get('reopened', 0)} / "
-                 f"새로 등록 {d.get('new', 0)}")
+        if d.get("skipped"):
+            L.append(f"- {d['skipped']}")
+        L.append(f"- 열림 {d.get('open', 0)} / 이번에 고침 확인 {d.get('verified_now', 0)} / 재발 {d.get('reopened', 0)} / "
+                 f"새로 등록 {d.get('new', 0)} / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) {d.get('needs_record', 0)} / "
+                 f"못 잼으로 바뀌어 열린 채 {d.get('unmeasured_now', 0)} / 이전 규칙으로 닫혔다가 재분류 {d.get('reclassified', 0)}")
         for rc in d.get("rechecked_other_episodes") or []:
             L.append(f"- 같은 검사 재확인: {rc}")
     L.append("")
     L.append("---")
-    L.append("판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음). "
+    L.append("판정 기준: 같다=허용오차 안, 다르다=허용오차 밖, 못 잼=측정 불가(완료로 치지 않음 — 필수 표시가 없는 '참고' 못 잼도 "
+             "production 최종 관문 P4 에서 완료를 막는다; 다른 필수 행이 같은 판정을 하는 경우만 예외). "
              "레퍼런스 열의 '못 잼'은 레퍼런스에서 측정되지 않은 임시값이라는 뜻이다.")
     L.append("")
-    L.append("오디오 판정은 모두 기계 측정(파형 대조·최소제곱·정합 필터·EBU R128)이다. 사람이 직접 들어 본 청취 확인은 "
-             "이 보고서에 포함되어 있지 않다.")
+    hc = rep.get("human_checks_used") or []
+    if hc:
+        L.append("오디오 판정은 기계 측정(파형 대조·최소제곱·정합 필터·EBU R128)이며, 아래 행만 사람이 직접 듣거나 본 기록"
+                 "(qa/human_checks.jsonl, 이 MP4 sha256 에 대해)으로 판정했다: "
+                 + "; ".join(f"{h['row_id']} {h['kind']} {h['verdict']} ({h['by']}, {h['at']})" for h in hc))
+    else:
+        L.append("오디오 판정은 모두 기계 측정(파형 대조·최소제곱·정합 필터·EBU R128)이다. 사람이 직접 들어 본 청취 확인은 "
+                 "이 보고서에 포함되어 있지 않다.")
     return "\n".join(L) + "\n"

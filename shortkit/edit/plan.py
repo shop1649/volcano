@@ -137,17 +137,226 @@ def approval_state(plan: dict, preset_requires: bool) -> dict:
     first_episode_requires_approval for episode 1 / no index, later_episodes_require_approval for
     episode_index > 1).  required: production & that rule (a plan may also set approval.required: true
     explicitly; it can never switch the rule off).  Test mode never needs approval.
+
+    ``approved`` is true only when the approval block is backed by evidence (``approval_evidence``: the
+    approved plan sha256, an ``approve`` event with that sha in approval_log.jsonl and the stored snapshot of
+    the approved proposal + plan written by ``shortkit episode approve``).  A hand-written
+    ``approval: {approved: true}`` is ``approval_claimed`` but not approved (S3-01).
     """
     ap = plan.get("approval") or {}
     prod = plan.get("mode") == "production"
     required = (prod and bool(preset_requires)) or (prod and ap.get("required") is True)
-    approved = bool(ap.get("approved"))
+    claimed = bool(ap.get("approved"))
+    ev = approval_evidence(plan) if claimed else {"ok": False, "problems": [], "snapshot": None}
+    approved = claimed and ev["ok"]
     cur = plan_sha256(plan)
-    return {"required": required, "approved": approved, "approved_by": ap.get("approved_by"),
+    return {"required": required, "approved": approved, "approval_claimed": claimed,
+            "evidence_problems": ev["problems"], "snapshot": ev.get("snapshot"),
+            "approved_by": ap.get("approved_by"),
             "approved_at": ap.get("approved_at"), "approved_plan_sha256": ap.get("approved_plan_sha256"),
             "plan_sha256": cur, "first_episode": is_first_episode(plan),
             "changed_since_approval": bool(approved and ap.get("approved_plan_sha256")
                                            and ap.get("approved_plan_sha256") != cur)}
+
+
+# ----------------------------------------------------------------------------- approval evidence (S3-01 / S3-02)
+APPROVALS_DIR = "approvals"
+SNAPSHOT_SHA_LINE = re.compile(r"plan_sha256:\s*`?([0-9a-f]{64})`?")
+
+
+def approval_log_path(episode_id: str) -> Path:
+    return paths.episode_dir(episode_id) / "approval_log.jsonl"
+
+
+def approval_log(episode_id: str) -> list[dict]:
+    from ..util.jsonio import read_jsonl
+
+    return [r for r in read_jsonl(approval_log_path(episode_id)) if isinstance(r, dict)]
+
+
+def append_log(episode_id: str, row: dict) -> dict:
+    from ..util.jsonio import append_jsonl, now_iso
+
+    r = {"at": now_iso(), **row}
+    append_jsonl(approval_log_path(episode_id), r)
+    return r
+
+
+def snapshot_dir(episode_id: str, sha: str) -> Path:
+    """episodes/<id>/approvals/<approved plan sha256>/ : proposal.md + plan.json exactly as approved."""
+    return paths.episode_dir(episode_id) / APPROVALS_DIR / sha
+
+
+def _file_sha(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def approval_evidence(plan: dict) -> dict:
+    """Is the plan's approval block backed by what ``shortkit episode approve`` records?
+
+    Required: ``approved_plan_sha256`` and ``approved_by`` set; an ``approve`` event with that sha in
+    approval_log.jsonl; the snapshot ``approvals/<sha>/proposal.md`` (embedding that sha, same file sha256 as
+    the log row) and ``approvals/<sha>/plan.json`` (whose plan sha256 is that sha).
+    -> ``{ok, problems[], snapshot}``."""
+    ap = plan.get("approval") or {}
+    eid = plan.get("episode_id") or ""
+    problems: list[str] = []
+    sha = ap.get("approved_plan_sha256")
+    if not sha:
+        problems.append("approved_plan_sha256 없음(승인한 plan 판을 알 수 없음)")
+    if not str(ap.get("approved_by") or "").strip():
+        problems.append("approved_by 없음(승인한 사람 기록 없음)")
+    snap = None
+    if sha:
+        rows = [r for r in approval_log(eid) if r.get("event") == "approve" and r.get("plan_sha256") == sha]
+        if not rows:
+            problems.append(f"approval_log.jsonl 에 plan_sha256 {sha[:12]}… 의 approve 기록 없음")
+        d = snapshot_dir(eid, sha)
+        prop, pj = d / "proposal.md", d / "plan.json"
+        snap = {"dir": paths.relp(d) if d.is_dir() else None, "proposal": None, "plan": None}
+        if not prop.is_file():
+            problems.append(f"승인한 제안서 사본 없음({APPROVALS_DIR}/{sha[:12]}…/proposal.md)")
+        else:
+            m = SNAPSHOT_SHA_LINE.search(prop.read_text(encoding="utf-8"))
+            if not m or m.group(1) != sha:
+                problems.append("승인한 제안서 사본의 plan_sha256 이 승인 기록과 다름")
+            fsha = _file_sha(prop)
+            snap["proposal"] = paths.relp(prop)
+            if rows and rows[-1].get("proposal_sha256") and rows[-1]["proposal_sha256"] != fsha:
+                problems.append("승인한 제안서 사본이 승인 뒤 바뀜(파일 sha256 불일치)")
+        if not pj.is_file():
+            problems.append(f"승인한 plan 사본 없음({APPROVALS_DIR}/{sha[:12]}…/plan.json)")
+        else:
+            try:
+                snap_plan = json.loads(pj.read_text(encoding="utf-8"))
+                if plan_sha256(snap_plan) != sha:
+                    problems.append("승인한 plan 사본의 sha256 이 승인 기록과 다름")
+                snap["plan"] = paths.relp(pj)
+            except (OSError, ValueError) as e:
+                problems.append(f"승인한 plan 사본을 읽지 못함: {e}")
+    return {"ok": not problems, "problems": problems, "snapshot": snap}
+
+
+def approved_snapshot_plan(plan: dict) -> dict | None:
+    """The plan exactly as approved (approvals/<sha>/plan.json), or None."""
+    sha = (plan.get("approval") or {}).get("approved_plan_sha256")
+    if not sha:
+        return None
+    p = snapshot_dir(plan.get("episode_id") or "", sha) / "plan.json"
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+# sections of a plan an approver sees in the proposal (proposal.py headings)
+SECTION_KO = {"sources": "소재", "timeline": "구간 시트", "cover": "표지 문구", "title_candidates": "제목 후보",
+              "captions": "자막", "sfx": "효과음 배치표", "bgm": "BGM", "decorations": "장식", "reveal": "반전 보호",
+              "format_id": "포맷", "episode_index": "회차", "mode": "모드", "preset_id": "프리셋", "notes": "메모",
+              "output": "출력", "actions": "중요 동작"}
+
+
+def plan_diff_sections(old: dict, new: dict) -> list[dict]:
+    """Top-level sections that differ between the approved plan and the current one (approval excluded):
+    ``[{key, ko, detail}]`` with item ids added/removed/changed for list sections."""
+    out = []
+    keys = sorted((set(old) | set(new)) - {"approval"})
+    for k in keys:
+        a, b = old.get(k), new.get(k)
+        if canonical_json(a) == canonical_json(b):
+            continue
+        detail = ""
+        if isinstance(a, list) and isinstance(b, list) and all(isinstance(x, dict) and "id" in x for x in a + b):
+            ia, ib = {x["id"]: x for x in a}, {x["id"]: x for x in b}
+            add = sorted(set(ib) - set(ia))
+            rem = sorted(set(ia) - set(ib))
+            chg = sorted(i for i in set(ia) & set(ib) if canonical_json(ia[i]) != canonical_json(ib[i]))
+            parts = ([f"추가 {add}"] if add else []) + ([f"삭제 {rem}"] if rem else []) + ([f"변경 {chg}"] if chg else [])
+            detail = ", ".join(parts)
+        elif isinstance(a, list) and isinstance(b, list):
+            detail = f"{a} → {b}"
+        out.append({"key": k, "ko": SECTION_KO.get(k, k), "detail": detail})
+    return out
+
+
+def record_approval(episode_id: str, plan: dict, *, by: str, proposal_text: str, note: str | None = None,
+                    required: bool | None = None, validation: dict | None = None) -> dict:
+    """Store the evidence of an approval (``shortkit episode approve``): snapshot of the approved proposal and
+    plan under approvals/<sha>/, an ``approve`` event in approval_log.jsonl (with the snapshot sha256s), and the
+    approval block in plan.yaml.  Returns the approval block."""
+    from ..util.jsonio import now_iso
+
+    sha = plan_sha256(plan)
+    m = SNAPSHOT_SHA_LINE.search(proposal_text)
+    if not m or m.group(1) != sha:
+        raise PlanError("제안서의 plan_sha256 이 현재 plan 과 다릅니다: 제안서를 다시 만든 뒤 승인하세요")
+    d = snapshot_dir(episode_id, sha)
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "proposal.md").write_text(proposal_text, encoding="utf-8")
+    body = {k: v for k, v in plan.items() if k != "approval"}
+    (d / "plan.json").write_text(json.dumps(body, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+    approval = {"required": bool(required) if required is not None else bool((plan.get("approval") or {}).get("required")),
+                "approved": True, "approved_by": by, "approved_at": now_iso(), "approved_plan_sha256": sha,
+                "note": note}
+    append_log(episode_id, {"event": "approve", "by": by, "plan_sha256": sha, "required": approval["required"],
+                            "snapshot": paths.relp(d), "proposal_sha256": _file_sha(d / "proposal.md"),
+                            "plan_snapshot_sha256": _file_sha(d / "plan.json"), "validation": validation})
+    write_approval(episode_id, approval)
+    return approval
+
+
+# ----------------------------------------------------------------------------- series (S3-01)
+def _rendered_after_approval(episode_id: str, sha: str) -> dict | None:
+    rows = approval_log(episode_id)
+    seen_approve = False
+    for r in rows:
+        if r.get("event") == "approve" and r.get("plan_sha256") == sha:
+            seen_approve = True
+        elif seen_approve and r.get("event") == "render" and r.get("output"):
+            return r
+    return None
+
+
+def series_first_episode(plan: dict) -> dict:
+    """For a PRODUCTION plan with episode_index > 1: the first production episode of the same preset
+    (episode_index 1 or no index) must exist in episodes/, be approved with evidence (``approval_evidence``)
+    and have been rendered after its approval.  -> ``{ok, first: [episode ids], problems[]}``."""
+    out = {"ok": True, "first": [], "problems": []}
+    if plan.get("mode") != "production" or is_first_episode(plan):
+        return out
+    base = paths.absp("episodes")
+    cands = []
+    for pp in sorted(base.glob("*/plan.yaml")) if base.is_dir() else []:
+        if pp.parent.name == plan.get("episode_id"):
+            continue
+        try:
+            other = read_yaml(pp)
+        except Exception:        # an unreadable plan is not a first episode
+            continue
+        if not isinstance(other, dict) or other.get("mode") != "production" \
+                or other.get("preset_id") != plan.get("preset_id") or not is_first_episode(other) \
+                or other.get("episode_id") != pp.parent.name:
+            continue
+        cands.append(other)
+    if not cands:
+        out.update(ok=False, problems=[f"같은 프리셋({plan.get('preset_id')})의 production 첫 편(episode_index 1)이 "
+                                       "episodes/ 에 없음"])
+        return out
+    probs = []
+    for o in cands:
+        ev = approval_evidence(o) if (o.get("approval") or {}).get("approved") else \
+            {"ok": False, "problems": ["승인 기록 없음"]}
+        if not ev["ok"]:
+            probs.append(f"{o['episode_id']}: 승인 증거 없음({'; '.join(ev['problems'])})")
+            continue
+        r = _rendered_after_approval(o["episode_id"], o["approval"]["approved_plan_sha256"])
+        if r is None:
+            probs.append(f"{o['episode_id']}: 승인 뒤 렌더 기록 없음(approval_log.jsonl render)")
+            continue
+        out["first"].append(o["episode_id"])
+    if not out["first"]:
+        out.update(ok=False, problems=probs)
+    return out
 
 
 # ----------------------------------------------------------------------------- writing

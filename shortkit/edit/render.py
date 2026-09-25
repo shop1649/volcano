@@ -85,7 +85,7 @@ def production_gate(r: ResolvedEdit, allow_unmeasured: bool = False, preset: con
     bad = [s.id for s in r.audio.sfx if not s.path]
     if bad:
         raise RenderError(f"production 렌더 거부: 파일이 해결되지 않은 효과음 {bad} (sfx_map have 필요)")
-    from .plan import approval_state_for, load_plan
+    from .plan import approval_state_for, load_plan, series_first_episode
 
     plan = load_plan(r.episode_id)
     pr = preset if preset is not None else \
@@ -93,7 +93,13 @@ def production_gate(r: ResolvedEdit, allow_unmeasured: bool = False, preset: con
     st = approval_state_for(plan, pr)
     if st["required"] and not st["approved"]:
         what = "첫 에피소드" if st["first_episode"] else f"{plan.get('episode_index')}번째 에피소드({st['rule_key']}=true)"
-        raise RenderError(f"production 렌더 거부: {what} 제안서가 승인되지 않았습니다")
+        why = ("" if not st.get("approval_claimed") else
+               " (approval 블록에 승인이 적혀 있지만 증거 없음: " + "; ".join(st.get("evidence_problems") or []) + ")")
+        raise RenderError(f"production 렌더 거부: {what} 제안서가 승인되지 않았습니다{why}")
+    ser = series_first_episode(plan)
+    if not ser["ok"]:
+        raise RenderError(f"production 렌더 거부: {plan.get('episode_index')}번째 에피소드인데 승인·렌더된 첫 편이 없습니다 — "
+                          + "; ".join(ser["problems"]))
 
 
 # ----------------------------------------------------------------------------- audio

@@ -7,10 +7,13 @@
 #   어떤 것도 레퍼런스에서 측정된 값이 아니다. 각 키의 상태·근거·영향은
 #   settings_registry.yaml 에 기록되어 있고, `shortkit preset audit` 이 미측정 키가 남아 있는 한
 #   production 렌더와 QA 최종 관문을 통과시키지 않는다(테스트 모드만 허용).
-#   측정 후 `shortkit preset apply-measurements` 가 measurements/*.json 의 값으로 이 파일을 갱신한다.
+#   측정 후 `shortkit preset apply-measurements` 가 measurements/*.json 의 값을 measured.yaml 층에 쓴다(이 파일은
+#   바뀌지 않는다 — 유효 값은 preset.yaml ← measured.yaml ← requested_changes.yaml, `shortkit preset show`).
 #
 # 규칙
-#   - 좌표·크기는 canvas 해상도(canvas.width x canvas.height) 기준 픽셀.
+#   - 좌표·크기는 canvas 해상도(canvas.width x canvas.height) 기준 픽셀. 이 파일의 임시값은 1080x1920 기준.
+#     측정값은 apply-measurements 가 측정 파일의 해상도(scaled_to/resolution)에서 유효 캔버스로 환산해
+#     measured.yaml 에 canvas_resolution 과 함께 쓴다(종횡비가 다르면 반영하지 않음).
 #   - 경로는 프로젝트 루트 기준 상대 경로.
 #   - 여기 있는 값은 "고정 스타일". 새 소재마다 다시 판단하는 좌표·시각은 에피소드 plan.yaml 에 둔다
 #     (per_episode 섹션은 무엇을 매번 다시 판단하는지의 목록일 뿐 값이 아니다).
@@ -193,12 +196,14 @@ motion:
     scale_to: 1.25
     dur_s: 0.35
     ease: out
-    max_consecutive: 1     # 같은 효과 연속 쌓기 금지: 연속 세그먼트에서 줌 최대 횟수
+    max_consecutive: 1     # 임시값(못 잼): 연속 세그먼트에서 줌 최대 횟수 — ref aggregate 가 영상별 최장 연속 확대 샷 수의
+                           #   p90 으로 측정(visual_motion.json). 규칙이 아니라 레퍼런스 스타일 값
     recenter: false        # 임시값(못 잼): false = 확대 중심(zoom.center)이 화면에서 제자리(현재 렌더러 동작),
                            #   true = 확대하면서 중심을 영상 영역 가운데로 옮김(cover 면 빈 곳이 안 보이게 제한)
   freeze:
     hold_s: 0.7
-    max_per_video: 2
+    max_per_video: 2       # 임시값(못 잼): 편당 정지 최대 횟수 — ref aggregate 가 영상별 정지 횟수의 p90 으로 측정
+                           #   (visual_motion.json, 전체·포맷별). 요청문에 이런 규칙은 없음: 레퍼런스 관측 범위로만 정함
   transitions:
     default: cut           # cut | flash | crossfade
     flash: {dur_s: 0.12, color: '#FFFFFF', scope: region}   # scope 임시값(못 잼): region = 영상 영역만(현재 동작) | canvas = 화면 전체

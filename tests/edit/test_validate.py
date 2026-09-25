@@ -135,7 +135,7 @@ def test_grounding_rules(root, plan):
     plan["mode"] = "production"
     assert "caption_grounding" in codes(run(root, plan), "error")
     plan["captions"][1]["grounding"] = {"kind": "seen"}
-    assert "caption_grounding" not in codes(run(root, plan))
+    assert "captions[c_s]" not in {i["where"] for i in run(root, plan) if i["code"] == "caption_grounding"}
 
 
 def test_dialogue_must_be_heard(root, plan):
@@ -310,8 +310,17 @@ def test_approval_gate(root, plan):
     assert "approval_required" in codes(run(root, plan), "warn")        # not rendering: just a warning
     from shortkit.edit.plan import plan_sha256
 
+    # a hand-written approval block is not an approval (no snapshot / approval_log evidence)
     plan["approval"] = {"approved": True, "approved_by": "tester", "approved_at": "2026-09-24T00:00:00+00:00",
                         "approved_plan_sha256": plan_sha256(plan)}
+    c = codes(run(root, plan, for_render=True))
+    assert "approval_required" in c and "approval_evidence_missing" in c
+    from shortkit.edit.plan import load_plan, record_approval
+
+    plan.pop("approval")
+    write_plan(root, plan)
+    record_approval("t1", plan, by="tester", proposal_text=f"plan_sha256: `{plan_sha256(plan)}`\n")
+    plan = load_plan("t1")
     assert "approval_required" not in codes(run(root, plan, for_render=True))
     plan["captions"][1]["text"] = "수정된 자막"          # later edit: recorded, never re-asked
     c = codes(run(root, plan, for_render=True))
@@ -372,7 +381,9 @@ def test_first_episode_proposal_needs_cover_and_three_titles(root, plan):
 def test_vocals_stem_quality_is_a_listening_item(root, plan):
     plan["sources"][0]["vocals_path"] = f"{M}/vocals.wav"
     plan["timeline"][0]["original_audio"] = {"keep": True, "reason": "대사", "stem": "vocals"}
-    assert "vocals_quality_unchecked" in codes(run(root, plan), "warn")
+    c = codes(run(root, plan), "warn")
+    # listening is a human item; the automatic quality record (quality.json) is required separately (S4-03)
+    assert "vocals_listening_needed" in c and "vocals_quality_missing" in c
 
 
 def test_sfx_event_must_match_real_source_moment(root, plan):

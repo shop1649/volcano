@@ -180,6 +180,10 @@ class OriginalAudio:
     gain_db: float
     fade_s: float
     reason: str = ""
+    # automatic speech check of the kept audio (SOURCE seconds inside src_start..src_end); the BGM is ducked only
+    # under these spans (``shortkit.edit.audio``).  speech_status: measured | unmeasured (then the whole range ducks)
+    speech: list = field(default_factory=list)
+    speech_status: str = "unmeasured"
 
 
 @dataclass

@@ -515,6 +515,10 @@ def upsert(items: Iterable[dict], *, keywords: Iterable[str] = (), now: str | No
             rec = merge_record(old, item, keywords=kw, now=now)
             rows[rows.index(old)] = rec
             upd.append(rec["id"])
+        hit = exclusions.check_account(rec, ex_entries)       # the reference channel's own upload
+        if hit:
+            apply_overlap(rec, {**hit, "checked_at": now}, by="exclusions:account")
+            continue
         hit = exclusions.check_urls([rec.get("url"), rec.get("original_url")], ex_entries)
         if hit:
             apply_overlap(rec, {**hit, "checked_at": now}, by="exclusions:url")

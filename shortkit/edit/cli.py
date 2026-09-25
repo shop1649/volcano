@@ -11,8 +11,12 @@ from .. import paths
 from ..util.hashing import sha256_file
 from ..util.jsonio import append_jsonl, now_iso, write_json
 from ..util.media import ffmpeg, probe
-from .plan import PlanError, approval_state_for, load_plan, plan_path, plan_sha256, write_approval
+from .plan import (PlanError, append_log, approval_state_for, approved_snapshot_plan, load_plan, plan_diff_sections,
+                   plan_path, plan_sha256, record_approval)
 from .validate import errors, format_issues, validate
+
+# issues that an approval itself resolves: everything else must be fixed BEFORE approving (S3-02)
+APPROVAL_CODES = ("approval_required", "approval_evidence_missing")
 
 EXPORTERS = ("export_mlt", "export_fcpxml", "export_otio")
 
@@ -46,11 +50,13 @@ def register(p: argparse.ArgumentParser) -> None:
             s.add_argument("--json", action="store_true")
         s.set_defaults(func=fn)
 
-    s = sub.add_parser("approve", help="제안서 승인 기록(approved, approved_at, approved_plan_sha256)")
+    s = sub.add_parser("approve", help="제안서 승인 기록(approved, approved_at, approved_plan_sha256) + 승인한 제안서·plan 사본 보관")
     s.add_argument("episode_id")
     s.add_argument("--by", required=True, help="승인한 사람 이름")
     s.add_argument("--note", default=None)
     s.add_argument("--preset", default=None)
+    s.add_argument("--allow-unmeasured", action="store_true",
+                   help="렌더와 같은 기준: production 에서 미측정(못 잼) 스타일 키를 오류 대신 경고로 취급")
     s.set_defaults(func=cmd_approve)
 
     s = sub.add_parser("test-source", help="테스트 소스: classroom.mp4 영상 + speech_02.wav 음성(원음 보존/덕킹 검증용)")
@@ -72,7 +78,7 @@ def _print_issues(issues):
 
 
 def _log(episode_id: str, row: dict) -> None:
-    append_jsonl(paths.episode_dir(episode_id) / "approval_log.jsonl", {"at": now_iso(), **row})
+    append_log(episode_id, row)
 
 
 def access_log_path(episode_id: str, command: str) -> Path:
@@ -196,7 +202,11 @@ def cmd_proposal(args) -> int:
 
 
 def cmd_approve(args) -> int:
-    from .proposal import proposal_sha
+    """Record an approval of the CURRENT proposal.md.  Refused when the proposal was made from another plan
+    version, or when the plan has validation errors other than the missing approval itself (a proposal with
+    missing title candidates / unresolved SFX / ... is not approvable: the approver must see the final items).
+    The approved proposal and plan are kept under approvals/<sha>/ (``plan.record_approval``)."""
+    from .proposal import proposal_path, proposal_sha
 
     try:
         plan, preset = _load(args)
@@ -211,18 +221,31 @@ def cmd_approve(args) -> int:
     if psha != sha:
         print("[오류] proposal.md 가 현재 plan 과 다른 버전에서 만들어졌습니다. 제안서를 다시 만든 뒤 승인하세요.")
         return 1
+    allow = bool(getattr(args, "allow_unmeasured", False))
     try:
         st = approval_state_for(plan, preset)
+        issues = validate(plan, preset, for_render=True, allow_unmeasured=allow)
     except PlanError as e:
         print(f"[오류] {e}")
         return 1
     finally:
         save_access(args.episode_id, preset, "approve")
-    approval = {"required": bool(st["required"]), "approved": True, "approved_by": args.by, "approved_at": now_iso(),
-                "approved_plan_sha256": sha, "note": args.note}
-    write_approval(args.episode_id, approval)
-    _log(args.episode_id, {"event": "approve", "by": args.by, "plan_sha256": sha, "required": st["required"]})
-    print(f"승인 기록: {args.by} / plan_sha256 {sha[:12]}… (이후 수정은 재승인 없이 기록만 됨)")
+    blocking = [i for i in errors(issues) if i["code"] not in APPROVAL_CODES]
+    if blocking:
+        _print_issues(blocking)
+        print("[오류] 승인 거부: 위 오류가 남은 제안서는 승인할 수 없습니다(승인자가 본 것이 렌더되는 것과 같아야 함). "
+              "고친 뒤 제안서를 다시 만들고 승인하세요.")
+        return 1
+    try:
+        record_approval(args.episode_id, plan, by=args.by, note=args.note, required=bool(st["required"]),
+                        proposal_text=proposal_path(args.episode_id).read_text(encoding="utf-8"),
+                        validation={"errors": 0, "warnings": len(issues), "allow_unmeasured": allow,
+                                    "warning_codes": sorted({i["code"] for i in issues})})
+    except PlanError as e:
+        print(f"[오류] {e}")
+        return 1
+    print(f"승인 기록: {args.by} / plan_sha256 {sha[:12]}… — 승인한 제안서·plan 사본: "
+          f"episodes/{args.episode_id}/approvals/{sha}/ (이후 수정은 재승인 없이 바뀐 부분만 기록됨)")
     return 0
 
 
@@ -283,9 +306,12 @@ def _render_steps(args, plan, preset, render, RenderError, resolve_episode, Reso
         print(f"[렌더 실패] {e}")
         return 1
     st = approval_state_for(plan, preset)
+    snap = approved_snapshot_plan(plan) if st["approved"] else None
     _log(args.episode_id, {"event": "render", "plan_sha256": st["plan_sha256"],
                            "approved_plan_sha256": st["approved_plan_sha256"],
-                           "changed_since_approval": st["changed_since_approval"], "output": paths.relp(out),
+                           "changed_since_approval": st["changed_since_approval"],
+                           "changed_sections": plan_diff_sections(snap, plan) if snap is not None else None,
+                           "output": paths.relp(out),
                            "output_sha256": sha256_file(out), "allow_unmeasured": args.allow_unmeasured})
     rep = json.loads((paths.episode_dir(args.episode_id) / "build" / "render_report.json").read_text())
     for w in (rep.get("audio") or {}).get("warnings") or []:

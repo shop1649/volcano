@@ -298,6 +298,10 @@ class QAContext:
     reference_analysis: dict = field(default_factory=dict)
     stems: dict = field(default_factory=dict)
     options: dict = field(default_factory=dict)
+    # how the reference was chosen: {representative: {format_id, video_id, path, source, reason, intro_variants},
+    # chosen_by, override_reason}
+    reference_info: dict = field(default_factory=dict)
+    deliverable: bool = True          # False: --mp4 named another file (report goes to qa/other_mp4/<name>/)
 
     @property
     def canvas_w(self) -> int:
@@ -318,8 +322,63 @@ class QAContext:
         return d
 
 
+def representative_for(preset, format_id: str | None) -> dict:
+    """The format's representative reference video from formats.yaml (``ref classify build``):
+    {format_id, video_id, path (downloaded MP4, root-relative), source, reason, intro_variants}.  ``reason`` says why a
+    field is missing -- the value is never guessed."""
+    from .. import paths
+    from ..util.jsonio import read_yaml
+
+    out: dict = {"format_id": format_id, "video_id": None, "path": None, "source": None, "reason": None,
+                 "intro_variants": None}
+    try:
+        ff = preset.get("structure.formats_file")
+    except KeyError:
+        ff = None
+    if not ff:
+        out["reason"] = "프리셋에 structure.formats_file 없음"
+        return out
+    out["source"] = ff
+    fy = read_yaml(paths.absp(ff))
+    if not fy:
+        out["reason"] = f"{ff} 없음(`shortkit ref classify build` 미실행)"
+        return out
+    if not format_id or format_id == "UNCLASSIFIED":
+        out["reason"] = (f"에피소드 포맷이 정해지지 않음({format_id or '없음'}) — 대표 영상을 고를 수 없음 "
+                         f"(formats.yaml 상태 {fy.get('status')}: {str(fy.get('blocker') or '')[:160]})")
+        return out
+    row = next((r for r in fy.get("table") or [] if r.get("format_id") == format_id), None)
+    if row is None:
+        out["reason"] = (f"formats.yaml 에 포맷 {format_id} 없음 (상태 {fy.get('status')}: "
+                         f"{str(fy.get('blocker') or '')[:160]})")
+        return out
+    out["intro_variants"] = row.get("intro_variants")
+    vid = (row.get("representative") or {}).get("video_id")
+    if not vid:
+        out["reason"] = f"포맷 {format_id} 의 대표 영상이 정해지지 않음(formats.yaml representative 없음)"
+        return out
+    out["video_id"] = vid
+    try:
+        from ..reference.common import video_path
+
+        vp = video_path(preset.name, vid)
+    except Exception as e:  # a missing reference module must not hide the missing comparison
+        vp = None
+        out["reason"] = f"레퍼런스 영상 경로를 찾지 못함: {type(e).__name__}: {e}"[:200]
+    if vp is not None:
+        out["path"] = paths.relp(vp)
+    elif not out["reason"]:
+        out["reason"] = f"대표 영상 {vid} 파일 없음(`shortkit ref download` 필요)"
+    return out
+
+
 def load_context(episode_id: str, reference: str | None = None, mp4: str | None = None,
-                 reference_id: str | None = None, options: dict | None = None) -> QAContext:
+                 reference_id: str | None = None, options: dict | None = None,
+                 reference_override_reason: str | None = None) -> QAContext:
+    """``reference`` / ``reference_id``: the video compared at the same absolute times.  Default = the representative
+    video of the episode's format in formats.yaml (production QA requires the comparison: gate rule R1).
+    ``mp4``: another file than the deliverable (``resolved.output_path``) -- its report is written under
+    ``qa/other_mp4/<name>/`` and never becomes the episode's report."""
     from .. import paths
     from ..config import load_preset
     from ..edit.ir import ResolvedEdit
@@ -336,14 +395,20 @@ def load_context(episode_id: str, reference: str | None = None, mp4: str | None 
     fmt = resolved.format_id if resolved.format_id and resolved.format_id != "UNCLASSIFIED" else None
     preset = load_preset(resolved.preset_name, fmt)
     preset.assert_same_preset(resolved.preset_id, "build/resolved.json")
-    out = paths.absp(mp4) if mp4 else paths.absp(resolved.output_path or f"episodes/{episode_id}/output/{episode_id}.mp4")
+    deliverable = paths.absp(resolved.output_path or f"episodes/{episode_id}/output/{episode_id}.mp4")
+    out = paths.absp(mp4) if mp4 else deliverable
     if not out.is_file():
         raise QAError(f"출력 MP4 없음: {resolved.output_path} — 렌더가 끝난 최종 MP4 만 검수합니다")
+    is_deliverable = out.resolve() == deliverable.resolve()
     info = probe(out)
     plan = read_yaml(ep / "plan.yaml")
-    qa_dir = ep / "qa"
+    qa_dir = ep / "qa" if is_deliverable else ep / "qa" / "other_mp4" / out.stem
     qa_dir.mkdir(parents=True, exist_ok=True)
     stems = {p.stem: p for p in sorted((ep / "build" / "stems").glob("*.wav"))} if (ep / "build" / "stems").is_dir() else {}
+    rep = representative_for(preset, resolved.format_id)
+    chosen_by = "--reference" if (reference or reference_id) else "formats.yaml 대표 영상"
+    if not reference and not reference_id:
+        reference, reference_id = rep.get("path"), rep.get("video_id")
     ref_path = paths.absp(reference) if reference else None
     if ref_path is not None and not ref_path.is_file():
         raise QAError(f"레퍼런스 MP4 없음: {reference}")
@@ -351,7 +416,10 @@ def load_context(episode_id: str, reference: str | None = None, mp4: str | None 
     analysis = load_reference_analysis(resolved.preset_name, rid) if rid else {}
     return QAContext(episode_id=episode_id, resolved=resolved, preset=preset, plan=plan, mp4=out, info=info,
                      qa_dir=qa_dir, reference_mp4=ref_path, reference_id=rid, reference_analysis=analysis,
-                     stems=stems, options=dict(options or {}))
+                     stems=stems, options=dict(options or {}),
+                     reference_info={"representative": rep, "chosen_by": chosen_by if rid else None,
+                                     "override_reason": reference_override_reason},
+                     deliverable=is_deliverable)
 
 
 def load_reference_analysis(preset_name: str, video_id: str) -> dict:
@@ -377,9 +445,10 @@ def load_reference_analysis(preset_name: str, video_id: str) -> dict:
 
 def run_episode(episode_id: str, reference: str | None = None, sheet_seconds: float = 15.0,
                 mp4: str | None = None, reference_id: str | None = None, only: list[str] | None = None,
-                recheck_others: bool = True, quiet: bool = False) -> dict:
+                recheck_others: bool = True, quiet: bool = False, reference_override_reason: str | None = None) -> dict:
     """Full QA run: probes -> rows -> sheet -> report -> gate -> defects.  Returns report dict."""
     from .report import run_and_write
 
     return run_and_write(episode_id, reference=reference, sheet_seconds=sheet_seconds, mp4=mp4,
-                         reference_id=reference_id, only=only, recheck_others=recheck_others, quiet=quiet)
+                         reference_id=reference_id, only=only, recheck_others=recheck_others, quiet=quiet,
+                         reference_override_reason=reference_override_reason)

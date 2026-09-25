@@ -5,6 +5,8 @@ The same *keyword* as the reference is fine; the same *recording* is not.  Entri
     {"kind": "reference_footage", "ref_video_id", "ref_url", "original_urls": [], "phash": ["<16 hex>"...],
      "frame_times": [...], "added_at", "added_by"}
     {"kind": "url", "url", "reason", "added_at", "added_by"}
+    {"kind": "account", "platform", "handle", "channel_url", "channel_ids": [], "reason"}   (``ref trace``: the
+        reference channel itself -- its uploads are never candidates, ``check_account``)
 
 Match rule: candidate keyframe pHash vs an entry's pHashes, Hamming distance <= 10 on >= 3 candidate
 keyframes -> excluded; or URL / original_url equality (canonical ``url_key``) -> excluded.
@@ -150,6 +152,60 @@ def keyframe_hashes(video: str | Path, n: int = DEFAULT_KEYFRAMES, variants: boo
 
 
 # ----------------------------------------------------------------------------- checks
+def _norm_handle(h: object) -> str:
+    """'@JoshuaMagazine ' -> 'joshuamagazine' (case, '@', spaces and separators do not matter)."""
+    return "".join(ch for ch in str(h or "").casefold() if ch.isalnum())
+
+
+def _norm_page(u: object) -> str:
+    """Channel page URL without scheme / www / m. / trailing slash / query, lower-case."""
+    s = str(u or "").strip().casefold()
+    for pre in ("https://", "http://"):
+        if s.startswith(pre):
+            s = s[len(pre):]
+    for pre in ("www.", "m.", "mobile."):
+        if s.startswith(pre):
+            s = s[len(pre):]
+    return s.split("?", 1)[0].split("#", 1)[0].rstrip("/")
+
+
+ACCOUNT_FIELDS = ("uploader", "uploader_id", "uploader_url", "channel", "channel_id", "channel_url")
+
+
+def check_account(candidate: dict | None, entries: list[dict] | None = None) -> dict | None:
+    """Account rule: the candidate's uploader / channel IS the reference channel (an ``account`` row written by
+    ``ref trace``: {kind: account, platform, handle, channel_url, channel_ids}).  Such an upload is the reference's
+    own edit (or its re-upload of someone's clip), never new footage.  Matches: channel id anywhere in the
+    uploader/channel fields, the channel page URL, or the handle (same handle on another platform is treated as
+    the same channel -- a person must confirm otherwise).  -> result dict (``excluded: True``) or None."""
+    if not candidate:
+        return None
+    entries = load() if entries is None else entries
+    vals = [str(candidate.get(k) or "") for k in ACCOUNT_FIELDS]
+    handles = {_norm_handle(v) for v in vals if v} - {""}
+    pages = {_norm_page(v) for v in vals if v and "/" in v} - {""}
+    for e in entries:
+        if e.get("kind") != "account":
+            continue
+        why = None
+        for cid in e.get("channel_ids") or []:
+            if cid and any(str(cid) in v for v in vals):
+                why = f"채널 id {cid}"
+                break
+        if why is None and e.get("channel_url") and _norm_page(e["channel_url"]) in pages:
+            why = f"채널 주소 {e['channel_url']}"
+        h = _norm_handle(e.get("handle"))
+        if why is None and h and h in handles:
+            same = not e.get("platform") or not candidate.get("platform") or e["platform"] == candidate["platform"]
+            why = f"핸들 {e.get('handle')}" + ("" if same else f"(다른 플랫폼 {candidate.get('platform')} 의 같은 핸들 — "
+                                                               "다른 사람이면 사람이 확인 후 기록)")
+        if why:
+            return {"excluded": True, "matched_ref_video_id": None, "distance": 0, "method": "account",
+                    "matched_account": e.get("handle") or e.get("channel_url"),
+                    "note": f"레퍼런스 채널 자체의 업로드({why}) — {e.get('reason') or '소재 후보가 될 수 없음'}"}
+    return None
+
+
 def check_urls(urls: Iterable[str | None], entries: list[dict] | None = None) -> dict | None:
     """URL rule: canonical equality of any candidate URL with an exclusion URL / reference URL."""
     entries = load() if entries is None else entries
@@ -188,7 +244,7 @@ def check(candidate: dict | None = None, *, video_path: str | Path | None = None
         cand_urls += [candidate.get("url"), candidate.get("original_url")]
         if video_path is None and candidate.get("download_path"):
             video_path = candidate["download_path"]
-    hit = check_urls(cand_urls, entries)
+    hit = check_account(candidate, entries) or check_urls(cand_urls, entries)
     if hit:
         return {**hit, "matched_keyframes": None, "n_keyframes": None, "checked_at": now}
     refs = []

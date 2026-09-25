@@ -1638,14 +1638,18 @@ def analyze_provenance(ctx: QAContext) -> dict:
                     stats.append(r)
                     per.append({"times": times, "rect_out": {k: rnd(ro[k], 1) for k in ("x", "y", "w", "h")},
                                 "template": tpl, "template_cropped": cropped, "max_ncc": r.get("max_ncc"),
-                                "ocr_hits": r.get("ocr_hits"), "residual": r.get("residual"), "status": r.get("status"),
-                                "per_time": r.get("per_time")})
+                                "max_tile_ncc": r.get("max_tile_ncc"), "ocr_hits": r.get("ocr_hits"),
+                                "ocr_partial_hits": r.get("ocr_partial_hits"), "residual": r.get("residual"),
+                                "status": r.get("status"), "per_time": r.get("per_time")})
                 ok = [r for r in stats if r is not None and r.get("status") == "measured"]
                 it.update(how="pixels", resolution_out=[W, H], checks=per,
                           times=[t for g in groups for t in g[0]],
                           rect_out={k: rnd(groups[0][1][k], 1) for k in ("x", "y", "w", "h")},
                           max_ncc=max((r["max_ncc"] for r in ok if r.get("max_ncc") is not None), default=None),
+                          max_tile_ncc=max((r["max_tile_ncc"] for r in ok if r.get("max_tile_ncc") is not None),
+                                           default=None),
                           ocr_hits=sum(int(r.get("ocr_hits") or 0) for r in ok),
+                          ocr_partial_hits=sum(int(r.get("ocr_partial_hits") or 0) for r in ok),
                           thresholds=(ok[0].get("thresholds") if ok else None))
                 if not ok:
                     it.update(status="unmeasured", residual=None,

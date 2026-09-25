@@ -12,6 +12,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import numpy as np
 import pytest
 import yaml
 
@@ -35,7 +36,61 @@ def media(tmp_path_factory):
     _ff("-f", "lavfi", "-i", "sine=f=220:d=12:sample_rate=48000", "-af", "volume=0.3", "-ac", "2", d / "bgm.wav")
     _ff("-f", "lavfi", "-i", "sine=f=1000:d=0.2:sample_rate=48000", "-ac", "1", d / "pop.wav")
     _ff("-f", "lavfi", "-i", "sine=f=300:d=4:sample_rate=48000", "-ac", "1", d / "vocals.wav")
+    # SYNTHETIC speech-like line (glottal pulses + vowel formants, syllables) at 1.0-2.6 s, and a SYNTHETIC chord bed
+    from shortkit.util.media import write_wav
+
+    sr = 48000
+    sp = np.concatenate([np.zeros(sr), speech_like(1.6, sr), np.zeros(int(1.4 * sr))]).astype(np.float32)
+    write_wav(d / "speech.wav", sp, sr)
+    write_wav(d / "music.wav", chord_bed(4.0, sr), sr)
+    for name, wav in (("src_speech.mp4", "speech.wav"), ("src_music.mp4", "music.wav")):
+        _ff("-f", "lavfi", "-i", "testsrc2=s=320x180:r=30:d=4", "-i", d / wav, "-map", "0:v", "-map", "1:a",
+            "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-c:a", "aac", "-ac", "2", "-t", "4",
+            d / name)
     return d
+
+
+def speech_like(dur: float = 1.6, sr: int = 48000, seed: int = 3) -> "np.ndarray":
+    """SYNTHETIC speech-like signal: glottal pulse train (f0 110-170 Hz contour) through vowel formants, syllables
+    of 0.12-0.22 s with short gaps (syllabic modulation).  Not a recording of anybody."""
+    from scipy.signal import lfilter
+
+    rng = np.random.default_rng(seed)
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    f0 = 140 + 30 * np.sin(2 * np.pi * 0.7 * t) + 8 * np.sin(2 * np.pi * 5.1 * t)
+    ph = np.cumsum(f0 / sr)
+    src = lfilter([1.0], [1.0, -0.97], (np.diff(np.floor(ph), prepend=0) > 0).astype(float))
+    y, env = np.zeros(n), np.zeros(n)
+    vowels = [(730, 1090, 2440), (270, 2290, 3010), (300, 870, 2240), (530, 1840, 2480)]
+    pos, k = 0.0, 0
+    while pos < dur:
+        L, G = rng.uniform(0.12, 0.22), rng.uniform(0.05, 0.10)
+        a, b = int(pos * sr), min(n, int((pos + L) * sr))
+        if a >= n:
+            break
+        env[a:b] = np.hanning(b - a)
+        out = np.zeros(b - a)
+        for F, bw in zip(vowels[k % 4], (80, 100, 120)):
+            r, th = np.exp(-np.pi * bw / sr), 2 * np.pi * F / sr
+            out += lfilter([1 - r], [1, -2 * r * np.cos(th), r * r], src[a:b])
+        y[a:b] = out
+        pos, k = pos + L + G, k + 1
+    y = y * env
+    return (0.5 * y / (np.max(np.abs(y)) + 1e-9)).astype(np.float32)
+
+
+def chord_bed(dur: float = 4.0, sr: int = 48000) -> "np.ndarray":
+    """SYNTHETIC music bed: sustained triads (I-vi) + bass, like shortkit.testassets.synth_music."""
+    t = np.arange(int(dur * sr)) / sr
+    y = np.zeros_like(t)
+    for i, chord in enumerate(([0, 4, 7], [-3, 0, 4])):
+        m = (t >= i * dur / 2) & (t < (i + 1) * dur / 2)
+        for semi in chord:
+            f = 220.0 * 2 ** (semi / 12)
+            y[m] += 0.1 * (np.sin(2 * np.pi * f * t[m]) + 0.3 * np.sin(4 * np.pi * f * t[m]))
+        y[m] += 0.15 * np.sin(2 * np.pi * 110.0 * 2 ** (chord[0] / 12) * t[m])
+    return (0.6 * y / np.max(np.abs(y))).astype(np.float32)
 
 
 @pytest.fixture
