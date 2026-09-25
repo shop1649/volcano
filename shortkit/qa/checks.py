@@ -50,62 +50,95 @@ REQUIRED_CATEGORIES = [CAT[k] for k in ("text_pos", "font", "cap_timing", "cut",
                                         "loudness", "ref_grid")]
 
 # ----------------------------------------------------------------------------- declarations
+# check_id -> the preset keys that check COMPARES in the output MP4 (a row's ``keys``).  Exact keys only, NO glob:
+# the registry matches with fnmatch, whose '*' also spans dots (text.roles.*.color would claim text.roles.X.box.color),
+# so role / decoration-kind keys are spelled out for every role (edit.resolve.ROLES) and kind the renderer draws.
+# A key no check measures is NOT listed -- `preset audit` then reports it as no_qa (e.g. shadows, box colour / padding,
+# dialogue lead_s, slide offset, quote marks, flash scope, zoom recenter, arrow head proportions and outline, BGM gain,
+# ducking attack/release, silence and original-audio fades, blur strength, video-region fit, emoji).
+# tests/qa/test_qa_review_d.py keeps this list equal to the keys the rows really carry.
+ROLES = ("title", "description", "situation", "speaker", "dialogue", "reaction")     # = shortkit.edit.resolve.ROLES
+DECO_KINDS = ("arrow", "box", "circle")                                             # captions.deco_shape kinds
+
+
+def _roles(*leaves: str) -> list[str]:
+    return [f"text.roles.{r}.{leaf}" for leaf in leaves for r in ROLES]
+
+
+def _kinds(*leaves: str, kinds: tuple[str, ...] = DECO_KINDS) -> list[str]:
+    return [f"decorations.{k}.{leaf}" for leaf in leaves for k in kinds]
+
+
 _DECL: dict[str, list[str]] = {
     "canvas.format": ["canvas.width", "canvas.height", "canvas.fps"],
-    "canvas.background": ["canvas.background.*"],
-    "canvas.video_region": ["canvas.video_region.*"],
-    "canvas.safe_margin": ["canvas.safe_margin.*"],
-    "caption.position": ["text.roles.*.anchor.*", "text.roles.*.max_width_px"],
-    "caption.size": ["text.roles.*.size_px", "text.roles.*.line_spacing", "text.roles.*.max_lines",
-                     "text.roles.*.max_chars_per_line"],
-    "caption.style": ["text.roles.*.color", "text.roles.*.highlight_color", "text.roles.*.outline_px",
-                      "text.roles.*.outline_color", "text.roles.*.shadow_px", "text.roles.*.shadow_color",
-                      "text.roles.*.box.*"],
-    "caption.font": ["text.roles.*.font_name", "text.roles.*.bold", "text.roles.*.font_file"],
-    "caption.timing": ["text.roles.*.timing.*", "text.roles.*.persist"],
-    "caption.motion": ["text.roles.*.motion_in.*", "text.roles.*.motion_out.*"],
-    "caption.text": ["text.roles.*.quote_marks"],
-    "caption.tone": ["text.tone.*"],
+    "canvas.background": ["canvas.background.type", "canvas.background.color"],
+    "canvas.video_region": ["canvas.video_region.x", "canvas.video_region.y", "canvas.video_region.w",
+                            "canvas.video_region.h"],
+    "canvas.safe_margin": ["canvas.safe_margin.left", "canvas.safe_margin.right", "canvas.safe_margin.top",
+                           "canvas.safe_margin.bottom"],
+    "caption.position": _roles("anchor.x", "anchor.y", "anchor.align", "anchor.valign"),
+    "caption.size": _roles("size_px", "max_width_px", "max_lines", "line_spacing", "max_chars_per_line"),
+    "caption.style": _roles("color", "outline_px", "outline_color", "box.enabled", "box.alpha", "highlight_color"),
+    "caption.font": _roles("font_name", "bold"),
+    "caption.timing": _roles("timing.min_dur_s", "persist"),
+    "caption.motion": _roles("motion_in.type", "motion_in.dur_s", "motion_in.scale_from", "motion_out.type",
+                             "motion_out.dur_s"),
+    "caption.text": [],
+    "caption.tone": ["text.tone.register"],
+    "caption.reveal": [],
     "video.cuts": [],
     "video.mapping": [],
-    "video.transitions": ["motion.transitions.*"],
-    "video.zoom": ["motion.zoom.*"],
-    "video.freeze": ["motion.freeze.*"],
-    "video.speed": ["motion.speed.*"],
-    "decor.position": ["decorations.*"],
-    "decor.brightness": ["decorations.*.blink_hz", "decorations.*.color"],
-    "identity.forbidden_text": ["identity_exclusions.forbidden_text", "identity_exclusions.own_branding"],
+    "video.transitions": ["motion.transitions.default", "motion.transitions.flash.dur_s",
+                          "motion.transitions.flash.color", "motion.transitions.crossfade.dur_s"],
+    "video.zoom": ["motion.zoom.scale_to", "motion.zoom.dur_s", "motion.zoom.ease", "motion.zoom.max_consecutive"],
+    "video.freeze": ["motion.freeze.hold_s", "motion.freeze.max_per_video"],
+    "video.speed": ["motion.speed.slowmo_factor"],
+    "decor.position": [],
+    "decor.brightness": _kinds("blink_hz"),
+    "decor.style": (_kinds("color", "blink_hz") + _kinds("stroke_px", kinds=("box", "circle"))
+                    + _kinds("size_px", kinds=("arrow",))),
+    "identity.forbidden_text": ["identity_exclusions.forbidden_text"],
     "identity.logo_templates": ["identity_exclusions.logo_templates_dir"],
     "identity.reference_footage": [],
-    "caption.reveal": [],
     "clean.corners": [],
     "clean.residual": ["render.clean.blur_sigma_ratio"],   # blur ops: the blurred overlay must not be readable
     "cover_up.protected": [],
     "cover_up.faces": [],
-    "audio.bgm": ["audio.bgm.*"],
-    "audio.ducking": ["audio.ducking.*"],
-    "audio.silence": ["audio.silence.*"],
-    "audio.original": ["audio.original.*"],
+    "audio.bgm": ["audio.bgm.track_id", "audio.bgm.title", "audio.bgm.version", "audio.bgm.tempo_ratio",
+                  "audio.bgm.section_start_s", "audio.bgm.fade_in_s", "audio.bgm.fade_out_s", "audio.bgm.loop"],
+    "audio.ducking": ["audio.ducking.depth_db", "audio.ducking.only_under_kept_dialogue"],
+    "audio.silence": [],
+    "audio.original": ["audio.original.keep_gain_db", "audio.original.default", "audio.original.remove_embedded_music"],
     "audio.sfx.placement": ["audio.sfx.gain_db_default"],
-    "audio.sfx.count": ["audio.sfx.catalog", "audio.sfx.map"],
-    "audio.sfx.offset": ["audio.sfx.max_event_offset_s", "audio.sfx.require_event"],
+    "audio.sfx.count": ["audio.sfx.catalog"],
+    "audio.sfx.offset": ["audio.sfx.max_event_offset_s"],
     "audio.sfx.no_event": ["audio.sfx.require_event"],
+    "audio.sfx.on_cut": [],
     "audio.sfx.unexplained": [],
-    "audio.loudness": ["audio.loudness.*", "audio.sample_rate"],
-    "structure.duration": ["structure.*"],
-    "cover.frame": ["cover.*"],
+    "audio.loudness": ["audio.loudness.integrated_lufs", "audio.loudness.true_peak_db", "audio.sample_rate"],
+    "structure.duration": ["structure.duration_s.p10", "structure.duration_s.p90", "structure.first_caption_at_s"],
+    "structure.cuts": ["structure.cuts_per_10s.p10", "structure.cuts_per_10s.p90", "structure.shot_len_s.p10",
+                       "structure.shot_len_s.p90"],
+    "cover.frame": ["cover.source", "cover.text_role"],
+    "presence": [f"presence.{k}" for k in ("zoom", "freeze", "speed_change", "flash", "crossfade", "decorations",
+                                           "bgm", "original_audio", "ducking", "intentional_silence")],
+    "ref_grid.captions": [],
+    "ref_grid.cuts": [],
+    "ref_grid.sfx": [],
+    "ref_grid.sheet": [],
 }
 
 # probe families each check needs (for selective re-runs)
 FAMILY = {
     "canvas.": ("video", "text"), "caption.": ("text",), "video.": ("video",), "decor.": ("video",),
     "identity.": ("text",), "clean.corners": ("text",), "clean.residual": ("video",), "cover_up.": ("text", "video"),
-    "audio.": ("audio",), "structure.": ("text", "audio"), "cover.": ("text",),
+    "audio.sfx.on_cut": ("audio", "video", "text"), "audio.": ("audio",), "structure.": ("text", "audio", "video"),
+    "cover.": ("text",), "presence": ("video", "audio"), "ref_grid.": ("text", "video", "audio"),
 }
 
 
 def declarations() -> dict[str, list[str]]:
-    """check_id -> preset key globs verified by that check in the output MP4."""
+    """check_id -> the preset keys that check compares in the output MP4 (exact keys, no globs)."""
     return {k: list(v) for k, v in _DECL.items()}
 
 
@@ -1005,7 +1038,7 @@ def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> d
             "한다 — 이 행의 못 잼은 관문을 막지 않지만 '다르다'는 그대로 관문(G1)에 걸린다(한 자막만 다른 글꼴일 수 있음). ")
     add = b.add
 
-    n_fonts = len({c.font_name for c in b.ctx.resolved.captions if c.role == role})
+    n_fonts = len({c.font_name for c in (getattr(b.ctx.resolved, "captions", None) or []) if c.role == role})
     cover_row = f"caption.font:role_{role if n_fonts <= 1 else role + ':' + str(cap.font_name)}"
 
     def _add(*a, **kw):            # every per-caption font row is informational
@@ -1014,14 +1047,26 @@ def _font_row(b: RowBuilder, cap, m: dict, label: str, role: str, ev: dict) -> d
         r = add(*a, **kw)
         r["covered_by"] = cover_row
         return r
+    ex = m.get("font_exact") or {}
+    if ex.get("status") == "measured":
+        v = ex.get("verdict")
+        st = {"identical": "same", "different": "different"}.get(v, "unmeasured")
+        return _add("caption.font", cap.id, item, CAT["font"], expected=cap.font_name,
+                    observed={"method": "정확 위치 재렌더", **{k: ex.get(k) for k in (
+                        "verdict", "mae_planned", "noise_mae", "mae_alternatives", "best_alternative", "margin",
+                        "start_frame", "crop_frames", "crop_box", "conditions")},
+                              "single_crop_verdict": idt.get("verdict")},
+                    tolerance="계획 글꼴 재렌더 MAE ≤ 재인코딩 잡음이고 대안보다 잡음 이상 가까우면 같다, 대안이 잡음 이상 더 가까우면 다르다",
+                    status=st, keys=keys, evidence=ev, note=str(ex.get("reason") or ""))
     if idt.get("status") == "measured":
         v = idt.get("verdict") or "unmeasured"
-        st = FONT_VERDICT_STATUS.get(v, "unmeasured")
+        # a single-crop 'identical' is not confirmed by the exact re-render here: at most 못 잼
+        st = FONT_VERDICT_STATUS.get(v, "unmeasured") if v != "identical" else "unmeasured"
         top = idt.get("top")
         top_is_exp = str(top or "").replace(" ", "").lower() == str(idt.get("expected_canonical") or "").replace(" ", "").lower()
         reasons = "; ".join(idt.get("reasons") or [])
         if v == "identical":
-            note = f"판정: 동일(identical) — {reasons}"
+            note = f"한 crop 판정은 동일(identical)이나 정확 위치 재렌더로 확인되지 않아 같다고 쓰지 않음 — {reasons}"
         elif v == "similar":
             note = ("판정: 유사(similar, 동일 확정 불가) — 같다고 쓰지 않음. " + reasons +
                     ("" if top_is_exp else f"; 가장 잘 맞는 후보는 {top}"))
@@ -1119,11 +1164,12 @@ def _font_role_rows(b: RowBuilder, roles: dict, error: str | None = None) -> Non
                         "glyph": r.get("glyph"),
                         "crops": [{k: c.get(k) for k in ("caption", "delay_frames", "t", "iou_expected")} for c in crops],
                         "other_font": r.get("other_font"),
+                        "exact_render": _exact_summary(r.get("exact")),
                         "conditions": {k: cond.get(k) for k in ("label", "crf", "x264_preset", "renderer", "assumed",
                                                                 "source")}},
-              tolerance="identical(합동 중앙값 IoU ≥ 같은 개수 crop 중앙값의 천장 p10, 차순위 대비 차이 > 잡음, 글자별 검사 통과)만 "
-                        "같다 · different(중앙값 < 천장 p10 − 잡음, 또는 1위인 다른 글꼴이 같은 규칙으로 identical)는 다르다 · "
-                        "similar 는 못 잼",
+              tolerance="같다 = 정확 위치 재렌더(계획 글꼴로 출력과 같은 ASS 이벤트·libass·bt709·x264 설정·같은 키 프레임에서 "
+                        "다시 그림)가 출력 crop 과 재인코딩 잡음 이내로 같고 대안 글꼴 재렌더보다 잡음 이상 가까움(합동 통계가 '다름'이 아닐 때); "
+                        "다르다 = 대안 글꼴 재렌더가 잡음 이상 더 가깝거나 합동 통계가 다름; 그 밖(합동 통계만 동일·유사)은 못 잼",
               status=st, keys=keys, evidence=ev, required=True, note=(note + tail).strip())
     for role in sorted(by_role):
         if role in done:
@@ -1132,6 +1178,16 @@ def _font_role_rows(b: RowBuilder, roles: dict, error: str | None = None) -> Non
               expected=by_role[role][0].font_name, observed=None, status="unmeasured",
               keys=_role_keys(role, ["font_name", "bold"]), required=True,
               note="판정 못 잼: " + (error or "역할 단위 글꼴 측정 결과 없음"))
+
+
+def _exact_summary(ex: dict | None) -> dict | None:
+    if not ex:
+        return None
+    return {"role_verdict": ex.get("exact_role_verdict"), "pooled_verdict": ex.get("pooled_verdict"),
+            "alternatives": ex.get("alternatives"), "error": ex.get("error"),
+            "captions": {cid: {k: e.get(k) for k in ("verdict", "mae_planned", "noise_mae", "mae_alternatives",
+                                                   "best_alternative", "margin", "start_frame", "crop_frames", "reason")}
+                         for cid, e in (ex.get("captions") or {}).items()}}
 
 
 def _font_ceiling(b: RowBuilder, font_name: str) -> float:
@@ -1344,32 +1400,16 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
                       evidence={"t": it.get("measured_t50")}, note="; ".join(znotes))
             else:
                 dev = it.get("measured_max_dev") or 0.0
-                reliable = (it.get("n_samples") or 0) >= 10 and (it.get("median_inliers") or 0) >= 40 and \
-                    (it.get("measured_spread") or 0) <= 0.02
                 corr = it.get("zoom_ratio_corrected")
                 geo = it.get("geometry") or {}
-                note = "소스 자체의 카메라 줌도 여기에 잡힘"
-                if dev > 0.05 and geo.get("confirmed") is True:
-                    # direct evidence wins over the feature scale curve (fooled by subjects walking to the camera)
-                    st = "same"
-                    note = (f"특징점 배율 곡선은 {dev:.2f} 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 "
-                            f"(NCC 중앙 {geo.get('ncc_median')}, 4% 확대 대안보다 {geo.get('alt_gap_median')} 높음) → 피사체 움직임")
-                elif dev > 0.05 and corr is not None and abs(corr - 1.0) <= 0.05:
-                    st = "same"            # the source itself changed scale (subject/camera motion)
-                elif dev <= 0.05:
-                    st = "same"
-                elif dev > 0.08 and reliable and corr is not None and abs(corr - 1.0) > 0.08:
-                    st = "different"
-                else:
-                    st = "unmeasured"
+                st, note = _no_zoom_status(it)
                 b.add("video.zoom", c.id, f"줌 없음 확인 [{c.id}]", CAT["motion"], expected={"final_ratio": 1.0},
                       observed={"max_dev": dev, "final_ratio": it.get("measured_final_ratio"), "source_ratio": it.get("source_ratio"),
                                 "corrected": corr, "median_inliers": it.get("median_inliers"), "spread": it.get("measured_spread"),
                                 **({"geometry": {k: geo.get(k) for k in ("confirmed", "ncc_median", "ncc_min", "alt_gap_median")}}
                                    if geo else {})},
                       tolerance="배율 변화 ≤ 5% (8% 초과 + 안정 추정일 때만 다르다); 계획 기하 NCC ≥ 0.95 + 4% 확대보다 0.02 높으면 줌 없음",
-                      status=st, required=False,
-                      note=note + ("; 특징점 추정이 불안정해 판정 보류" if st == "unmeasured" else ""))
+                      status=st, required=False, note=note)
         mc = b.pget("motion.zoom.max_consecutive")
         if mc is not None:
             b.add("video.zoom", "max_consecutive", "연속 세그먼트 줌 횟수(같은 효과 쌓기 금지)", CAT["motion"],
@@ -1719,6 +1759,7 @@ def rows_residual(b: RowBuilder, probes: dict) -> None:
               tolerance=("원본 오버레이와 경계 NCC < 0.55, 같은 글자 OCR 없음, 그리고 clean.verify.residual_score: 전체 경사 NCC "
                          "< 0.5, 칸(tile)별 경사 NCC 모두 < 0.6, 원래 글자와 비슷한 OCR 0건·글자 일부(부분 OCR) 0건"),
               status="different" if it.get("residual") else "same",
+              keys=["render.clean.blur_sigma_ratio"] if it.get("op") == "blur" else [],
               evidence={"t": best.get("t")}, note=it.get("note", "") +
               ("" if rs.get("clean_verify_available") else " (shortkit.clean.verify 없음 → 자체 측정)"))
 
@@ -2241,8 +2282,9 @@ def _rows_original(b: RowBuilder, ap: dict) -> None:
 
     srcs = {x.get("id"): x for x in ((ctx.plan or {}).get("sources") or [])}
     mode = getattr(ctx.resolved, "mode", "test")
-    hcs = ctx.options.get("human_checks") or []
-    sha = ctx.options.get("mp4_sha256")
+    opts = getattr(ctx, "options", None) or {}
+    hcs = opts.get("human_checks") or []
+    sha = opts.get("mp4_sha256")
     for i, o in enumerate(ctx.resolved.audio.originals):
         c = next((x for x in ctx.resolved.clips if x.id == o.clip_id), None)
         src = srcs.get(c.source_id) if c is not None else None
@@ -2426,8 +2468,9 @@ def _sfx_on_cut_rows(b: RowBuilder, placed: list, probes: dict) -> None:
         tr = (it.get("position") or {}).get("track") or []
         if tr:
             marks.append(("장식 등장", float(tr[0][0])))
-    hcs = ctx.options.get("human_checks") or []
-    sha = ctx.options.get("mp4_sha256")
+    opts = getattr(ctx, "options", None) or {}
+    hcs = opts.get("human_checks") or []
+    sha = opts.get("mp4_sha256")
     on_cut = []
     for s_, d in placed:
         near = [c for c in cuts if abs(float(c["t"]) - float(d["t"])) <= SFX_ON_CUT_S]
@@ -2604,33 +2647,230 @@ def rows_structure(b: RowBuilder, probes: dict) -> None:
     b.add("structure.duration", "duration", "영상 길이", CAT["structure"], expected=_r(ctx.resolved.duration, 3),
           observed=_r(d_obs, 3), tolerance="±2프레임", status="same" if abs(d_obs - ctx.resolved.duration) <= 2 * fr + 0.01 else "different")
     b.style_row("structure.duration", "duration_ref", "영상 길이 (레퍼런스 분포 대비)", CAT["structure"],
-                ["structure.duration_s.p10", "structure.duration_s.p50", "structure.duration_s.p90", "structure.duration_s.n"],
+                ["structure.duration_s.p10", "structure.duration_s.p90"],
                 {"duration": _r(d_obs, 2)},
-                lambda o, r: r.get("structure.duration_s.p10") is not None and
-                float(r["structure.duration_s.p10"]) <= o["duration"] <= float(r["structure.duration_s.p90"]))
+                lambda o, r: r.get("structure.duration_s.p10") is not None and r.get("structure.duration_s.p90") is not None
+                and float(r["structure.duration_s.p10"]) <= o["duration"] <= float(r["structure.duration_s.p90"]))
     fc = first_timed_caption(ctx.resolved.captions, (probes.get("text") or {}).get("captions") or [])
     b.style_row("structure.duration", "first_caption_ref", "첫 시간제 자막 시각 (레퍼런스 대비)", CAT["structure"],
                 ["structure.first_caption_at_s"],
                 {"first_caption_at_s": fc["t"], "caption": fc["caption"], "role": fc["role"]} if fc["t"] is not None else None,
                 lambda o, r: abs(o["first_caption_at_s"] - float(r.get("structure.first_caption_at_s") or 0)) <= FIRST_CAPTION_TOL_S,
                 evidence={"t": fc["t"]}, note=fc["note"])
+    _rows_cut_structure(b, probes)
     cov = (probes.get("text") or {}).get("cover")
     if cov:
         sim = cov.get("similarity")
         b.add("cover.frame", "frame", "표지 프레임에 제목 문구 표시", CAT["structure"],
-              expected={"t": cov.get("t"), "text": cov.get("expected_text"), "role": cov.get("text_role")},
+              expected={"t": cov.get("t"), "text": cov.get("expected_text"), "role": cov.get("text_role"),
+                        "source": cov.get("source")},
               observed={"ocr": cov.get("ocr"), "similarity": sim, "role_caption_visible": cov.get("role_caption_visible")},
-              tolerance="OCR 유사도 ≥ 0.5", status="unmeasured" if sim is None else ("same" if sim >= 0.5 else "different"),
-              keys=["cover.source", "cover.text_role"], required=False, evidence={"t": cov.get("t")})
+              tolerance="OCR 유사도 ≥ 0.5 (cover.source=first_frame 이면 첫 프레임)",
+              status="unmeasured" if sim is None else ("same" if sim >= 0.5 else "different"),
+              keys=["cover.source", "cover.text_role"], required=False, evidence={"t": cov.get("t")},
+              note=cov.get("note") or "")
         b.style_row("cover.frame", "cover_ref", "표지 구성 (레퍼런스 대비)", CAT["structure"], ["cover.source", "cover.text_role"],
-                    {"text_role_visible": cov.get("role_caption_visible")}, lambda o, r: bool(o["text_role_visible"]))
+                    {"text_role_visible": cov.get("role_caption_visible"), "similarity": sim},
+                    lambda o, r: bool(o["text_role_visible"]) and (o["similarity"] or 0) >= 0.5)
+
+
+CUT_STRUCTURE_KEYS = ("structure.cuts_per_10s.p10", "structure.cuts_per_10s.p90",
+                      "structure.shot_len_s.p10", "structure.shot_len_s.p90")
+
+
+def _rows_cut_structure(b: RowBuilder, probes: dict) -> None:
+    """Cut structure of the OUTPUT (cuts per 10 s, median shot length, from the cuts measured in the MP4) vs the
+    format's reference distribution.  The preset keys are per-video values of the format's snapshot videos
+    (p10 / p90 of 'cuts per 10 s' and of 'median shot length'); while the preset has no such keys the rows are 못 잼
+    (`ref aggregate` must emit them -- not guessed here)."""
+    from .grid import our_cuts
+
+    ctx = b.ctx
+    d_obs = float(ctx.info.duration)
+    cuts = our_cuts(probes.get("video") or {})
+    obs_rate = obs_len = None
+    if cuts is not None and d_obs > 0:
+        ts = sorted(float(c["t"]) for c in cuts if 0.0 < float(c["t"]) < d_obs)
+        edges = [0.0] + ts + [d_obs]
+        shots = [round(y - x, 3) for x, y in zip(edges, edges[1:]) if y - x > 1e-3]
+        obs_rate = {"cuts_per_10s": _r(len(ts) / d_obs * 10.0, 3), "n_cuts": len(ts), "duration": _r(d_obs, 3)}
+        obs_len = {"shot_len_median_s": _r(_median(shots), 3), "shots_s": shots}
+    need = "`shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)"
+    b.style_row("structure.cuts", "rate_ref", "컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비)", CAT["cut"],
+                list(CUT_STRUCTURE_KEYS[:2]), obs_rate,
+                lambda o, r: float(r["structure.cuts_per_10s.p10"]) <= o["cuts_per_10s"] <= float(r["structure.cuts_per_10s.p90"]),
+                note="출력에서 잰 컷(계획 경계에서 보인 컷 + 계획 밖 컷) 기준. " + need)
+    b.style_row("structure.cuts", "shot_len_ref", "샷 길이 중앙값 (레퍼런스 포맷 분포 대비)", CAT["cut"],
+                list(CUT_STRUCTURE_KEYS[2:]), obs_len,
+                lambda o, r: float(r["structure.shot_len_s.p10"]) <= o["shot_len_median_s"] <= float(r["structure.shot_len_s.p90"]),
+                note="출력에서 잰 컷 사이 간격의 중앙값. " + need)
+
+
+# ----------------------------------------------------------------------------- presence (있다/없다/못 잼)
+PRESENCE_ITEMS = {"zoom": "motion", "freeze": "motion", "speed_change": "motion", "flash": "motion",
+                  "crossfade": "motion", "decorations": "deco", "bgm": "music", "original_audio": "original",
+                  "ducking": "music", "intentional_silence": "music"}
+PRESENCE_KO = {"zoom": "확대(줌)", "freeze": "정지", "speed_change": "속도 변화", "flash": "플래시 전환",
+               "crossfade": "크로스페이드", "decorations": "움직이는 장식", "bgm": "BGM", "original_audio": "원음",
+               "ducking": "덕킹", "intentional_silence": "의도적 정적"}
+
+
+def _no_zoom_status(it: dict) -> tuple[str, str]:
+    """No zoom planned in a clip: 'same' (no zoom in the output) / 'different' (a zoom seen) / 'unmeasured'."""
+    dev = it.get("measured_max_dev") or 0.0
+    reliable = (it.get("n_samples") or 0) >= 10 and (it.get("median_inliers") or 0) >= 40 and \
+        (it.get("measured_spread") or 0) <= 0.02
+    corr = it.get("zoom_ratio_corrected")
+    geo = it.get("geometry") or {}
+    note = "소스 자체의 카메라 줌도 여기에 잡힘"
+    if dev > 0.05 and geo.get("confirmed") is True:
+        # direct evidence wins over the feature scale curve (fooled by subjects walking to the camera)
+        return "same", (f"특징점 배율 곡선은 {dev:.2f} 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 "
+                        f"(NCC 중앙 {geo.get('ncc_median')}, 4% 확대 대안보다 {geo.get('alt_gap_median')} 높음) → 피사체 움직임")
+    if dev > 0.05 and corr is not None and abs(corr - 1.0) <= 0.05:
+        return "same", note                 # the source itself changed scale (subject/camera motion)
+    if dev <= 0.05:
+        return "same", note
+    if dev > 0.08 and reliable and corr is not None and abs(corr - 1.0) > 0.08:
+        return "different", note
+    return "unmeasured", note + "; 특징점 추정이 불안정해 판정 보류"
+
+
+def presence_observed(ctx, probes: dict) -> dict[str, tuple[str, str]]:
+    """{item: (present|absent|unmeasured, basis)} of the OUTPUT, from the probes of the final MP4."""
+    vp = probes.get("video") or {}
+    ap = probes.get("audio") or {}
+    out: dict[str, tuple[str, str]] = {}
+    zm = vp.get("zoom")
+    if zm is None:
+        out["zoom"] = ("unmeasured", "줌 측정 실패")
+    else:
+        pres = [it["clip_id"] for it in zm["clips"] if it.get("expected") and it.get("status") == "measured"
+                and abs(float(it.get("zoom_ratio_corrected") or it.get("measured_final_ratio") or 1.0) - 1.0) > TOL["zoom_ratio"]]
+        st_no = [(_no_zoom_status(it)[0] if it.get("status") == "measured" else "unmeasured")
+                 for it in zm["clips"] if not it.get("expected")]
+        unplanned = "different" in st_no
+        if pres or unplanned:
+            out["zoom"] = ("present", "출력에서 잰 줌: " + ", ".join(pres) + (" + 계획에 없는 줌" if unplanned else ""))
+        elif all(x == "same" for x in st_no) and all(it.get("status") == "measured" for it in zm["clips"]):
+            out["zoom"] = ("absent", "모든 클립에서 배율 변화 없음(출력 측정)")
+        else:
+            out["zoom"] = ("unmeasured", "일부 클립의 줌 여부를 판정하지 못함")
+    fz = vp.get("freezes")
+    if fz is None:
+        out["freeze"] = ("unmeasured", "정지 측정 실패")
+    else:
+        seen = [e["clip_id"] for e in fz.get("expected") or [] if e.get("observed")]
+        un = [r for r in fz.get("unexpected") or [] if r.get("source_static") is not True]
+        blind = [e["clip_id"] for e in fz.get("expected") or [] if e.get("distinguishable") is False]
+        if seen or un:
+            out["freeze"] = ("present", f"출력의 반복 프레임 구간 {len(seen) + len(un)}개")
+        elif blind:
+            out["freeze"] = ("unmeasured", "정지 직전 소스가 거의 움직이지 않아 구별 못 함: " + ", ".join(blind))
+        else:
+            out["freeze"] = ("absent", "출력에 반복 프레임 구간 없음(소스가 멈춘 구간 제외)")
+    mp = vp.get("mapping") or {}
+    items = mp.get("clips") or []
+    sp_seen = [x["clip_id"] for x in items if x.get("speed_obs") is not None and abs(float(x["speed_obs"]) - 1.0) > 0.1]
+    if sp_seen:
+        out["speed_change"] = ("present", "출력에서 잰 재생 속도 ≠ 1: " + ", ".join(sp_seen))
+    elif items and len(items) == len(ctx.resolved.clips) and all(x.get("status") == "measured" and (
+            x.get("mode") == "still_match" or (x.get("offset_p50") is not None and abs(float(x["offset_p50"])) <= 0.1))
+            for x in items) and all(abs(float(c.speed or 1.0) - 1.0) <= 1e-3 for c in ctx.resolved.clips):
+        out["speed_change"] = ("absent", "모든 클립이 계획한 소스 시각대로(속도 1) 나옴(소스 대조)")
+    else:
+        out["speed_change"] = ("unmeasured", "클립별 재생 속도를 모두 확인하지 못함")
+    tr = vp.get("transitions")
+    for k in ("flash", "crossfade"):
+        if tr is None:
+            out[k] = ("unmeasured", "전환 측정 실패")
+            continue
+        n = sum(1 for bd in tr.get("boundaries") or [] if (bd.get("observed") or {}).get("type") == k) + \
+            sum(1 for x in tr.get("unexpected") or [] if x.get("type") == k)
+        out[k] = ("present", f"출력에서 잰 {k} {n}개") if n else ("absent", f"출력 전체에서 {k} 없음(프레임 차이·밝기 검사)")
+    deco = [it for it in ((vp.get("decorations") or {}).get("items") or []) if it.get("status") == "measured"
+            and it.get("position")]
+    out["decorations"] = (("present", "출력에서 잰 장식 " + ", ".join(it["id"] for it in deco)) if deco else
+                          ("unmeasured", "계획에 없는 장식을 출력에서 찾는 검출기가 없어 '없다'를 확정하지 못함"))
+    if ap.get("status") == "no_audio":
+        for k in ("bgm", "original_audio", "ducking", "intentional_silence"):
+            out[k] = ("absent", "오디오 트랙 없음")
+        return out
+    if ap.get("status") != "measured":
+        for k in ("bgm", "original_audio", "ducking", "intentional_silence"):
+            out[k] = ("unmeasured", "오디오 측정 실패")
+        return out
+    bi = ap.get("bgm") or {}
+    found = bi.get("status") == "measured" and bool(bi.get("found"))
+    out["bgm"] = (("present", "계획한 음원 파형을 출력에서 찾음") if found else
+                  ("unmeasured", "모르는 음악의 부재는 증명 못 함" if bi.get("status") == "not_planned" else
+                   "계획한 BGM 을 출력에서 찾지 못함"))
+    og = ap.get("originals") or {}
+    wins = og.get("windows") or []
+    has_src_audio = any(t.get("has_audio") for t in og.get("tracks") or [])
+    if any(w.get("present") for w in wins):
+        out["original_audio"] = ("present", "출력 믹스에서 원음 확인(창별 최소제곱)")
+    elif not has_src_audio and og.get("tracks") is not None:
+        out["original_audio"] = ("absent", "소스에 소리가 없음")
+    elif wins:
+        out["original_audio"] = ("absent", "원음 창 모두 없음")
+    else:
+        out["original_audio"] = ("unmeasured", "원음 창을 재지 못함")
+    if found:
+        span = bi.get("audible_span_obs")
+        fo = float(getattr(ctx.resolved.audio.bgm, "fade_out_s", 0) or 0) if ctx.resolved.audio.bgm else 0.0
+        sil = [x for x in bi.get("silent_ranges_obs") or [] if span is None or (x[0] > span[0] + 0.1 and x[1] < span[1] - fo - 0.1)]
+        out["ducking"] = (("present", f"출력에서 잰 BGM 낮춤 {len(bi.get('ducked_ranges_obs') or [])}구간")
+                          if bi.get("ducked_ranges_obs") else ("absent", "BGM 이득 곡선에 낮춤 없음"))
+        out["intentional_silence"] = (("present", f"출력에서 잰 BGM 끊김 {len(sil)}구간") if sil else
+                                      ("absent", "BGM 이득 곡선에 끊김 없음(시작·끝 페이드 제외)"))
+    else:
+        out["ducking"] = ("unmeasured", "BGM 을 출력에서 찾지 못해 덕킹 여부 못 잼")
+        out["intentional_silence"] = ("unmeasured", "BGM 을 출력에서 찾지 못해 정적 여부 못 잼")
+    return out
+
+
+def rows_presence(b: RowBuilder, probes: dict) -> None:
+    """presence.<item>: the channel-level 있다/없다 of the reference (preset key, from `ref aggregate` /
+    `ref audio-measure`) vs the same item in our output.  Reference absent -> ours must be absent; reference present in
+    every measured video of the format -> ours must be present; reference present in some videos only -> either state
+    is inside the observed range."""
+    obs = presence_observed(b.ctx, probes)
+    meas = b.measurements()
+    fmt = b.ctx.preset.format_id
+    for k, cat in PRESENCE_ITEMS.items():
+        key = f"presence.{k}"
+        m = meas.get(key) or {}
+        st = ((m.get("by_format") or {}).get(fmt or "") if fmt else None) or m.get("overall") or {}
+        share = st.get("share")
+        ours, basis = obs.get(k, ("unmeasured", "측정 없음"))
+
+        def cmp(o, r, key=key, share=share):
+            ref = r.get(key)
+            if ref not in ("present", "absent"):
+                return None
+            if ref == "absent":
+                return None if o["presence"] == "unmeasured" else o["presence"] == "absent"
+            if share is not None and float(share) >= 1.0:
+                return None if o["presence"] == "unmeasured" else o["presence"] == "present"
+            return True
+        b.style_row("presence", k, f"{PRESENCE_KO[k]} 있다/없다 (레퍼런스 대비)", CAT[cat], [key],
+                    {"presence": ours, "basis": basis, "reference_share": share}, cmp,
+                    note=("레퍼런스가 없다 → 우리도 없어야 같다; 레퍼런스 영상 모두 있다 → 우리도 있어야 같다; 일부 영상에만 있다 → "
+                          "있다/없다 모두 관측 범위 안"))
 
 
 # ----------------------------------------------------------------------------- entry
+def _grid_rows(b: RowBuilder, probes: dict) -> None:
+    from .grid import rows_reference_grid
+
+    rows_reference_grid(b, probes)
+
+
 BUILDERS = [(("canvas.",), rows_canvas), (("caption.",), rows_captions), (("video.",), rows_video),
             (("decor.",), rows_decorations), (("identity.", "clean.corners"), rows_identity),
             (("clean.residual",), rows_residual), (("cover_up.",), rows_cover_up), (("audio.",), rows_audio),
-            (("structure.", "cover."), rows_structure)]
+            (("structure.", "cover."), rows_structure), (("presence",), rows_presence), (("ref_grid.",), _grid_rows)]
 
 
 def _wanted(only: list[str] | None, produces: tuple[str, ...]) -> bool:

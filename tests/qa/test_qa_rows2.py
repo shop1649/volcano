@@ -43,6 +43,14 @@ def test_first_caption_uses_the_reference_analyzer_definition(temp_root):
 
     items = [("t", "title", 0.0, 20.0), ("d", "description", 0.0, 4.0), ("k", "speaker", 0.3, 3.0),
              ("s", "situation", 0.5, 4.0), ("r", "reaction", 6.0, 7.0)]
+    # production aggregation uses ONLY members of the fixed latest-N snapshot: a SYNTHETIC snapshot holding the test
+    # video (the real snapshot of this repo is 'blocked' and empty)
+    write_json(paths.preset_dir("joshuamagazine") / "reference" / "latest100.json", {
+        "schema": "shortkit.ref_snapshot/1", "status": "ok", "captured_at": "2026-01-01T00:00:00+00:00",
+        "method": "SYNTHETIC (test fixture)", "latest_n": 1, "n": 1,
+        "videos": [{"rank": 1, "video_id": "vid0000001", "url": "https://www.youtube.com/watch?v=vid0000001",
+                    "title": "SYNTHETIC vid0000001", "duration": 20.0, "view_count": None, "published_at": None,
+                    "kind": "short"}]})
     d = paths.preset_dir("joshuamagazine") / "analysis" / "vid0000001"
     write_json(d / "captions.json", {"video_id": "vid0000001", "resolution": [1080, 1920], "duration": 20.0,
                                      "items": [{"id": i, "role": r, "start": a, "end": b, "text": "가나다",
@@ -172,7 +180,9 @@ def test_wrong_face_drawn_for_a_role_is_different(tmp_path, monkeypatch):
     row = next(x for x in rows if x["row_id"] == "caption.font:role_situation")
     assert row["status"] == "different" and row["required"] is True
     per_cap = next(x for x in rows if x["row_id"] == "caption.font:s1")
-    assert per_cap["required"] is False
+    assert per_cap["required"] is False and per_cap["covered_by"] == "caption.font:role_situation"
+    # first line of evidence: the exact-position re-render in the face really drawn reproduces the output better
+    assert r["exact"]["exact_role_verdict"] == "different", r["exact"]
 
 
 # ============================================================================ 3. style keys that do not apply
@@ -328,10 +338,13 @@ def test_defect_of_a_row_that_became_informational_is_superseded_not_fixed(temp_
     row = {"check_id": "caption.font", "row_id": "caption.font:c_desc", "status": "unmeasured", "required": True,
            "intended_change": False, "item": "자막 글꼴", "category": "폰트", "expected": "X", "observed": None,
            "note": "유사"}
+    role_row = {"check_id": "caption.font", "row_id": "caption.font:role_description", "status": "same",
+                "required": True, "intended_change": False, "item": "역할 글꼴", "category": "폰트"}
     rep = {"rows": [row], "gate": {"pass": False, "complete": False}, "output": {"sha256": "a"}}
     defects.sync(ctx, rep, recheck_others=False, quiet=True)
     assert defects.load("e1")[0]["status"] == "open"
-    rep["rows"] = [{**row, "required": False, "note": "참고 행"}]
+    # the per-caption row is now informational AND names the (measured) per-role row that judges it
+    rep["rows"] = [{**row, "required": False, "note": "참고 행", "covered_by": "caption.font:role_description"}, role_row]
     st = defects.sync(ctx, rep, recheck_others=False, quiet=True)
     d = defects.load("e1")[0]
     assert d["status"] == "superseded" and st.get("superseded") == 1 and st["verified_now"] == 0
@@ -347,10 +360,11 @@ def test_defect_of_a_row_that_became_informational_is_superseded_not_fixed(temp_
 @pytest.mark.parametrize("episode", ["test-pipeline-001", "test-coverage-001"])
 def test_planned_font_per_role_on_the_test_episodes(episode):
     """The test episodes are rendered with exactly the planned faces (production libass path; the render refuses any
-    substitution).  Per role, pooled over every rest frame of every caption, the planned font must be 'identical'.
-    Hard failures: 'different', unmeasured, or another face ranked first / within the noise.  A 'similar' verdict
-    (pooled median below the pooled ceiling p10: the true font lands there ~10 % of the time) is reported as XFAIL
-    with the measured numbers -- never as a pass, and the QA gate keeps failing on that role."""
+    substitution).  Per role the planned font must be 'identical': the exact-position re-render (same ASS event,
+    libass, bt709, x264 at the output's CRF/preset, from frame 0 like production) reproduces the output crops within
+    the re-encode noise and beats the top alternative faces by more than it.  Single-caption roles used to stay
+    'similar' on the pooled statistics alone (test-pipeline-001 description: median IoU 0.9511 < pooled p10 0.9548)
+    although the right face was rendered -- the exact re-render settles them."""
     from shortkit.qa import load_context
     from shortkit.qa.probes_text import probe_captions, probe_font_roles
 
@@ -361,19 +375,14 @@ def test_planned_font_per_role_on_the_test_episodes(episode):
     caps = probe_captions(ctx)
     roles = probe_font_roles(ctx, caps)
     assert set(roles) == {c.role for c in ctx.resolved.captions}
-    got = {}
     for role, r in roles.items():
         assert r["status"] == "measured", (role, r.get("reason"))
-        assert r["verdict"] != "different", (role, r.get("reasons"))
-        assert r["top"].replace(" ", "").lower() == r["expected_canonical"].replace(" ", "").lower(), (role, r["ranked"])
-        assert r["margin"] > (r["ceiling"]["noise_p90"] or 0), (role, r["margin"], r["ceiling"])
-        got[role] = r
-    similar = {k: v for k, v in got.items() if v["verdict"] != "identical"}
-    assert all(v["verdict"] == "similar" for v in similar.values()), similar
-    if similar:
-        pytest.xfail("planned font measured 'similar' (not identical) for " + "; ".join(
-            f"{k}: median IoU {v['iou_expected']} < pooled p10 {v['ceiling']['p10']} ({v['n_captions']} captions, "
-            f"{v['n_crops']} crops)" for k, v in similar.items()))
+        assert r["verdict"] == "identical", (role, r["verdict"], r.get("reasons"))
+        assert r["exact"]["exact_role_verdict"] == "identical", (role, r["exact"])
+        for cid, e in r["exact"]["captions"].items():
+            assert e["mae_planned"] <= e["noise_mae"] and e["margin"] > e["noise_mae"], (role, cid, e)
+        # the pooled statistics (second line of evidence) never contradict it
+        assert r["exact"]["pooled_verdict"] in ("identical", "similar"), (role, r["exact"]["pooled_verdict"])
 
 
 def test_ceiling_entrance_matches_the_renderer_tags():

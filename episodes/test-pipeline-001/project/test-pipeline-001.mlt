@@ -317,7 +317,7 @@
     <filter id="filter17" in="0" out="577">
       <property name="mlt_service">volume</property>
       <property name="shotcut:filter">audioGain</property>
-      <property name="level">0=0;201=0;202=-40;203=-120;222=-120;223=-80;224=0;296=0;297=-1.667;299=-10;368=-10;377=0;577=0</property>
+      <property name="level">0=0;201=0;202=-40;203=-120;222=-120;223=-80;224=0;300=0;301=-0.208;303=-8.542;304=-10;353=-10;354=-8.956;362=-0.067;363=0;577=0</property>
       <property name="shortkit:role">envelope(ducking/silence)</property>
     </filter>
     <filter id="filter18" in="0" out="577">

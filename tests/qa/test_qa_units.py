@@ -25,20 +25,39 @@ def _clip(**kw):
 
 
 # ----------------------------------------------------------------------------- declarations
-def test_declarations_cover_every_style_key():
+# style keys NO output check measures (review S1-13): `preset audit` must report exactly these as no_qa -- a key
+# leaves this list only when a real output check for it is added (and declared).
+NO_OUTPUT_CHECK = {
+    "audio.bgm.gain_db", "audio.ducking.attack_s", "audio.ducking.release_s", "audio.original.fade_s",
+    "audio.silence.fade_s", "canvas.background.blur_sigma", "canvas.video_region.fit",
+    "decorations.arrow.head_len_ratio", "decorations.arrow.head_width_ratio", "decorations.arrow.outline_color",
+    "decorations.arrow.outline_px", "decorations.arrow.shaft_width_ratio", "motion.transitions.flash.scope",
+    "motion.zoom.recenter", "structure.duration_s.n", "structure.duration_s.p50", "text.tone.emoji",
+    "text.tone.sentence_end_examples", "text.roles.dialogue.quote_marks",
+    *[f"text.roles.{r}.{leaf}" for r in checks.ROLES for leaf in ("box.color", "box.pad_x", "box.pad_y",
+                                                                   "motion_in.offset_px", "shadow_color", "shadow_px",
+                                                                   "timing.lead_s")],
+}
+
+
+def test_declarations_are_exact_keys_without_globs():
+    """Every declared key is an exact preset key (the registry's fnmatch '*' would also span dots and claim e.g.
+    text.roles.X.box.color for text.roles.*.color); keys no check measures are not declared."""
     pr = config.load_preset("joshuamagazine")
+    allk = set(config.flatten(pr.data))
     decl = checks.declarations()
-    missing = []
-    for k in config.flatten(pr.data):
-        cat = config.classify_key(k)
-        if cat in ("meta", "infra", "rule"):
-            continue
-        if not any(config._match(k, p) for pats in decl.values() for p in pats):
-            missing.append(k)
-    assert missing == []
-    fams = {"canvas.", "text.roles.", "text.tone.", "motion.", "decorations.", "audio.", "structure.", "cover."}
-    for f in fams:
-        assert any(p.startswith(f) or p.startswith(f.rstrip(".")) for pats in decl.values() for p in pats), f
+    pats = [p for v in decl.values() for p in v]
+    assert not [p for p in pats if any(c in p for c in "*?[")]
+    # declared keys the preset does not have yet: the cut-structure keys `ref aggregate` must emit (requested)
+    assert sorted({p for p in pats if p not in allk}) == sorted(checks.CUT_STRUCTURE_KEYS)
+    covered = {k for k in allk if any(config._match(k, p) for p in pats)}
+    for k in ("motion.transitions.flash.scope", "decorations.arrow.head_len_ratio", "decorations.arrow.shaft_width_ratio",
+              "text.roles.title.box.color", "text.tone.emoji", "canvas.background.blur_sigma"):
+        assert k not in covered, k
+    for k in [f"presence.{x}" for x in checks.PRESENCE_ITEMS] + ["text.roles.speaker.motion_out.type",
+                                                               "text.roles.speaker.motion_out.dur_s"]:
+        assert k in covered, k
+    assert checks.ROLES == __import__("shortkit.edit.resolve", fromlist=["ROLES"]).ROLES
 
 
 def test_categories_required_by_user_exist():
@@ -200,7 +219,12 @@ def test_style_rows_provisional_measured_and_requested(temp_root):
     d = temp_root / "presets" / "joshuamagazine"
     write_yaml(d / "measured.yaml", {"preset_id": "joshuamagazine-v1", "common": {"canvas": {"width": 1080, "height": 1920,
                                                                                                "fps": 30}}})
-    write_json(d / "measurements" / "canvas.json", {"schema": "shortkit.measurement/1", "group": "canvas", "items": [
+    from shortkit.util.jsonio import read_json
+
+    snap_at = (read_json(d / "reference" / "latest100.json") or {}).get("captured_at")
+    # SYNTHETIC measurement file of THIS preset and its fixed snapshot (the loader refuses files of unknown origin)
+    write_json(d / "measurements" / "canvas.json", {"schema": "shortkit.measurement/1", "group": "canvas",
+                                                    "preset_id": "joshuamagazine-v1", "source_snapshot": snap_at, "items": [
         {"key": "canvas.width", "status": "measured", "value": 1080, "overall": {"n": 40, "p10": 1080, "p50": 1080, "p90": 1080}},
         {"key": "canvas.height", "status": "measured", "value": 1920, "overall": {"n": 40, "p10": 1920, "p50": 1920, "p90": 1920}},
         {"key": "canvas.fps", "status": "measured", "value": 30, "overall": {"n": 40, "p10": 30, "p50": 30, "p90": 30}}]})
@@ -250,25 +274,31 @@ def test_defects_lifecycle(temp_root):
     s = defects.sync(ctx, rep("different"), recheck_others=False)
     assert s["reopened"] == 1 and defects.load("e1")[0]["status"] == "reopened"
     defects.add_fix("e1", items[0]["id"], "다시 수정")
+    # the row passes, but without the same-case re-check (--no-recheck-others) it is not 'fixed' yet
     s = defects.sync(ctx, rep("same"), recheck_others=False)
     d = defects.load("e1")[0]
-    assert s["verified_now"] == 1 and d["status"] == "fixed" and d["final_gate"]["pass"] is True
-    assert [h["event"] for h in d["history"]] == ["found", "fix_submitted", "reopened", "fix_submitted", "verified_fixed"]
+    assert s["verified_now"] == 1 and d["status"] == "fixed_unrechecked" and d["final_gate"]["pass"] is True
+    # a run WITH the re-check (no other rendered episode here -> recorded explicitly) makes it 'fixed'
+    s = defects.sync(ctx, rep("same"), recheck_others=True)
+    d = defects.load("e1")[0]
+    assert d["status"] == "fixed" and d["recheck_same_cases"][-1]["verdict"] == "no_other_episodes"
+    assert [h["event"] for h in d["history"]][:6] == ["found", "fix_submitted", "reopened", "fix_submitted",
+                                                      "verified_fixed", "fixed_unrechecked"]
 
 
-def test_registry_audit_has_no_style_key_without_a_qa_check(temp_root):
-    """`shortkit preset audit` flags style keys no QA check verifies; with qa.checks.declarations()
-    none may remain (run on a temp copy of the preset: the real registry is not touched)."""
+def test_registry_audit_reports_exactly_the_keys_without_an_output_check(temp_root):
+    """`shortkit preset audit` flags style keys no QA check verifies.  With exact declarations the keys that no
+    check measures show up as no_qa -- no more, no fewer (run on a temp copy of the preset)."""
     config.sync_registry("joshuamagazine", access_logs=[])
     res = config.audit("joshuamagazine", production=False)
-    assert res["no_qa"] == []
-    reg = config.load_preset("joshuamagazine")
-    assert reg is not None
+    assert set(res["no_qa"]) == NO_OUTPUT_CHECK
     from shortkit.util.jsonio import read_yaml
 
     ent = read_yaml(temp_root / "presets/joshuamagazine/settings_registry.yaml")["entries"]
     assert "caption.position" in ent["text.roles.situation.anchor.y"]["qa_checks"]
     assert "audio.bgm" in ent["audio.bgm.section_start_s"]["qa_checks"]
+    assert ent["presence.zoom"]["qa_checks"] == ["presence"]
+    assert ent["motion.transitions.flash.scope"]["qa_checks"] == []
 
 
 # ----------------------------------------------------------------------------- caption locating (SYNTHETIC image)

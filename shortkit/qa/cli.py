@@ -10,10 +10,15 @@ def register(p: argparse.ArgumentParser) -> None:
 
     r = sub.add_parser("run", help="최종 MP4 측정 → report.json/report.md/비교 시트/관문/결함 재확인")
     r.add_argument("--episode", required=True)
-    r.add_argument("--reference", default=None, help="같은 시각 비교용 레퍼런스 MP4 (프로젝트 안의 경로)")
+    r.add_argument("--reference", default=None,
+                   help="같은 시각 비교용 레퍼런스 MP4 (프로젝트 안의 경로). 기본 = formats.yaml 에서 이 포맷의 대표 영상")
     r.add_argument("--reference-id", default=None, help="레퍼런스 영상 id (analysis/<id>/ 사용; 기본=파일 이름)")
+    r.add_argument("--reference-override-reason", default=None,
+                   help="포맷 대표 영상이 아닌 레퍼런스를 쓰는 이유(production 관문 R1 이 요구; 보고서에 기록)")
     r.add_argument("--sheet-seconds", type=float, default=15.0, help="비교 시트 한 장당 초(기본 15)")
-    r.add_argument("--mp4", default=None, help="검사할 MP4 (기본: resolved.json 의 output_path)")
+    r.add_argument("--mp4", default=None,
+                   help="다른 MP4 를 검사(기본: resolved.json 의 output_path = 납품 파일). 납품 파일이 아니면 결과는 "
+                        "qa/other_mp4/<이름>/ 에 쓰이고 에피소드 보고서·결함·최종 관문에는 쓰이지 않음")
     r.add_argument("--no-recheck-others", action="store_true", help="다른 에피소드의 같은 검사 재확인을 건너뜀")
     r.set_defaults(func=cmd_run)
 
@@ -50,6 +55,15 @@ def register(p: argparse.ArgumentParser) -> None:
     c = sub.add_parser("checks", help="검사 id → 검증하는 프리셋 키 목록")
     c.set_defaults(func=cmd_checks)
 
+    h = sub.add_parser("human-check", help="사람이 최종 MP4 를 직접 듣거나 보고 내린 판정 기록(에이전트는 사용 금지)")
+    h.add_argument("--episode", required=True)
+    h.add_argument("--row", required=True, help="검사 행 id (예: audio.original:music0, audio.sfx.on_cut:fx1)")
+    h.add_argument("--kind", required=True, choices=["listen", "watch"])
+    h.add_argument("--verdict", required=True, choices=["same", "different"])
+    h.add_argument("--by", required=True, help="직접 듣거나 본 사람")
+    h.add_argument("--note", required=True, help="무엇을 듣고/보고 그렇게 판단했는지")
+    h.set_defaults(func=cmd_human_check)
+
 
 def _print_summary(rep: dict) -> None:
     s = rep["summary"]
@@ -79,7 +93,8 @@ def cmd_run(args) -> int:
 
     try:
         rep = run_and_write(args.episode, reference=args.reference, sheet_seconds=args.sheet_seconds, mp4=args.mp4,
-                            reference_id=args.reference_id, recheck_others=not args.no_recheck_others)
+                            reference_id=args.reference_id, recheck_others=not args.no_recheck_others,
+                            reference_override_reason=getattr(args, "reference_override_reason", None))
     except QAError as e:
         print(f"[qa] 시작할 수 없음: {e}", file=sys.stderr)
         return 2
@@ -147,8 +162,30 @@ def cmd_defects_fix(args) -> int:
 
 def cmd_defects_recheck(args) -> int:
     ns = argparse.Namespace(episode=args.episode, reference=args.reference, sheet_seconds=args.sheet_seconds, mp4=None,
-                            reference_id=None, no_recheck_others=False)
+                            reference_id=None, no_recheck_others=False, reference_override_reason=None)
     return cmd_run(ns)
+
+
+def cmd_human_check(args) -> int:
+    """Record a person's listening / watching verdict for one row, bound to the deliverable's sha256."""
+    from .. import paths
+    from ..util.hashing import sha256_file
+    from ..util.jsonio import read_json
+    from .human import record
+
+    rj = read_json(paths.episode_dir(args.episode) / "build" / "resolved.json") or {}
+    mp4 = paths.absp(rj.get("output_path") or f"episodes/{args.episode}/output/{args.episode}.mp4")
+    if not mp4.is_file():
+        print(f"[qa] 출력 MP4 없음: {paths.relp(mp4)}", file=sys.stderr)
+        return 2
+    try:
+        rec = record(args.episode, args.row, args.kind, args.verdict, args.by, args.note, sha256_file(mp4))
+    except ValueError as e:
+        print(f"[qa] 기록 못 함: {e}", file=sys.stderr)
+        return 2
+    print(f"[qa] 사람 {'청취' if args.kind == 'listen' else '시청'} 기록: {rec['row_id']} → {rec['verdict']} ({rec['by']}, "
+          f"MP4 sha256 {rec['mp4_sha256'][:12]}…) — 다음 `shortkit qa run` 에서 반영")
+    return 0
 
 
 def cmd_checks(args) -> int:

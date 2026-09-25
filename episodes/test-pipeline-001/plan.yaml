@@ -1,7 +1,9 @@
 # 파이프라인 검증용 테스트 에피소드 (mode: test — 게시용 아님, 승인 불필요)
 # 소재: Intel sample-videos (CC BY 4.0) 두 개. classroom_voice.mp4 는 무음 classroom.mp4 에
 #       espeak-ng 한국어 TTS 한 줄(speech_02.wav)을 19.6s 에 얹은 합성 소스다
-#       (`python -m shortkit episode test-source` 로 재생성, sha256 은 같은 ffmpeg 에서 재현됨).
+#       (`python -m shortkit episode test-source` 로 재생성). 파일 바이트(sha256)는 ffmpeg(AAC 인코더)·espeak-ng 빌드마다
+#       달라진다: sha256 은 이 plan 을 만든 빌드(ffmpeg 6.1.1-3ubuntu5, eSpeak NG 1.51)의 값이고, 다른 빌드에서는 test 모드
+#       validate 가 sources[].test_fingerprint(복사한 영상 프레임 md5 + 말소리 구간)로 같은 내용인지 확인한다(경고만).
 # 자막·효과음 사건 시각은 프레임을 직접 보고 정했다(0.5s/0.17s 간격 접촉 시트):
 #   classroom  2.8s 창가 남성이 일어서기 시작 → 4.5s 선 자세 / 15.5~16.5s 다시 앉음 /
 #              17.17~17.33s 뒷줄 남성이 손을 듦 / 20.0~21.0s 뒷줄 남성이 일어섬
@@ -21,12 +23,17 @@ cover:                           # 표지 문구 = 표지 프레임(0.0s)에 실
   frame_t: 0.0
 title_candidates:
 - 창가 남성이 일어섰다 앉기까지
-- 손을 든 뒷줄, 고개를 기울인 두 사람
+- 손을 든 뒷줄, 그리고 마주 앉은 두 사람
 - 움직임 테스트 영상
 sources:
 - id: v_class
   path: assets/test/generated/classroom_voice.mp4
   sha256: 7ca6f09cb32cf87c942cd9b56d5067a3ee48817629f4c576ef706515292a2533
+  test_fingerprint:              # 테스트 모드 전용: 다른 ffmpeg/TTS 빌드로 다시 만든 같은 내용의 파일을 알아봄(production 은 sha256 만)
+    video_md5: 44b5f4c7a1e42ba78a0e70aed468c6c6    # 복사한 영상 스트림의 디코딩 프레임 md5 (ffmpeg -map 0:v:0 -f md5)
+    speech: [[19.645, 21.302]]                     # 자동 음성 검사로 잰 말소리 구간(원본 초, ±0.1s 허용)
+    tools: {ffmpeg: ffmpeg version 6.1.1-3ubuntu5, espeak-ng: 'eSpeak NG text-to-speech: 1.51'}
+    note: 2026-09-25 이 컴퓨터에서 shortkit.edit.validate.source_content_fingerprint 로 잼
   warehouse_id: null
   vocals_path: null
   has_embedded_music: false      # 음악 없음(만든 과정으로 확인): 무음 영상 + TTS 한 줄뿐 — assets/test/generated/classroom_voice.truth.json
@@ -85,8 +92,10 @@ timeline:
   purpose: reveal
   transition_in: {type: crossfade}
 captions:
-- {id: c_title, role: title, text: 움직임 테스트 영상, start: 0.0, end: 19.25}
-- {id: c_desc, role: description, text: 파이프라인 검증용 합성 샘플, start: 0.0, end: 4.0}
+- {id: c_title, role: title, text: 움직임 테스트 영상, start: 0.0, end: 19.25,
+   grounding: {kind: framing, note: 편집 틀 제목(영상 속 사실을 주장하지 않음)}}
+- {id: c_desc, role: description, text: 파이프라인 검증용 합성 샘플, start: 0.0, end: 4.0,
+   grounding: {kind: framing, note: 이 영상이 검증용 합성 샘플이라는 설명}}
 - id: c_spk
   role: speaker
   text: 창가 남성

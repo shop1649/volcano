@@ -123,15 +123,21 @@ sources:
   has_embedded_music: null               # 원본에 음악이 섞였는지 true/false (원음을 살리면 필수; null = 못 잼)
   clean: {{crop: null, delogo: [], inpaint: [], blur: []}}
   protected: []                          # 얼굴/손/핵심 물체 {{label, x, y, w, h, start, end}} (원본 px/시각)
+  # protected_reviewed: {{by: 이름, at: 시각, note: 보호할 것이 없음을 확인}}   # protected 가 빈 채로 쓸 때만(production 필수)
+  # watched: {{by: 이름, at: 시각, sha256: 이 파일 sha256}}   # 처음부터 끝까지 보고 들은 기록 — 자막을 쓰기 전에(production 필수)
 timeline:
 - id: s1
   source: src1
   src_in: 0.0
   src_out: 3.0
   purpose: hook
-captions: []
+  # tail_reason: ...                     # 마지막 의미 뒤 꼬리를 남기는 이유(production: 없으면 trim_tail 오류)
+  # replay_of: s?  replay_reason: ...    # 같은 원본 구간을 의도해서 다시 보여 줄 때만(아니면 반복 금지)
+captions: []                             # 모든 자막에 grounding(seen/heard 는 source + src_t), 제목·설명은 kind: framing + note
 decorations: []
-sfx: []
+sfx: []                                  # event: {{t, desc, kind, source, src_t}} + emotion (production 필수)
+actions: []                              # 자르면 안 되는 중요한 동작 {{id, source, src_start, src_end, desc}} (원본 시각)
+# reveal: {{t: 반전 시각(출력 초), keywords: [미리 말하면 안 되는 말]}}   또는 {{none: true, reason: ...}} (production 필수)
 bgm:
   enabled: true
   path: null                             # null = 프리셋 audio.bgm.track_id
@@ -466,18 +472,47 @@ def make_voice_test_source(at: float = 19.6, video: str = "assets/test/generated
             f"[1:a]aresample=48000,adelay={ms}|{ms},apad,atrim=0:{dur:.6f},aformat=channel_layouts=stereo[a]",
             "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
             "-fflags", "+bitexact", "-flags:a", "+bitexact", "-map_metadata", "-1", "-t", f"{dur:.6f}", o])
+    from .validate import source_content_fingerprint
+
     truth = {"schema": "shortkit.testsource/1", "output": out, "sha256": sha256_file(o), "created_at": now_iso(),
              "video": video, "video_sha256": sha256_file(v), "speech": speech, "speech_sha256": sha256_file(s),
              "speech_at_s": at, "speech_dur_s": round(probe(s).duration, 6),
+             # the file's bytes depend on the ffmpeg (AAC encoder) and TTS builds; its CONTENT does not when the inputs
+             # are the same: decoded video frames (stream copy) + where the line is spoken.  Example plans pin this
+             # fingerprint (sources[].test_fingerprint, test mode only) next to the sha256 of the build they used.
+             "content_fingerprint": source_content_fingerprint(out), "tools": tool_versions(),
              "note": "합성 테스트 소스: 영상(Intel sample, CC BY 4.0, 무음)에 espeak-ng 한국어 TTS 한 줄을 얹음. "
                      "화면 속 인물의 실제 말이 아니다."}
     write_json(o.with_suffix(".truth.json"), truth)
     return truth
 
 
+def tool_versions() -> dict:
+    """First version line of the tools a generated test source depends on (None when not installed)."""
+    import shutil
+    import subprocess
+
+    from ..util.media import FFMPEG
+
+    out = {}
+    for name, cmd in (("ffmpeg", [FFMPEG, "-version"]), ("espeak-ng", ["espeak-ng", "--version"])):
+        if shutil.which(cmd[0]) is None and not Path(cmd[0]).is_file():
+            out[name] = None
+            continue
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            out[name] = (r.stdout or r.stderr).strip().splitlines()[0] if (r.stdout or r.stderr).strip() else None
+        except (OSError, subprocess.TimeoutExpired):
+            out[name] = None
+    return out
+
+
 def cmd_test_source(args) -> int:
     t = make_voice_test_source(args.at)
     print(f"테스트 소스: {t['output']} sha256={t['sha256']} (음성 {t['speech_at_s']}s~{t['speech_at_s'] + t['speech_dur_s']:.2f}s)")
+    fp = t.get("content_fingerprint") or {}
+    print(f"  내용 지문(테스트 plan 의 sources[].test_fingerprint): video_md5={fp.get('video_md5')} speech={fp.get('speech')}")
+    print(f"  도구: {t.get('tools')} — sha256 은 이 빌드에서만 같음; 다른 빌드면 test 모드 validate 가 내용 지문으로 확인")
     return 0
 
 

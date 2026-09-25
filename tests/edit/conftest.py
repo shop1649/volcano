@@ -51,18 +51,15 @@ def media(tmp_path_factory):
 
 
 def speech_like(dur: float = 1.6, sr: int = 48000, seed: int = 3) -> "np.ndarray":
-    """SYNTHETIC speech-like signal: glottal pulse train (f0 110-170 Hz contour) through vowel formants, syllables
-    of 0.12-0.22 s with short gaps (syllabic modulation).  Not a recording of anybody."""
-    from scipy.signal import lfilter
-
+    """SYNTHETIC speech-like signal: harmonics of a gliding f0 (110-170 Hz) shaped by vowel formants, in syllables
+    of 0.12-0.22 s with short gaps (syllabic modulation); crest factor ~13 dB.  Not a recording of anybody."""
     rng = np.random.default_rng(seed)
     n = int(dur * sr)
     t = np.arange(n) / sr
     f0 = 140 + 30 * np.sin(2 * np.pi * 0.7 * t) + 8 * np.sin(2 * np.pi * 5.1 * t)
-    ph = np.cumsum(f0 / sr)
-    src = lfilter([1.0], [1.0, -0.97], (np.diff(np.floor(ph), prepend=0) > 0).astype(float))
-    y, env = np.zeros(n), np.zeros(n)
+    ph = 2 * np.pi * np.cumsum(f0) / sr
     vowels = [(730, 1090, 2440), (270, 2290, 3010), (300, 870, 2240), (530, 1840, 2480)]
+    y, env = np.zeros(n), np.zeros(n)
     pos, k = 0.0, 0
     while pos < dur:
         L, G = rng.uniform(0.12, 0.22), rng.uniform(0.05, 0.10)
@@ -70,11 +67,12 @@ def speech_like(dur: float = 1.6, sr: int = 48000, seed: int = 3) -> "np.ndarray
         if a >= n:
             break
         env[a:b] = np.hanning(b - a)
-        out = np.zeros(b - a)
-        for F, bw in zip(vowels[k % 4], (80, 100, 120)):
-            r, th = np.exp(-np.pi * bw / sr), 2 * np.pi * F / sr
-            out += lfilter([1 - r], [1, -2 * r * np.cos(th), r * r], src[a:b])
-        y[a:b] = out
+        seg = np.zeros(b - a)
+        for h in range(1, 25):
+            fh = h * f0[a:b]
+            amp = sum(np.exp(-((fh - F) / 150.0) ** 2) for F in vowels[k % 4]) / h ** 0.5 + 0.02
+            seg += amp * np.sin(h * ph[a:b] + rng.uniform(0, 2 * np.pi))
+        y[a:b] = seg
         pos, k = pos + L + G, k + 1
     y = y * env
     return (0.5 * y / (np.max(np.abs(y)) + 1e-9)).astype(np.float32)

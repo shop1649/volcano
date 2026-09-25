@@ -397,3 +397,19 @@ def test_presence_keys_compare_plan_with_reference(root, plan):
     assert "presence_absent_used" in codes(iss, "warn")
     assert "presence.intentional_silence" in {i["where"] for i in iss if i["code"] == "presence_present_unused"}
     assert "presence_absent_used" in codes(run(root, _prod(plan)), "error")
+
+
+def test_s6_6_test_source_records_content_fingerprint(root):
+    """``episode test-source`` records the content fingerprint + tool versions next to the build-dependent sha256."""
+    from shortkit.edit.cli import make_voice_test_source
+
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=s=320x180:r=30:d=4", "-c:v", "libx264",
+                    "-preset", "ultrafast", "-pix_fmt", "yuv420p", str(root / M / "silent.mp4")], check=True)
+    t = make_voice_test_source(at=0.5, video=f"{M}/silent.mp4", speech=f"{M}/speech.wav", out=f"{M}/voice.mp4")
+    fp = t["content_fingerprint"]
+    assert fp["video_md5"] and len(fp["speech"]) == 1
+    a, b = fp["speech"][0]
+    assert a == pytest.approx(1.5, abs=0.1) and b == pytest.approx(3.1, abs=0.15)      # speech.wav 1.0-2.6 s + 0.5 s
+    assert t["tools"]["ffmpeg"]
+    truth = json.loads((root / M / "voice.truth.json").read_text())
+    assert truth["content_fingerprint"] == fp and truth["sha256"] == sha(root / M / "voice.mp4")

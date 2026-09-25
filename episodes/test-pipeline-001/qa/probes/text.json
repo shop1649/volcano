@@ -278,6 +278,57 @@
           1.0
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          4,
+          12,
+          21,
+          30
+        ],
+        "crop_box": [
+          182,
+          265,
+          898,
+          405
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 57.7425,
+          "Pretendard ExtraBold": 57.4564,
+          "Noto Sans CJK KR Bold": 9.6094
+        },
+        "noise_mae": 0.064,
+        "noise_by_start": {
+          "mis1": 0.0462,
+          "mis2": 0.064
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 9.6094,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.064, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.609 더 가까움(> 잡음)"
       }
     },
     {
@@ -376,7 +427,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.2
       },
       "presence_in": [
         [
@@ -464,7 +516,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -704,6 +757,57 @@
           1.2
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          10,
+          18,
+          27,
+          36
+        ],
+        "crop_box": [
+          253,
+          463,
+          827,
+          544
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Bold": 52.2395,
+          "Pretendard ExtraBold": 52.8012,
+          "NanumSquare ExtraBold": 41.6465
+        },
+        "noise_mae": 0.9546,
+        "noise_by_start": {
+          "mis1": 0.0068,
+          "mis2": 0.9546
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Bold",
+        "best_alternative": "NanumSquare ExtraBold",
+        "margin": 41.6465,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.955, 가장 가까운 대안 NanumSquare ExtraBold 보다 41.647 더 가까움(> 잡음)"
       }
     },
     {
@@ -798,7 +902,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.167
       },
       "presence_in": [
         [
@@ -914,7 +1019,8 @@
       "motion_out_obs": {
         "type": "fade",
         "dur_s": 0.067,
-        "expected": "fade"
+        "expected": "fade",
+        "fade_dur_s": 0.167
       },
       "presence_out": [
         [
@@ -1154,6 +1260,57 @@
           1.4667
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          18,
+          26,
+          35,
+          44
+        ],
+        "crop_box": [
+          654,
+          744,
+          824,
+          801
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Bold": 35.2759,
+          "Pretendard ExtraBold": 35.8502,
+          "NanumSquare ExtraBold": 33.9071
+        },
+        "noise_mae": 1.5882,
+        "noise_by_start": {
+          "mis1": 1.5882,
+          "mis2": 1.0939
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Bold",
+        "best_alternative": "NanumSquare ExtraBold",
+        "margin": 33.9071,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 1.588, 가장 가까운 대안 NanumSquare ExtraBold 보다 33.907 더 가까움(> 잡음)"
       }
     },
     {
@@ -1252,7 +1409,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.167
       },
       "presence_in": [
         [
@@ -1372,7 +1530,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -1592,6 +1751,57 @@
           2.4333
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          47,
+          55,
+          64,
+          73
+        ],
+        "crop_box": [
+          226,
+          1376,
+          854,
+          1491
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 55.2343,
+          "Pretendard ExtraBold": 54.6923,
+          "Noto Sans CJK KR Bold": 9.3287
+        },
+        "noise_mae": 0.0647,
+        "noise_by_start": {
+          "mis1": 0.0647,
+          "mis2": 0.0528
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 9.3287,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.065, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.329 더 가까움(> 잡음)"
       }
     },
     {
@@ -1690,7 +1900,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.167
       },
       "presence_in": [
         [
@@ -1794,7 +2005,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -2026,6 +2238,57 @@
           5.2333
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          131,
+          139,
+          148,
+          157
+        ],
+        "crop_box": [
+          257,
+          1376,
+          824,
+          1491
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 51.1584,
+          "Pretendard ExtraBold": 49.8288,
+          "Noto Sans CJK KR Bold": 9.0945
+        },
+        "noise_mae": 0.2686,
+        "noise_by_start": {
+          "mis1": 0.2686,
+          "mis2": 0.0028
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 9.0945,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.269, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.095 더 가까움(> 잡음)"
       }
     },
     {
@@ -2124,7 +2387,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.167
       },
       "presence_in": [
         [
@@ -2240,7 +2504,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -2460,6 +2725,57 @@
           8.8333
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 0,
+        "crop_frames": [
+          239,
+          247,
+          256,
+          265
+        ],
+        "crop_box": [
+          219,
+          1376,
+          862,
+          1491
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0,
+        "mae_planned_per_crop": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 52.1565,
+          "Pretendard ExtraBold": 51.8436,
+          "Noto Sans CJK KR Bold": 9.617
+        },
+        "noise_mae": 0.4946,
+        "noise_by_start": {
+          "mis1": 0.4946,
+          "mis2": 0.0777
+        },
+        "misaligned_starts": [
+          1,
+          2
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 9.617,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.495, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.617 더 가까움(> 잡음)"
       }
     },
     {
@@ -2558,7 +2874,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.033
       },
       "presence_in": [
         [
@@ -2646,7 +2963,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -2886,6 +3204,57 @@
           11.1
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 250,
+        "crop_frames": [
+          307,
+          315,
+          324,
+          333
+        ],
+        "crop_box": [
+          237,
+          1377,
+          842,
+          1498
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.0095,
+        "mae_planned_per_crop": [
+          0.0365,
+          0.0005,
+          0.0005,
+          0.0005
+        ],
+        "mae_alternatives": {
+          "Noto Sans CJK KR Bold": 8.4014,
+          "Pretendard Black": 29.223,
+          "Pretendard ExtraBold": 28.8911
+        },
+        "noise_mae": 0.0366,
+        "noise_by_start": {
+          "mis235": 0.0366,
+          "mis210": 0.0173
+        },
+        "misaligned_starts": [
+          235,
+          210
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 8.3919,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.009 ≤ 재인코딩 잡음 0.037, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.392 더 가까움(> 잡음)"
       }
     },
     {
@@ -2985,7 +3354,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.1
       },
       "presence_in": [
         [
@@ -3101,7 +3471,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -3341,6 +3712,57 @@
           16.2
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 250,
+        "crop_frames": [
+          460,
+          468,
+          477,
+          486
+        ],
+        "crop_box": [
+          386,
+          1079,
+          695,
+          1210
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 1.8846,
+        "mae_planned_per_crop": [
+          2.1573,
+          1.9299,
+          1.7208,
+          1.7305
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 28.679,
+          "Pretendard ExtraBold": 29.1225,
+          "Noto Sans CJK KR Bold": 9.1168
+        },
+        "noise_mae": 1.8974,
+        "noise_by_start": {
+          "mis235": 1.8974,
+          "mis210": 1.8703
+        },
+        "misaligned_starts": [
+          235,
+          210
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 7.2322,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 1.885 ≤ 재인코딩 잡음 1.897, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 7.232 더 가까움(> 잡음)"
       }
     },
     {
@@ -3440,7 +3862,8 @@
           1.0,
           1.0,
           1.0
-        ]
+        ],
+        "fade_dur_s": 0.167
       },
       "presence_in": [
         [
@@ -3560,7 +3983,8 @@
       "motion_out_obs": {
         "type": "none",
         "dur_s": 0.0,
-        "expected": "none"
+        "expected": "none",
+        "fade_dur_s": 0.033
       },
       "presence_out": [
         [
@@ -3788,6 +4212,57 @@
           16.2333
         ],
         "skipped": []
+      },
+      "font_exact": {
+        "status": "measured",
+        "key_frame": 250,
+        "crop_frames": [
+          461,
+          469,
+          478,
+          487
+        ],
+        "crop_box": [
+          158,
+          1376,
+          922,
+          1491
+        ],
+        "conditions": {
+          "crf": 18.0,
+          "x264_preset": "veryfast",
+          "threads": 2,
+          "assumed": false,
+          "source": "output MP4 x264 SEI",
+          "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+        },
+        "mae_planned": 0.7079,
+        "mae_planned_per_crop": [
+          0.7029,
+          0.7012,
+          0.7261,
+          0.7014
+        ],
+        "mae_alternatives": {
+          "Pretendard Black": 48.7093,
+          "Pretendard ExtraBold": 48.5326,
+          "Noto Sans CJK KR Bold": 8.888
+        },
+        "noise_mae": 0.782,
+        "noise_by_start": {
+          "mis235": 0.7703,
+          "mis210": 0.782
+        },
+        "misaligned_starts": [
+          235,
+          210
+        ],
+        "expected": "Noto Sans CJK KR Black",
+        "best_alternative": "Noto Sans CJK KR Bold",
+        "margin": 8.1801,
+        "reproduced": true,
+        "verdict": "identical",
+        "reason": "계획 글꼴 재렌더가 출력과 MAE 0.708 ≤ 재인코딩 잡음 0.782, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.180 더 가까움(> 잡음)"
       }
     }
   ],
@@ -3842,6 +4317,8 @@
       "verdict": "identical",
       "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_title: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.064, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.609 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): identical",
         "IoU 0.988 >= 천장 p10 0.980",
         "차순위 대비 차이 +0.073 > 잡음 0.011",
         "글자별 검사 통과"
@@ -3934,7 +4411,74 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Pretendard Black",
+          "Pretendard ExtraBold",
+          "Noto Sans CJK KR Bold"
+        ],
+        "captions": {
+          "c_title": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              4,
+              12,
+              21,
+              30
+            ],
+            "crop_box": [
+              182,
+              265,
+              898,
+              405
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 57.7425,
+              "Pretendard ExtraBold": 57.4564,
+              "Noto Sans CJK KR Bold": 9.6094
+            },
+            "noise_mae": 0.064,
+            "noise_by_start": {
+              "mis1": 0.0462,
+              "mis2": 0.064
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 9.6094,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.064, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.609 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "identical",
+        "verdict": "identical",
+        "conflict": false
+      }
     },
     "description": {
       "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
@@ -3983,9 +4527,11 @@
       "missing_candidates": [],
       "failed_crops": [],
       "status": "measured",
-      "verdict": "similar",
-      "verdict_ko": "유사(동일 확정 불가)",
+      "verdict": "identical",
+      "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_desc: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.955, 가장 가까운 대안 NanumSquare ExtraBold 보다 41.647 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): similar",
         "IoU 0.951 < 천장 p10 0.955",
         "차순위 대비 차이 +0.057 > 잡음 0.046",
         "글자별 검사 통과"
@@ -4078,7 +4624,74 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Pretendard Bold",
+          "Pretendard ExtraBold",
+          "NanumSquare ExtraBold"
+        ],
+        "captions": {
+          "c_desc": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              10,
+              18,
+              27,
+              36
+            ],
+            "crop_box": [
+              253,
+              463,
+              827,
+              544
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Bold": 52.2395,
+              "Pretendard ExtraBold": 52.8012,
+              "NanumSquare ExtraBold": 41.6465
+            },
+            "noise_mae": 0.9546,
+            "noise_by_start": {
+              "mis1": 0.0068,
+              "mis2": 0.9546
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Bold",
+            "best_alternative": "NanumSquare ExtraBold",
+            "margin": 41.6465,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.955, 가장 가까운 대안 NanumSquare ExtraBold 보다 41.647 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "similar",
+        "verdict": "identical",
+        "conflict": false
+      }
     },
     "speaker": {
       "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
@@ -4130,6 +4743,8 @@
       "verdict": "identical",
       "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_spk: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 1.588, 가장 가까운 대안 NanumSquare ExtraBold 보다 33.907 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): identical",
         "IoU 0.959 >= 천장 p10 0.951",
         "차순위 대비 차이 +0.053 > 잡음 0.027",
         "글자별 검사 통과"
@@ -4222,7 +4837,74 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Pretendard Bold",
+          "Pretendard ExtraBold",
+          "NanumSquare ExtraBold"
+        ],
+        "captions": {
+          "c_spk": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              18,
+              26,
+              35,
+              44
+            ],
+            "crop_box": [
+              654,
+              744,
+              824,
+              801
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Bold": 35.2759,
+              "Pretendard ExtraBold": 35.8502,
+              "NanumSquare ExtraBold": 33.9071
+            },
+            "noise_mae": 1.5882,
+            "noise_by_start": {
+              "mis1": 1.5882,
+              "mis2": 1.0939
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Bold",
+            "best_alternative": "NanumSquare ExtraBold",
+            "margin": 33.9071,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 1.588, 가장 가까운 대안 NanumSquare ExtraBold 보다 33.907 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "identical",
+        "verdict": "identical",
+        "conflict": false
+      }
     },
     "situation": {
       "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
@@ -4277,6 +4959,8 @@
       "verdict": "identical",
       "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_sit1: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.065, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.329 더 가까움(> 잡음); c_sit2: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.269, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.095 더 가까움(> 잡음); c_sit3: identical — 계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.495, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.617 더 가까움(> 잡음); c_sit4: identical — 계획 글꼴 재렌더가 출력과 MAE 0.708 ≤ 재인코딩 잡음 0.782, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.180 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): identical",
         "IoU 0.969 >= 천장 p10 0.968",
         "차순위 대비 차이 +0.057 > 잡음 0.020",
         "글자별 검사 통과"
@@ -4468,7 +5152,227 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Pretendard Black",
+          "Pretendard ExtraBold",
+          "Noto Sans CJK KR Bold"
+        ],
+        "captions": {
+          "c_sit1": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              47,
+              55,
+              64,
+              73
+            ],
+            "crop_box": [
+              226,
+              1376,
+              854,
+              1491
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 55.2343,
+              "Pretendard ExtraBold": 54.6923,
+              "Noto Sans CJK KR Bold": 9.3287
+            },
+            "noise_mae": 0.0647,
+            "noise_by_start": {
+              "mis1": 0.0647,
+              "mis2": 0.0528
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 9.3287,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.065, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.329 더 가까움(> 잡음)"
+          },
+          "c_sit2": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              131,
+              139,
+              148,
+              157
+            ],
+            "crop_box": [
+              257,
+              1376,
+              824,
+              1491
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 51.1584,
+              "Pretendard ExtraBold": 49.8288,
+              "Noto Sans CJK KR Bold": 9.0945
+            },
+            "noise_mae": 0.2686,
+            "noise_by_start": {
+              "mis1": 0.2686,
+              "mis2": 0.0028
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 9.0945,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.269, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.095 더 가까움(> 잡음)"
+          },
+          "c_sit3": {
+            "status": "measured",
+            "key_frame": 0,
+            "crop_frames": [
+              239,
+              247,
+              256,
+              265
+            ],
+            "crop_box": [
+              219,
+              1376,
+              862,
+              1491
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0,
+            "mae_planned_per_crop": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 52.1565,
+              "Pretendard ExtraBold": 51.8436,
+              "Noto Sans CJK KR Bold": 9.617
+            },
+            "noise_mae": 0.4946,
+            "noise_by_start": {
+              "mis1": 0.4946,
+              "mis2": 0.0777
+            },
+            "misaligned_starts": [
+              1,
+              2
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 9.617,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.000 ≤ 재인코딩 잡음 0.495, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 9.617 더 가까움(> 잡음)"
+          },
+          "c_sit4": {
+            "status": "measured",
+            "key_frame": 250,
+            "crop_frames": [
+              461,
+              469,
+              478,
+              487
+            ],
+            "crop_box": [
+              158,
+              1376,
+              922,
+              1491
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.7079,
+            "mae_planned_per_crop": [
+              0.7029,
+              0.7012,
+              0.7261,
+              0.7014
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 48.7093,
+              "Pretendard ExtraBold": 48.5326,
+              "Noto Sans CJK KR Bold": 8.888
+            },
+            "noise_mae": 0.782,
+            "noise_by_start": {
+              "mis235": 0.7703,
+              "mis210": 0.782
+            },
+            "misaligned_starts": [
+              235,
+              210
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 8.1801,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.708 ≤ 재인코딩 잡음 0.782, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.180 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "identical",
+        "verdict": "identical",
+        "conflict": false
+      }
     },
     "dialogue": {
       "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
@@ -4520,6 +5424,8 @@
       "verdict": "identical",
       "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_dlg: identical — 계획 글꼴 재렌더가 출력과 MAE 0.009 ≤ 재인코딩 잡음 0.037, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.392 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): identical",
         "IoU 0.962 >= 천장 p10 0.961",
         "차순위 대비 차이 +0.132 > 잡음 0.020",
         "글자별 검사 통과"
@@ -4612,7 +5518,74 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Noto Sans CJK KR Bold",
+          "Pretendard Black",
+          "Pretendard ExtraBold"
+        ],
+        "captions": {
+          "c_dlg": {
+            "status": "measured",
+            "key_frame": 250,
+            "crop_frames": [
+              307,
+              315,
+              324,
+              333
+            ],
+            "crop_box": [
+              237,
+              1377,
+              842,
+              1498
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 0.0095,
+            "mae_planned_per_crop": [
+              0.0365,
+              0.0005,
+              0.0005,
+              0.0005
+            ],
+            "mae_alternatives": {
+              "Noto Sans CJK KR Bold": 8.4014,
+              "Pretendard Black": 29.223,
+              "Pretendard ExtraBold": 28.8911
+            },
+            "noise_mae": 0.0366,
+            "noise_by_start": {
+              "mis235": 0.0366,
+              "mis210": 0.0173
+            },
+            "misaligned_starts": [
+              235,
+              210
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 8.3919,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 0.009 ≤ 재인코딩 잡음 0.037, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 8.392 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "identical",
+        "verdict": "identical",
+        "conflict": false
+      }
     },
     "reaction": {
       "method": "역할 단위 합동 판정: 모든 자막의 여러 정지 프레임 crop 의 기대 글꼴 IoU 중앙값 vs 같은 개수 crop 중앙값의 천장(부트스트랩, 자막별 문구·정확한 크기·실제 배경·같은 지연)",
@@ -4664,6 +5637,8 @@
       "verdict": "identical",
       "verdict_ko": "동일",
       "reasons": [
+        "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움 [c_rx: identical — 계획 글꼴 재렌더가 출력과 MAE 1.885 ≤ 재인코딩 잡음 1.897, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 7.232 더 가까움(> 잡음)]",
+        "합동 통계(두 번째 근거): identical",
         "IoU 0.981 >= 천장 p10 0.972",
         "차순위 대비 차이 +0.084 > 잡음 0.015",
         "글자별 검사 통과"
@@ -4756,7 +5731,74 @@
         }
       ],
       "other_font": null,
-      "captions_without_crops": []
+      "captions_without_crops": [],
+      "exact": {
+        "method": "production ASS 이벤트 그대로(위치·모션), libass→bt709→x264(출력 SEI 의 CRF·프리셋·스레드), 출력과 같은 키 프레임에서 시작한 재렌더 vs 출력 crop",
+        "error": null,
+        "notes": [],
+        "alternatives": [
+          "Pretendard Black",
+          "Pretendard ExtraBold",
+          "Noto Sans CJK KR Bold"
+        ],
+        "captions": {
+          "c_rx": {
+            "status": "measured",
+            "key_frame": 250,
+            "crop_frames": [
+              460,
+              468,
+              477,
+              486
+            ],
+            "crop_box": [
+              386,
+              1079,
+              695,
+              1210
+            ],
+            "conditions": {
+              "crf": 18.0,
+              "x264_preset": "veryfast",
+              "threads": 2,
+              "assumed": false,
+              "source": "output MP4 x264 SEI",
+              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 출력과 같은 키 프레임에서 시작"
+            },
+            "mae_planned": 1.8846,
+            "mae_planned_per_crop": [
+              2.1573,
+              1.9299,
+              1.7208,
+              1.7305
+            ],
+            "mae_alternatives": {
+              "Pretendard Black": 28.679,
+              "Pretendard ExtraBold": 29.1225,
+              "Noto Sans CJK KR Bold": 9.1168
+            },
+            "noise_mae": 1.8974,
+            "noise_by_start": {
+              "mis235": 1.8974,
+              "mis210": 1.8703
+            },
+            "misaligned_starts": [
+              235,
+              210
+            ],
+            "expected": "Noto Sans CJK KR Black",
+            "best_alternative": "Noto Sans CJK KR Bold",
+            "margin": 7.2322,
+            "reproduced": true,
+            "verdict": "identical",
+            "reason": "계획 글꼴 재렌더가 출력과 MAE 1.885 ≤ 재인코딩 잡음 1.897, 가장 가까운 대안 Noto Sans CJK KR Bold 보다 7.232 더 가까움(> 잡음)"
+          }
+        },
+        "exact_role_verdict": "identical",
+        "pooled_verdict": "identical",
+        "verdict": "identical",
+        "conflict": false
+      }
     }
   },
   "identity": {
@@ -5523,7 +6565,8 @@
     "expected_text": "움직임 테스트 영상",
     "ocr": "움직임 테스트 영상",
     "similarity": 1.0,
-    "role_caption_visible": true
+    "role_caption_visible": true,
+    "note": ""
   },
   "status": "measured"
 }

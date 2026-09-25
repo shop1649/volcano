@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-coverage-001.mlt",
-    "created_at": "2026-09-24T21:50:21+00:00",
+    "created_at": "2026-09-25T04:15:38+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -52,6 +52,9 @@
         "envelope_points": 2,
         "duck_ranges": [],
         "silences": [],
+        "loop": {
+          "status": "없음"
+        },
         "note": "시작점은 프레임(1/fps) 단위로 맞춰짐; 덕킹/정적 envelope 는 volume level 키프레임"
       },
       "mono_upmix_compensation": {
@@ -141,6 +144,11 @@
       "master_limiter_max_reduction_db": 0.0,
       "note": "마스터의 정규화 이득 + 최종 트림을 타임라인 volume 필터로 적용"
     },
+    "start_ramp": {
+      "status": "없음",
+      "samples": 0,
+      "source": "episodes/test-coverage-001/build/fg_gain.json"
+    },
     "editable": [
       "클립 순서·길이·트림(V2 영상 트랙의 각 조각)",
       "클립별 위치/크기/줌(Size, Position & Rotate = affine 키프레임)",
@@ -159,12 +167,12 @@
       "정지(freeze) 프레임은 이미지 파일(media/*_hold_*.png)"
     ]
   },
-  "updated_at": "2026-09-24T21:50:23+00:00",
+  "updated_at": "2026-09-25T04:15:40+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-coverage-001.fcpxml",
-    "created_at": "2026-09-24T21:50:22+00:00",
+    "created_at": "2026-09-25T04:15:39+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -224,7 +232,7 @@
   "otio": {
     "format": "otio",
     "file": "test-coverage-001.otio",
-    "created_at": "2026-09-24T21:50:22+00:00",
+    "created_at": "2026-09-25T04:15:39+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",

@@ -1,7 +1,7 @@
 {
   "schema": "shortkit.project_verify/1",
   "episode_id": "test-pipeline-001",
-  "checked_at": "2026-09-25T02:14:11+00:00",
+  "checked_at": "2026-09-25T04:14:05+00:00",
   "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.mlt",
   "master": "episodes/test-pipeline-001/output/test-pipeline-001.mp4",
   "thresholds": {
@@ -22,7 +22,7 @@
     "Shotcut/Kdenlive GUI 에서 실제로 열어 보기(이 기계에 GUI 없음)",
     "사람이 직접 보고 들은 확인(청취·시청 확인 안 함)"
   ],
-  "master_sha256": "56f4a76ce53947bc8da8d8f18a5d036b00dbeacd2e2af00d7ef4f961873736d6",
+  "master_sha256": "7326a854240bfd13897ca1994382775ed17ba06458125145b2f8479c6528d966",
   "melt": {
     "cmd": [
       "xvfb-run",
@@ -30,7 +30,7 @@
       "melt",
       "test-pipeline-001.mlt",
       "-consumer",
-      "avformat:../build/verify/test-pipeline-001.melt.32664.tmp.render.mkv",
+      "avformat:../build/verify/test-pipeline-001.melt.20351.tmp.render.mkv",
       "progressive=1",
       "vcodec=libx264",
       "preset=veryfast",
@@ -53,7 +53,7 @@
     "ssim_overall": 0.9975,
     "ssim_worst_second": 0.9939,
     "mad_overall": 0.414,
-    "audio_env_corr": 0.9968,
+    "audio_env_corr": 0.9966,
     "duration_master_s": 19.2667,
     "duration_project_s": 19.266,
     "duration_diff_frames": 0.02,
@@ -78,7 +78,7 @@
         "n": 20,
         "p10": 0.01,
         "p50": 0.025,
-        "p90": 0.105
+        "p90": 0.112
       }
     }
   },
@@ -226,8 +226,8 @@
       "ssim_min": 0.998,
       "mad": 0.264,
       "video": "pass",
-      "level_master_dbfs": -20.79,
-      "level_project_dbfs": -20.78,
+      "level_master_dbfs": -20.67,
+      "level_project_dbfs": -20.65,
       "level_diff_db": 0.02,
       "audio": "pass"
     },
@@ -240,9 +240,9 @@
       "ssim_min": 0.998,
       "mad": 0.309,
       "video": "pass",
-      "level_master_dbfs": -17.08,
-      "level_project_dbfs": -16.92,
-      "level_diff_db": 0.15,
+      "level_master_dbfs": -16.64,
+      "level_project_dbfs": -16.52,
+      "level_diff_db": 0.13,
       "audio": "pass"
     },
     {
@@ -254,8 +254,8 @@
       "ssim_min": 0.9979,
       "mad": 0.319,
       "video": "pass",
-      "level_master_dbfs": -17.49,
-      "level_project_dbfs": -17.46,
+      "level_master_dbfs": -17.44,
+      "level_project_dbfs": -17.41,
       "level_diff_db": 0.03,
       "audio": "pass"
     },
@@ -268,9 +268,9 @@
       "ssim_min": 0.9666,
       "mad": 1.88,
       "video": "pass",
-      "level_master_dbfs": -21.96,
-      "level_project_dbfs": -21.94,
-      "level_diff_db": 0.03,
+      "level_master_dbfs": -19.3,
+      "level_project_dbfs": -19.28,
+      "level_diff_db": 0.02,
       "audio": "pass"
     },
     {
@@ -284,7 +284,7 @@
       "video": "pass",
       "level_master_dbfs": -18.74,
       "level_project_dbfs": -18.72,
-      "level_diff_db": 0.02,
+      "level_diff_db": 0.01,
       "audio": "pass"
     },
     {
@@ -298,7 +298,7 @@
       "video": "pass",
       "level_master_dbfs": -19.04,
       "level_project_dbfs": -19.02,
-      "level_diff_db": 0.02,
+      "level_diff_db": 0.03,
       "audio": "pass"
     },
     {
@@ -310,7 +310,7 @@
       "ssim_min": 0.9789,
       "mad": 0.518,
       "video": "pass",
-      "level_master_dbfs": -18.57,
+      "level_master_dbfs": -18.58,
       "level_project_dbfs": -18.55,
       "level_diff_db": 0.02,
       "audio": "pass"
@@ -352,9 +352,9 @@
       "ssim_min": 0.9967,
       "mad": 0.415,
       "video": "pass",
-      "level_master_dbfs": -20.68,
+      "level_master_dbfs": -20.7,
       "level_project_dbfs": -20.59,
-      "level_diff_db": 0.1,
+      "level_diff_db": 0.11,
       "audio": "pass"
     },
     {
@@ -366,7 +366,7 @@
       "ssim_min": 0.9964,
       "mad": 0.395,
       "video": "pass",
-      "level_master_dbfs": -31.84,
+      "level_master_dbfs": -31.83,
       "level_project_dbfs": -31.07,
       "level_diff_db": 0.76,
       "audio": "pass"
@@ -377,7 +377,7 @@
   "other_formats": {
     "fcpxml": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.fcpxml",
-      "checked_at": "2026-09-25T02:15:36+00:00",
+      "checked_at": "2026-09-25T04:15:07+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
@@ -385,7 +385,7 @@
     },
     "otio": {
       "project_file": "episodes/test-pipeline-001/project/test-pipeline-001.otio",
-      "checked_at": "2026-09-25T02:15:36+00:00",
+      "checked_at": "2026-09-25T04:15:07+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",

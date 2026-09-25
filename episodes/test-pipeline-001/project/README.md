@@ -1,6 +1,6 @@
 # test-pipeline-001 편집 프로젝트
 
-- 생성 2026-09-25T02:15:36+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-25T04:15:07+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 19.25s · 마스터 `episodes/test-pipeline-001/output/test-pipeline-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 
@@ -118,7 +118,7 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 - MLT 프로젝트를 melt 로 실제 렌더해 마스터 MP4 와 같은 시각 1초 격자로 비교: **통과**
   - 화면 SSIM 전체 0.9975 (기준 ≥ 0.95), 가장 낮은 1초 0.9939 (기준 ≥ 0.9), 평균 절대차 0.414 (1초 기준 ≤ 10.0)
   - 1초별 SSIM 분포: n=20, p10 0.996 / p50 0.998 / p90 0.998
-  - 소리 RMS 포락선 상관 0.9968 (기준 ≥ 0.9), 초별 레벨 차 최대 0.76 dB
+  - 소리 RMS 포락선 상관 0.9966 (기준 ≥ 0.9), 초별 레벨 차 최대 0.76 dB
   - 길이: 마스터 19.2667s / 프로젝트 19.266s, 비교 프레임 578/578
   - 렌더 방식: `xvfb-run -a …` (xvfb-run), 결과 파일 episodes/test-pipeline-001/build/verify/test-pipeline-001.melt.mkv
 
@@ -136,15 +136,15 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 | 7 | 0.9981 | 0.317 | 0.05 | 통과 | 통과 |
 | 8 | 0.9982 | 0.261 | 0.01 | 통과 | 통과 |
 | 9 | 0.9982 | 0.264 | 0.02 | 통과 | 통과 |
-| 10 | 0.9981 | 0.309 | 0.15 | 통과 | 통과 |
+| 10 | 0.9981 | 0.309 | 0.13 | 통과 | 통과 |
 | 11 | 0.998 | 0.319 | 0.03 | 통과 | 통과 |
-| 12 | 0.9939 | 1.88 | 0.03 | 통과 | 통과 |
-| 13 | 0.9973 | 0.392 | 0.02 | 통과 | 통과 |
-| 14 | 0.9961 | 0.429 | 0.02 | 통과 | 통과 |
+| 12 | 0.9939 | 1.88 | 0.02 | 통과 | 통과 |
+| 13 | 0.9973 | 0.392 | 0.01 | 통과 | 통과 |
+| 14 | 0.9961 | 0.429 | 0.03 | 통과 | 통과 |
 | 15 | 0.9954 | 0.518 | 0.02 | 통과 | 통과 |
 | 16 | 0.9974 | 0.455 | 0.01 | 통과 | 통과 |
 | 17 | 0.9973 | 0.435 | 0.01 | 통과 | 통과 |
-| 18 | 0.9972 | 0.415 | 0.1 | 통과 | 통과 |
+| 18 | 0.9972 | 0.415 | 0.11 | 통과 | 통과 |
 | 19 | 0.9971 | 0.395 | 0.76 | 통과 | 통과 |
 
 ## 검증하지 못한 것 (못 잼)
@@ -165,13 +165,26 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [format_unclassified] 테스트 모드: 포맷 미분류(UNCLASSIFIED) — 포맷별 범위 검사는 못 함
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
+  - [clean_no_record] 오버레이 기록 없음(warehouse/overlays/7ca6f09cb32c….json) → `python -m shortkit clean detect --source assets/test/generated/classroom_voice.mp4` 후 `clean plan` 결과를 붙여야 함
+  - [clean_no_record] 오버레이 기록 없음(warehouse/overlays/650166430c4b….json) → `python -m shortkit clean detect --source assets/test/generated/video/head-pose-face-detection-female-and-male.mp4` 후 `clean plan` 결과를 붙여야 함
+  - [style_override] plan 이 고정 스타일 decorations.arrow.blink_hz=0.0 Hz(임시값·못 잼) 을 2.0 Hz 로 덮어씁니다: 레퍼런스와 다른 스타일 — 의도한 변경이면 requested_changes.yaml 에 적어 프리셋 값을 바꾸고 plan 에서는 지우기
+  - [style_override] plan 이 고정 스타일 audio.sfx.gain_db_default=-8.0 dB(임시값·못 잼) 을 -12.0 dB 로 덮어씁니다: 레퍼런스와 다른 스타일 — 의도한 변경이면 requested_changes.yaml 에 적어 프리셋 값을 바꾸고 plan 에서는 지우기
   - [duration_unmeasured] 영상 길이 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 19.25s 의 적합성 판정 불가
   - [zoom_cuts_protected] 확대(zoom) 때문에 보호 영역 '왼쪽 남성 얼굴' 이 화면 밖으로 잘립니다
+  - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
+  - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
+  - [reveal_order_unmeasured] 테스트 모드(포맷 미분류): 정보 공개 순서를 레퍼런스 포맷과 비교 못 함
   - [sfx_range_unmeasured] 효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 (2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단)
+  - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/whoosh.wav 이 종류 'whoosh' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
+  - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/click.wav 이 종류 'click' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
+  - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/pop.wav 이 종류 'pop' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
+  - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/ding.wav 이 종류 'ding' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
+  - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/boing.wav 이 종류 'boing' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
   - [bgm_identity_unmeasured] 프리셋 BGM 제목·버전 미식별(못 잼: title=None, version=None): 쓰는 음악 파일이 레퍼런스 곡·버전과 같은지 판정 불가
-  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 255개로 렌더합니다(레퍼런스 일치 아님)
-- 프리셋 미측정(못 잼) 값 248개로 만든 편집이다(레퍼런스 일치 아님).
-- plan sha256 `0d2a41e1d3d3b22bb92b65af42ae28ddd2da55f499be20e8c4b7d80e300bcc85`
+  - [presence_unmeasured] 레퍼런스의 효과 사용 여부 못 잼: zoom(씀), freeze(씀), speed_change(안 씀), flash(씀), crossfade(씀), decorations(씀), bgm(씀), original_audio(씀), ducking(씀), intentional_silence(씀) — 이 plan 의 선택을 레퍼런스와 비교할 수 없음
+  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 262개로 렌더합니다(레퍼런스 일치 아님)
+- 프리셋 미측정(못 잼) 값 260개로 만든 편집이다(레퍼런스 일치 아님).
+- plan sha256 `1f50c54f34f3b79bd44114460b0a33fb31fe13064b59dd092f03b8fffcf6b7f9`
 - 승인 상태: 필요=False 승인됨=False
 - 소스 v_class: `assets/test/generated/classroom_voice.mp4` sha256=7ca6f09cb32cf87c… 창고 id=None
 - 소스 v_pair: `assets/test/generated/video/head-pose-face-detection-female-and-male.mp4` sha256=650166430c4bf9dd… 창고 id=None

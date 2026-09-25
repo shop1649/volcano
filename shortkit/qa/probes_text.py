@@ -442,6 +442,28 @@ def _presence(frames: list[np.ndarray], rest: np.ndarray, mask: np.ndarray, cap)
     return np.array(out), c_rest
 
 
+FULL_P, ZERO_P = 0.97, 0.03     # presence levels taken as "fully shown" / "gone" when timing a fade
+
+
+def fade_length(ts, p, rising: bool) -> float | None:
+    """Length of a fade from the presence curve: last frame with the caption gone -> first frame fully shown
+    (``rising``), or last fully shown -> first gone.  Frame-quantised (+-1 frame); None when the curve does not contain
+    both ends.  Measured on the test renders: libass \\fad(200) -> 0.200 s, \\fad(150) -> 0.167 s (30 fps)."""
+    pv = [float(x) if x is not None and x == x else None for x in p]
+    if rising:
+        i_full = next((i for i, v in enumerate(pv) if v is not None and v >= FULL_P), None)
+        if i_full is None:
+            return None
+        i_zero = next((i for i in range(i_full - 1, -1, -1) if pv[i] is not None and pv[i] <= ZERO_P), None)
+        return None if i_zero is None else round(float(ts[i_full]) - float(ts[i_zero]), 3)
+    i_zero = None
+    last_full = next((i for i in range(len(pv) - 1, -1, -1) if pv[i] is not None and pv[i] >= FULL_P), None)
+    if last_full is None:
+        return None
+    i_zero = next((i for i in range(last_full + 1, len(pv)) if pv[i] is not None and pv[i] <= ZERO_P), None)
+    return None if i_zero is None else round(float(ts[i_zero]) - float(ts[last_full]), 3)
+
+
 def _ramp_start(ts, p, i) -> float:
     """Onset: frame i is the first clearly visible frame; if it is only partly visible (fade),
     extrapolate the presence ramp back to 0."""
@@ -524,6 +546,8 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
                 out["onset_frame_t"] = round(ts[idx], 4)
                 out["onset"] = round(_ramp_start(ts, p, idx), 4)
                 out.update(_motion_in(ts, frs, p, idx, rest, mask, cap, fps))
+                if out.get("motion_in_obs") is not None:
+                    out["motion_in_obs"]["fade_dur_s"] = fade_length(ts, p, rising=True)
         out["presence_in"] = [[rnd(a, 3), rnd(b, 3)] for a, b in zip(ts, p)]
     # ---------------- offset
     if cap.end >= ctx.info.duration - 1.5 * fr:
@@ -567,7 +591,8 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
                     else:
                         out["offset"] = round(ts2[last] + fr, 4)
                     out["motion_out_obs"] = {"type": "fade" if ramp_frames >= 2 else "none",
-                                             "dur_s": round(ramp_frames * fr, 3), "expected": mo.get("type")}
+                                             "dur_s": round(ramp_frames * fr, 3), "expected": mo.get("type"),
+                                             "fade_dur_s": fade_length(ts2, p2, rising=False)}
                 out["presence_out"] = [[rnd(a, 3), rnd(b, 3)] for a, b in zip(ts2, p2)]
     return out
 
@@ -1046,10 +1071,16 @@ def font_role_key(cap) -> str:
 
 
 def probe_font_roles(ctx: QAContext, captions: list[dict]) -> dict:
-    """Per-ROLE pooled font verdicts (``font_id.identify_role_font``) from the rest-frame crops collected by
-    ``probe_captions`` for every found caption.  -> {subject: result}; subject = the role, or ``role:font``
-    when one role uses several planned fonts."""
-    from .font_id import identify_role_font
+    """Per-ROLE font verdicts.  Two lines of evidence:
+
+    1. the exact-position re-render (``font_id.exact_render_checks``): each caption re-rendered exactly as production
+       did, in the planned face and in the top alternative faces, compared with the MP4 crop -- 'identical' only when the
+       planned face reproduces the output within the re-encode noise and beats every alternative by more than it;
+    2. the pooled statistics (``font_id.identify_role_font``): the rest-frame crops of every caption of the role vs the
+       bootstrapped same-font ceiling.
+    ``font_id.combine_role_verdict`` joins them.  -> {subject: result}; subject = the role, or ``role:font`` when one
+    role uses several planned fonts.  Every caption item gets ``font_exact`` (its exact-check result)."""
+    from .font_id import combine_role_verdict, exact_render_checks, identify_role_font, nearest_fonts
 
     stash = ctx.options.get("_font_pool") or {}
     found = {c["id"] for c in captions if c.get("found")}
@@ -1057,10 +1088,12 @@ def probe_font_roles(ctx: QAContext, captions: list[dict]) -> dict:
     for cap in ctx.resolved.captions:
         groups.setdefault(font_role_key(cap), []).append(cap)
     roles = {}
+    subj_caps: dict[str, tuple[str, list]] = {}
     for key, caps in groups.items():
         role = caps[0].role
         n_fonts = len({font_role_key(c) for c in ctx.resolved.captions if c.role == role})
         subject = role if n_fonts == 1 else f"{role}:{caps[0].font_name}"
+        subj_caps[subject] = (role, caps)
         entries, missing = [], []
         for cap in caps:
             st = stash.get(cap.id)
@@ -1074,28 +1107,94 @@ def probe_font_roles(ctx: QAContext, captions: list[dict]) -> dict:
             roles[subject] = {"status": "unmeasured", "verdict": "unmeasured", "role": role,
                               "expected": caps[0].font_name, "captions_without_crops": missing,
                               "reason": "이 역할의 어느 자막에서도 정지 프레임 crop 을 얻지 못함"}
-            continue
-        try:
-            r = identify_role_font(ctx, role, entries)
-        except Exception as e:
-            r = {"status": "unmeasured", "verdict": "unmeasured", "role": role, "expected": caps[0].font_name,
-                 "reason": f"합동 글꼴 판정 실패: {type(e).__name__}: {e}"[:300]}
-        r["captions_without_crops"] = missing
-        roles[subject] = r
+        else:
+            try:
+                r = identify_role_font(ctx, role, entries)
+            except Exception as e:
+                r = {"status": "unmeasured", "verdict": "unmeasured", "role": role, "expected": caps[0].font_name,
+                     "reason": f"합동 글꼴 판정 실패: {type(e).__name__}: {e}"[:300]}
+            r["captions_without_crops"] = missing
+            roles[subject] = r
     ctx.options.pop("_font_pool", None)
+    # ---- exact-position re-render (first line of evidence)
+    role_caps: dict[str, list] = {}
+    role_alts: dict[str, list[str]] = {}
+    for subject, (role, caps) in subj_caps.items():
+        r = roles[subject]
+        exp = str(r.get("expected_canonical") or caps[0].font_name).replace(" ", "").lower()
+        alts = [x["font"] for x in (r.get("ranked") or []) if str(x.get("font") or "").replace(" ", "").lower() != exp]
+        if not alts:
+            try:
+                alts = [n for n in nearest_fonts(caps[0].font_name)
+                        if str(n).replace(" ", "").lower() not in (exp, str(caps[0].font_name).replace(" ", "").lower())]
+            except Exception as e:
+                r.setdefault("notes", []).append(f"대안 글꼴 목록 실패: {type(e).__name__}: {e}"[:200])
+                alts = []
+        role_caps.setdefault(role, []).extend(caps)
+        role_alts.setdefault(role, [])
+        for a in alts[:3]:
+            if a not in role_alts[role]:
+                role_alts[role].append(a)
+    try:
+        ex = exact_render_checks(ctx, role_caps, role_alts)
+    except Exception as e:
+        ex = {"captions": {}, "error": f"{type(e).__name__}: {e}"[:300], "notes": []}
+    byid = {c["id"]: c for c in captions}
+    for cid, res in (ex.get("captions") or {}).items():
+        if cid in byid:
+            byid[cid]["font_exact"] = res
+    from ..reference import typography as ty
+
+    for subject, (role, caps) in subj_caps.items():
+        r = roles[subject]
+        exact_caps = {c.id: ex["captions"][c.id] for c in caps if c.id in (ex.get("captions") or {})}
+        comb = combine_role_verdict(r, exact_caps)
+        r["exact"] = {"method": ex.get("method"), "error": ex.get("error"), "notes": ex.get("notes"),
+                      "alternatives": role_alts.get(role), "captions": exact_caps, **comb}
+        if comb["exact_role_verdict"] in ("identical", "different", "not_reproduced", "best_not_reproduced"):
+            r["status"] = "measured"
+        why = []
+        for cid, e in exact_caps.items():
+            why.append(f"{cid}: {e.get('verdict')} — {e.get('reason')}")
+        if ex.get("error"):
+            why.append("정확 위치 재렌더 못 함: " + str(ex["error"]))
+        head = {"identical": "정확 위치 재렌더: 계획 글꼴이 출력을 재현(잡음 이내)하고 대안보다 잡음 이상 가까움",
+                "different": "정확 위치 재렌더: 다른 글꼴이 출력을 더 잘 재현",
+                "not_reproduced": "정확 위치 재렌더: 계획 글꼴도 대안도 출력을 재현하지 못함(글꼴 판정 불가)",
+                "best_not_reproduced": ("정확 위치 재렌더: 계획 글꼴이 대안보다 잡음 이상 가깝지만 출력을 그대로 재현하지는 못함 — "
+                                        "합동 통계가 동일일 때만 동일"),
+                "unmeasured": "정확 위치 재렌더 못 잼"}[comb["exact_role_verdict"]]
+        second = f"합동 통계(두 번째 근거): {comb['pooled_verdict']}"
+        if comb["conflict"]:
+            second += " — 재렌더(동일)와 합동 통계(다름)가 충돌해 못 잼"
+        r["reasons"] = [head + (" [" + "; ".join(why) + "]" if why else ""), second] + list(r.get("reasons") or [])
+        r["verdict"] = comb["verdict"]
+        r["verdict_ko"] = ty.VERDICT_KO.get(comb["verdict"], comb["verdict"])
+        r.setdefault("role", role)
+        r.setdefault("expected", caps[0].font_name)
     return roles
 
 
 def probe_cover(ctx: QAContext, captions: list[dict]) -> dict:
+    """The cover frame the preset names (cover.source: first_frame -> t=0; chosen_frame -> the plan's cover.frame_t)
+    with the cover.text_role caption OCR'd on it."""
     plan = ctx.plan or {}
     cov = plan.get("cover") or {}
-    t = cov.get("frame_t")
-    t = 0.0 if t is None else float(t)
     try:
         src = ctx.preset.get("cover.source")
         role = ctx.preset.get("cover.text_role")
     except KeyError:
         src, role = None, None
+    note = ""
+    if src == "first_frame":
+        t = 0.0
+        if cov.get("frame_t") not in (None, 0, 0.0):
+            note = f"cover.source=first_frame 이라 plan cover.frame_t={cov.get('frame_t')} 대신 첫 프레임을 검사"
+    elif src == "chosen_frame" and cov.get("frame_t") is None:
+        return {"t": None, "source": src, "text_role": role, "similarity": None, "role_caption_visible": None,
+                "note": "cover.source=chosen_frame 인데 plan 에 cover.frame_t 가 없음 — 표지 프레임 못 잼"}
+    else:
+        t = float(cov.get("frame_t") or 0.0)
     exp_text = cov.get("text") or next((c.text for c in ctx.resolved.captions if c.role == role), None)
     fr = grab(ctx.mp4, t)
     caps_at = [c for c in ctx.resolved.captions if c.start <= t + 1e-3 < c.end and c.role == role]
@@ -1108,7 +1207,7 @@ def probe_cover(ctx: QAContext, captions: list[dict]) -> dict:
         ocr = ocr_text(fr, psm=11)
     return {"t": t, "source": src, "text_role": role, "expected_text": exp_text, "ocr": ocr[:300],
             "similarity": rnd(text_similarity(ocr, exp_text), 3) if exp_text else None,
-            "role_caption_visible": bool(caps_at)}
+            "role_caption_visible": bool(caps_at), "note": note}
 
 
 def _safe(s: str) -> str:

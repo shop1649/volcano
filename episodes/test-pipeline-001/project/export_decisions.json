@@ -2,7 +2,7 @@
   "mlt": {
     "format": "mlt",
     "file": "test-pipeline-001.mlt",
-    "created_at": "2026-09-25T02:14:08+00:00",
+    "created_at": "2026-09-25T04:14:02+00:00",
     "warnings": [],
     "notes": [],
     "prerendered": [
@@ -62,8 +62,8 @@
         "envelope_points": 10,
         "duck_ranges": [
           [
-            10.0,
-            12.3
+            10.145,
+            11.802
           ]
         ],
         "silences": [
@@ -214,12 +214,12 @@
       "시작 램프(앞 1024 샘플 선형 페이드인)는 타임라인의 avfilter.afade 필터"
     ]
   },
-  "updated_at": "2026-09-25T02:14:11+00:00",
+  "updated_at": "2026-09-25T04:14:05+00:00",
   "fcpxml": {
     "format": "fcpxml",
     "version": "1.9",
     "file": "test-pipeline-001.fcpxml",
-    "created_at": "2026-09-25T02:14:09+00:00",
+    "created_at": "2026-09-25T04:14:03+00:00",
     "absolute_urls": false,
     "warnings": [],
     "prerendered": [],
@@ -300,7 +300,7 @@
   "otio": {
     "format": "otio",
     "file": "test-pipeline-001.otio",
-    "created_at": "2026-09-25T02:14:10+00:00",
+    "created_at": "2026-09-25T04:14:04+00:00",
     "warnings": [],
     "prerendered": [],
     "otio_version": "0.18.1",

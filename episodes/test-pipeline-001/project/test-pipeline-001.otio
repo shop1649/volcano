@@ -139,7 +139,10 @@
                                 ],
                                 "drawn_by": "captions.ass (libass)",
                                 "font_name": "Noto Sans CJK KR Black",
-                                "grounding": null,
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "편집 틀 제목(영상 속 사실을 주장하지 않음)"
+                                },
                                 "id": "c_title",
                                 "kind": "caption",
                                 "lines": [
@@ -180,7 +183,10 @@
                                 ],
                                 "drawn_by": "captions.ass (libass)",
                                 "font_name": "Noto Sans CJK KR Bold",
-                                "grounding": null,
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "이 영상이 검증용 합성 샘플이라는 설명"
+                                },
                                 "id": "c_desc",
                                 "kind": "caption",
                                 "lines": [
@@ -2213,8 +2219,8 @@
                             "shortkit": {
                                 "duck_ranges": [
                                     [
-                                        10.0,
-                                        12.3
+                                        10.145,
+                                        11.802
                                     ]
                                 ],
                                 "envelope_db": [
@@ -2239,19 +2245,19 @@
                                         0.0
                                     ],
                                     [
-                                        9.92,
+                                        10.065,
                                         0.0
                                     ],
                                     [
-                                        10.0,
+                                        10.145,
                                         -10.0
                                     ],
                                     [
-                                        12.3,
+                                        11.802,
                                         -10.0
                                     ],
                                     [
-                                        12.6,
+                                        12.102,
                                         0.0
                                     ],
                                     [

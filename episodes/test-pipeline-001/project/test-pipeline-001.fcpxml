@@ -167,11 +167,12 @@
                       <keyframe time="223/30s" value="-120.00dB" interp="linear" />
                       <keyframe time="112/15s" value="-80.24dB" interp="linear" />
                       <keyframe time="15/2s" value="-0.24dB" interp="linear" />
-                      <keyframe time="99/10s" value="-0.24dB" interp="linear" />
-                      <keyframe time="149/15s" value="-1.90dB" interp="linear" />
-                      <keyframe time="10s" value="-10.24dB" interp="linear" />
-                      <keyframe time="123/10s" value="-10.24dB" interp="linear" />
-                      <keyframe time="63/5s" value="-0.24dB" interp="linear" />
+                      <keyframe time="301/30s" value="-0.24dB" interp="linear" />
+                      <keyframe time="151/15s" value="-0.45dB" interp="linear" />
+                      <keyframe time="152/15s" value="-8.78dB" interp="linear" />
+                      <keyframe time="61/6s" value="-10.24dB" interp="linear" />
+                      <keyframe time="59/5s" value="-10.24dB" interp="linear" />
+                      <keyframe time="121/10s" value="-0.30dB" interp="linear" />
                       <keyframe time="277/15s" value="-0.24dB" interp="linear" />
                       <keyframe time="559/30s" value="-2.27dB" interp="linear" />
                       <keyframe time="563/30s" value="-4.32dB" interp="linear" />

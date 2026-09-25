@@ -215,6 +215,8 @@ def test_later_episode_approval_rule(root, plan):
     plan["episode_index"] = 2
     iss = run(root, plan, for_render=True, allow_unmeasured=True)
     assert "approval_required" not in codes(iss)                # later_episodes_require_approval: false
+    # ... but a later episode is never a way around the first-episode gate: no approved + rendered episode 1 (S3-01)
+    assert "series_first_episode" in codes(iss, "error")
     pr = load_preset()
     st = approval_state_for(plan, pr)
     assert st["rule_key"] == "approval.later_episodes_require_approval" and not st["required"]
@@ -387,7 +389,9 @@ def test_registry_drops_dead_and_superseded_code_links(root, plan):
                                "reads": {"decorations.box.color": ["shortkit/edit/resolve.py:resolve_decorations"]}}))
     ent = config.sync_registry("joshuamagazine", qa_declarations={})["entries"]
     assert ent["decorations.box.color"]["code"] == ["shortkit/edit/resolve.py:resolve_decorations"]
-    assert ent["decorations.circle.color"]["code"] == ["shortkit/edit/resolve.py:<dictcomp>"]   # nothing newer: kept
+    # code links come only from the tracked access-log archive (config.sync_registry, wave-2 registry fix): a link
+    # that exists only in the previous registry file is not carried over
+    assert ent["decorations.circle.color"]["code"] == []
 
 
 def test_circle_and_box_styles_are_read_when_used(root, plan):

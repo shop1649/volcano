@@ -815,3 +815,474 @@ def _pooled_verdict(rows: list[dict], cap_ceil: dict, crop_cap: dict, crop_delay
                                                         for w in weak[:6]) + " — 다른 글꼴이거나 문구 오류일 수 있음")
     return {"verdict": verdict, "reasons": reasons, "bst": bst, "noise": noise, "gshare": gshare, "gpass": gpass,
             "weak": weak, "gsz": gsz, "n_glyphs": len(gvals)}
+
+
+# ----------------------------------------------------------------------------- exact-position re-render check
+# The strongest font evidence the output allows: re-render the caption EXACTLY as production did -- the episode's own
+# ASS events (position, \\move / \\fad / \\t motion, highlight markup) with the caption's style naming the PLANNED face
+# (the plan's font_name, never simply the face the ASS on disk names), libass through ffmpeg's subtitles filter over the
+# episode's own composited frames (shortkit.edit.render.Compositor), bt709 conversion, x264 at the CRF / preset /
+# threads read from the output's SEI, starting at frame 0 like the production encode -- and compare the MP4 crop with
+# that re-render and with re-renders in the top alternative faces at the same position.
+# Measured: re-renders started at frame 0 reproduced the MP4 crops bit for bit (MAE 0.000; test-pipeline-001 c_desc,
+# test-coverage-001 c_rx), while a re-render started at the key frame before the caption did NOT (test-coverage-001
+# c_rx: MAE 1.13 from frame 250 -- x264 carries state across key frames); the alternatives were 7-66 MAE away.
+# The re-encode noise is measured by the same planned render started at other frames (EXACT_MISALIGNED_STARTS: a
+# different GOP phase): how far a re-encode of the SAME picture can land.
+#
+# Verdict per caption:  identical  = the planned face reproduces the MP4 within the re-encode noise (MAE <= noise)
+#                                    AND every alternative is worse by more than the noise
+#                       best_not_reproduced = the planned face is closer than every alternative by more than the noise
+#                                    but its re-render does not reproduce the MP4 (MAE > noise: the picture behind the
+#                                    caption was not made by this pipeline, e.g. a synthetic test render) -> counts as
+#                                    'identical' for the role only when the pooled statistics also say identical
+#                       different  = an alternative face reproduces the MP4 better than the planned face by more than
+#                                    the noise
+#                       not_reproduced = none of the above (no font verdict from this check)
+EXACT_MAX_CAPTIONS_PER_ROLE = 4
+EXACT_MAX_CROPS = 4
+EXACT_TAIL_FRAMES = 24            # frames after the last crop: > x264 rc_lookahead (10 at veryfast) + b-frames
+EXACT_MISALIGNED_STARTS = (1, 3)  # planned re-renders started off frame 0 (another GOP phase): the re-encode noise
+EXACT_PARALLEL = 8                # x264 re-encodes fed by one Compositor pass (else: frames on disk, batches)
+
+
+def mp4_keyframes(ctx) -> list[int]:
+    """Frame indices of the key frames of the output MP4 (ffprobe), cached on ctx."""
+    cache = ctx.options.setdefault("_font_id", {})
+    if "keyframes" in cache:
+        return cache["keyframes"]
+    from ..util.media import FFPROBE
+
+    out = subprocess.run([FFPROBE, "-v", "error", "-select_streams", "v:0", "-skip_frame", "nokey", "-show_entries",
+                          "frame=pts_time", "-of", "csv=p=0", str(ctx.mp4)], capture_output=True, text=True, timeout=120)
+    fps = float(ctx.fps)
+    ks = sorted({int(round(float(x.strip().rstrip(",")) * fps)) for x in out.stdout.splitlines()
+                 if x.strip().rstrip(",") not in ("", "N/A")})
+    cache["keyframes"] = ks
+    return ks
+
+
+def _event_matches(line: str, cap) -> str | None:
+    """The style name of this ``Dialogue:`` line if it is a TEXT event of ``cap`` (same start, end and line text; the
+    style is whatever the renderer named -- the role in production), else None.  Box drawings (\\p1..) are not text."""
+    from ..edit import captions as capmod
+
+    f = line.split(",", 9)
+    if len(f) < 10:
+        return None
+    if f[1] != capmod.ass_time(cap.start) or f[2] != capmod.ass_time(cap.end):
+        return None
+    if re.search(r"\\p[1-9]", f[9]):
+        return None
+    body = re.sub(r"\{[^}]*\}", "", f[9])
+    lines = [str(ln) for ln in (cap.lines or str(cap.text).split("\n")) if str(ln).strip()]
+    return f[3] if any(body == ln for ln in lines) else None
+
+
+def alt_face_ass(ass_txt: str, caps: list, size_px: float, alt, prefix: str = "qaalt_") -> tuple[str, dict]:
+    """The production ASS with the text events of ``caps`` switched to copies of their styles that name ``alt`` (a
+    captions.ResolvedFont) -- libass-matched name, win-metric font size for the same size_px, Bold flag from the face
+    weight; everything else (colours, outline, alignment, the events' position / motion tags) unchanged.
+    -> (text, {cloned style name: number of events switched})."""
+    from ..edit import captions as capmod
+
+    head, sep, events = ass_txt.partition("[Events]")
+    rows = capmod._style_rows(head)
+    clones: dict[str, str] = {}
+    out, counts = [], {}
+    for ln in events.split("\n"):
+        if ln.startswith("Dialogue:"):
+            st = next((x for x in (_event_matches(ln, c) for c in caps) if x), None)
+            if st and st in rows:
+                name = f"{prefix}{st}"
+                if name not in clones:
+                    parts = list(rows[st])
+                    parts[0], parts[1] = name, alt.ass_name
+                    parts[2] = capmod._f(alt.face.ass_fontsize(float(size_px)))
+                    parts[7] = str(capmod.ass_bold_flag(alt.face.weight))
+                    clones[name] = "Style: " + ",".join(parts)
+                f = ln.split(",", 9)
+                f[3] = name
+                ln = ",".join(f)
+                counts[name] = counts.get(name, 0) + 1
+        out.append(ln)
+    head2 = head.rstrip("\n") + "\n" + "\n".join(clones.values()) + "\n\n"
+    return head2 + sep + "\n".join(out), counts
+
+
+def _decode_indices(path, idxs: set[int], first_index: int, fps: float, W: int, H: int) -> dict[int, np.ndarray]:
+    """Frames ``idxs`` (absolute indices) of a re-render whose first frame is absolute frame ``first_index``."""
+    from ..util.media import FFMPEG
+
+    want = {i - first_index for i in idxs if i >= first_index}
+    if not want:
+        return {}
+    cmd = [FFMPEG, "-hide_banner", "-nostdin", "-v", "error", "-i", str(path), "-frames:v", str(max(want) + 1),
+           "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]
+    got = _stream(cmd, "/", frame_bytes=W * H * 3, keep=want)
+    return {i + first_index: np.frombuffer(buf, np.uint8).reshape(H, W, 3) for i, buf in got.items()}
+
+
+def _decode_mp4_frames(ctx, idxs: set[int], start: int) -> dict[int, np.ndarray]:
+    """Frames of the OUTPUT MP4 at ``idxs`` decoded from key frame ``start`` (accurate seek)."""
+    from ..util.media import FFMPEG
+
+    W, H, fps = int(ctx.info.width), int(ctx.info.height), float(ctx.fps)
+    cmd = [FFMPEG, "-hide_banner", "-nostdin", "-v", "error"]
+    if start > 0:
+        cmd += ["-ss", f"{(start - 0.5) / fps:.6f}"]
+    cmd += ["-i", str(ctx.mp4), "-frames:v", str(max(idxs) - start + 1), "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]
+    got = _stream(cmd, "/", frame_bytes=W * H * 3, keep={i - start for i in idxs})
+    return {i + start: np.frombuffer(buf, np.uint8).reshape(H, W, 3) for i, buf in got.items()}
+
+
+def _crop_box(cap, W: int, H: int) -> tuple[int, int, int, int]:
+    pad = max(8.0, 0.25 * float(cap.bbox.h))
+    x0, y0 = max(0, int(cap.bbox.x - pad)), max(0, int(cap.bbox.y - pad))
+    x1, y1 = min(W, int(math.ceil(cap.bbox.x + cap.bbox.w + pad))), min(H, int(math.ceil(cap.bbox.y + cap.bbox.h + pad)))
+    return x0, y0, x1, y1
+
+
+def _mae(a: np.ndarray, b: np.ndarray, box) -> float:
+    x0, y0, x1, y1 = box
+    return float(np.abs(a[y0:y1, x0:x1].astype(np.int16) - b[y0:y1, x0:x1].astype(np.int16)).mean())
+
+
+def caption_crop_frames(ctx, cap) -> list[int]:
+    """Frame indices where a caption is at rest (after its entrance motion), at the pooled delays."""
+    fps = float(ctx.fps)
+    mi = cap.motion_in or {}
+    dur_in = float(mi.get("dur_s") or 0.0) if (mi.get("type") or "none") != "none" else 0.0
+    n_rest = int(math.ceil((float(cap.start) + dur_in) * fps - 1e-6))
+    n_last = int(math.ceil(float(cap.end) * fps - 1e-6)) - 1
+    n_total = int(round(float(ctx.info.duration) * fps))
+    out = [n_rest + d for d in delay_frames(fps) if n_rest + d < min(n_last, n_total - 1)]
+    return out[:EXACT_MAX_CROPS]
+
+
+def exact_render_checks(ctx, role_caps: dict[str, list], role_alts: dict[str, list[str]]) -> dict:
+    """Exact-position re-render check for the captions in ``role_caps`` ({role: [caption, ...]}) against the top
+    alternative faces ``role_alts`` ({role: [font name, ...]}).  -> {"captions": {caption id: result}, "notes": [...]}.
+    One Compositor pass from frame 0 (where the production encode started) feeds every re-encode: the planned face from
+    frame 0, the planned face from EXACT_MISALIGNED_STARTS (the re-encode noise), and one layer per alternative rank
+    (``_alt_layers``)."""
+    from .. import paths
+    from ..edit import captions as capmod
+
+    res: dict = {"captions": {}, "notes": [], "method": "production ASS 이벤트 그대로(위치·모션)에 계획 글꼴, libass→bt709→x264"
+                                                        "(출력 SEI 의 CRF·프리셋·스레드), 제작처럼 0 프레임부터 다시 그린 것 vs 출력 crop"}
+    r = ctx.resolved
+    enc = encode_settings(ctx)
+    if enc.get("crf") is None or enc.get("preset") is None:
+        res["error"] = "출력 인코딩 설정(CRF·프리셋)을 SEI 에서 읽지 못함: " + "; ".join(enc.get("notes") or [])
+        return res
+    ass_p = paths.absp(r.ass_path) if r.ass_path else None
+    fonts_dir = paths.absp(r.fonts_dir) if r.fonts_dir else paths.episode_dir(ctx.episode_id) / "build" / "fonts"
+    if ass_p is None or not ass_p.is_file() or not fonts_dir.is_dir():
+        res["error"] = f"렌더에 쓴 ASS/글꼴 폴더 없음: {r.ass_path}, {r.fonts_dir or paths.relp(fonts_dir)}"
+        return res
+    ass_txt = ass_p.read_text(encoding="utf-8")
+    W, H, fps = int(ctx.canvas_w), int(ctx.canvas_h), float(ctx.fps)
+    n_total = int(round(float(ctx.info.duration) * fps))
+    # alternative faces (resolved once)
+    alts: dict[str, list] = {}
+    planned_rf: dict[str, object] = {}
+    for role, caps in role_caps.items():
+        try:
+            planned_rf[role] = capmod.resolve_font(caps[0].font_name, getattr(caps[0], "font_file", None))
+        except Exception as e:
+            res["notes"].append(f"{role}: 계획 글꼴 {caps[0].font_name} 을 찾지 못함: {type(e).__name__}: {e}"[:200])
+    for role, names in role_alts.items():
+        got = []
+        planned = set()
+        for c in role_caps.get(role) or []:
+            try:
+                f = capmod.resolve_font(c.font_name, getattr(c, "font_file", None)).face
+                planned.add((str(Path(f.path).resolve()), int(f.index)))
+            except Exception:
+                pass
+        for nm in names:
+            try:
+                rf = capmod.resolve_font(nm)
+            except Exception as e:  # a missing alternative is recorded, never replaced by another face
+                res["notes"].append(f"대안 글꼴 {nm} 을 찾지 못함: {type(e).__name__}: {e}"[:200])
+                continue
+            if (str(Path(rf.face.path).resolve()), int(rf.face.index)) in planned:
+                continue                     # the planned face itself is not an alternative
+            got.append((nm, rf))
+        alts[role] = got
+    jobs = []
+    for role, caps in role_caps.items():
+        if role not in planned_rf:
+            for cap in caps:
+                res["captions"][cap.id] = {"status": "unmeasured", "verdict": "unmeasured",
+                                           "reason": f"계획 글꼴 {cap.font_name} 을 찾지 못해 다시 그릴 수 없음"}
+            continue
+        for cap in caps[:EXACT_MAX_CAPTIONS_PER_ROLE]:
+            crops = caption_crop_frames(ctx, cap)
+            if not crops:
+                res["captions"][cap.id] = {"status": "unmeasured", "verdict": "unmeasured", "reason": "정지 프레임이 없음(표시 시간이 짧음)"}
+                continue
+            if not any(_event_matches(ln, cap) for ln in ass_txt.split("\n") if ln.startswith("Dialogue:")):
+                res["captions"][cap.id] = {"status": "unmeasured", "verdict": "unmeasured",
+                                           "reason": "렌더에 쓴 ASS 에서 이 자막의 이벤트를 찾지 못함(resolve 후 다시 렌더?)"}
+                continue
+            jobs.append({"cap": cap, "role": role, "crops": crops, "box": _crop_box(cap, W, H)})
+    if jobs:
+        try:
+            _exact_all(ctx, jobs, ass_txt, fonts_dir, alts, planned_rf, enc, W, H, fps, n_total, res)
+        except Exception as e:
+            for j in jobs:
+                res["captions"][j["cap"].id] = {"status": "unmeasured", "verdict": "unmeasured",
+                                                "reason": f"재렌더 실패: {type(e).__name__}: {e}"[:300]}
+    return res
+
+
+def _face_dir(tdp: Path, tag: str, fonts_dir: Path, faces: list) -> Path:
+    """fontsdir for a re-render: the render's own faces + the given faces (symlinks)."""
+    fd = tdp / f"fonts_{tag}"
+    fd.mkdir()
+    for p in fonts_dir.iterdir():
+        if not (fd / p.name).exists():
+            os.symlink(p.resolve(), fd / p.name)
+    for f in faces:
+        if not (fd / Path(f.path).name).exists():
+            os.symlink(Path(f.path).resolve(), fd / Path(f.path).name)
+    return fd
+
+
+def _alt_layers(jobs: list, alts: dict) -> list[dict]:
+    """Alternative re-renders to make: layer i switches every role to its i-th alternative at once, except roles whose
+    crop boxes overlap another role's in space AND time (their alternative glyphs would reach the other's crop) --
+    those get layers of their own.  -> [{role: (name, ResolvedFont)}]."""
+    def span(role):
+        js = [j for j in jobs if j["role"] == role]
+        return [(j["box"], min(j["crops"]), max(j["crops"])) for j in js]
+
+    def clash(r1, r2):
+        for (b1, a1, e1) in span(r1):
+            for (b2, a2, e2) in span(r2):
+                if a1 <= e2 and a2 <= e1 and b1[0] < b2[2] and b2[0] < b1[2] and b1[1] < b2[3] and b2[1] < b1[3]:
+                    return True
+        return False
+    roles = sorted({j["role"] for j in jobs})
+    groups: list[list[str]] = []
+    for r in roles:
+        for g in groups:
+            if not any(clash(r, o) for o in g):
+                g.append(r)
+                break
+        else:
+            groups.append([r])
+    layers = []
+    for g in groups:
+        depth = max((len(alts.get(r) or []) for r in g), default=0)
+        for i in range(depth):
+            lay = {r: alts[r][i] for r in g if len(alts.get(r) or []) > i}
+            if lay:
+                layers.append(lay)
+    return layers
+
+
+def _exact_all(ctx, jobs: list, ass_txt: str, fonts_dir: Path, alts: dict, planned_rf: dict, enc: dict,
+               W: int, H: int, fps: float, n_total: int, res: dict) -> None:
+    from ..edit import captions as capmod
+    from ..edit.render import Compositor
+    from ..util.media import FFMPEG
+
+    last = max(max(j["crops"]) for j in jobs)
+    n_end = min(n_total, last + EXACT_TAIL_FRAMES + 1)
+    first_crop = min(min(j["crops"]) for j in jobs)
+    mis = [m for m in EXACT_MISALIGNED_STARTS if 0 < m < first_crop]
+    idxs = sorted({i for j in jobs for i in j["crops"]})
+    roles = sorted({j["role"] for j in jobs})
+    with tempfile.TemporaryDirectory(prefix="sk_qa_exact_") as td:
+        tdp = Path(td)
+        # the PLANNED face (the plan's font_name, resolved like the renderer does), not whatever face the ASS on disk
+        # names: a render whose ASS carried a wrong face must not be 'reproduced' by re-rendering that same ASS
+        plan_txt, plan_faces, n_plan = ass_txt, {}, 0
+        for role in roles:
+            caps = [j["cap"] for j in jobs if j["role"] == role]
+            plan_txt, n_by = alt_face_ass(plan_txt, caps, float(caps[0].size_px), planned_rf[role], prefix="qaplan_")
+            n_plan += sum(n_by.values())
+            plan_faces.update({name: planned_rf[role].face for name in n_by})
+        pd = _face_dir(tdp, "plan", fonts_dir, [rf.face for rf in planned_rf.values()])
+        chk = capmod.verify_libass_fonts(plan_txt, pd, plan_faces) if plan_faces else {"ok": False}
+        if not chk.get("ok") or not n_plan:
+            bad = {k_: {kk: v.get(kk) for kk in ("selected", "fallback_glyphs", "synthetic_bold")}
+                   for k_, v in (chk.get("styles") or {}).items() if not v.get("ok")}
+            raise RuntimeError(f"계획 글꼴로 다시 그릴 수 없음(libass 선택/대체 글자 {bad}, 바꾼 이벤트 {n_plan}개)")
+        (tdp / "plan.ass").write_text(plan_txt, encoding="utf-8")
+        variants = [{"tag": "plan", "start": 0, "ass": "plan.ass", "fonts": pd.name}]
+        variants += [{"tag": f"mis{m}", "start": m, "ass": "plan.ass", "fonts": pd.name} for m in mis]
+        alt_meta: dict[str, dict] = {}
+        for li, lay in enumerate(_alt_layers(jobs, alts)):
+            txt, faces, role_names = plan_txt, {}, {}
+            for role, (nm, rf) in lay.items():
+                caps = [j["cap"] for j in jobs if j["role"] == role]
+                txt, n_by = alt_face_ass(txt, caps, float(caps[0].size_px), rf)
+                role_names[role] = list(n_by)
+                faces.update({name: rf.face for name in n_by})
+            tag = f"alt{li}"
+            fd = _face_dir(tdp, tag, fonts_dir, [rf.face for _, rf in lay.values()] + [x.face for x in planned_rf.values()])
+            chk = capmod.verify_libass_fonts(txt, fd, faces) if faces else {"ok": False, "styles": {}}
+            styles = chk.get("styles") or {}
+            ok_roles = {}
+            for role, (nm, rf) in lay.items():
+                names = role_names.get(role) or []
+                st_ok = bool(names) and all((styles.get(n) or {}).get("ok") for n in names)
+                if st_ok:
+                    ok_roles[role] = nm
+                else:
+                    bad = {n: {kk: (styles.get(n) or {}).get(kk) for kk in ("selected", "fallback_glyphs")} for n in names}
+                    res["notes"].append(f"{role}: 대안 {nm} 재렌더 불가(libass 선택/대체 글자 {bad})")
+            if not ok_roles:
+                continue
+            (tdp / f"{tag}.ass").write_text(txt, encoding="utf-8")
+            variants.append({"tag": tag, "start": 0, "ass": f"{tag}.ass", "fonts": fd.name})
+            alt_meta[tag] = ok_roles
+        _encode_variants(ctx, variants, tdp, enc, W, H, fps, 0, n_end, FFMPEG, Compositor)
+        frames = {v["tag"]: _decode_indices(tdp / f"{v['tag']}.mp4", set(idxs), v["start"], fps, W, H) for v in variants}
+    mp4f = _decode_mp4_frames(ctx, set(idxs), 0)
+    for j in jobs:
+        cap, box = j["cap"], j["box"]
+        crops = [i for i in j["crops"] if i in mp4f and i in frames["plan"]]
+        if not crops:
+            res["captions"][cap.id] = {"status": "unmeasured", "verdict": "unmeasured", "reason": "crop 프레임을 디코드하지 못함"}
+            continue
+        d_plan = [_mae(frames["plan"][i], mp4f[i], box) for i in crops]
+        noise_by = {}
+        for v in variants:
+            if v["tag"].startswith("mis"):
+                ds = [_mae(frames[v["tag"]][i], frames["plan"][i], box) for i in crops if i in frames[v["tag"]]]
+                if ds:
+                    noise_by[v["tag"]] = max(ds)
+        alt_d = {}
+        for tag, ok_roles in alt_meta.items():
+            if j["role"] in ok_roles:
+                alt_d[ok_roles[j["role"]]] = round(float(np.mean([_mae(frames[tag][i], mp4f[i], box) for i in crops])), 4)
+        dp = float(np.mean(d_plan))
+        noise = max(noise_by.values()) if noise_by else None
+        out = {"status": "measured", "start_frame": 0, "crop_frames": crops, "crop_box": list(box),
+               "conditions": {"crf": enc.get("crf"), "x264_preset": enc.get("preset"), "threads": enc.get("threads"),
+                              "assumed": False, "source": enc.get("source"),
+                              "renderer": "libass(ffmpeg subtitles) + shortkit.edit.render.Compositor, 0 프레임부터(제작과 같게)"},
+               "mae_planned": round(dp, 4), "mae_planned_per_crop": [round(x, 4) for x in d_plan],
+               "mae_alternatives": alt_d, "noise_mae": None if noise is None else round(noise, 4),
+               "noise_by_start": {t: round(v, 4) for t, v in noise_by.items()},
+               "misaligned_starts": [v["start"] for v in variants if v["tag"].startswith("mis")],
+               "expected": cap.font_name}
+        if noise is None:
+            out.update(status="unmeasured", verdict="unmeasured", reason="다른 시작 프레임 재렌더가 없어 재인코딩 잡음을 못 잼")
+        elif not alt_d:
+            out.update(status="unmeasured", verdict="unmeasured",
+                       reason="대안 글꼴을 같은 위치에 재렌더하지 못해 차이(margin)를 못 잼")
+        else:
+            best_alt = min(alt_d, key=alt_d.get)
+            margin = alt_d[best_alt] - dp
+            out.update(best_alternative=best_alt, margin=round(margin, 4), reproduced=dp <= noise)
+            if dp <= noise and margin > noise:
+                out.update(verdict="identical", reason=(f"계획 글꼴 재렌더가 출력과 MAE {dp:.3f} ≤ 재인코딩 잡음 {noise:.3f}, "
+                                                        f"가장 가까운 대안 {best_alt} 보다 {margin:.3f} 더 가까움(> 잡음)"))
+            elif margin > noise:
+                out.update(verdict="best_not_reproduced",
+                           reason=(f"계획 글꼴이 가장 가까운 대안 {best_alt} 보다 {margin:.3f} 더 가깝지만(> 잡음 {noise:.3f}) 재렌더가 "
+                                   f"출력을 그대로 재현하지는 못함(MAE {dp:.3f} > 잡음) — 자막 뒤 화면·인코딩이 이 파이프라인과 "
+                                   "다름(합성 테스트 렌더 등): 역할 판정은 합동 통계도 동일일 때만 동일"))
+            elif alt_d[best_alt] < dp - noise:
+                out.update(verdict="different", reason=(f"대안 {best_alt} 재렌더가 출력과 더 가까움(MAE {alt_d[best_alt]:.3f} < "
+                                                        f"계획 {dp:.3f} − 잡음 {noise:.3f})"))
+            else:
+                out.update(verdict="not_reproduced", reason=(f"계획 글꼴 재렌더가 출력을 재현하지 못함(MAE {dp:.3f} > 잡음 "
+                                                             f"{noise:.3f})이고 대안도 더 가깝지 않음 — 글꼴 외 차이(위치·색·배경)나 "
+                                                             "후보 밖 글꼴일 수 있어 이 검사로는 판정 못 함"))
+        res["captions"][cap.id] = out
+
+
+def _encode_variants(ctx, variants: list, tdp: Path, enc: dict, W: int, H: int, fps: float, n0: int, n_end: int,
+                     FFMPEG: str, Compositor) -> None:
+    """Composite frames n0..n_end once and feed every variant's x264 encode (production's filter chain and settings);
+    with more than EXACT_PARALLEL variants the frames go to disk first and the encodes run in batches."""
+    def start(v):
+        vf = (f"setpts=PTS+{v['start'] / fps:.6f}/TB,subtitles=filename={v['ass']}:fontsdir={v['fonts']},"
+              "setpts=PTS-STARTPTS,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p")
+        cmd = [FFMPEG, "-hide_banner", "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
+               "-s", f"{W}x{H}", "-framerate", f"{fps:g}", "-i", "-", "-vf", vf, "-c:v", "libx264",
+               "-preset", str(enc["preset"]), "-crf", f"{float(enc['crf']):g}", "-pix_fmt", "yuv420p",
+               "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv",
+               "-threads", str(int(enc.get("threads") or 2)), f"{v['tag']}.mp4"]
+        return subprocess.Popen(cmd, cwd=str(tdp), stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
+                                stderr=subprocess.PIPE)
+
+    def finish(procs):
+        errs = {}
+        for tag, pr in procs.items():
+            try:
+                pr.stdin.close()
+            except OSError:
+                pass
+            rc = pr.wait()
+            if rc != 0:
+                errs[tag] = pr.stderr.read().decode("utf-8", "replace")[-300:]
+        if errs:
+            raise RuntimeError(f"재렌더 인코딩 실패: {errs}")
+
+    comp = Compositor(ctx.resolved)
+    if len(variants) <= EXACT_PARALLEL:
+        procs = {v["tag"]: start(v) for v in variants}
+        try:
+            for n in range(n0, n_end):
+                buf = np.ascontiguousarray(comp.frame(n)).tobytes()
+                for v in variants:
+                    if n >= v["start"]:
+                        procs[v["tag"]].stdin.write(buf)
+        finally:
+            comp.close()
+            finish(procs)
+        return
+    raw = tdp / "frames.rgb"
+    fb = W * H * 3
+    try:
+        with open(raw, "wb") as fh:
+            for n in range(n0, n_end):
+                fh.write(np.ascontiguousarray(comp.frame(n)).tobytes())
+    finally:
+        comp.close()
+    for bi in range(0, len(variants), EXACT_PARALLEL):
+        batch = variants[bi:bi + EXACT_PARALLEL]
+        procs = {v["tag"]: start(v) for v in batch}
+        try:
+            with open(raw, "rb") as fh:
+                for n in range(n0, n_end):
+                    buf = fh.read(fb)
+                    for v in batch:
+                        if n >= v["start"]:
+                            procs[v["tag"]].stdin.write(buf)
+        finally:
+            finish(procs)
+    raw.unlink()
+
+
+def combine_role_verdict(pooled: dict, exact: dict[str, dict]) -> dict:
+    """The role's font verdict: the exact-position re-render decides 'identical' (every checked caption identical and
+    the pooled statistics not 'different'); 'different' from either line of evidence; otherwise the pooled 'identical'
+    / 'similar' is at most 'similar' (못 잼)."""
+    vs = [e.get("verdict") for e in exact.values() if e.get("status") == "measured"]
+    ex = ("unmeasured" if not vs else "different" if "different" in vs else
+          "identical" if all(v == "identical" for v in vs) else
+          "best_not_reproduced" if all(v in ("identical", "best_not_reproduced") for v in vs) else "not_reproduced")
+    pv = pooled.get("verdict") or "unmeasured"
+    if ex == "identical":
+        final = "identical" if pv != "different" else "unmeasured"
+    elif ex == "best_not_reproduced":
+        final = "identical" if pv == "identical" else ("different" if pv == "different" else "similar")
+    elif ex == "different":
+        final = "different"
+    elif pv == "different":
+        final = "different"
+    elif pv in ("identical", "similar"):
+        final = "similar"
+    else:
+        final = pv
+    return {"exact_role_verdict": ex, "pooled_verdict": pv, "verdict": final,
+            "conflict": ex == "identical" and pv == "different"}

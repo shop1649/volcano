@@ -334,8 +334,12 @@ def series_first_episode(plan: dict) -> dict:
         except Exception:        # an unreadable plan is not a first episode
             continue
         if not isinstance(other, dict) or other.get("mode") != "production" \
-                or other.get("preset_id") != plan.get("preset_id") or not is_first_episode(other) \
-                or other.get("episode_id") != pp.parent.name:
+                or other.get("preset_id") != plan.get("preset_id") or other.get("episode_id") != pp.parent.name:
+            continue
+        try:
+            if not is_first_episode(other):
+                continue
+        except (TypeError, ValueError):     # malformed episode_index: not a valid first episode
             continue
         cands.append(other)
     if not cands:

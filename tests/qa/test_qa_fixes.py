@@ -202,13 +202,25 @@ def _font_m(verdict, top="Noto Sans CJK KR Black"):
                                   "ceiling": {"p10": 0.93}, "conditions": {"crf": 18.0}}}}
 
 
-@pytest.mark.parametrize("verdict,status", [("identical", "same"), ("similar", "unmeasured"),
+# a single-crop 'identical' is not confirmed by the exact-position re-render: at most 못 잼 (review: font exact check)
+@pytest.mark.parametrize("verdict,status", [("identical", "unmeasured"), ("similar", "unmeasured"),
                                             ("different", "different"), ("unmeasured", "unmeasured")])
 def test_font_row_is_same_only_for_identical(temp_root, verdict, status):
     b = _builder()
     cap = SimpleNamespace(id="t1", font_name="Noto Sans CJK KR Black")
     r = checks._font_row(b, cap, _font_m(verdict), "[t1]", "title", {})
     assert r["status"] == status and r["observed"]["verdict"] == verdict
+
+
+@pytest.mark.parametrize("verdict,status", [("identical", "same"), ("best_not_reproduced", "unmeasured"),
+                                            ("not_reproduced", "unmeasured"), ("different", "different")])
+def test_per_caption_font_row_follows_the_exact_render(temp_root, verdict, status):
+    b = _builder()
+    cap = SimpleNamespace(id="t1", font_name="Noto Sans CJK KR Black")
+    m = dict(_font_m("similar"), font_exact={"status": "measured", "verdict": verdict, "mae_planned": 0.0,
+                                             "noise_mae": 0.5, "mae_alternatives": {"X": 12.0}, "reason": "SYNTHETIC"})
+    r = checks._font_row(b, cap, m, "[t1]", "title", {})
+    assert r["status"] == status and r["observed"]["verdict"] == verdict and r["required"] is False
 
 
 def test_font_row_fallback_never_says_same(temp_root):

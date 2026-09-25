@@ -139,7 +139,10 @@
                                 ],
                                 "drawn_by": "captions.ass (libass)",
                                 "font_name": "Noto Sans CJK KR Black",
-                                "grounding": null,
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "편집 틀 제목 — 두 소스에 사람이 들어오는 장면이 있음(people-detection 2.0s, face-demographics 5.0s·32.0s)"
+                                },
                                 "id": "c_title",
                                 "kind": "caption",
                                 "lines": [
@@ -180,7 +183,10 @@
                                 ],
                                 "drawn_by": "captions.ass (libass)",
                                 "font_name": "Noto Sans CJK KR Bold",
-                                "grounding": null,
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "이 영상이 검증용 테스트라는 설명"
+                                },
                                 "id": "c_desc",
                                 "kind": "caption",
                                 "lines": [
