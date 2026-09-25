@@ -93,7 +93,8 @@ python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/�
 python -m shortkit ref transcribe --set latest100  # (선택) faster-whisper 가 설치된 경우 음성 대본 → analysis/<id>/audio/transcript.json
 python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자료 + format_labels.csv(빈 줄)
 #  ▶ 에이전트/사람이 analysis/<id>/review/ 를 "실제로 보고" format_labels.csv 를 채운다
-#    (intro_type=도입 방식, structure_type=전개 구조, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
+#    (intro_type=도입 방식, structure_type=전개 구조, beats=정보 공개 순서 hook>context>build>reveal>reaction>outro,
+#     reveal_t=반전 시각(초) 또는 none, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
 python -m shortkit ref classify build              # formats.yaml: 전개 구조별 포맷, 도입만 다른 것은 intro_variants, 대표 영상
 python -m shortkit ref fonts                       # 글꼴: IoU 상한(같은 글꼴의 한계) 먼저 → 후보 검증(동일/유사/다름)
 python -m shortkit preset apply-measurements       # (글꼴이 '동일'로 확정된 역할이 있으면) 반영 후

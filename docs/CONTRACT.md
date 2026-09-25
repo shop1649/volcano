@@ -350,6 +350,30 @@ Match rule (sourcing): candidate keyframe phash vs any exclusion phash Hamming �
   `clean.crop` checked against the face track; `shortkit.clean.coverage` enforced; `presence.*` enforced (absent-but-used →
   error in production). `episode test-source` records the content fingerprint and tool versions in truth.json.
 
+### 12.4 Review-fix additions (wave 3: QA and reference remainders)
+- **QA rows**: `video.replay` (overlapping measured source spans need `replay_of` + `replay_reason`), `audio.sfx.type:<id>`
+  (detected SFX typed by catalog centroid, not by the plan label), `audio.ducking:speech` (every measured duck sits under speech
+  measured in the output), `audio.original:speech<i>` / `music<i>` (kept voice measured in the output: mix − fitted BGM − SFX;
+  `has_embedded_music` is displayed but never decides), `audio.original:vocals_qc<i>` (required, carries quality.json),
+  `audio.bgm:clean_file` (always present: path rule + reference-stem match), `caption.reveal` (required; unmeasured when no reveal
+  is declared), `cover_up.protected:none` and `cover_up.faces` (always required), grid rows `ref_grid.captions/cuts/sfx/sheet`
+  (production requires the format's representative video as reference). Every style row compares every key it lists
+  (`keys_not_compared` otherwise) and `declarations()` holds exact keys only.
+- **Gate**: A1 uses `plan.approval_state_for` + `series_first_episode` (`gate.approval_facts`); A2 warns when the plan changed
+  after approval; P4: a not-required 못 잼 row blocks completion unless covered by a measured required row; G5 hashes the
+  deliverable (`resolved.output_path`); R1 requires the representative reference in production.
+- **Defects**: `fixed` only with a fix note + a same-case re-check; otherwise `resolved_without_fix` / `fixed_unrechecked`; a row that
+  becomes 못 잼 keeps its defect open.
+- **SFX catalog** status `measured | partial | unmeasured`; `types[].columns` / `column_status` / `unmeasured_columns`;
+  `per_video_count.videos {video_id: count}`, `per_video_total` (+ `_incl_silence`). `partial` = every video counted but a column
+  (e.g. emotion) missing → production stays blocked.
+- **formats.yaml**: label CSV columns `beats` (hook>context>build>reveal>reaction>outro, Korean aliases allowed) and `reveal_t`
+  (seconds or `none`), filled only by someone who watched; `table[].beats`, `reveal_frac {n,p10,p50,p90}`, `reveal_t_s`,
+  `reveal_presence`, `disclosure {status, order, evidence, missing, blocker}`; top-level `disclosure_order`, `label_columns`.
+- **Music library**: `audio_bgm.load_library` / `reference_audio_copy(path)` reject files that are copies of reference stems or
+  reference media (sha256 incl. separation-record hashes, waveform containment, level following); `bgm.json
+  library.refused_reference_audio`; `separation.json stems_sha256`.
+
 ## Appendix A. First build record (2026-09-24) — historical, does not apply to other machines
 
 ### Environment facts of the first build machine
