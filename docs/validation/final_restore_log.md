@@ -156,3 +156,12 @@
 - 환경: Ubuntu 24.04.4 LTS, 커널 6.18.44, Python 3.11.15, ffmpeg 6.1.1, melt 7.22.0, tesseract 5.3.4.
 - 이 뒤의 번들은 위 테스트 고침과 문서(VALIDATION·이 기록·PROGRESS)만 달라진다. 최종 번들은 복원 블록·바이트 대조·그 테스트 파일만
   다시 확인했다(아래 3절).
+
+## 3. 최종 번들 확인 (커밋 0154af3 의 PRESET_BUNDLE.md)
+
+이 절은 번들을 만든 **뒤에** 적었다. 그래서 번들 안의 이 파일에는 이 절이 없다.
+
+- 빈 폴더에서 MD 첫 줄이 읽으라는 1–436 행 안의 bash 블록(38–56 행)을 수정 없이 실행했다: 종료 0, `restored 364 files (sha256 ok)`.
+- 복원된 364개가 저장소 파일과 바이트 단위로 같다(차이 0).
+- 2차 이후 바뀐 테스트 3개 파일(`tests/qa/test_qa_finish.py`, `tests/core/test_bundle.py`, `tests/qa/test_qa_restore_fixes.py`)을
+  복원 폴더에서 실행했다: 32 passed, 4 skipped. 건너뛴 이유는 번들에 넣지 않는 예제 MP4·합성 QA 에피소드이며, 다시 만드는 명령이 표시된다.
