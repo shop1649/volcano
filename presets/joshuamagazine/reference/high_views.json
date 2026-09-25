@@ -1,14 +1,3259 @@
 {
   "schema": "shortkit.ref_high_views/1",
   "preset_id": "joshuamagazine-v1",
-  "status": "blocked",
-  "blocker": "https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))\")); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U",
-  "captured_at": "2026-09-24T17:56:07+00:00",
-  "method": "yt-dlp 2026.08.19",
-  "channel_url": "https://youtube.com/@joshuamagazine",
-  "videos": [],
-  "n": 0,
   "threshold": 800000,
-  "checked_at": "2026-09-24T17:56:07+00:00",
-  "unverified": []
+  "checked_at": "2026-09-25T15:47:08+00:00",
+  "status": "partial",
+  "blocker": "조회수 800,000 이상일 수 있는 영상 124편의 정확한 조회수를 확인하지 못함: -C7ESnM1r7E(영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -C7ESnM1r7E:), -io0SyooJUQ(영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -io0SyooJUQ:), -m1O0pCLVvU(영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -m1O0pCLVvU:), -p4TA7v7i2s(영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -p4TA7v7i2s:), 03WGRQGS3p8(영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 03WGRQGS3p8:)",
+  "n": 198,
+  "method": "yt-dlp: 각 탭 최신 N편 + 목록 근사 조회수가 기준의 90% 이상이거나 없는 모든 영상의 영상별 메타데이터",
+  "candidates_checked": 275,
+  "videos": [
+    {
+      "video_id": "LIEWU4TbVJU",
+      "url": "https://www.youtube.com/shorts/LIEWU4TbVJU",
+      "title": "소년이 큐브를 보고 깜놀한 이유 ㄷㄷ",
+      "view_count": 33622125,
+      "view_count_checked_at": "2026-09-25T15:50:39+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 33622125,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "30BDy8M00tI",
+      "url": "https://www.youtube.com/shorts/30BDy8M00tI",
+      "title": "마이클 잭슨이 되고 싶은 가수들",
+      "view_count": 25986691,
+      "view_count_checked_at": "2026-09-25T15:50:41+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 25986691,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "tzCS90nkAw4",
+      "url": "https://www.youtube.com/shorts/tzCS90nkAw4",
+      "title": "아빠랑 해변에서 놀면 안되는 이유",
+      "view_count": 24220972,
+      "view_count_checked_at": "2026-09-25T15:50:43+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "DR_w_RwLHnM",
+      "url": "https://www.youtube.com/shorts/DR_w_RwLHnM",
+      "title": "한번 쓰담아 줬는데.. 수호천사가 된 개",
+      "view_count": 22940702,
+      "view_count_checked_at": "2026-09-25T15:50:46+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 22940702,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "AF7X8uYXSBU",
+      "url": "https://www.youtube.com/shorts/AF7X8uYXSBU",
+      "title": "어쩌다 오게 된 손님",
+      "view_count": 19380174,
+      "view_count_checked_at": "2026-09-25T15:50:52+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 19380174,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "oxmZyCbV6B0",
+      "url": "https://www.youtube.com/shorts/oxmZyCbV6B0",
+      "title": "선수 아내 앞에서 빠던하면 벌어지는 일",
+      "view_count": 17915158,
+      "view_count_checked_at": "2026-09-25T15:51:04+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 17915158,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "YJRZ1YfukTc",
+      "url": "https://www.youtube.com/shorts/YJRZ1YfukTc",
+      "title": "아빠가 듣지 못한다는 걸 깨달은 딸",
+      "view_count": 17786068,
+      "view_count_checked_at": "2026-09-25T15:51:02+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 17786068,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "LG3sh2fll8Q",
+      "url": "https://www.youtube.com/shorts/LG3sh2fll8Q",
+      "title": "투수가 가랑이에 손만 넣고 안 던지는 이유",
+      "view_count": 17348612,
+      "view_count_checked_at": "2026-09-25T15:51:00+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 17348612,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "FthCdi6QiRE",
+      "url": "https://www.youtube.com/shorts/FthCdi6QiRE",
+      "title": "아델이 두 눈을 의심한 이유",
+      "view_count": 17267405,
+      "view_count_checked_at": "2026-09-25T15:50:56+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 17267405,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "KitzSVJvwTs",
+      "url": "https://www.youtube.com/shorts/KitzSVJvwTs",
+      "title": "배고파? 아저씨가 울어버린 이유",
+      "view_count": 17007454,
+      "view_count_checked_at": "2026-09-25T15:50:58+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "HBvbP6UQWOo",
+      "url": "https://www.youtube.com/shorts/HBvbP6UQWOo",
+      "title": "호날두가 상을 받고도 기쁘지 않은 이유",
+      "view_count": 16338040,
+      "view_count_checked_at": "2026-09-25T15:51:06+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 16338040,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "jBm9oCw52xU",
+      "url": "https://www.youtube.com/shorts/jBm9oCw52xU",
+      "title": "엄마가 남자친구 집에 왜.. ㄷㄷ",
+      "view_count": 13933465,
+      "view_count_checked_at": "2026-09-25T15:51:26+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "cJEzWpRCVGs",
+      "url": "https://www.youtube.com/shorts/cJEzWpRCVGs",
+      "title": "매일 다쳐도 미국 10대들에게 인기있는 직업",
+      "view_count": 13376953,
+      "view_count_checked_at": "2026-09-25T15:51:24+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "3YPevYy-Q3c",
+      "url": "https://www.youtube.com/shorts/3YPevYy-Q3c",
+      "title": "태어나 보니 \"억만장자\" 10살 소녀의 하루",
+      "view_count": 13328643,
+      "view_count_checked_at": "2026-09-25T15:51:18+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Q73pUvZGc-k",
+      "url": "https://www.youtube.com/shorts/Q73pUvZGc-k",
+      "title": "적조차 리스펙한 넘사벽 스킬 ㄷㄷ",
+      "view_count": 13165024,
+      "view_count_checked_at": "2026-09-25T15:51:20+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 13165024,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "mMLh1dwkCBI",
+      "url": "https://www.youtube.com/shorts/mMLh1dwkCBI",
+      "title": "과일 이름으로 피아노 쉽게 마스터 하는 법",
+      "view_count": 12891579,
+      "view_count_checked_at": "2026-09-25T15:51:32+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 12891579,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "nDa-CXPfgzw",
+      "url": "https://www.youtube.com/shorts/nDa-CXPfgzw",
+      "title": "근무중에 도넛 먹으면 ㅈ되는 이유",
+      "view_count": 12248835,
+      "view_count_checked_at": "2026-09-25T15:51:34+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "ZN5hO77FP14",
+      "url": "https://www.youtube.com/shorts/ZN5hO77FP14",
+      "title": "CNN 리포터 아무나 못 하는 이유",
+      "view_count": 10893026,
+      "view_count_checked_at": "2026-09-25T15:51:45+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 10893026,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "2V33brq6AsU",
+      "url": "https://www.youtube.com/shorts/2V33brq6AsU",
+      "title": "낮잠 자다가 트라우마에 걸린 아빠",
+      "view_count": 10474899,
+      "view_count_checked_at": "2026-09-25T15:51:36+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 10474899,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "XnMuVQN3-z8",
+      "url": "https://www.youtube.com/shorts/XnMuVQN3-z8",
+      "title": "중고거래 하다가 죽을뻔한 남자...ㄷㄷ",
+      "view_count": 10107874,
+      "view_count_checked_at": "2026-09-25T15:51:43+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "tkfmjqNiQe8",
+      "url": "https://www.youtube.com/shorts/tkfmjqNiQe8",
+      "title": "동생 때문에 트라우마 걸린 언니",
+      "view_count": 10087490,
+      "view_count_checked_at": "2026-09-25T15:51:47+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "8RpVgVWV3Zs",
+      "url": "https://www.youtube.com/shorts/8RpVgVWV3Zs",
+      "title": "당뇨병 환자를 오해한 교수님 ㄷㄷ",
+      "view_count": 10052012,
+      "view_count_checked_at": "2026-09-25T15:51:41+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 10052012,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "jAA3TCzdYSQ",
+      "url": "https://www.youtube.com/shorts/jAA3TCzdYSQ",
+      "title": "친오빠가 기장이면 벌어지는 일 ㅋㅋㅋㅋㅋ",
+      "view_count": 9525241,
+      "view_count_checked_at": "2026-09-25T15:51:51+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "lI7-vaRaxVo",
+      "url": "https://www.youtube.com/shorts/lI7-vaRaxVo",
+      "title": "야외에서 음식 리뷰하면 안 되는 이유",
+      "view_count": 9470869,
+      "view_count_checked_at": "2026-09-25T15:51:53+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 9470869,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "102z6L8BpN0",
+      "url": "https://www.youtube.com/shorts/102z6L8BpN0",
+      "title": "호주인들이 미국에서 고통 받는 단어",
+      "view_count": 9185449,
+      "view_count_checked_at": "2026-09-25T15:51:57+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 9185449,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "Zw8R4qEDRnE",
+      "url": "https://www.youtube.com/shorts/Zw8R4qEDRnE",
+      "title": "팔이 없다는 걸 한참 뒤에야 깨달은 군인",
+      "view_count": 9161199,
+      "view_count_checked_at": "2026-09-25T15:52:02+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 9161199,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "uVvhfy6wn6A",
+      "url": "https://www.youtube.com/shorts/uVvhfy6wn6A",
+      "title": "모두가 경악한 8살 마술사",
+      "view_count": 8859512,
+      "view_count_checked_at": "2026-09-25T15:52:07+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8859512,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "_ZNQY2NS_j8",
+      "url": "https://www.youtube.com/shorts/_ZNQY2NS_j8",
+      "title": "땅을 밟지 않으면 좋은 점",
+      "view_count": 8763501,
+      "view_count_checked_at": "2026-09-25T15:52:09+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "T03JUBi74VI",
+      "url": "https://www.youtube.com/shorts/T03JUBi74VI",
+      "title": "지각쟁이 체스 챔피언이 큰코다친 이유",
+      "view_count": 8644300,
+      "view_count_checked_at": "2026-09-25T15:52:11+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8644300,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "hO9U_LGOo_A",
+      "url": "https://www.youtube.com/shorts/hO9U_LGOo_A",
+      "title": "심문실에서 최악의 결정을 한 범죄자",
+      "view_count": 8569333,
+      "view_count_checked_at": "2026-09-25T15:52:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "5bhDiKNqRAc",
+      "url": "https://www.youtube.com/shorts/5bhDiKNqRAc",
+      "title": "빡쳐서 만든 초콜릿, 대박 나버린 이유",
+      "view_count": 8348485,
+      "view_count_checked_at": "2026-09-25T15:52:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "4dZpQhWVop4",
+      "url": "https://www.youtube.com/shorts/4dZpQhWVop4",
+      "title": "테일러 스위프트 콘서트가 극한인 이유",
+      "view_count": 8347411,
+      "view_count_checked_at": "2026-09-25T15:52:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8347411,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "3nDh1A2RpoY",
+      "url": "https://www.youtube.com/shorts/3nDh1A2RpoY",
+      "title": "반지 뺏긴 빌리아일리시가 도둑 찾는 방법",
+      "view_count": 8317183,
+      "view_count_checked_at": "2026-09-25T15:52:15+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8317183,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "7MZAX5Q7jJU",
+      "url": "https://www.youtube.com/shorts/7MZAX5Q7jJU",
+      "title": "우버를 함부로 타면 안 되는 이유 ㄷㄷ",
+      "view_count": 8253857,
+      "view_count_checked_at": "2026-09-25T15:52:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8253857,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "g1TecOVaTRg",
+      "url": "https://www.youtube.com/shorts/g1TecOVaTRg",
+      "title": "실력이 확고해야 보이는 것 ㄷㄷ",
+      "view_count": 8114095,
+      "view_count_checked_at": "2026-09-25T15:52:29+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 8114095,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "ViHs5FGYuHc",
+      "url": "https://www.youtube.com/shorts/ViHs5FGYuHc",
+      "title": "일본 열도를 울린 11살 소녀 달리기",
+      "view_count": 7964140,
+      "view_count_checked_at": "2026-09-25T15:50:33+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 7964140,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "0Z7O0RofrP8",
+      "url": "https://www.youtube.com/shorts/0Z7O0RofrP8",
+      "title": "승객 중 한명이 비행기를 몰게 된 이유",
+      "view_count": 7768478,
+      "view_count_checked_at": "2026-09-25T15:52:33+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "DOEuDYkBRsg",
+      "url": "https://www.youtube.com/shorts/DOEuDYkBRsg",
+      "title": "브라질에서 총 게임 하면 벌어지는 일 ㄷㄷ",
+      "view_count": 7731753,
+      "view_count_checked_at": "2026-09-25T15:52:37+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 7731753,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "X68G37tGhoA",
+      "url": "https://www.youtube.com/shorts/X68G37tGhoA",
+      "title": "골프공 꺼내다가 온몸에 소름돋은 이유",
+      "view_count": 7651674,
+      "view_count_checked_at": "2026-09-25T15:52:41+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 7651674,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "i6z6BXRwIZw",
+      "url": "https://www.youtube.com/shorts/i6z6BXRwIZw",
+      "title": "엄마가 아들바보가 되는 이유",
+      "view_count": 7621219,
+      "view_count_checked_at": "2026-09-25T15:52:43+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "eCSS6RuBS6A",
+      "url": "https://www.youtube.com/shorts/eCSS6RuBS6A",
+      "title": "아들을 울려버린 군인 아빠의 한마디",
+      "view_count": 7574684,
+      "view_count_checked_at": "2026-09-25T15:52:45+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "fONS_Wcx57A",
+      "url": "https://www.youtube.com/shorts/fONS_Wcx57A",
+      "title": "파병에서 돌아온 아들.. 민망한 재회",
+      "view_count": 7559266,
+      "view_count_checked_at": "2026-09-25T15:52:47+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "7TkEdp20MuM",
+      "url": "https://www.youtube.com/shorts/7TkEdp20MuM",
+      "title": "TV보다 트라우마 걸린 틱톡커",
+      "view_count": 7405401,
+      "view_count_checked_at": "2026-09-25T15:52:50+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 7405401,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "8r9V6jD6Ykc",
+      "url": "https://www.youtube.com/shorts/8r9V6jD6Ykc",
+      "title": "무조건 아빠만 좋아하는 아이",
+      "view_count": 7356141,
+      "view_count_checked_at": "2026-09-25T15:52:53+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "-LzZ255i04w",
+      "url": "https://www.youtube.com/shorts/-LzZ255i04w",
+      "title": "하키 관중석 소름 끼치는 한마디..ㄷㄷ",
+      "view_count": 7332597,
+      "view_count_checked_at": "2026-09-25T15:52:52+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "yNGegJY1e5o",
+      "url": "https://www.youtube.com/shorts/yNGegJY1e5o",
+      "title": "뚱뚱하다고 놀림받는 딸의 고백 \"아빠는 울컥\"",
+      "view_count": 7324876,
+      "view_count_checked_at": "2026-09-25T15:52:56+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "zI3P3Q5Xqbg",
+      "url": "https://www.youtube.com/shorts/zI3P3Q5Xqbg",
+      "title": "남은 음료 완벽히 테이크아웃 하는 방법",
+      "view_count": 7081517,
+      "view_count_checked_at": "2026-09-25T15:53:01+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 7081517,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "AG5O4OVpriI",
+      "url": "https://www.youtube.com/shorts/AG5O4OVpriI",
+      "title": "차에서 떨어져도 절대 다치지 않는 방법",
+      "view_count": 6629677,
+      "view_count_checked_at": "2026-09-25T15:53:05+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6629677,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "2yVODcV8bgc",
+      "url": "https://www.youtube.com/shorts/2yVODcV8bgc",
+      "title": "에미넴이 인터뷰하다가 개빡친 이유",
+      "view_count": 6582382,
+      "view_count_checked_at": "2026-09-25T15:53:07+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6582382,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "qC65ZQXFVkM",
+      "url": "https://www.youtube.com/shorts/qC65ZQXFVkM",
+      "title": "부동산 말을 들으면 안 되는 이유",
+      "view_count": 6574763,
+      "view_count_checked_at": "2026-09-25T15:53:11+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6574763,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "YyDwCRSZI4w",
+      "url": "https://www.youtube.com/shorts/YyDwCRSZI4w",
+      "title": "WWE 경기, 레슬러보다 엄마가 위대한 이유",
+      "view_count": 6466760,
+      "view_count_checked_at": "2026-09-25T15:53:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6466760,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "8gRFkr5y1vk",
+      "url": "https://www.youtube.com/shorts/8gRFkr5y1vk",
+      "title": "모두를 충격에 빠뜨린 아군의 반전",
+      "view_count": 6414699,
+      "view_count_checked_at": "2026-09-25T15:53:15+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "apUYfmrxSBY",
+      "url": "https://www.youtube.com/shorts/apUYfmrxSBY",
+      "title": "큐브 대회에서 두번이나 억까당한 아이",
+      "view_count": 6408481,
+      "view_count_checked_at": "2026-09-25T15:53:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6408481,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "3cmUnwj0hX0",
+      "url": "https://www.youtube.com/shorts/3cmUnwj0hX0",
+      "title": "동료들 퇴근 못하게 자물쇠로 잠그는 이유",
+      "view_count": 6388085,
+      "view_count_checked_at": "2026-09-25T15:53:21+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6388085,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "SK1ozniLOrE",
+      "url": "https://www.youtube.com/shorts/SK1ozniLOrE",
+      "title": "인터뷰중 고등학교 친구를 알아본 코비",
+      "view_count": 6205574,
+      "view_count_checked_at": "2026-09-25T15:53:25+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "OVXIvtUq8Ns",
+      "url": "https://www.youtube.com/shorts/OVXIvtUq8Ns",
+      "title": "버스에서 던진 충격적인 한마디 ㄷㄷ",
+      "view_count": 6204951,
+      "view_count_checked_at": "2026-09-25T15:53:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 6204951,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "ERxkrUe22CQ",
+      "url": "https://www.youtube.com/shorts/ERxkrUe22CQ",
+      "title": "거짓말로 10억버는 최악의 틱톡 사기단",
+      "view_count": 6073059,
+      "view_count_checked_at": "2026-09-25T15:53:29+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "zTJdOi_hyGg",
+      "url": "https://www.youtube.com/shorts/zTJdOi_hyGg",
+      "title": "자신의 어린 시절이 떠오른 판사",
+      "view_count": 5999505,
+      "view_count_checked_at": "2026-09-25T15:53:34+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5999505,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "JGwM8TgspF0",
+      "url": "https://www.youtube.com/shorts/JGwM8TgspF0",
+      "title": "NBA 선수들이 공을 잡지 않는 이유",
+      "view_count": 5977834,
+      "view_count_checked_at": "2026-09-25T15:53:32+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5977834,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "VLpq7i9q46g",
+      "url": "https://www.youtube.com/shorts/VLpq7i9q46g",
+      "title": "바이커들이 숲속을 무서워하는 이유",
+      "view_count": 5858978,
+      "view_count_checked_at": "2026-09-25T15:53:36+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5858978,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "jeesmK1lE0c",
+      "url": "https://www.youtube.com/shorts/jeesmK1lE0c",
+      "title": "기장한테 칭찬하면 안 되는 이유",
+      "view_count": 5825984,
+      "view_count_checked_at": "2026-09-25T15:53:39+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5825984,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "WTW6NZ6xIuk",
+      "url": "https://www.youtube.com/shorts/WTW6NZ6xIuk",
+      "title": "기장이 주파수 잘못 맞추면 벌어지는 일",
+      "view_count": 5611187,
+      "view_count_checked_at": "2026-09-25T15:53:43+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "LY13quzuWeA",
+      "url": "https://www.youtube.com/shorts/LY13quzuWeA",
+      "title": "대통령 집 위를 날면 벌어지는 일 ㄷㄷ",
+      "view_count": 5480598,
+      "view_count_checked_at": "2026-09-25T15:53:49+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "SDBK25znyo4",
+      "url": "https://www.youtube.com/shorts/SDBK25znyo4",
+      "title": "\"자유투 안 넣고\" 칭찬 받은 남자",
+      "view_count": 5420349,
+      "view_count_checked_at": "2026-09-25T15:53:53+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "M0xWTr4GQWQ",
+      "url": "https://www.youtube.com/shorts/M0xWTr4GQWQ",
+      "title": "장인이 장비를 탓하지 않는 이유",
+      "view_count": 5401629,
+      "view_count_checked_at": "2026-09-25T15:53:51+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5401629,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "7T4BGG0_n58",
+      "url": "https://www.youtube.com/shorts/7T4BGG0_n58",
+      "title": "배송 오류로 아이폰 1억원치 받은 남자",
+      "view_count": 5383555,
+      "view_count_checked_at": "2026-09-25T15:53:55+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "LHLo7_rOxQE",
+      "url": "https://www.youtube.com/shorts/LHLo7_rOxQE",
+      "title": "20살 손자가 아기가 되면 벌어지는 일",
+      "view_count": 5331614,
+      "view_count_checked_at": "2026-09-25T15:53:57+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "TbmUNwDVo8c",
+      "url": "https://www.youtube.com/shorts/TbmUNwDVo8c",
+      "title": "낮에 장사하면 손님한테 혼나는 가게",
+      "view_count": 5320366,
+      "view_count_checked_at": "2026-09-25T15:53:59+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "xN4RMurWfoo",
+      "url": "https://www.youtube.com/shorts/xN4RMurWfoo",
+      "title": "갑자기 떡상한 \"시청자 2명 스트리머\"",
+      "view_count": 5212633,
+      "view_count_checked_at": "2026-09-25T15:54:05+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "XQKROAVocq8",
+      "url": "https://www.youtube.com/shorts/XQKROAVocq8",
+      "title": "무슬림의 진짜 실체를 폭로한 경찰ㄷㄷ",
+      "view_count": 5211509,
+      "view_count_checked_at": "2026-09-25T15:54:01+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5211509,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "98btSAHPmOA",
+      "url": "https://www.youtube.com/shorts/98btSAHPmOA",
+      "title": "아빠가 갑자기 이성을 잃은 이유",
+      "view_count": 5017230,
+      "view_count_checked_at": "2026-09-25T15:54:07+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 5017230,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "UfYdfk5z7_w",
+      "url": "https://www.youtube.com/shorts/UfYdfk5z7_w",
+      "title": "경험자에게 제대로 걸린 아이들",
+      "view_count": 4982618,
+      "view_count_checked_at": "2026-09-25T15:54:11+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4982618,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "lmq6tLQmzgM",
+      "url": "https://www.youtube.com/shorts/lmq6tLQmzgM",
+      "title": "등반가들만 안다는 산 정상 슬롯머신",
+      "view_count": 4944975,
+      "view_count_checked_at": "2026-09-25T15:54:14+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "O_IAUS9jor0",
+      "url": "https://www.youtube.com/shorts/O_IAUS9jor0",
+      "title": "승무원 때문에 트라우마에 걸린 이유",
+      "view_count": 4935438,
+      "view_count_checked_at": "2026-09-25T15:54:09+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "t2zJuKcKAos",
+      "url": "https://www.youtube.com/shorts/t2zJuKcKAos",
+      "title": "결혼하기전 남편감 맞는지 확인하는  여자친구",
+      "view_count": 4934309,
+      "view_count_checked_at": "2026-09-25T15:54:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "VJyG7A8MhCc",
+      "url": "https://www.youtube.com/shorts/VJyG7A8MhCc",
+      "title": "이제는 먹지 못하는 인도네시아 희귀 소금",
+      "view_count": 4684471,
+      "view_count_checked_at": "2026-09-25T15:54:20+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "4bf2yzsvXnI",
+      "url": "https://www.youtube.com/shorts/4bf2yzsvXnI",
+      "title": "제발 동생만은.. 누나가 박수를 치는 이유",
+      "view_count": 4670782,
+      "view_count_checked_at": "2026-09-25T15:54:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "y_cn-WkkUGA",
+      "url": "https://www.youtube.com/shorts/y_cn-WkkUGA",
+      "title": "외로운 여대생이 남친 얻는 법",
+      "view_count": 4636932,
+      "view_count_checked_at": "2026-09-25T15:54:26+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "xCZ_hBeziBU",
+      "url": "https://www.youtube.com/shorts/xCZ_hBeziBU",
+      "title": "아빠는 웃고 엄마는 화난 이유",
+      "view_count": 4613978,
+      "view_count_checked_at": "2026-09-25T15:54:24+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "uVZ3y_3DIBA",
+      "url": "https://www.youtube.com/shorts/uVZ3y_3DIBA",
+      "title": "아빠 생일이라며..ㅠ",
+      "view_count": 4608293,
+      "view_count_checked_at": "2026-09-25T15:54:22+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "fu_8B7jYNcw",
+      "url": "https://www.youtube.com/shorts/fu_8B7jYNcw",
+      "title": "캐나다 선수가 남의 국기를 만진 이유",
+      "view_count": 4554576,
+      "view_count_checked_at": "2026-09-25T15:54:28+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4554576,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "cwg6ZcFpufI",
+      "url": "https://www.youtube.com/shorts/cwg6ZcFpufI",
+      "title": "세상에서 제일 큰 비극...",
+      "view_count": 4475751,
+      "view_count_checked_at": "2026-09-25T15:54:30+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4475751,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "slgck52pZfw",
+      "url": "https://www.youtube.com/shorts/slgck52pZfw",
+      "title": "드웨인 존슨이 장난친 팬에게 급발진한 이유",
+      "view_count": 4428773,
+      "view_count_checked_at": "2026-09-25T15:54:34+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "qBqGSIs4CeI",
+      "url": "https://www.youtube.com/shorts/qBqGSIs4CeI",
+      "title": "자신만 빠진 가족사진을 받은 아이",
+      "view_count": 4425688,
+      "view_count_checked_at": "2026-09-25T15:54:32+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "i01RgFzmRLs",
+      "url": "https://www.youtube.com/shorts/i01RgFzmRLs",
+      "title": "100 - 36 = 절대 맞출 수 없는 이유",
+      "view_count": 4357222,
+      "view_count_checked_at": "2026-09-25T15:54:40+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "c8Fcr7Y5zG0",
+      "url": "https://www.youtube.com/shorts/c8Fcr7Y5zG0",
+      "title": "손자의 그림에 할머니가 경악한 이유",
+      "view_count": 4211367,
+      "view_count_checked_at": "2026-09-25T15:54:42+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "IEW4vj9aVQ8",
+      "url": "https://www.youtube.com/shorts/IEW4vj9aVQ8",
+      "title": "컨셉 잘못 잡은 한 유튜버의 최후",
+      "view_count": 4147573,
+      "view_count_checked_at": "2026-09-25T15:54:46+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "z50F2J-wcX0",
+      "url": "https://www.youtube.com/shorts/z50F2J-wcX0",
+      "title": "갑자기 \"불쑥\" 들어와 뽀뽀하고 도망가는 아기",
+      "view_count": 4140094,
+      "view_count_checked_at": "2026-09-25T15:54:54+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "gjwJOIThyW4",
+      "url": "https://www.youtube.com/shorts/gjwJOIThyW4",
+      "title": "광부들이 지하 3,000m에서 일하는 방법",
+      "view_count": 4104910,
+      "view_count_checked_at": "2026-09-25T15:54:52+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4104910,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "-_tveg8wNfc",
+      "url": "https://www.youtube.com/shorts/-_tveg8wNfc",
+      "title": "친구 집 청소해 주고 돌아온 반전",
+      "view_count": 4039584,
+      "view_count_checked_at": "2026-09-25T15:54:56+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4039584,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "eKI53SYGG-E",
+      "url": "https://www.youtube.com/shorts/eKI53SYGG-E",
+      "title": "전투기 조종사의 꿈을 못 버린 기장",
+      "view_count": 4025189,
+      "view_count_checked_at": "2026-09-25T15:54:58+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 4025189,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "keeA4SKptH4",
+      "url": "https://www.youtube.com/shorts/keeA4SKptH4",
+      "title": "빠꾸 없는 친오빠",
+      "view_count": 4007877,
+      "view_count_checked_at": "2026-09-25T15:54:59+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "NdkF6Lp9bQk",
+      "url": "https://www.youtube.com/shorts/NdkF6Lp9bQk",
+      "title": "넣으면 슈퍼 히어로🔥",
+      "view_count": 3991153,
+      "view_count_checked_at": "2026-09-25T15:55:03+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "NzJYK33lwLc",
+      "url": "https://www.youtube.com/shorts/NzJYK33lwLc",
+      "title": "괴롭힘 당하는 소년이 이웃집 문을 두드린 이유",
+      "view_count": 3866942,
+      "view_count_checked_at": "2026-09-25T15:55:09+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "GXBn1Vjtlto",
+      "url": "https://www.youtube.com/shorts/GXBn1Vjtlto",
+      "title": "전설의 무대에서 극딜 박힌 마이클 잭슨",
+      "view_count": 3856621,
+      "view_count_checked_at": "2026-09-25T15:55:07+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3856621,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "zHrM287ZDHw",
+      "url": "https://www.youtube.com/shorts/zHrM287ZDHw",
+      "title": "실력 있는 자만 반칙할 수 있는 이유",
+      "view_count": 3826136,
+      "view_count_checked_at": "2026-09-25T15:49:55+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3826136,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "6lxM-Q2hJKU",
+      "url": "https://www.youtube.com/shorts/6lxM-Q2hJKU",
+      "title": "드러머가 세상에서 제일 무서워 하는 순간",
+      "view_count": 3771773,
+      "view_count_checked_at": "2026-09-25T15:50:10+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3771773,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "SBmJmqwS4U8",
+      "url": "https://www.youtube.com/shorts/SBmJmqwS4U8",
+      "title": "탁구 선수가 웃음을 참을 수 없는 이유",
+      "view_count": 3657980,
+      "view_count_checked_at": "2026-09-25T15:50:16+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3657980,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "yV1lm7RK8sI",
+      "url": "https://www.youtube.com/shorts/yV1lm7RK8sI",
+      "title": "선생님과 생일이 같으면 벌어지는 일",
+      "view_count": 3645226,
+      "view_count_checked_at": "2026-09-25T15:55:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "ZQmBIP00r7o",
+      "url": "https://www.youtube.com/shorts/ZQmBIP00r7o",
+      "title": "할머니는 어딨어? \"엄마 입양 됐어..\"",
+      "view_count": 3642667,
+      "view_count_checked_at": "2026-09-25T15:55:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "LpO7Alp9JAA",
+      "url": "https://www.youtube.com/shorts/LpO7Alp9JAA",
+      "title": "주먹 대신 낭만으로 이기는 방법",
+      "view_count": 3608318,
+      "view_count_checked_at": "2026-09-25T15:55:11+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3608318,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "635dIIlMp9A",
+      "url": "https://www.youtube.com/shorts/635dIIlMp9A",
+      "title": "부모만 느낄 수 있는 끔찍한 순간",
+      "view_count": 3548270,
+      "view_count_checked_at": "2026-09-25T15:55:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3548270,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "DyX6uOUcJyE",
+      "url": "https://www.youtube.com/shorts/DyX6uOUcJyE",
+      "title": "계속 같은 말만 하는 이웃집 임산부",
+      "view_count": 3535651,
+      "view_count_checked_at": "2026-09-25T15:55:21+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "GjQ_jWzTZh8",
+      "url": "https://www.youtube.com/shorts/GjQ_jWzTZh8",
+      "title": "경찰이 주소를 잘못 알면 벌어지는 일",
+      "view_count": 3528176,
+      "view_count_checked_at": "2026-09-25T15:55:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3528176,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "p2u4SIGY0r4",
+      "url": "https://www.youtube.com/shorts/p2u4SIGY0r4",
+      "title": "비행기에 오르기전 남자가 자수한 이유",
+      "view_count": 3518883,
+      "view_count_checked_at": "2026-09-25T15:55:25+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "J3XPZTFmbUQ",
+      "url": "https://www.youtube.com/shorts/J3XPZTFmbUQ",
+      "title": "위반인걸 알지만 승무원들이 못 참는 행동",
+      "view_count": 3452602,
+      "view_count_checked_at": "2026-09-25T15:55:30+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "-SjXXyVPiII",
+      "url": "https://www.youtube.com/shorts/-SjXXyVPiII",
+      "title": "이 결혼이 깨질 수가 없는 이유",
+      "view_count": 3408074,
+      "view_count_checked_at": "2026-09-25T15:55:27+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3408074,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "tr8yXWM0TNg",
+      "url": "https://www.youtube.com/shorts/tr8yXWM0TNg",
+      "title": "아빠 나 임신했어.. 아빠의 역대급 반응",
+      "view_count": 3320134,
+      "view_count_checked_at": "2026-09-25T15:55:34+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "i4kVtHZbfNs",
+      "url": "https://www.youtube.com/shorts/i4kVtHZbfNs",
+      "title": "셔터만이 살 길인 이유!!",
+      "view_count": 3297037,
+      "view_count_checked_at": "2026-09-25T15:55:40+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Vd6114jN7oI",
+      "url": "https://www.youtube.com/shorts/Vd6114jN7oI",
+      "title": "빌런이 되고 싶었던 한 어린이의 최후",
+      "view_count": 3242493,
+      "view_count_checked_at": "2026-09-25T15:55:38+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3242493,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "2KJRUM5RCPU",
+      "url": "https://www.youtube.com/shorts/2KJRUM5RCPU",
+      "title": "도로에서 견문색이 필요한 이유",
+      "view_count": 3203960,
+      "view_count_checked_at": "2026-09-25T15:55:36+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3203960,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "RQSRuLK9J14",
+      "url": "https://www.youtube.com/shorts/RQSRuLK9J14",
+      "title": "마지막 인사하러 온 강아지",
+      "view_count": 3136491,
+      "view_count_checked_at": "2026-09-25T15:50:01+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3136491,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "QqKIzu2zgjg",
+      "url": "https://www.youtube.com/shorts/QqKIzu2zgjg",
+      "title": "후배 때문에 심장 쫄깃해진 선배",
+      "view_count": 3133244,
+      "view_count_checked_at": "2026-09-25T15:50:28+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 3133244,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "6l-7Bm2SJ54",
+      "url": "https://www.youtube.com/shorts/6l-7Bm2SJ54",
+      "title": "쓰나미를 대비한 무적의 캡슐",
+      "view_count": 2989549,
+      "view_count_checked_at": "2026-09-25T15:55:44+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "1T9wCkDVfNc",
+      "url": "https://www.youtube.com/shorts/1T9wCkDVfNc",
+      "title": "12살이 프로 사이클 선수 압살하는 법",
+      "view_count": 2981646,
+      "view_count_checked_at": "2026-09-25T15:55:42+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2981646,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "UQONOSzv4Rg",
+      "url": "https://www.youtube.com/shorts/UQONOSzv4Rg",
+      "title": "F15 조종사가 급유하다 개빡친 이유",
+      "view_count": 2958101,
+      "view_count_checked_at": "2026-09-25T15:55:46+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2958101,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "W7n7v2u4m5U",
+      "url": "https://www.youtube.com/shorts/W7n7v2u4m5U",
+      "title": "푸틴이 말없이 말하는 방법 ㄷㄷ",
+      "view_count": 2742907,
+      "view_count_checked_at": "2026-09-25T15:55:52+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2742907,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "f1VLiORqqy8",
+      "url": "https://www.youtube.com/shorts/f1VLiORqqy8",
+      "title": "보고도 믿기 힘든 \"충격적인 가족 사진\"",
+      "view_count": 2724393,
+      "view_count_checked_at": "2026-09-25T15:55:55+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "6EGMTlIX-ak",
+      "url": "https://www.youtube.com/shorts/6EGMTlIX-ak",
+      "title": "학교에 있는 이상한 구멍의 정체",
+      "view_count": 2672804,
+      "view_count_checked_at": "2026-09-25T15:55:59+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2672804,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "27zWvJpjtDU",
+      "url": "https://www.youtube.com/shorts/27zWvJpjtDU",
+      "title": "타이어에 \"10만원치 공기 넣은 딸\" 아빠는 대환장 파티",
+      "view_count": 2672432,
+      "view_count_checked_at": "2026-09-25T15:55:57+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "x_hxXsP1Nqw",
+      "url": "https://www.youtube.com/shorts/x_hxXsP1Nqw",
+      "title": "멸치 동생이 형에게 복수하는 법",
+      "view_count": 2659566,
+      "view_count_checked_at": "2026-09-25T15:50:35+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2659566,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "wB2lbnxFlBc",
+      "url": "https://www.youtube.com/shorts/wB2lbnxFlBc",
+      "title": "백만장자를 노숙자로 오해한 아이",
+      "view_count": 2643980,
+      "view_count_checked_at": "2026-09-25T15:56:04+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2643980,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "ab824iMo8vI",
+      "url": "https://www.youtube.com/shorts/ab824iMo8vI",
+      "title": "말 못 한다고 했는데 갑자기.. ㅠㅠ",
+      "view_count": 2620909,
+      "view_count_checked_at": "2026-09-25T15:56:02+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "zCB8ORr4fi0",
+      "url": "https://www.youtube.com/shorts/zCB8ORr4fi0",
+      "title": "뚜렛증후군 드라이버가 태운 특별한 손님",
+      "view_count": 2576295,
+      "view_count_checked_at": "2026-09-25T15:56:15+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "HIXc0ksl3S0",
+      "url": "https://www.youtube.com/shorts/HIXc0ksl3S0",
+      "title": "절대 남친 데려오지 말라던 아빠",
+      "view_count": 2565081,
+      "view_count_checked_at": "2026-09-25T15:56:08+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "-EHB0GiUJ_g",
+      "url": "https://www.youtube.com/shorts/-EHB0GiUJ_g",
+      "title": "경기 포기한 남자, 하지만 박수 받은 이유",
+      "view_count": 2564716,
+      "view_count_checked_at": "2026-09-25T15:56:06+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "v0TXuPjvgWI",
+      "url": "https://www.youtube.com/shorts/v0TXuPjvgWI",
+      "title": "두번은 절대 못하는 과학 실험",
+      "view_count": 2509929,
+      "view_count_checked_at": "2026-09-25T15:56:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "W_dortLeeD8",
+      "url": "https://www.youtube.com/shorts/W_dortLeeD8",
+      "title": "딸의 한마디에 군인 아빠가 울어버린 이유",
+      "view_count": 2426762,
+      "view_count_checked_at": "2026-09-25T15:56:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "GEi4s5uxCJ4",
+      "url": "https://www.youtube.com/shorts/GEi4s5uxCJ4",
+      "title": "남친 골려주려다 벌어진 참극",
+      "view_count": 2416178,
+      "view_count_checked_at": "2026-09-25T15:56:21+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2416178,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "2-0HZDcy84k",
+      "url": "https://www.youtube.com/shorts/2-0HZDcy84k",
+      "title": "천재를 알아본 고든램지가 보인 행동",
+      "view_count": 2415743,
+      "view_count_checked_at": "2026-09-25T15:56:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "ky_VHpl7KuM",
+      "url": "https://www.youtube.com/shorts/ky_VHpl7KuM",
+      "title": "퇴역 군인을 몰라본 강도의 최후",
+      "view_count": 2413312,
+      "view_count_checked_at": "2026-09-25T15:56:27+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "1YehF_qfZLw",
+      "url": "https://www.youtube.com/shorts/1YehF_qfZLw",
+      "title": "엄마를 동창회 보냈더니 벌어진 반전",
+      "view_count": 2412431,
+      "view_count_checked_at": "2026-09-25T15:56:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "a7DZaAyEums",
+      "url": "https://www.youtube.com/shorts/a7DZaAyEums",
+      "title": "심판이 안말리자 알리가 보인 행동 ㄷㄷ",
+      "view_count": 2403721,
+      "view_count_checked_at": "2026-09-25T15:56:25+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "VIpvuD90yUU",
+      "url": "https://www.youtube.com/shorts/VIpvuD90yUU",
+      "title": "웃지 못하는 삼촌, 웃기려는 조카",
+      "view_count": 2345224,
+      "view_count_checked_at": "2026-09-25T15:56:29+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "eV8tAFStRZM",
+      "url": "https://www.youtube.com/shorts/eV8tAFStRZM",
+      "title": "와ㅆ... 이륙하라며?!?!",
+      "view_count": 2290982,
+      "view_count_checked_at": "2026-09-25T15:56:40+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2290982,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "nK515hX3yDk",
+      "url": "https://www.youtube.com/shorts/nK515hX3yDk",
+      "title": "구독자 0명 스트리머가 비참한 이유",
+      "view_count": 2238918,
+      "view_count_checked_at": "2026-09-25T15:56:42+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2238918,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "NHtz9qXouhw",
+      "url": "https://www.youtube.com/shorts/NHtz9qXouhw",
+      "title": "CCTV 확인한 주인, 패닉에 빠진 이유",
+      "view_count": 2138862,
+      "view_count_checked_at": "2026-09-25T15:56:47+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "gYy7XhrGXGA",
+      "url": "https://www.youtube.com/shorts/gYy7XhrGXGA",
+      "title": "상대가 두렵고 무서워웠던 체스 챔피언",
+      "view_count": 2136466,
+      "view_count_checked_at": "2026-09-25T15:56:53+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2136466,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "pgKaH83Bdo0",
+      "url": "https://www.youtube.com/shorts/pgKaH83Bdo0",
+      "title": "르브론의 초짜 보디가드, 연봉 10억인 이유",
+      "view_count": 2098516,
+      "view_count_checked_at": "2026-09-25T15:57:16+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Uus4mF4Ij-8",
+      "url": "https://www.youtube.com/shorts/Uus4mF4Ij-8",
+      "title": "\"숨이 꺼져가는 아내..\" 남편이 보인 행동",
+      "view_count": 2092270,
+      "view_count_checked_at": "2026-09-25T15:57:07+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "DDjBKkowncw",
+      "url": "https://www.youtube.com/shorts/DDjBKkowncw",
+      "title": "18년만에 만난 아들.. \"누구세요?\"",
+      "view_count": 2090768,
+      "view_count_checked_at": "2026-09-25T15:57:01+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "22NoR4xte_g",
+      "url": "https://www.youtube.com/shorts/22NoR4xte_g",
+      "title": "여동생을 본 오빠의 예상치 못한 반응",
+      "view_count": 2055805,
+      "view_count_checked_at": "2026-09-25T15:56:57+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "6LT-rXxPVSA",
+      "url": "https://www.youtube.com/shorts/6LT-rXxPVSA",
+      "title": "딸을 절대 이길 수 없는 이유",
+      "view_count": 2045548,
+      "view_count_checked_at": "2026-09-25T15:56:59+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2045548,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "G3Ffxc8iZ1Q",
+      "url": "https://www.youtube.com/shorts/G3Ffxc8iZ1Q",
+      "title": "랜딩 하면 해고되는 이유",
+      "view_count": 2034716,
+      "view_count_checked_at": "2026-09-25T15:57:04+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2034716,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "bhwln4BmX20",
+      "url": "https://www.youtube.com/shorts/bhwln4BmX20",
+      "title": "버거킹 깔려다가 되치기 당한 맥도날드",
+      "view_count": 2033497,
+      "view_count_checked_at": "2026-09-25T15:57:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2033497,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "_KO9KVBEE4g",
+      "url": "https://www.youtube.com/shorts/_KO9KVBEE4g",
+      "title": "토네이도 온다고!!! 끔찍한 기장의 선택",
+      "view_count": 2020917,
+      "view_count_checked_at": "2026-09-25T15:57:10+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 2020917,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "z0894sLkixc",
+      "url": "https://www.youtube.com/shorts/z0894sLkixc",
+      "title": "이름만 불렀는데 오열하는 친구",
+      "view_count": 2000568,
+      "view_count_checked_at": "2026-09-25T15:57:18+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "atVE-_G1m9g",
+      "url": "https://www.youtube.com/shorts/atVE-_G1m9g",
+      "title": "전세계가 경악한 일본 여자의 훈련법",
+      "view_count": 1985753,
+      "view_count_checked_at": "2026-09-25T15:57:22+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1985753,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "jHH29DvtZMs",
+      "url": "https://www.youtube.com/shorts/jHH29DvtZMs",
+      "title": "마트에서 파는 캐비어 부화시킨 남자",
+      "view_count": 1977603,
+      "view_count_checked_at": "2026-09-25T15:57:24+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "mRgtse6qguc",
+      "url": "https://www.youtube.com/shorts/mRgtse6qguc",
+      "title": "우는 아기에게 강제로 피어싱하는 엄마",
+      "view_count": 1960686,
+      "view_count_checked_at": "2026-09-25T15:57:26+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "IRGRFQOWmk0",
+      "url": "https://www.youtube.com/shorts/IRGRFQOWmk0",
+      "title": "당연히 AI라고 착각한 이유 ㄷㄷ",
+      "view_count": 1894448,
+      "view_count_checked_at": "2026-09-25T15:57:28+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1894448,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "LVGIXg8SfBA",
+      "url": "https://www.youtube.com/shorts/LVGIXg8SfBA",
+      "title": "바이러스 1000개 설치하자 벌어진 비극",
+      "view_count": 1889574,
+      "view_count_checked_at": "2026-09-25T15:57:30+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "uyhR2LKo7qM",
+      "url": "https://www.youtube.com/shorts/uyhR2LKo7qM",
+      "title": "그냥 싫은 \"딸 남자친구\"",
+      "view_count": 1818185,
+      "view_count_checked_at": "2026-09-25T15:57:36+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "fUWDDbw3nlE",
+      "url": "https://www.youtube.com/shorts/fUWDDbw3nlE",
+      "title": "음악으로 학생들 피말리는 법",
+      "view_count": 1804398,
+      "view_count_checked_at": "2026-09-25T15:57:34+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "oy7cwv9GcW0",
+      "url": "https://www.youtube.com/shorts/oy7cwv9GcW0",
+      "title": "CG가 없던 시절 고전으로 화살 맞는 법",
+      "view_count": 1786580,
+      "view_count_checked_at": "2026-09-25T15:57:38+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1786580,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "13V0iDIbU0s",
+      "url": "https://www.youtube.com/shorts/13V0iDIbU0s",
+      "title": "죽으려는 할아버지를 울린 \"4살 아이의 한마디\"",
+      "view_count": 1690357,
+      "view_count_checked_at": "2026-09-25T15:57:44+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "-8apYPVviTo",
+      "url": "https://www.youtube.com/shorts/-8apYPVviTo",
+      "title": "아들한테 장난치면 큰일나는 이유",
+      "view_count": 1680688,
+      "view_count_checked_at": "2026-09-25T15:57:42+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1680688,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "9hjtqH98iNE",
+      "url": "https://www.youtube.com/shorts/9hjtqH98iNE",
+      "title": "\"날 거절해?\".. 5년뒤 벌어진 복수",
+      "view_count": 1642618,
+      "view_count_checked_at": "2026-09-25T15:57:46+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "TifvM-GLips",
+      "url": "https://www.youtube.com/shorts/TifvM-GLips",
+      "title": "아빠 앞에서 급발진하면 안되는 이유 #shorts",
+      "view_count": 1609675,
+      "view_count_checked_at": "2026-09-25T15:57:48+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "dMSO-008oI4",
+      "url": "https://www.youtube.com/shorts/dMSO-008oI4",
+      "title": "찐친의 출생의 비밀을 알게된 친구들",
+      "view_count": 1604938,
+      "view_count_checked_at": "2026-09-25T15:57:50+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "KNFQBAJo3e4",
+      "url": "https://www.youtube.com/shorts/KNFQBAJo3e4",
+      "title": "손님과 우버기사가 뇌정지 온 이유",
+      "view_count": 1587743,
+      "view_count_checked_at": "2026-09-25T15:57:56+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1587743,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "XBD-6ow1Zcs",
+      "url": "https://www.youtube.com/shorts/XBD-6ow1Zcs",
+      "title": "사지마비 된 여자가 결혼하는 방법",
+      "view_count": 1547428,
+      "view_count_checked_at": "2026-09-25T15:58:00+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "DtNd8cdtHs0",
+      "url": "https://www.youtube.com/shorts/DtNd8cdtHs0",
+      "title": "두 여자가 모르는 결혼식을 찾아간 이유",
+      "view_count": 1545415,
+      "view_count_checked_at": "2026-09-25T15:57:54+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1545415,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "MXWkU5TIv6g",
+      "url": "https://www.youtube.com/shorts/MXWkU5TIv6g",
+      "title": "ATM 허점을 이용해 16억 인출한 남자",
+      "view_count": 1521531,
+      "view_count_checked_at": "2026-09-25T15:57:58+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Tuzw8aHFcU4",
+      "url": "https://www.youtube.com/shorts/Tuzw8aHFcU4",
+      "title": "타이슨 코치가 알리 필살기 무력화 하는 법",
+      "view_count": 1497389,
+      "view_count_checked_at": "2026-09-25T15:58:06+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1497389,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "L0CODfrQ_44",
+      "url": "https://www.youtube.com/shorts/L0CODfrQ_44",
+      "title": "여친 보다 예쁜 \"여친 남동생\"",
+      "view_count": 1478818,
+      "view_count_checked_at": "2026-09-25T15:58:04+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "p-ovJ_qvxCs",
+      "url": "https://www.youtube.com/shorts/p-ovJ_qvxCs",
+      "title": "엄마 없는 생일, 큰 누나의 선물",
+      "view_count": 1472708,
+      "view_count_checked_at": "2026-09-25T15:58:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "fqmcsQtQZys",
+      "url": "https://www.youtube.com/shorts/fqmcsQtQZys",
+      "title": "누나를 이길수 없는 이유 ㅋㅋㅋㅋ",
+      "view_count": 1428730,
+      "view_count_checked_at": "2026-09-25T15:58:10+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "alAcUW7deng",
+      "url": "https://www.youtube.com/shorts/alAcUW7deng",
+      "title": "아들과 딸이 다른 이유... \"F인 딸 T인 아들\"",
+      "view_count": 1413192,
+      "view_count_checked_at": "2026-09-25T15:58:08+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "E1JdGCmKSVk",
+      "url": "https://www.youtube.com/shorts/E1JdGCmKSVk",
+      "title": "아기상어 노래를 모르면 벌어지는 일",
+      "view_count": 1388825,
+      "view_count_checked_at": "2026-09-25T15:58:17+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "o1QLMyuZB24",
+      "url": "https://www.youtube.com/shorts/o1QLMyuZB24",
+      "title": "경기중에 음료 엎지르면 벌어지는 일ㄷㄷ",
+      "view_count": 1356002,
+      "view_count_checked_at": "2026-09-25T15:50:12+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1356002,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "-LKjevEMifc",
+      "url": "https://www.youtube.com/shorts/-LKjevEMifc",
+      "title": "기장이 비행을 거부하면 벌어지는 일",
+      "view_count": 1350886,
+      "view_count_checked_at": "2026-09-25T15:58:15+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "eCQgFxktFI8",
+      "url": "https://www.youtube.com/shorts/eCQgFxktFI8",
+      "title": "귀신의 집 무적의 방패",
+      "view_count": 1348262,
+      "view_count_checked_at": "2026-09-25T15:58:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1348262,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "kCknUFR_-Yc",
+      "url": "https://www.youtube.com/shorts/kCknUFR_-Yc",
+      "title": "똑똑한 남자가 결혼에 성공하는 이유 ㄷㄷ",
+      "view_count": 1313187,
+      "view_count_checked_at": "2026-09-25T15:58:25+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1313187,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "_bIx9Ho6PYY",
+      "url": "https://www.youtube.com/shorts/_bIx9Ho6PYY",
+      "title": "아픈 할머니가 전하려고 했던 말ㅠㅠ",
+      "view_count": 1309614,
+      "view_count_checked_at": "2026-09-25T15:58:21+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "l-QbiopD5Do",
+      "url": "https://www.youtube.com/shorts/l-QbiopD5Do",
+      "title": "닭 깃털로 만든 스테이크 ㄷㄷ",
+      "view_count": 1297132,
+      "view_count_checked_at": "2026-09-25T15:58:31+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "usEZ0Jjf09Y",
+      "url": "https://www.youtube.com/shorts/usEZ0Jjf09Y",
+      "title": "혼자만 보법이 다른 로다주 그림 실력",
+      "view_count": 1268742,
+      "view_count_checked_at": "2026-09-25T15:58:33+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1268742,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "I1b0MmI4KaY",
+      "url": "https://www.youtube.com/shorts/I1b0MmI4KaY",
+      "title": "선수의 15초를 뺏은 황당한 심판",
+      "view_count": 1258964,
+      "view_count_checked_at": "2026-09-25T15:58:29+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 1258964,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "Cci4V5OIey4",
+      "url": "https://www.youtube.com/shorts/Cci4V5OIey4",
+      "title": "일주일간의 코마, 딸의 충격적인 첫마디",
+      "view_count": 1239538,
+      "view_count_checked_at": "2026-09-25T15:58:27+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "5-xXz0EiuYo",
+      "url": "https://www.youtube.com/shorts/5-xXz0EiuYo",
+      "title": "세상에서 가장 불순한 입양",
+      "view_count": 1188672,
+      "view_count_checked_at": "2026-09-25T15:58:37+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "wiYWj4xvlHQ",
+      "url": "https://www.youtube.com/shorts/wiYWj4xvlHQ",
+      "title": "김정일이 피자에 환장하면 벌어지는 일",
+      "view_count": 1185073,
+      "view_count_checked_at": "2026-09-25T15:58:51+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "jCV35ABOcHw",
+      "url": "https://www.youtube.com/shorts/jCV35ABOcHw",
+      "title": "괴롭힘 당하는 학생의 정중한 부탁",
+      "view_count": 1167112,
+      "view_count_checked_at": "2026-09-25T15:58:49+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Z5x6CUO9cCA",
+      "url": "https://www.youtube.com/shorts/Z5x6CUO9cCA",
+      "title": "50년전에 도둑맞은 차를 찾아준 아들",
+      "view_count": 1121445,
+      "view_count_checked_at": "2026-09-25T15:58:43+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "JV4tXV0zJxc",
+      "url": "https://www.youtube.com/shorts/JV4tXV0zJxc",
+      "title": "다리가 박살나도 모자만 있으면 장땡인 선수",
+      "view_count": 1121140,
+      "view_count_checked_at": "2026-09-25T15:58:41+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "fW4rpqcl7j8",
+      "url": "https://www.youtube.com/shorts/fW4rpqcl7j8",
+      "title": "18년뒤, 출생 순서를 듣게된 세쌍둥이",
+      "view_count": 1116419,
+      "view_count_checked_at": "2026-09-25T15:58:47+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "OOus_dbNORU",
+      "url": "https://www.youtube.com/shorts/OOus_dbNORU",
+      "title": "장님 할아버지가 판매를 포기한 이유",
+      "view_count": 1086027,
+      "view_count_checked_at": "2026-09-25T15:58:56+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "Dv4kSxw8PWs",
+      "url": "https://www.youtube.com/shorts/Dv4kSxw8PWs",
+      "title": "선물을 쓰레기로 착각한 청소부",
+      "view_count": 1032162,
+      "view_count_checked_at": "2026-09-25T15:58:52+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "SEFpumjh0Tw",
+      "url": "https://www.youtube.com/shorts/SEFpumjh0Tw",
+      "title": "배우자를 잘 만나야 되는 이유",
+      "view_count": 1024562,
+      "view_count_checked_at": "2026-09-25T15:58:58+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "SBfn2I39gGY",
+      "url": "https://www.youtube.com/shorts/SBfn2I39gGY",
+      "title": "일본의 욱일기를 보자 미 해군이 꺼낸 물건",
+      "view_count": 996906,
+      "view_count_checked_at": "2026-09-25T15:59:04+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 996906,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "85amh62XWzQ",
+      "url": "https://www.youtube.com/shorts/85amh62XWzQ",
+      "title": "쓰레기통 뒤진 노숙자, 버스커의 선택",
+      "view_count": 994211,
+      "view_count_checked_at": "2026-09-25T15:59:06+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "nO0AQPqAegE",
+      "url": "https://www.youtube.com/shorts/nO0AQPqAegE",
+      "title": "쌍둥이가 다른 음식을 먹으면 벌어지는 일",
+      "view_count": 988647,
+      "view_count_checked_at": "2026-09-25T15:59:08+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 988647,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    },
+    {
+      "video_id": "AIvZe-R0bOU",
+      "url": "https://www.youtube.com/shorts/AIvZe-R0bOU",
+      "title": "외면받던 작가가 하루 아침에 떡상한 이유",
+      "view_count": 981201,
+      "view_count_checked_at": "2026-09-25T15:59:11+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "8zIn-Ng17bU",
+      "url": "https://www.youtube.com/shorts/8zIn-Ng17bU",
+      "title": "기자에게 행패부린 술취한 양아치의 최후",
+      "view_count": 965402,
+      "view_count_checked_at": "2026-09-25T15:59:13+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "m7bdzuVofak",
+      "url": "https://www.youtube.com/shorts/m7bdzuVofak",
+      "title": "물고기를 풀어주자 벌어진 반전..ㄷㄷ",
+      "view_count": 958986,
+      "view_count_checked_at": "2026-09-25T15:59:15+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "mD2RSlIjJBA",
+      "url": "https://www.youtube.com/shorts/mD2RSlIjJBA",
+      "title": "스트리머 카메라에 포착된 소름끼치는 장면",
+      "view_count": 915876,
+      "view_count_checked_at": "2026-09-25T15:59:19+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "ynn3Sf-k-vo",
+      "url": "https://www.youtube.com/shorts/ynn3Sf-k-vo",
+      "title": "아내 친구들에게 호구잡힌 남편",
+      "view_count": 905169,
+      "view_count_checked_at": "2026-09-25T15:59:21+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "-S-NwVTXHvw",
+      "url": "https://www.youtube.com/shorts/-S-NwVTXHvw",
+      "title": "집이 통째로 날라간 할머니가 행복한 이유",
+      "view_count": 881039,
+      "view_count_checked_at": "2026-09-25T15:59:23+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": null,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": false
+    },
+    {
+      "video_id": "8ts_6Ubh_0Q",
+      "url": "https://www.youtube.com/shorts/8ts_6Ubh_0Q",
+      "title": "그녀가 할 수 있는 최소한의 복수..",
+      "view_count": 853469,
+      "view_count_checked_at": "2026-09-25T15:50:18+00:00",
+      "view_count_source": "video_metadata",
+      "view_count_at_snapshot": 853469,
+      "published_at": null,
+      "kind": "short",
+      "in_latest100": true
+    }
+  ],
+  "unverified": [
+    {
+      "video_id": "-C7ESnM1r7E",
+      "view_count_approx": 13000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -C7ESnM1r7E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/-C7ESnM1r7E",
+      "kind": "short"
+    },
+    {
+      "video_id": "-io0SyooJUQ",
+      "view_count_approx": 8100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -io0SyooJUQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/-io0SyooJUQ",
+      "kind": "short"
+    },
+    {
+      "video_id": "-m1O0pCLVvU",
+      "view_count_approx": 4100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -m1O0pCLVvU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/-m1O0pCLVvU",
+      "kind": "short"
+    },
+    {
+      "video_id": "-p4TA7v7i2s",
+      "view_count_approx": 2700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] -p4TA7v7i2s: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/-p4TA7v7i2s",
+      "kind": "short"
+    },
+    {
+      "video_id": "03WGRQGS3p8",
+      "view_count_approx": 3700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 03WGRQGS3p8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/03WGRQGS3p8",
+      "kind": "short"
+    },
+    {
+      "video_id": "0gva1efy6Sw",
+      "view_count_approx": 5400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 0gva1efy6Sw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/0gva1efy6Sw",
+      "kind": "short"
+    },
+    {
+      "video_id": "2LTqZWT-D7E",
+      "view_count_approx": 982000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 2LTqZWT-D7E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/2LTqZWT-D7E",
+      "kind": "short"
+    },
+    {
+      "video_id": "2XtnaUwbjBg",
+      "view_count_approx": 946000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 2XtnaUwbjBg: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/2XtnaUwbjBg",
+      "kind": "short"
+    },
+    {
+      "video_id": "3sXZfTLKCCs",
+      "view_count_approx": 815000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 3sXZfTLKCCs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/3sXZfTLKCCs",
+      "kind": "short"
+    },
+    {
+      "video_id": "4NEsahERkCE",
+      "view_count_approx": 2600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 4NEsahERkCE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/4NEsahERkCE",
+      "kind": "short"
+    },
+    {
+      "video_id": "5PHKmukMT-M",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 5PHKmukMT-M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/5PHKmukMT-M",
+      "kind": "short"
+    },
+    {
+      "video_id": "5_B7h_BKPDE",
+      "view_count_approx": 2500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 5_B7h_BKPDE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/5_B7h_BKPDE",
+      "kind": "short"
+    },
+    {
+      "video_id": "6LO4AInfRjc",
+      "view_count_approx": 3900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 6LO4AInfRjc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/6LO4AInfRjc",
+      "kind": "short"
+    },
+    {
+      "video_id": "6Ojax_8l-Eo",
+      "view_count_approx": 10000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 6Ojax_8l-Eo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/6Ojax_8l-Eo",
+      "kind": "short"
+    },
+    {
+      "video_id": "6coHd-R76pw",
+      "view_count_approx": 772000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 6coHd-R76pw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/6coHd-R76pw",
+      "kind": "short"
+    },
+    {
+      "video_id": "7jkP1SfJpqE",
+      "view_count_approx": 6400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 7jkP1SfJpqE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/7jkP1SfJpqE",
+      "kind": "short"
+    },
+    {
+      "video_id": "7rZQSZNATIo",
+      "view_count_approx": 7700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 7rZQSZNATIo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/7rZQSZNATIo",
+      "kind": "short"
+    },
+    {
+      "video_id": "8ST8EkyowuI",
+      "view_count_approx": 1100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 8ST8EkyowuI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/8ST8EkyowuI",
+      "kind": "short"
+    },
+    {
+      "video_id": "8Wl9m1P-jH4",
+      "view_count_approx": 2600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 8Wl9m1P-jH4: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/8Wl9m1P-jH4",
+      "kind": "short"
+    },
+    {
+      "video_id": "8fZYHR9a-Kc",
+      "view_count_approx": 20000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 8fZYHR9a-Kc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/8fZYHR9a-Kc",
+      "kind": "short"
+    },
+    {
+      "video_id": "9TkMiZcDQ6c",
+      "view_count_approx": 901000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 9TkMiZcDQ6c: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/9TkMiZcDQ6c",
+      "kind": "short"
+    },
+    {
+      "video_id": "9kEc8aGlWfU",
+      "view_count_approx": 812000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] 9kEc8aGlWfU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/9kEc8aGlWfU",
+      "kind": "short"
+    },
+    {
+      "video_id": "ACUyQ0vyxaA",
+      "view_count_approx": 4100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ACUyQ0vyxaA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ACUyQ0vyxaA",
+      "kind": "short"
+    },
+    {
+      "video_id": "A_C8R5sgyGg",
+      "view_count_approx": 9000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] A_C8R5sgyGg: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/A_C8R5sgyGg",
+      "kind": "short"
+    },
+    {
+      "video_id": "AlfxsUS-QQs",
+      "view_count_approx": 12000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] AlfxsUS-QQs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/AlfxsUS-QQs",
+      "kind": "short"
+    },
+    {
+      "video_id": "AoQqsCqMkDA",
+      "view_count_approx": 876000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] AoQqsCqMkDA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/AoQqsCqMkDA",
+      "kind": "short"
+    },
+    {
+      "video_id": "B2gMp4WquNw",
+      "view_count_approx": 751000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] B2gMp4WquNw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/B2gMp4WquNw",
+      "kind": "short"
+    },
+    {
+      "video_id": "B8xfA6c_v30",
+      "view_count_approx": 6500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] B8xfA6c_v30: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/B8xfA6c_v30",
+      "kind": "short"
+    },
+    {
+      "video_id": "Bb9rhsLx1sY",
+      "view_count_approx": 4100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Bb9rhsLx1sY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Bb9rhsLx1sY",
+      "kind": "short"
+    },
+    {
+      "video_id": "CO8EUM332W8",
+      "view_count_approx": 843000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] CO8EUM332W8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/CO8EUM332W8",
+      "kind": "short"
+    },
+    {
+      "video_id": "CXY067WdY74",
+      "view_count_approx": 15000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] CXY067WdY74: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/CXY067WdY74",
+      "kind": "short"
+    },
+    {
+      "video_id": "Cc9_kJxbA80",
+      "view_count_approx": 6000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Cc9_kJxbA80: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Cc9_kJxbA80",
+      "kind": "short"
+    },
+    {
+      "video_id": "CffSx1eXqEs",
+      "view_count_approx": 8200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] CffSx1eXqEs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/CffSx1eXqEs",
+      "kind": "short"
+    },
+    {
+      "video_id": "D2WrFLzGNH0",
+      "view_count_approx": 1900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] D2WrFLzGNH0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/D2WrFLzGNH0",
+      "kind": "short"
+    },
+    {
+      "video_id": "EWmin5f3JMk",
+      "view_count_approx": 840000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] EWmin5f3JMk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/EWmin5f3JMk",
+      "kind": "short"
+    },
+    {
+      "video_id": "FKGd0-z2sts",
+      "view_count_approx": 3500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] FKGd0-z2sts: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/FKGd0-z2sts",
+      "kind": "short"
+    },
+    {
+      "video_id": "GSuysh-p6M4",
+      "view_count_approx": 2000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] GSuysh-p6M4: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/GSuysh-p6M4",
+      "kind": "short"
+    },
+    {
+      "video_id": "GYBRC4UmAZg",
+      "view_count_approx": 9200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] GYBRC4UmAZg: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/GYBRC4UmAZg",
+      "kind": "short"
+    },
+    {
+      "video_id": "Hasdzdk9z_Q",
+      "view_count_approx": 9300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Hasdzdk9z_Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Hasdzdk9z_Q",
+      "kind": "short"
+    },
+    {
+      "video_id": "Ifhs1gPYO24",
+      "view_count_approx": 2700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Ifhs1gPYO24: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Ifhs1gPYO24",
+      "kind": "short"
+    },
+    {
+      "video_id": "It8tN3r_IYc",
+      "view_count_approx": 1300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] It8tN3r_IYc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/It8tN3r_IYc",
+      "kind": "short"
+    },
+    {
+      "video_id": "J2N63-I3WDs",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] J2N63-I3WDs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/J2N63-I3WDs",
+      "kind": "short"
+    },
+    {
+      "video_id": "KOHecZXK8B8",
+      "view_count_approx": 7600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] KOHecZXK8B8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/KOHecZXK8B8",
+      "kind": "short"
+    },
+    {
+      "video_id": "KZRzumeD4Rs",
+      "view_count_approx": 741000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] KZRzumeD4Rs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/KZRzumeD4Rs",
+      "kind": "short"
+    },
+    {
+      "video_id": "LWYfK4J492o",
+      "view_count_approx": 15000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] LWYfK4J492o: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/LWYfK4J492o",
+      "kind": "short"
+    },
+    {
+      "video_id": "LohVDPUxvWM",
+      "view_count_approx": 1000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] LohVDPUxvWM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/LohVDPUxvWM",
+      "kind": "short"
+    },
+    {
+      "video_id": "MDPebkJAfgM",
+      "view_count_approx": 4100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] MDPebkJAfgM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/MDPebkJAfgM",
+      "kind": "short"
+    },
+    {
+      "video_id": "MPSH7smx4jg",
+      "view_count_approx": 4100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] MPSH7smx4jg: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/MPSH7smx4jg",
+      "kind": "short"
+    },
+    {
+      "video_id": "Ng2RnkZxy18",
+      "view_count_approx": 5700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Ng2RnkZxy18: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Ng2RnkZxy18",
+      "kind": "short"
+    },
+    {
+      "video_id": "P2XolmjMAms",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] P2XolmjMAms: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/P2XolmjMAms",
+      "kind": "short"
+    },
+    {
+      "video_id": "P3CjDwz5EKs",
+      "view_count_approx": 7700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] P3CjDwz5EKs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/P3CjDwz5EKs",
+      "kind": "short"
+    },
+    {
+      "video_id": "Pakt3--f9fo",
+      "view_count_approx": 11000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Pakt3--f9fo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Pakt3--f9fo",
+      "kind": "short"
+    },
+    {
+      "video_id": "QG8MSoF6Sz0",
+      "view_count_approx": 9100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] QG8MSoF6Sz0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/QG8MSoF6Sz0",
+      "kind": "short"
+    },
+    {
+      "video_id": "R-jlMnP7vis",
+      "view_count_approx": 2100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] R-jlMnP7vis: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/R-jlMnP7vis",
+      "kind": "short"
+    },
+    {
+      "video_id": "RAsNbYzwVFk",
+      "view_count_approx": 13000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] RAsNbYzwVFk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/RAsNbYzwVFk",
+      "kind": "short"
+    },
+    {
+      "video_id": "Rf-uUen3dtA",
+      "view_count_approx": 5500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Rf-uUen3dtA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Rf-uUen3dtA",
+      "kind": "short"
+    },
+    {
+      "video_id": "Rk82XdXefYw",
+      "view_count_approx": 13000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Rk82XdXefYw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Rk82XdXefYw",
+      "kind": "short"
+    },
+    {
+      "video_id": "Shh1LX0OOAk",
+      "view_count_approx": 1800000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Shh1LX0OOAk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Shh1LX0OOAk",
+      "kind": "short"
+    },
+    {
+      "video_id": "SrnDsJmn9PE",
+      "view_count_approx": 3300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] SrnDsJmn9PE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/SrnDsJmn9PE",
+      "kind": "short"
+    },
+    {
+      "video_id": "TSuqE5yPEeM",
+      "view_count_approx": 9100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] TSuqE5yPEeM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/TSuqE5yPEeM",
+      "kind": "short"
+    },
+    {
+      "video_id": "Tkn2ekmljK4",
+      "view_count_approx": 9500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Tkn2ekmljK4: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Tkn2ekmljK4",
+      "kind": "short"
+    },
+    {
+      "video_id": "ToVK5kXYhsI",
+      "view_count_approx": 3900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ToVK5kXYhsI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ToVK5kXYhsI",
+      "kind": "short"
+    },
+    {
+      "video_id": "U0qc7TwOiwE",
+      "view_count_approx": 785000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] U0qc7TwOiwE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/U0qc7TwOiwE",
+      "kind": "short"
+    },
+    {
+      "video_id": "V1ONK-v-VO0",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] V1ONK-v-VO0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/V1ONK-v-VO0",
+      "kind": "short"
+    },
+    {
+      "video_id": "VNbdRxtA6mg",
+      "view_count_approx": 1000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] VNbdRxtA6mg: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/VNbdRxtA6mg",
+      "kind": "short"
+    },
+    {
+      "video_id": "VVklbfLOPyM",
+      "view_count_approx": 5500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] VVklbfLOPyM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/VVklbfLOPyM",
+      "kind": "short"
+    },
+    {
+      "video_id": "Vf_UorLnj2U",
+      "view_count_approx": 984000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Vf_UorLnj2U: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Vf_UorLnj2U",
+      "kind": "short"
+    },
+    {
+      "video_id": "W5aLvjoeaJU",
+      "view_count_approx": 14000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] W5aLvjoeaJU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/W5aLvjoeaJU",
+      "kind": "short"
+    },
+    {
+      "video_id": "W6XxooVHhuU",
+      "view_count_approx": 759000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] W6XxooVHhuU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/W6XxooVHhuU",
+      "kind": "short"
+    },
+    {
+      "video_id": "Wq5FLLU8N-g",
+      "view_count_approx": 7600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Wq5FLLU8N-g: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Wq5FLLU8N-g",
+      "kind": "short"
+    },
+    {
+      "video_id": "Xv4fGnmPrrE",
+      "view_count_approx": 2900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Xv4fGnmPrrE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Xv4fGnmPrrE",
+      "kind": "short"
+    },
+    {
+      "video_id": "Yeaz13St1vY",
+      "view_count_approx": 2300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Yeaz13St1vY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Yeaz13St1vY",
+      "kind": "short"
+    },
+    {
+      "video_id": "Z1uDllQ1H-k",
+      "view_count_approx": 1400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] Z1uDllQ1H-k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/Z1uDllQ1H-k",
+      "kind": "short"
+    },
+    {
+      "video_id": "ZUtv7a0T8t8",
+      "view_count_approx": 4900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ZUtv7a0T8t8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ZUtv7a0T8t8",
+      "kind": "short"
+    },
+    {
+      "video_id": "ZVNIrUTVsqI",
+      "view_count_approx": 4300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ZVNIrUTVsqI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ZVNIrUTVsqI",
+      "kind": "short"
+    },
+    {
+      "video_id": "ZWOGngoAE0Y",
+      "view_count_approx": 6200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ZWOGngoAE0Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ZWOGngoAE0Y",
+      "kind": "short"
+    },
+    {
+      "video_id": "_E4838VzJw0",
+      "view_count_approx": 2900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] _E4838VzJw0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/_E4838VzJw0",
+      "kind": "short"
+    },
+    {
+      "video_id": "_Xh9iPwZx6A",
+      "view_count_approx": 2100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] _Xh9iPwZx6A: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/_Xh9iPwZx6A",
+      "kind": "short"
+    },
+    {
+      "video_id": "_zi8B7IU9rw",
+      "view_count_approx": 1500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] _zi8B7IU9rw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/_zi8B7IU9rw",
+      "kind": "short"
+    },
+    {
+      "video_id": "b6_UQL0khEQ",
+      "view_count_approx": 2000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] b6_UQL0khEQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/b6_UQL0khEQ",
+      "kind": "short"
+    },
+    {
+      "video_id": "bHpnQEPIbP8",
+      "view_count_approx": 2500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] bHpnQEPIbP8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/bHpnQEPIbP8",
+      "kind": "short"
+    },
+    {
+      "video_id": "brc_UK5Xnr4",
+      "view_count_approx": 5200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] brc_UK5Xnr4: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/brc_UK5Xnr4",
+      "kind": "short"
+    },
+    {
+      "video_id": "c94sz6TMLPE",
+      "view_count_approx": 8500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] c94sz6TMLPE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/c94sz6TMLPE",
+      "kind": "short"
+    },
+    {
+      "video_id": "cMywLJj191I",
+      "view_count_approx": 1100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] cMywLJj191I: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/cMywLJj191I",
+      "kind": "short"
+    },
+    {
+      "video_id": "cUtmud_M4cI",
+      "view_count_approx": 14000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] cUtmud_M4cI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/cUtmud_M4cI",
+      "kind": "short"
+    },
+    {
+      "video_id": "cX0Rc1RBXCQ",
+      "view_count_approx": 8300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] cX0Rc1RBXCQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/cX0Rc1RBXCQ",
+      "kind": "short"
+    },
+    {
+      "video_id": "cmnX7rq9fVM",
+      "view_count_approx": 4200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] cmnX7rq9fVM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/cmnX7rq9fVM",
+      "kind": "short"
+    },
+    {
+      "video_id": "dXdsBpFuH2Y",
+      "view_count_approx": 2700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] dXdsBpFuH2Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/dXdsBpFuH2Y",
+      "kind": "short"
+    },
+    {
+      "video_id": "dnl9FV39C3k",
+      "view_count_approx": 7100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] dnl9FV39C3k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/dnl9FV39C3k",
+      "kind": "short"
+    },
+    {
+      "video_id": "dzSCOwYUdDs",
+      "view_count_approx": 3100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] dzSCOwYUdDs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/dzSCOwYUdDs",
+      "kind": "short"
+    },
+    {
+      "video_id": "fFM1gSLww8o",
+      "view_count_approx": 823000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] fFM1gSLww8o: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/fFM1gSLww8o",
+      "kind": "short"
+    },
+    {
+      "video_id": "fSSfLX_KK60",
+      "view_count_approx": 3400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] fSSfLX_KK60: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/fSSfLX_KK60",
+      "kind": "short"
+    },
+    {
+      "video_id": "g2gYy1ben1E",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] g2gYy1ben1E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/g2gYy1ben1E",
+      "kind": "short"
+    },
+    {
+      "video_id": "gMuX6Dr4N9I",
+      "view_count_approx": 6900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] gMuX6Dr4N9I: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/gMuX6Dr4N9I",
+      "kind": "short"
+    },
+    {
+      "video_id": "hQtdKg0-SRY",
+      "view_count_approx": 1200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] hQtdKg0-SRY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/hQtdKg0-SRY",
+      "kind": "short"
+    },
+    {
+      "video_id": "haKobR1fdP8",
+      "view_count_approx": 7100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] haKobR1fdP8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/haKobR1fdP8",
+      "kind": "short"
+    },
+    {
+      "video_id": "hd19n_zXJbs",
+      "view_count_approx": 3600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] hd19n_zXJbs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/hd19n_zXJbs",
+      "kind": "short"
+    },
+    {
+      "video_id": "iRpxtiDjbXM",
+      "view_count_approx": 1900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] iRpxtiDjbXM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/iRpxtiDjbXM",
+      "kind": "short"
+    },
+    {
+      "video_id": "iouzgtfPUSY",
+      "view_count_approx": 1400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] iouzgtfPUSY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/iouzgtfPUSY",
+      "kind": "short"
+    },
+    {
+      "video_id": "j_hLzdLvj3E",
+      "view_count_approx": 2500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] j_hLzdLvj3E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/j_hLzdLvj3E",
+      "kind": "short"
+    },
+    {
+      "video_id": "lirwBXtkvvE",
+      "view_count_approx": 22000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] lirwBXtkvvE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/lirwBXtkvvE",
+      "kind": "short"
+    },
+    {
+      "video_id": "mOrIB7VLagI",
+      "view_count_approx": 13000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] mOrIB7VLagI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/mOrIB7VLagI",
+      "kind": "short"
+    },
+    {
+      "video_id": "nbUwgWQvzrY",
+      "view_count_approx": 7900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] nbUwgWQvzrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/nbUwgWQvzrY",
+      "kind": "short"
+    },
+    {
+      "video_id": "oIdcT0rxZ2k",
+      "view_count_approx": 2100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] oIdcT0rxZ2k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/oIdcT0rxZ2k",
+      "kind": "short"
+    },
+    {
+      "video_id": "paZag7goQu0",
+      "view_count_approx": 6000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] paZag7goQu0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/paZag7goQu0",
+      "kind": "short"
+    },
+    {
+      "video_id": "q7I1Dt76LFo",
+      "view_count_approx": 7800000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] q7I1Dt76LFo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/q7I1Dt76LFo",
+      "kind": "short"
+    },
+    {
+      "video_id": "rDak9ovwqKk",
+      "view_count_approx": 2400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] rDak9ovwqKk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/rDak9ovwqKk",
+      "kind": "short"
+    },
+    {
+      "video_id": "s9kMpFZNRHo",
+      "view_count_approx": 818000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] s9kMpFZNRHo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/s9kMpFZNRHo",
+      "kind": "short"
+    },
+    {
+      "video_id": "tljchYAEh-k",
+      "view_count_approx": 1600000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] tljchYAEh-k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/tljchYAEh-k",
+      "kind": "short"
+    },
+    {
+      "video_id": "uNg4cYvYxrY",
+      "view_count_approx": 2000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] uNg4cYvYxrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/uNg4cYvYxrY",
+      "kind": "short"
+    },
+    {
+      "video_id": "u_QcQjYy-3s",
+      "view_count_approx": 2500000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] u_QcQjYy-3s: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/u_QcQjYy-3s",
+      "kind": "short"
+    },
+    {
+      "video_id": "uz6XFq4pkK4",
+      "view_count_approx": 19000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] uz6XFq4pkK4: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/uz6XFq4pkK4",
+      "kind": "short"
+    },
+    {
+      "video_id": "vrI9quSSDDM",
+      "view_count_approx": 1200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] vrI9quSSDDM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/vrI9quSSDDM",
+      "kind": "short"
+    },
+    {
+      "video_id": "wE9yk7ct2GU",
+      "view_count_approx": 4400000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] wE9yk7ct2GU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/wE9yk7ct2GU",
+      "kind": "short"
+    },
+    {
+      "video_id": "wmJAeXL4_Mo",
+      "view_count_approx": 2100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] wmJAeXL4_Mo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/wmJAeXL4_Mo",
+      "kind": "short"
+    },
+    {
+      "video_id": "x4bK0AsavXo",
+      "view_count_approx": 2100000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] x4bK0AsavXo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/x4bK0AsavXo",
+      "kind": "short"
+    },
+    {
+      "video_id": "xkrjABuIRck",
+      "view_count_approx": 1000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] xkrjABuIRck: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/xkrjABuIRck",
+      "kind": "short"
+    },
+    {
+      "video_id": "xzy1zbffv8Q",
+      "view_count_approx": 3300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] xzy1zbffv8Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/xzy1zbffv8Q",
+      "kind": "short"
+    },
+    {
+      "video_id": "y6t2O1JNi4w",
+      "view_count_approx": 2200000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] y6t2O1JNi4w: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/y6t2O1JNi4w",
+      "kind": "short"
+    },
+    {
+      "video_id": "yDTWGjt793A",
+      "view_count_approx": 903000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] yDTWGjt793A: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/yDTWGjt793A",
+      "kind": "short"
+    },
+    {
+      "video_id": "ySg7Y_hNCxU",
+      "view_count_approx": 7300000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] ySg7Y_hNCxU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/ySg7Y_hNCxU",
+      "kind": "short"
+    },
+    {
+      "video_id": "z-hSrL49g_w",
+      "view_count_approx": 1700000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] z-hSrL49g_w: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/z-hSrL49g_w",
+      "kind": "short"
+    },
+    {
+      "video_id": "zMPK8PTK10M",
+      "view_count_approx": 12000000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] zMPK8PTK10M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/zMPK8PTK10M",
+      "kind": "short"
+    },
+    {
+      "video_id": "zZ1Mg4FCoFI",
+      "view_count_approx": 2900000,
+      "reason": "영상 메타데이터 조회 실패: DownloadError: ERROR: [youtube] zZ1Mg4FCoFI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-",
+      "url": "https://www.youtube.com/shorts/zZ1Mg4FCoFI",
+      "kind": "short"
+    }
+  ]
 }

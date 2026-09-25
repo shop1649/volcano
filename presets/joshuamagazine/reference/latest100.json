@@ -1,15 +1,2671 @@
 {
   "schema": "shortkit.ref_snapshot/1",
   "preset_id": "joshuamagazine-v1",
-  "latest_n": 100,
-  "status": "blocked",
-  "blocker": "https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))\")); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U",
-  "captured_at": "2026-09-24T17:56:07+00:00",
-  "method": "yt-dlp 2026.08.19",
   "channel_url": "https://youtube.com/@joshuamagazine",
-  "videos": [],
-  "n": 0,
-  "notes": [
-    "차단으로 목록을 한 건도 받지 못함 — 이 파일은 차단 사실의 기록이며 기준 목록이 아님"
+  "captured_at": "2026-09-25T15:47:08+00:00",
+  "method": "yt-dlp 2026.08.19 (extract_flat /shorts,/videos + per-video metadata: newest 100/tab + every high-view candidate)",
+  "status": "partial",
+  "blocker": "메타데이터 실패 80건(최신 100편 후보): ObZrTroOaLM: DownloadError: ERROR: [youtube] ObZrTroOaLM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://g; 5_Eh8Z53L6I: DownloadError: ERROR: [youtube] 5_Eh8Z53L6I: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://g; x30XeUk-osw: DownloadError: ERROR: [youtube] x30XeUk-osw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://g",
+  "latest_n": 100,
+  "n": 100,
+  "sort": "published_at desc (timestamp; upload_date if no time)",
+  "tabs": {
+    "shorts": {
+      "status": "ok",
+      "n": 510,
+      "url": "https://youtube.com/@joshuamagazine/shorts"
+    },
+    "videos": {
+      "status": "tab_absent",
+      "error": "DownloadError: ERROR: [youtube:tab] @joshuamagazine: This channel does not have a videos tab"
+    }
+  },
+  "notes": [],
+  "failures": [
+    {
+      "video_id": "ObZrTroOaLM",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ObZrTroOaLM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 1,
+      "at": "2026-09-25T15:47:17+00:00",
+      "view_count_flat": 23000
+    },
+    {
+      "video_id": "5_Eh8Z53L6I",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 5_Eh8Z53L6I: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 2,
+      "at": "2026-09-25T15:47:19+00:00",
+      "view_count_flat": 68000
+    },
+    {
+      "video_id": "x30XeUk-osw",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] x30XeUk-osw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 3,
+      "at": "2026-09-25T15:47:21+00:00",
+      "view_count_flat": 44000
+    },
+    {
+      "video_id": "Ifhs1gPYO24",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Ifhs1gPYO24: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 4,
+      "at": "2026-09-25T15:47:23+00:00",
+      "view_count_flat": 2700000
+    },
+    {
+      "video_id": "YxqZY75TzEM",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YxqZY75TzEM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 5,
+      "at": "2026-09-25T15:47:25+00:00",
+      "view_count_flat": 412000
+    },
+    {
+      "video_id": "uNg4cYvYxrY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] uNg4cYvYxrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 6,
+      "at": "2026-09-25T15:47:27+00:00",
+      "view_count_flat": 2000000
+    },
+    {
+      "video_id": "5_B7h_BKPDE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 5_B7h_BKPDE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 7,
+      "at": "2026-09-25T15:47:29+00:00",
+      "view_count_flat": 2500000
+    },
+    {
+      "video_id": "gJWamFsQQKo",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] gJWamFsQQKo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 8,
+      "at": "2026-09-25T15:47:32+00:00",
+      "view_count_flat": 51000
+    },
+    {
+      "video_id": "FKGd0-z2sts",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FKGd0-z2sts: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 9,
+      "at": "2026-09-25T15:47:33+00:00",
+      "view_count_flat": 3500000
+    },
+    {
+      "video_id": "FbRlzw8KqHQ",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FbRlzw8KqHQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 10,
+      "at": "2026-09-25T15:47:35+00:00",
+      "view_count_flat": 232000
+    },
+    {
+      "video_id": "Xv4fGnmPrrE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Xv4fGnmPrrE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 11,
+      "at": "2026-09-25T15:47:37+00:00",
+      "view_count_flat": 2900000
+    },
+    {
+      "video_id": "Wu4uu7rE2Jo",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Wu4uu7rE2Jo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 12,
+      "at": "2026-09-25T15:47:39+00:00",
+      "view_count_flat": 163000
+    },
+    {
+      "video_id": "g2gYy1ben1E",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] g2gYy1ben1E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 13,
+      "at": "2026-09-25T15:47:41+00:00",
+      "view_count_flat": 2200000
+    },
+    {
+      "video_id": "0IgFvGXPB1M",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 0IgFvGXPB1M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 14,
+      "at": "2026-09-25T15:47:43+00:00",
+      "view_count_flat": 43000
+    },
+    {
+      "video_id": "03WGRQGS3p8",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 03WGRQGS3p8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 15,
+      "at": "2026-09-25T15:47:45+00:00",
+      "view_count_flat": 3700000
+    },
+    {
+      "video_id": "YknsqtIwE18",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YknsqtIwE18: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 16,
+      "at": "2026-09-25T15:47:47+00:00",
+      "view_count_flat": 59000
+    },
+    {
+      "video_id": "VVklbfLOPyM",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] VVklbfLOPyM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 17,
+      "at": "2026-09-25T15:47:49+00:00",
+      "view_count_flat": 5500000
+    },
+    {
+      "video_id": "ubm0xllEfeU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ubm0xllEfeU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 18,
+      "at": "2026-09-25T15:47:51+00:00",
+      "view_count_flat": 176000
+    },
+    {
+      "video_id": "nbUwgWQvzrY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] nbUwgWQvzrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 19,
+      "at": "2026-09-25T15:47:53+00:00",
+      "view_count_flat": 7900000
+    },
+    {
+      "video_id": "dzSCOwYUdDs",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] dzSCOwYUdDs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 20,
+      "at": "2026-09-25T15:47:55+00:00",
+      "view_count_flat": 3100000
+    },
+    {
+      "video_id": "DM2kCm9Z8ro",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] DM2kCm9Z8ro: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 21,
+      "at": "2026-09-25T15:47:57+00:00",
+      "view_count_flat": 137000
+    },
+    {
+      "video_id": "9C2HX7ChCZ8",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 9C2HX7ChCZ8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 22,
+      "at": "2026-09-25T15:47:59+00:00",
+      "view_count_flat": 65000
+    },
+    {
+      "video_id": "Z1uDllQ1H-k",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Z1uDllQ1H-k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 23,
+      "at": "2026-09-25T15:48:01+00:00",
+      "view_count_flat": 1400000
+    },
+    {
+      "video_id": "rDak9ovwqKk",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] rDak9ovwqKk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 24,
+      "at": "2026-09-25T15:48:03+00:00",
+      "view_count_flat": 2400000
+    },
+    {
+      "video_id": "9TkMiZcDQ6c",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 9TkMiZcDQ6c: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 25,
+      "at": "2026-09-25T15:48:05+00:00",
+      "view_count_flat": 901000
+    },
+    {
+      "video_id": "sUq3Gw93ihY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] sUq3Gw93ihY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 26,
+      "at": "2026-09-25T15:48:07+00:00",
+      "view_count_flat": 137000
+    },
+    {
+      "video_id": "c94sz6TMLPE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] c94sz6TMLPE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 27,
+      "at": "2026-09-25T15:48:09+00:00",
+      "view_count_flat": 8500000
+    },
+    {
+      "video_id": "wmJAeXL4_Mo",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] wmJAeXL4_Mo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 28,
+      "at": "2026-09-25T15:48:11+00:00",
+      "view_count_flat": 2100000
+    },
+    {
+      "video_id": "ySg7Y_hNCxU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ySg7Y_hNCxU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 29,
+      "at": "2026-09-25T15:48:12+00:00",
+      "view_count_flat": 7300000
+    },
+    {
+      "video_id": "hQtdKg0-SRY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] hQtdKg0-SRY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 30,
+      "at": "2026-09-25T15:48:14+00:00",
+      "view_count_flat": 1200000
+    },
+    {
+      "video_id": "vfxLh0womMw",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] vfxLh0womMw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 31,
+      "at": "2026-09-25T15:48:16+00:00",
+      "view_count_flat": 300000
+    },
+    {
+      "video_id": "A-Y-MQhkijY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] A-Y-MQhkijY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 32,
+      "at": "2026-09-25T15:48:18+00:00",
+      "view_count_flat": 556000
+    },
+    {
+      "video_id": "Rk82XdXefYw",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Rk82XdXefYw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 33,
+      "at": "2026-09-25T15:48:20+00:00",
+      "view_count_flat": 13000000
+    },
+    {
+      "video_id": "j_hLzdLvj3E",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] j_hLzdLvj3E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 34,
+      "at": "2026-09-25T15:48:23+00:00",
+      "view_count_flat": 2500000
+    },
+    {
+      "video_id": "4NEsahERkCE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 4NEsahERkCE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 35,
+      "at": "2026-09-25T15:48:24+00:00",
+      "view_count_flat": 2600000
+    },
+    {
+      "video_id": "czo1rSEgOnk",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] czo1rSEgOnk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 36,
+      "at": "2026-09-25T15:48:27+00:00",
+      "view_count_flat": 387000
+    },
+    {
+      "video_id": "paZag7goQu0",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] paZag7goQu0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 37,
+      "at": "2026-09-25T15:48:29+00:00",
+      "view_count_flat": 6000000
+    },
+    {
+      "video_id": "iRpxtiDjbXM",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] iRpxtiDjbXM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 38,
+      "at": "2026-09-25T15:48:31+00:00",
+      "view_count_flat": 1900000
+    },
+    {
+      "video_id": "YAuWrJEKddc",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YAuWrJEKddc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 39,
+      "at": "2026-09-25T15:48:33+00:00",
+      "view_count_flat": 397000
+    },
+    {
+      "video_id": "Hasdzdk9z_Q",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Hasdzdk9z_Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 40,
+      "at": "2026-09-25T15:48:35+00:00",
+      "view_count_flat": 9300000
+    },
+    {
+      "video_id": "E8DJWlPJ83E",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] E8DJWlPJ83E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 41,
+      "at": "2026-09-25T15:48:36+00:00",
+      "view_count_flat": 74000
+    },
+    {
+      "video_id": "3Ymi6xXVWoQ",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 3Ymi6xXVWoQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 42,
+      "at": "2026-09-25T15:48:38+00:00",
+      "view_count_flat": 355000
+    },
+    {
+      "video_id": "B6E5GXG-VRU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] B6E5GXG-VRU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 43,
+      "at": "2026-09-25T15:48:40+00:00",
+      "view_count_flat": 221000
+    },
+    {
+      "video_id": "nGdfmyRRmaY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] nGdfmyRRmaY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 44,
+      "at": "2026-09-25T15:48:42+00:00",
+      "view_count_flat": 80000
+    },
+    {
+      "video_id": "FPHB5q_rGGc",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FPHB5q_rGGc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 45,
+      "at": "2026-09-25T15:48:44+00:00",
+      "view_count_flat": 58000
+    },
+    {
+      "video_id": "xzy1zbffv8Q",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] xzy1zbffv8Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 46,
+      "at": "2026-09-25T15:48:46+00:00",
+      "view_count_flat": 3300000
+    },
+    {
+      "video_id": "oIdcT0rxZ2k",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] oIdcT0rxZ2k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 47,
+      "at": "2026-09-25T15:48:48+00:00",
+      "view_count_flat": 2100000
+    },
+    {
+      "video_id": "KOHecZXK8B8",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] KOHecZXK8B8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 48,
+      "at": "2026-09-25T15:48:50+00:00",
+      "view_count_flat": 7600000
+    },
+    {
+      "video_id": "DdqLkzYM5MU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] DdqLkzYM5MU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 49,
+      "at": "2026-09-25T15:48:52+00:00",
+      "view_count_flat": 348000
+    },
+    {
+      "video_id": "ZWOGngoAE0Y",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ZWOGngoAE0Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 50,
+      "at": "2026-09-25T15:48:54+00:00",
+      "view_count_flat": 6200000
+    },
+    {
+      "video_id": "Ti71eawPatw",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Ti71eawPatw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 51,
+      "at": "2026-09-25T15:48:56+00:00",
+      "view_count_flat": 176000
+    },
+    {
+      "video_id": "khFVRXHeNkI",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] khFVRXHeNkI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 52,
+      "at": "2026-09-25T15:48:58+00:00",
+      "view_count_flat": 223000
+    },
+    {
+      "video_id": "covofwUhf00",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] covofwUhf00: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 53,
+      "at": "2026-09-25T15:49:00+00:00",
+      "view_count_flat": 158000
+    },
+    {
+      "video_id": "E_3Gl3DTF_Q",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] E_3Gl3DTF_Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 54,
+      "at": "2026-09-25T15:49:02+00:00",
+      "view_count_flat": 91000
+    },
+    {
+      "video_id": "yEzHXtEe66U",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] yEzHXtEe66U: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 55,
+      "at": "2026-09-25T15:49:04+00:00",
+      "view_count_flat": 33000
+    },
+    {
+      "video_id": "bQm1f4f5RdM",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] bQm1f4f5RdM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 56,
+      "at": "2026-09-25T15:49:06+00:00",
+      "view_count_flat": 199000
+    },
+    {
+      "video_id": "FZ-YM33CZIA",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FZ-YM33CZIA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 57,
+      "at": "2026-09-25T15:49:08+00:00",
+      "view_count_flat": 42000
+    },
+    {
+      "video_id": "fSSfLX_KK60",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] fSSfLX_KK60: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 58,
+      "at": "2026-09-25T15:49:10+00:00",
+      "view_count_flat": 3400000
+    },
+    {
+      "video_id": "vUS7PPHImaE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] vUS7PPHImaE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 59,
+      "at": "2026-09-25T15:49:12+00:00",
+      "view_count_flat": 116000
+    },
+    {
+      "video_id": "kb3Dgw63bvY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] kb3Dgw63bvY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 60,
+      "at": "2026-09-25T15:49:14+00:00",
+      "view_count_flat": 96000
+    },
+    {
+      "video_id": "psPTIvO4qvI",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] psPTIvO4qvI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 61,
+      "at": "2026-09-25T15:49:16+00:00",
+      "view_count_flat": 123000
+    },
+    {
+      "video_id": "-m1O0pCLVvU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] -m1O0pCLVvU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 62,
+      "at": "2026-09-25T15:49:18+00:00",
+      "view_count_flat": 4100000
+    },
+    {
+      "video_id": "P3CjDwz5EKs",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] P3CjDwz5EKs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 63,
+      "at": "2026-09-25T15:49:19+00:00",
+      "view_count_flat": 7700000
+    },
+    {
+      "video_id": "-RiH8LOKZ20",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] -RiH8LOKZ20: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 64,
+      "at": "2026-09-25T15:49:21+00:00",
+      "view_count_flat": 37000
+    },
+    {
+      "video_id": "LE5PlQtPBTY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] LE5PlQtPBTY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 65,
+      "at": "2026-09-25T15:49:24+00:00",
+      "view_count_flat": 414000
+    },
+    {
+      "video_id": "cU1StwWsSZI",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] cU1StwWsSZI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 66,
+      "at": "2026-09-25T15:49:25+00:00",
+      "view_count_flat": 33000
+    },
+    {
+      "video_id": "iaUgLh5m68g",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] iaUgLh5m68g: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 67,
+      "at": "2026-09-25T15:49:27+00:00",
+      "view_count_flat": 204000
+    },
+    {
+      "video_id": "ltCxGFWIR7c",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ltCxGFWIR7c: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 68,
+      "at": "2026-09-25T15:49:29+00:00",
+      "view_count_flat": 57000
+    },
+    {
+      "video_id": "S6B-dLoD7_Y",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] S6B-dLoD7_Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 69,
+      "at": "2026-09-25T15:49:31+00:00",
+      "view_count_flat": 457000
+    },
+    {
+      "video_id": "2LTqZWT-D7E",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 2LTqZWT-D7E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 70,
+      "at": "2026-09-25T15:49:32+00:00",
+      "view_count_flat": 982000
+    },
+    {
+      "video_id": "yDTWGjt793A",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] yDTWGjt793A: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 71,
+      "at": "2026-09-25T15:49:35+00:00",
+      "view_count_flat": 903000
+    },
+    {
+      "video_id": "ACUyQ0vyxaA",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ACUyQ0vyxaA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 72,
+      "at": "2026-09-25T15:49:37+00:00",
+      "view_count_flat": 4100000
+    },
+    {
+      "video_id": "Pakt3--f9fo",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Pakt3--f9fo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 73,
+      "at": "2026-09-25T15:49:39+00:00",
+      "view_count_flat": 11000000
+    },
+    {
+      "video_id": "cn_E6Fty2ts",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] cn_E6Fty2ts: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 76,
+      "at": "2026-09-25T15:49:45+00:00",
+      "view_count_flat": 238000
+    },
+    {
+      "video_id": "82yDUWzSlWE",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 82yDUWzSlWE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 78,
+      "at": "2026-09-25T15:49:49+00:00",
+      "view_count_flat": 40000
+    },
+    {
+      "video_id": "_E4838VzJw0",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] _E4838VzJw0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 85,
+      "at": "2026-09-25T15:50:03+00:00",
+      "view_count_flat": 2900000
+    },
+    {
+      "video_id": "dXdsBpFuH2Y",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] dXdsBpFuH2Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 88,
+      "at": "2026-09-25T15:50:14+00:00",
+      "view_count_flat": 2700000
+    },
+    {
+      "video_id": "Bb9rhsLx1sY",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Bb9rhsLx1sY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 91,
+      "at": "2026-09-25T15:50:20+00:00",
+      "view_count_flat": 4100000
+    },
+    {
+      "video_id": "zMPK8PTK10M",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] zMPK8PTK10M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 92,
+      "at": "2026-09-25T15:50:22+00:00",
+      "view_count_flat": 12000000
+    },
+    {
+      "video_id": "gRxEYoQYFGU",
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] gRxEYoQYFGU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "tab": "shorts",
+      "tab_rank": 97,
+      "at": "2026-09-25T15:50:31+00:00",
+      "view_count_flat": 69000
+    }
+  ],
+  "missing_members": [
+    {
+      "video_id": "ObZrTroOaLM",
+      "tab": "shorts",
+      "tab_rank": 1,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ObZrTroOaLM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:17+00:00",
+      "url": "https://www.youtube.com/shorts/ObZrTroOaLM"
+    },
+    {
+      "video_id": "5_Eh8Z53L6I",
+      "tab": "shorts",
+      "tab_rank": 2,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 5_Eh8Z53L6I: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:19+00:00",
+      "url": "https://www.youtube.com/shorts/5_Eh8Z53L6I"
+    },
+    {
+      "video_id": "x30XeUk-osw",
+      "tab": "shorts",
+      "tab_rank": 3,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] x30XeUk-osw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:21+00:00",
+      "url": "https://www.youtube.com/shorts/x30XeUk-osw"
+    },
+    {
+      "video_id": "Ifhs1gPYO24",
+      "tab": "shorts",
+      "tab_rank": 4,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Ifhs1gPYO24: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:23+00:00",
+      "url": "https://www.youtube.com/shorts/Ifhs1gPYO24"
+    },
+    {
+      "video_id": "YxqZY75TzEM",
+      "tab": "shorts",
+      "tab_rank": 5,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YxqZY75TzEM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:25+00:00",
+      "url": "https://www.youtube.com/shorts/YxqZY75TzEM"
+    },
+    {
+      "video_id": "uNg4cYvYxrY",
+      "tab": "shorts",
+      "tab_rank": 6,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] uNg4cYvYxrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:27+00:00",
+      "url": "https://www.youtube.com/shorts/uNg4cYvYxrY"
+    },
+    {
+      "video_id": "5_B7h_BKPDE",
+      "tab": "shorts",
+      "tab_rank": 7,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 5_B7h_BKPDE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:29+00:00",
+      "url": "https://www.youtube.com/shorts/5_B7h_BKPDE"
+    },
+    {
+      "video_id": "gJWamFsQQKo",
+      "tab": "shorts",
+      "tab_rank": 8,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] gJWamFsQQKo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:32+00:00",
+      "url": "https://www.youtube.com/shorts/gJWamFsQQKo"
+    },
+    {
+      "video_id": "FKGd0-z2sts",
+      "tab": "shorts",
+      "tab_rank": 9,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FKGd0-z2sts: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:33+00:00",
+      "url": "https://www.youtube.com/shorts/FKGd0-z2sts"
+    },
+    {
+      "video_id": "FbRlzw8KqHQ",
+      "tab": "shorts",
+      "tab_rank": 10,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FbRlzw8KqHQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:35+00:00",
+      "url": "https://www.youtube.com/shorts/FbRlzw8KqHQ"
+    },
+    {
+      "video_id": "Xv4fGnmPrrE",
+      "tab": "shorts",
+      "tab_rank": 11,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Xv4fGnmPrrE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:37+00:00",
+      "url": "https://www.youtube.com/shorts/Xv4fGnmPrrE"
+    },
+    {
+      "video_id": "Wu4uu7rE2Jo",
+      "tab": "shorts",
+      "tab_rank": 12,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Wu4uu7rE2Jo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:39+00:00",
+      "url": "https://www.youtube.com/shorts/Wu4uu7rE2Jo"
+    },
+    {
+      "video_id": "g2gYy1ben1E",
+      "tab": "shorts",
+      "tab_rank": 13,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] g2gYy1ben1E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:41+00:00",
+      "url": "https://www.youtube.com/shorts/g2gYy1ben1E"
+    },
+    {
+      "video_id": "0IgFvGXPB1M",
+      "tab": "shorts",
+      "tab_rank": 14,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 0IgFvGXPB1M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:43+00:00",
+      "url": "https://www.youtube.com/shorts/0IgFvGXPB1M"
+    },
+    {
+      "video_id": "03WGRQGS3p8",
+      "tab": "shorts",
+      "tab_rank": 15,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 03WGRQGS3p8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:45+00:00",
+      "url": "https://www.youtube.com/shorts/03WGRQGS3p8"
+    },
+    {
+      "video_id": "YknsqtIwE18",
+      "tab": "shorts",
+      "tab_rank": 16,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YknsqtIwE18: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:47+00:00",
+      "url": "https://www.youtube.com/shorts/YknsqtIwE18"
+    },
+    {
+      "video_id": "VVklbfLOPyM",
+      "tab": "shorts",
+      "tab_rank": 17,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] VVklbfLOPyM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:49+00:00",
+      "url": "https://www.youtube.com/shorts/VVklbfLOPyM"
+    },
+    {
+      "video_id": "ubm0xllEfeU",
+      "tab": "shorts",
+      "tab_rank": 18,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ubm0xllEfeU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:51+00:00",
+      "url": "https://www.youtube.com/shorts/ubm0xllEfeU"
+    },
+    {
+      "video_id": "nbUwgWQvzrY",
+      "tab": "shorts",
+      "tab_rank": 19,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] nbUwgWQvzrY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:53+00:00",
+      "url": "https://www.youtube.com/shorts/nbUwgWQvzrY"
+    },
+    {
+      "video_id": "dzSCOwYUdDs",
+      "tab": "shorts",
+      "tab_rank": 20,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] dzSCOwYUdDs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:55+00:00",
+      "url": "https://www.youtube.com/shorts/dzSCOwYUdDs"
+    },
+    {
+      "video_id": "DM2kCm9Z8ro",
+      "tab": "shorts",
+      "tab_rank": 21,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] DM2kCm9Z8ro: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:57+00:00",
+      "url": "https://www.youtube.com/shorts/DM2kCm9Z8ro"
+    },
+    {
+      "video_id": "9C2HX7ChCZ8",
+      "tab": "shorts",
+      "tab_rank": 22,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 9C2HX7ChCZ8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:47:59+00:00",
+      "url": "https://www.youtube.com/shorts/9C2HX7ChCZ8"
+    },
+    {
+      "video_id": "Z1uDllQ1H-k",
+      "tab": "shorts",
+      "tab_rank": 23,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Z1uDllQ1H-k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:01+00:00",
+      "url": "https://www.youtube.com/shorts/Z1uDllQ1H-k"
+    },
+    {
+      "video_id": "rDak9ovwqKk",
+      "tab": "shorts",
+      "tab_rank": 24,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] rDak9ovwqKk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:03+00:00",
+      "url": "https://www.youtube.com/shorts/rDak9ovwqKk"
+    },
+    {
+      "video_id": "9TkMiZcDQ6c",
+      "tab": "shorts",
+      "tab_rank": 25,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 9TkMiZcDQ6c: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:05+00:00",
+      "url": "https://www.youtube.com/shorts/9TkMiZcDQ6c"
+    },
+    {
+      "video_id": "sUq3Gw93ihY",
+      "tab": "shorts",
+      "tab_rank": 26,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] sUq3Gw93ihY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:07+00:00",
+      "url": "https://www.youtube.com/shorts/sUq3Gw93ihY"
+    },
+    {
+      "video_id": "c94sz6TMLPE",
+      "tab": "shorts",
+      "tab_rank": 27,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] c94sz6TMLPE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:09+00:00",
+      "url": "https://www.youtube.com/shorts/c94sz6TMLPE"
+    },
+    {
+      "video_id": "wmJAeXL4_Mo",
+      "tab": "shorts",
+      "tab_rank": 28,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] wmJAeXL4_Mo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:11+00:00",
+      "url": "https://www.youtube.com/shorts/wmJAeXL4_Mo"
+    },
+    {
+      "video_id": "ySg7Y_hNCxU",
+      "tab": "shorts",
+      "tab_rank": 29,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ySg7Y_hNCxU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:12+00:00",
+      "url": "https://www.youtube.com/shorts/ySg7Y_hNCxU"
+    },
+    {
+      "video_id": "hQtdKg0-SRY",
+      "tab": "shorts",
+      "tab_rank": 30,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] hQtdKg0-SRY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:14+00:00",
+      "url": "https://www.youtube.com/shorts/hQtdKg0-SRY"
+    },
+    {
+      "video_id": "vfxLh0womMw",
+      "tab": "shorts",
+      "tab_rank": 31,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] vfxLh0womMw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:16+00:00",
+      "url": "https://www.youtube.com/shorts/vfxLh0womMw"
+    },
+    {
+      "video_id": "A-Y-MQhkijY",
+      "tab": "shorts",
+      "tab_rank": 32,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] A-Y-MQhkijY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:18+00:00",
+      "url": "https://www.youtube.com/shorts/A-Y-MQhkijY"
+    },
+    {
+      "video_id": "Rk82XdXefYw",
+      "tab": "shorts",
+      "tab_rank": 33,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Rk82XdXefYw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:20+00:00",
+      "url": "https://www.youtube.com/shorts/Rk82XdXefYw"
+    },
+    {
+      "video_id": "j_hLzdLvj3E",
+      "tab": "shorts",
+      "tab_rank": 34,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] j_hLzdLvj3E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:23+00:00",
+      "url": "https://www.youtube.com/shorts/j_hLzdLvj3E"
+    },
+    {
+      "video_id": "4NEsahERkCE",
+      "tab": "shorts",
+      "tab_rank": 35,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 4NEsahERkCE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:24+00:00",
+      "url": "https://www.youtube.com/shorts/4NEsahERkCE"
+    },
+    {
+      "video_id": "czo1rSEgOnk",
+      "tab": "shorts",
+      "tab_rank": 36,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] czo1rSEgOnk: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:27+00:00",
+      "url": "https://www.youtube.com/shorts/czo1rSEgOnk"
+    },
+    {
+      "video_id": "paZag7goQu0",
+      "tab": "shorts",
+      "tab_rank": 37,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] paZag7goQu0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:29+00:00",
+      "url": "https://www.youtube.com/shorts/paZag7goQu0"
+    },
+    {
+      "video_id": "iRpxtiDjbXM",
+      "tab": "shorts",
+      "tab_rank": 38,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] iRpxtiDjbXM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:31+00:00",
+      "url": "https://www.youtube.com/shorts/iRpxtiDjbXM"
+    },
+    {
+      "video_id": "YAuWrJEKddc",
+      "tab": "shorts",
+      "tab_rank": 39,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] YAuWrJEKddc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:33+00:00",
+      "url": "https://www.youtube.com/shorts/YAuWrJEKddc"
+    },
+    {
+      "video_id": "Hasdzdk9z_Q",
+      "tab": "shorts",
+      "tab_rank": 40,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Hasdzdk9z_Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:35+00:00",
+      "url": "https://www.youtube.com/shorts/Hasdzdk9z_Q"
+    },
+    {
+      "video_id": "E8DJWlPJ83E",
+      "tab": "shorts",
+      "tab_rank": 41,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] E8DJWlPJ83E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:36+00:00",
+      "url": "https://www.youtube.com/shorts/E8DJWlPJ83E"
+    },
+    {
+      "video_id": "3Ymi6xXVWoQ",
+      "tab": "shorts",
+      "tab_rank": 42,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 3Ymi6xXVWoQ: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:38+00:00",
+      "url": "https://www.youtube.com/shorts/3Ymi6xXVWoQ"
+    },
+    {
+      "video_id": "B6E5GXG-VRU",
+      "tab": "shorts",
+      "tab_rank": 43,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] B6E5GXG-VRU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:40+00:00",
+      "url": "https://www.youtube.com/shorts/B6E5GXG-VRU"
+    },
+    {
+      "video_id": "nGdfmyRRmaY",
+      "tab": "shorts",
+      "tab_rank": 44,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] nGdfmyRRmaY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:42+00:00",
+      "url": "https://www.youtube.com/shorts/nGdfmyRRmaY"
+    },
+    {
+      "video_id": "FPHB5q_rGGc",
+      "tab": "shorts",
+      "tab_rank": 45,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FPHB5q_rGGc: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:44+00:00",
+      "url": "https://www.youtube.com/shorts/FPHB5q_rGGc"
+    },
+    {
+      "video_id": "xzy1zbffv8Q",
+      "tab": "shorts",
+      "tab_rank": 46,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] xzy1zbffv8Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:46+00:00",
+      "url": "https://www.youtube.com/shorts/xzy1zbffv8Q"
+    },
+    {
+      "video_id": "oIdcT0rxZ2k",
+      "tab": "shorts",
+      "tab_rank": 47,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] oIdcT0rxZ2k: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:48+00:00",
+      "url": "https://www.youtube.com/shorts/oIdcT0rxZ2k"
+    },
+    {
+      "video_id": "KOHecZXK8B8",
+      "tab": "shorts",
+      "tab_rank": 48,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] KOHecZXK8B8: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:50+00:00",
+      "url": "https://www.youtube.com/shorts/KOHecZXK8B8"
+    },
+    {
+      "video_id": "DdqLkzYM5MU",
+      "tab": "shorts",
+      "tab_rank": 49,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] DdqLkzYM5MU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:52+00:00",
+      "url": "https://www.youtube.com/shorts/DdqLkzYM5MU"
+    },
+    {
+      "video_id": "ZWOGngoAE0Y",
+      "tab": "shorts",
+      "tab_rank": 50,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ZWOGngoAE0Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:54+00:00",
+      "url": "https://www.youtube.com/shorts/ZWOGngoAE0Y"
+    },
+    {
+      "video_id": "Ti71eawPatw",
+      "tab": "shorts",
+      "tab_rank": 51,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Ti71eawPatw: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:56+00:00",
+      "url": "https://www.youtube.com/shorts/Ti71eawPatw"
+    },
+    {
+      "video_id": "khFVRXHeNkI",
+      "tab": "shorts",
+      "tab_rank": 52,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] khFVRXHeNkI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:48:58+00:00",
+      "url": "https://www.youtube.com/shorts/khFVRXHeNkI"
+    },
+    {
+      "video_id": "covofwUhf00",
+      "tab": "shorts",
+      "tab_rank": 53,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] covofwUhf00: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:00+00:00",
+      "url": "https://www.youtube.com/shorts/covofwUhf00"
+    },
+    {
+      "video_id": "E_3Gl3DTF_Q",
+      "tab": "shorts",
+      "tab_rank": 54,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] E_3Gl3DTF_Q: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:02+00:00",
+      "url": "https://www.youtube.com/shorts/E_3Gl3DTF_Q"
+    },
+    {
+      "video_id": "yEzHXtEe66U",
+      "tab": "shorts",
+      "tab_rank": 55,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] yEzHXtEe66U: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:04+00:00",
+      "url": "https://www.youtube.com/shorts/yEzHXtEe66U"
+    },
+    {
+      "video_id": "bQm1f4f5RdM",
+      "tab": "shorts",
+      "tab_rank": 56,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] bQm1f4f5RdM: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:06+00:00",
+      "url": "https://www.youtube.com/shorts/bQm1f4f5RdM"
+    },
+    {
+      "video_id": "FZ-YM33CZIA",
+      "tab": "shorts",
+      "tab_rank": 57,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] FZ-YM33CZIA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:08+00:00",
+      "url": "https://www.youtube.com/shorts/FZ-YM33CZIA"
+    },
+    {
+      "video_id": "fSSfLX_KK60",
+      "tab": "shorts",
+      "tab_rank": 58,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] fSSfLX_KK60: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:10+00:00",
+      "url": "https://www.youtube.com/shorts/fSSfLX_KK60"
+    },
+    {
+      "video_id": "vUS7PPHImaE",
+      "tab": "shorts",
+      "tab_rank": 59,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] vUS7PPHImaE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:12+00:00",
+      "url": "https://www.youtube.com/shorts/vUS7PPHImaE"
+    },
+    {
+      "video_id": "kb3Dgw63bvY",
+      "tab": "shorts",
+      "tab_rank": 60,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] kb3Dgw63bvY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:14+00:00",
+      "url": "https://www.youtube.com/shorts/kb3Dgw63bvY"
+    },
+    {
+      "video_id": "psPTIvO4qvI",
+      "tab": "shorts",
+      "tab_rank": 61,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] psPTIvO4qvI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:16+00:00",
+      "url": "https://www.youtube.com/shorts/psPTIvO4qvI"
+    },
+    {
+      "video_id": "-m1O0pCLVvU",
+      "tab": "shorts",
+      "tab_rank": 62,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] -m1O0pCLVvU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:18+00:00",
+      "url": "https://www.youtube.com/shorts/-m1O0pCLVvU"
+    },
+    {
+      "video_id": "P3CjDwz5EKs",
+      "tab": "shorts",
+      "tab_rank": 63,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] P3CjDwz5EKs: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:19+00:00",
+      "url": "https://www.youtube.com/shorts/P3CjDwz5EKs"
+    },
+    {
+      "video_id": "-RiH8LOKZ20",
+      "tab": "shorts",
+      "tab_rank": 64,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] -RiH8LOKZ20: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:21+00:00",
+      "url": "https://www.youtube.com/shorts/-RiH8LOKZ20"
+    },
+    {
+      "video_id": "LE5PlQtPBTY",
+      "tab": "shorts",
+      "tab_rank": 65,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] LE5PlQtPBTY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:24+00:00",
+      "url": "https://www.youtube.com/shorts/LE5PlQtPBTY"
+    },
+    {
+      "video_id": "cU1StwWsSZI",
+      "tab": "shorts",
+      "tab_rank": 66,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] cU1StwWsSZI: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:25+00:00",
+      "url": "https://www.youtube.com/shorts/cU1StwWsSZI"
+    },
+    {
+      "video_id": "iaUgLh5m68g",
+      "tab": "shorts",
+      "tab_rank": 67,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] iaUgLh5m68g: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:27+00:00",
+      "url": "https://www.youtube.com/shorts/iaUgLh5m68g"
+    },
+    {
+      "video_id": "ltCxGFWIR7c",
+      "tab": "shorts",
+      "tab_rank": 68,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ltCxGFWIR7c: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:29+00:00",
+      "url": "https://www.youtube.com/shorts/ltCxGFWIR7c"
+    },
+    {
+      "video_id": "S6B-dLoD7_Y",
+      "tab": "shorts",
+      "tab_rank": 69,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] S6B-dLoD7_Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:31+00:00",
+      "url": "https://www.youtube.com/shorts/S6B-dLoD7_Y"
+    },
+    {
+      "video_id": "2LTqZWT-D7E",
+      "tab": "shorts",
+      "tab_rank": 70,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 2LTqZWT-D7E: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:32+00:00",
+      "url": "https://www.youtube.com/shorts/2LTqZWT-D7E"
+    },
+    {
+      "video_id": "yDTWGjt793A",
+      "tab": "shorts",
+      "tab_rank": 71,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] yDTWGjt793A: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:35+00:00",
+      "url": "https://www.youtube.com/shorts/yDTWGjt793A"
+    },
+    {
+      "video_id": "ACUyQ0vyxaA",
+      "tab": "shorts",
+      "tab_rank": 72,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] ACUyQ0vyxaA: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:37+00:00",
+      "url": "https://www.youtube.com/shorts/ACUyQ0vyxaA"
+    },
+    {
+      "video_id": "Pakt3--f9fo",
+      "tab": "shorts",
+      "tab_rank": 73,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Pakt3--f9fo: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:39+00:00",
+      "url": "https://www.youtube.com/shorts/Pakt3--f9fo"
+    },
+    {
+      "video_id": "cn_E6Fty2ts",
+      "tab": "shorts",
+      "tab_rank": 76,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] cn_E6Fty2ts: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:45+00:00",
+      "url": "https://www.youtube.com/shorts/cn_E6Fty2ts"
+    },
+    {
+      "video_id": "82yDUWzSlWE",
+      "tab": "shorts",
+      "tab_rank": 78,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] 82yDUWzSlWE: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:49:49+00:00",
+      "url": "https://www.youtube.com/shorts/82yDUWzSlWE"
+    },
+    {
+      "video_id": "_E4838VzJw0",
+      "tab": "shorts",
+      "tab_rank": 85,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] _E4838VzJw0: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:50:03+00:00",
+      "url": "https://www.youtube.com/shorts/_E4838VzJw0"
+    },
+    {
+      "video_id": "dXdsBpFuH2Y",
+      "tab": "shorts",
+      "tab_rank": 88,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] dXdsBpFuH2Y: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:50:14+00:00",
+      "url": "https://www.youtube.com/shorts/dXdsBpFuH2Y"
+    },
+    {
+      "video_id": "Bb9rhsLx1sY",
+      "tab": "shorts",
+      "tab_rank": 91,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] Bb9rhsLx1sY: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:50:20+00:00",
+      "url": "https://www.youtube.com/shorts/Bb9rhsLx1sY"
+    },
+    {
+      "video_id": "zMPK8PTK10M",
+      "tab": "shorts",
+      "tab_rank": 92,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] zMPK8PTK10M: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:50:22+00:00",
+      "url": "https://www.youtube.com/shorts/zMPK8PTK10M"
+    },
+    {
+      "video_id": "gRxEYoQYFGU",
+      "tab": "shorts",
+      "tab_rank": 97,
+      "kind": "blocked",
+      "error": "DownloadError: ERROR: [youtube] gRxEYoQYFGU: Sign in to confirm you’re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+      "at": "2026-09-25T15:50:31+00:00",
+      "url": "https://www.youtube.com/shorts/gRxEYoQYFGU"
+    }
+  ],
+  "partial_reason_listing_short": false,
+  "videos": [
+    {
+      "rank": 1,
+      "video_id": "o4Mrqnvh7ik",
+      "url": "https://www.youtube.com/shorts/o4Mrqnvh7ik",
+      "title": "K-POP을 좋아한 누나의 최후",
+      "published_at": null,
+      "upload_date": "2026-05-01",
+      "duration": 17,
+      "view_count": 45764,
+      "view_count_checked_at": "2026-09-25T15:49:40+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 2,
+      "video_id": "peE-VN3jZoQ",
+      "url": "https://www.youtube.com/shorts/peE-VN3jZoQ",
+      "title": "자신의 숨겨진 능력을 발견한 아이",
+      "published_at": null,
+      "upload_date": "2026-04-28",
+      "duration": 15,
+      "view_count": 274710,
+      "view_count_checked_at": "2026-09-25T15:49:42+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 3,
+      "video_id": "HpTlwowexIo",
+      "url": "https://www.youtube.com/shorts/HpTlwowexIo",
+      "title": "신랑의 한마디에 결혼 무를뻔한 이유",
+      "published_at": null,
+      "upload_date": "2026-04-24",
+      "duration": 19,
+      "view_count": 41394,
+      "view_count_checked_at": "2026-09-25T15:49:47+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 4,
+      "video_id": "Cki1xVZaNPw",
+      "url": "https://www.youtube.com/shorts/Cki1xVZaNPw",
+      "title": "할아버지가 눈을 치운 이유",
+      "published_at": null,
+      "upload_date": "2026-04-20",
+      "duration": 30,
+      "view_count": 320356,
+      "view_count_checked_at": "2026-09-25T15:49:51+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 5,
+      "video_id": "W4k1RVSik-s",
+      "url": "https://www.youtube.com/shorts/W4k1RVSik-s",
+      "title": "중거거래 게임기의 정체 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2026-04-18",
+      "duration": 22,
+      "view_count": 627367,
+      "view_count_checked_at": "2026-09-25T15:49:53+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 6,
+      "video_id": "zHrM287ZDHw",
+      "url": "https://www.youtube.com/shorts/zHrM287ZDHw",
+      "title": "실력 있는 자만 반칙할 수 있는 이유",
+      "published_at": null,
+      "upload_date": "2026-04-16",
+      "duration": 20,
+      "view_count": 3826136,
+      "view_count_checked_at": "2026-09-25T15:49:55+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 7,
+      "video_id": "agStsZ7ROdA",
+      "url": "https://www.youtube.com/shorts/agStsZ7ROdA",
+      "title": "손자가 할머니에게 전화를 한 이유",
+      "published_at": null,
+      "upload_date": "2026-04-15",
+      "duration": 15,
+      "view_count": 122122,
+      "view_count_checked_at": "2026-09-25T15:49:57+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 8,
+      "video_id": "0q1XeOnUeaA",
+      "url": "https://www.youtube.com/shorts/0q1XeOnUeaA",
+      "title": "높이뛰기 선수들이 출발전에 춤추는 이유",
+      "published_at": null,
+      "upload_date": "2026-04-13",
+      "duration": 21,
+      "view_count": 161901,
+      "view_count_checked_at": "2026-09-25T15:49:59+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 9,
+      "video_id": "RQSRuLK9J14",
+      "url": "https://www.youtube.com/shorts/RQSRuLK9J14",
+      "title": "마지막 인사하러 온 강아지",
+      "published_at": null,
+      "upload_date": "2026-04-12",
+      "duration": 27,
+      "view_count": 3136491,
+      "view_count_checked_at": "2026-09-25T15:50:01+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 10,
+      "video_id": "6lxM-Q2hJKU",
+      "url": "https://www.youtube.com/shorts/6lxM-Q2hJKU",
+      "title": "드러머가 세상에서 제일 무서워 하는 순간",
+      "published_at": null,
+      "upload_date": "2026-04-09",
+      "duration": 27,
+      "view_count": 3771773,
+      "view_count_checked_at": "2026-09-25T15:50:10+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 11,
+      "video_id": "o1QLMyuZB24",
+      "url": "https://www.youtube.com/shorts/o1QLMyuZB24",
+      "title": "경기중에 음료 엎지르면 벌어지는 일ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2026-04-08",
+      "duration": 34,
+      "view_count": 1356002,
+      "view_count_checked_at": "2026-09-25T15:50:12+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 12,
+      "video_id": "SBmJmqwS4U8",
+      "url": "https://www.youtube.com/shorts/SBmJmqwS4U8",
+      "title": "탁구 선수가 웃음을 참을 수 없는 이유",
+      "published_at": null,
+      "upload_date": "2026-04-05",
+      "duration": 25,
+      "view_count": 3657980,
+      "view_count_checked_at": "2026-09-25T15:50:16+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 13,
+      "video_id": "8ts_6Ubh_0Q",
+      "url": "https://www.youtube.com/shorts/8ts_6Ubh_0Q",
+      "title": "그녀가 할 수 있는 최소한의 복수..",
+      "published_at": null,
+      "upload_date": "2026-04-03",
+      "duration": 14,
+      "view_count": 853469,
+      "view_count_checked_at": "2026-09-25T15:50:18+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 14,
+      "video_id": "sKgU8DCUMzE",
+      "url": "https://www.youtube.com/shorts/sKgU8DCUMzE",
+      "title": "평생 가려야만 했던 이유",
+      "published_at": null,
+      "upload_date": "2026-03-30",
+      "duration": 15,
+      "view_count": 48149,
+      "view_count_checked_at": "2026-09-25T15:50:24+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 15,
+      "video_id": "Wzdij98qjeY",
+      "url": "https://www.youtube.com/shorts/Wzdij98qjeY",
+      "title": "자신의 도플갱어를 발견한 아이",
+      "published_at": null,
+      "upload_date": "2026-03-29",
+      "duration": 19,
+      "view_count": 184745,
+      "view_count_checked_at": "2026-09-25T15:50:26+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 16,
+      "video_id": "QqKIzu2zgjg",
+      "url": "https://www.youtube.com/shorts/QqKIzu2zgjg",
+      "title": "후배 때문에 심장 쫄깃해진 선배",
+      "published_at": null,
+      "upload_date": "2026-03-27",
+      "duration": 31,
+      "view_count": 3133244,
+      "view_count_checked_at": "2026-09-25T15:50:28+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 17,
+      "video_id": "C3cIMWhluaE",
+      "url": "https://www.youtube.com/shorts/C3cIMWhluaE",
+      "title": "비트가 같아도 랩이 무한한 이유",
+      "published_at": null,
+      "upload_date": "2026-03-25",
+      "duration": 23,
+      "view_count": 568928,
+      "view_count_checked_at": "2026-09-25T15:50:30+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 18,
+      "video_id": "ViHs5FGYuHc",
+      "url": "https://www.youtube.com/shorts/ViHs5FGYuHc",
+      "title": "일본 열도를 울린 11살 소녀 달리기",
+      "published_at": null,
+      "upload_date": "2026-03-20",
+      "duration": 42,
+      "view_count": 7964140,
+      "view_count_checked_at": "2026-09-25T15:50:33+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 19,
+      "video_id": "x_hxXsP1Nqw",
+      "url": "https://www.youtube.com/shorts/x_hxXsP1Nqw",
+      "title": "멸치 동생이 형에게 복수하는 법",
+      "published_at": null,
+      "upload_date": "2026-03-18",
+      "duration": 15,
+      "view_count": 2659566,
+      "view_count_checked_at": "2026-09-25T15:50:35+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 20,
+      "video_id": "sUNhT6Xv9og",
+      "url": "https://www.youtube.com/shorts/sUNhT6Xv9og",
+      "title": "술을 적당히 마셔야 하는 이유",
+      "published_at": null,
+      "upload_date": "2026-03-10",
+      "duration": 18,
+      "view_count": 46340,
+      "view_count_checked_at": "2026-09-25T15:50:37+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 21,
+      "video_id": "nO0AQPqAegE",
+      "url": "https://www.youtube.com/shorts/nO0AQPqAegE",
+      "title": "쌍둥이가 다른 음식을 먹으면 벌어지는 일",
+      "published_at": null,
+      "upload_date": "2026-03-03",
+      "duration": 27,
+      "view_count": 988647,
+      "view_count_checked_at": "2026-09-25T15:59:08+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 22,
+      "video_id": "usEZ0Jjf09Y",
+      "url": "https://www.youtube.com/shorts/usEZ0Jjf09Y",
+      "title": "혼자만 보법이 다른 로다주 그림 실력",
+      "published_at": null,
+      "upload_date": "2026-03-02",
+      "duration": 26,
+      "view_count": 1268742,
+      "view_count_checked_at": "2026-09-25T15:58:33+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 23,
+      "video_id": "I1b0MmI4KaY",
+      "url": "https://www.youtube.com/shorts/I1b0MmI4KaY",
+      "title": "선수의 15초를 뺏은 황당한 심판",
+      "published_at": null,
+      "upload_date": "2026-02-17",
+      "duration": 18,
+      "view_count": 1258964,
+      "view_count_checked_at": "2026-09-25T15:58:29+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 24,
+      "video_id": "T03JUBi74VI",
+      "url": "https://www.youtube.com/shorts/T03JUBi74VI",
+      "title": "지각쟁이 체스 챔피언이 큰코다친 이유",
+      "published_at": null,
+      "upload_date": "2026-02-14",
+      "duration": 39,
+      "view_count": 8644300,
+      "view_count_checked_at": "2026-09-25T15:52:11+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 25,
+      "video_id": "3nDh1A2RpoY",
+      "url": "https://www.youtube.com/shorts/3nDh1A2RpoY",
+      "title": "반지 뺏긴 빌리아일리시가 도둑 찾는 방법",
+      "published_at": null,
+      "upload_date": "2026-02-12",
+      "duration": 35,
+      "view_count": 8317183,
+      "view_count_checked_at": "2026-09-25T15:52:15+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 26,
+      "video_id": "W7n7v2u4m5U",
+      "url": "https://www.youtube.com/shorts/W7n7v2u4m5U",
+      "title": "푸틴이 말없이 말하는 방법 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2026-01-23",
+      "duration": 30,
+      "view_count": 2742907,
+      "view_count_checked_at": "2026-09-25T15:55:52+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 27,
+      "video_id": "-SjXXyVPiII",
+      "url": "https://www.youtube.com/shorts/-SjXXyVPiII",
+      "title": "이 결혼이 깨질 수가 없는 이유",
+      "published_at": null,
+      "upload_date": "2026-01-19",
+      "duration": 25,
+      "view_count": 3408074,
+      "view_count_checked_at": "2026-09-25T15:55:27+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 28,
+      "video_id": "DtNd8cdtHs0",
+      "url": "https://www.youtube.com/shorts/DtNd8cdtHs0",
+      "title": "두 여자가 모르는 결혼식을 찾아간 이유",
+      "published_at": null,
+      "upload_date": "2026-01-16",
+      "duration": 21,
+      "view_count": 1545415,
+      "view_count_checked_at": "2026-09-25T15:57:54+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 29,
+      "video_id": "nK515hX3yDk",
+      "url": "https://www.youtube.com/shorts/nK515hX3yDk",
+      "title": "구독자 0명 스트리머가 비참한 이유",
+      "published_at": null,
+      "upload_date": "2026-01-08",
+      "duration": 16,
+      "view_count": 2238918,
+      "view_count_checked_at": "2026-09-25T15:56:42+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 30,
+      "video_id": "IRGRFQOWmk0",
+      "url": "https://www.youtube.com/shorts/IRGRFQOWmk0",
+      "title": "당연히 AI라고 착각한 이유 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2026-01-06",
+      "duration": 16,
+      "view_count": 1894448,
+      "view_count_checked_at": "2026-09-25T15:57:28+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 31,
+      "video_id": "g1TecOVaTRg",
+      "url": "https://www.youtube.com/shorts/g1TecOVaTRg",
+      "title": "실력이 확고해야 보이는 것 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2026-01-03",
+      "duration": 23,
+      "view_count": 8114095,
+      "view_count_checked_at": "2026-09-25T15:52:29+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 32,
+      "video_id": "1T9wCkDVfNc",
+      "url": "https://www.youtube.com/shorts/1T9wCkDVfNc",
+      "title": "12살이 프로 사이클 선수 압살하는 법",
+      "published_at": null,
+      "upload_date": "2026-01-02",
+      "duration": 20,
+      "view_count": 2981646,
+      "view_count_checked_at": "2026-09-25T15:55:42+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 33,
+      "video_id": "fu_8B7jYNcw",
+      "url": "https://www.youtube.com/shorts/fu_8B7jYNcw",
+      "title": "캐나다 선수가 남의 국기를 만진 이유",
+      "published_at": null,
+      "upload_date": "2025-12-26",
+      "duration": 22,
+      "view_count": 4554576,
+      "view_count_checked_at": "2026-09-25T15:54:28+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 34,
+      "video_id": "UfYdfk5z7_w",
+      "url": "https://www.youtube.com/shorts/UfYdfk5z7_w",
+      "title": "경험자에게 제대로 걸린 아이들",
+      "published_at": null,
+      "upload_date": "2025-12-25",
+      "duration": 20,
+      "view_count": 4982618,
+      "view_count_checked_at": "2026-09-25T15:54:11+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 35,
+      "video_id": "JGwM8TgspF0",
+      "url": "https://www.youtube.com/shorts/JGwM8TgspF0",
+      "title": "NBA 선수들이 공을 잡지 않는 이유",
+      "published_at": null,
+      "upload_date": "2025-12-23",
+      "duration": 34,
+      "view_count": 5977834,
+      "view_count_checked_at": "2026-09-25T15:53:32+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 36,
+      "video_id": "bhwln4BmX20",
+      "url": "https://www.youtube.com/shorts/bhwln4BmX20",
+      "title": "버거킹 깔려다가 되치기 당한 맥도날드",
+      "published_at": null,
+      "upload_date": "2025-12-20",
+      "duration": 25,
+      "view_count": 2033497,
+      "view_count_checked_at": "2026-09-25T15:57:13+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 37,
+      "video_id": "DR_w_RwLHnM",
+      "url": "https://www.youtube.com/shorts/DR_w_RwLHnM",
+      "title": "한번 쓰담아 줬는데.. 수호천사가 된 개",
+      "published_at": null,
+      "upload_date": "2025-12-15",
+      "duration": 29,
+      "view_count": 22940702,
+      "view_count_checked_at": "2026-09-25T15:50:46+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 38,
+      "video_id": "6EGMTlIX-ak",
+      "url": "https://www.youtube.com/shorts/6EGMTlIX-ak",
+      "title": "학교에 있는 이상한 구멍의 정체",
+      "published_at": null,
+      "upload_date": "2025-11-25",
+      "duration": 23,
+      "view_count": 2672804,
+      "view_count_checked_at": "2026-09-25T15:55:59+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 39,
+      "video_id": "apUYfmrxSBY",
+      "url": "https://www.youtube.com/shorts/apUYfmrxSBY",
+      "title": "큐브 대회에서 두번이나 억까당한 아이",
+      "published_at": null,
+      "upload_date": "2025-11-15",
+      "duration": 14,
+      "view_count": 6408481,
+      "view_count_checked_at": "2026-09-25T15:53:19+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 40,
+      "video_id": "GEi4s5uxCJ4",
+      "url": "https://www.youtube.com/shorts/GEi4s5uxCJ4",
+      "title": "남친 골려주려다 벌어진 참극",
+      "published_at": null,
+      "upload_date": "2025-10-30",
+      "duration": 13,
+      "view_count": 2416178,
+      "view_count_checked_at": "2026-09-25T15:56:21+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 41,
+      "video_id": "GXBn1Vjtlto",
+      "url": "https://www.youtube.com/shorts/GXBn1Vjtlto",
+      "title": "전설의 무대에서 극딜 박힌 마이클 잭슨",
+      "published_at": null,
+      "upload_date": "2025-10-21",
+      "duration": 31,
+      "view_count": 3856621,
+      "view_count_checked_at": "2026-09-25T15:55:07+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 42,
+      "video_id": "VLpq7i9q46g",
+      "url": "https://www.youtube.com/shorts/VLpq7i9q46g",
+      "title": "바이커들이 숲속을 무서워하는 이유",
+      "published_at": null,
+      "upload_date": "2025-10-17",
+      "duration": 32,
+      "view_count": 5858978,
+      "view_count_checked_at": "2026-09-25T15:53:36+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 43,
+      "video_id": "2KJRUM5RCPU",
+      "url": "https://www.youtube.com/shorts/2KJRUM5RCPU",
+      "title": "도로에서 견문색이 필요한 이유",
+      "published_at": null,
+      "upload_date": "2025-10-15",
+      "duration": 16,
+      "view_count": 3203960,
+      "view_count_checked_at": "2026-09-25T15:55:36+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 44,
+      "video_id": "zTJdOi_hyGg",
+      "url": "https://www.youtube.com/shorts/zTJdOi_hyGg",
+      "title": "자신의 어린 시절이 떠오른 판사",
+      "published_at": null,
+      "upload_date": "2025-10-14",
+      "duration": 43,
+      "view_count": 5999505,
+      "view_count_checked_at": "2026-09-25T15:53:34+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 45,
+      "video_id": "635dIIlMp9A",
+      "url": "https://www.youtube.com/shorts/635dIIlMp9A",
+      "title": "부모만 느낄 수 있는 끔찍한 순간",
+      "published_at": null,
+      "upload_date": "2025-10-11",
+      "duration": 30,
+      "view_count": 3548270,
+      "view_count_checked_at": "2026-09-25T15:55:19+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 46,
+      "video_id": "2V33brq6AsU",
+      "url": "https://www.youtube.com/shorts/2V33brq6AsU",
+      "title": "낮잠 자다가 트라우마에 걸린 아빠",
+      "published_at": null,
+      "upload_date": "2025-10-10",
+      "duration": 20,
+      "view_count": 10474899,
+      "view_count_checked_at": "2026-09-25T15:51:36+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 47,
+      "video_id": "30BDy8M00tI",
+      "url": "https://www.youtube.com/shorts/30BDy8M00tI",
+      "title": "마이클 잭슨이 되고 싶은 가수들",
+      "published_at": null,
+      "upload_date": "2025-10-09",
+      "duration": 15,
+      "view_count": 25986691,
+      "view_count_checked_at": "2026-09-25T15:50:41+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 48,
+      "video_id": "eCQgFxktFI8",
+      "url": "https://www.youtube.com/shorts/eCQgFxktFI8",
+      "title": "귀신의 집 무적의 방패",
+      "published_at": null,
+      "upload_date": "2025-10-07",
+      "duration": 19,
+      "view_count": 1348262,
+      "view_count_checked_at": "2026-09-25T15:58:23+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 49,
+      "video_id": "atVE-_G1m9g",
+      "url": "https://www.youtube.com/shorts/atVE-_G1m9g",
+      "title": "전세계가 경악한 일본 여자의 훈련법",
+      "published_at": null,
+      "upload_date": "2025-09-16",
+      "duration": 24,
+      "view_count": 1985753,
+      "view_count_checked_at": "2026-09-25T15:57:22+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 50,
+      "video_id": "-_tveg8wNfc",
+      "url": "https://www.youtube.com/shorts/-_tveg8wNfc",
+      "title": "친구 집 청소해 주고 돌아온 반전",
+      "published_at": null,
+      "upload_date": "2025-09-07",
+      "duration": 29,
+      "view_count": 4039584,
+      "view_count_checked_at": "2026-09-25T15:54:56+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 51,
+      "video_id": "uVvhfy6wn6A",
+      "url": "https://www.youtube.com/shorts/uVvhfy6wn6A",
+      "title": "모두가 경악한 8살 마술사",
+      "published_at": null,
+      "upload_date": "2025-09-05",
+      "duration": 30,
+      "view_count": 8859512,
+      "view_count_checked_at": "2026-09-25T15:52:07+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 52,
+      "video_id": "7TkEdp20MuM",
+      "url": "https://www.youtube.com/shorts/7TkEdp20MuM",
+      "title": "TV보다 트라우마 걸린 틱톡커",
+      "published_at": null,
+      "upload_date": "2025-08-30",
+      "duration": 19,
+      "view_count": 7405401,
+      "view_count_checked_at": "2026-09-25T15:52:50+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 53,
+      "video_id": "AF7X8uYXSBU",
+      "url": "https://www.youtube.com/shorts/AF7X8uYXSBU",
+      "title": "어쩌다 오게 된 손님",
+      "published_at": null,
+      "upload_date": "2025-08-16",
+      "duration": 13,
+      "view_count": 19380174,
+      "view_count_checked_at": "2026-09-25T15:50:52+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 54,
+      "video_id": "qC65ZQXFVkM",
+      "url": "https://www.youtube.com/shorts/qC65ZQXFVkM",
+      "title": "부동산 말을 들으면 안 되는 이유",
+      "published_at": null,
+      "upload_date": "2025-08-14",
+      "duration": 19,
+      "view_count": 6574763,
+      "view_count_checked_at": "2026-09-25T15:53:11+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 55,
+      "video_id": "jeesmK1lE0c",
+      "url": "https://www.youtube.com/shorts/jeesmK1lE0c",
+      "title": "기장한테 칭찬하면 안 되는 이유",
+      "published_at": null,
+      "upload_date": "2025-08-04",
+      "duration": 11,
+      "view_count": 5825984,
+      "view_count_checked_at": "2026-09-25T15:53:39+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 56,
+      "video_id": "HBvbP6UQWOo",
+      "url": "https://www.youtube.com/shorts/HBvbP6UQWOo",
+      "title": "호날두가 상을 받고도 기쁘지 않은 이유",
+      "published_at": null,
+      "upload_date": "2025-07-22",
+      "duration": 26,
+      "view_count": 16338040,
+      "view_count_checked_at": "2026-09-25T15:51:06+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 57,
+      "video_id": "102z6L8BpN0",
+      "url": "https://www.youtube.com/shorts/102z6L8BpN0",
+      "title": "호주인들이 미국에서 고통 받는 단어",
+      "published_at": null,
+      "upload_date": "2025-07-17",
+      "duration": 33,
+      "view_count": 9185449,
+      "view_count_checked_at": "2026-09-25T15:51:57+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 58,
+      "video_id": "4dZpQhWVop4",
+      "url": "https://www.youtube.com/shorts/4dZpQhWVop4",
+      "title": "테일러 스위프트 콘서트가 극한인 이유",
+      "published_at": null,
+      "upload_date": "2025-07-15",
+      "duration": 18,
+      "view_count": 8347411,
+      "view_count_checked_at": "2026-09-25T15:52:17+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 59,
+      "video_id": "LpO7Alp9JAA",
+      "url": "https://www.youtube.com/shorts/LpO7Alp9JAA",
+      "title": "주먹 대신 낭만으로 이기는 방법",
+      "published_at": null,
+      "upload_date": "2025-07-11",
+      "duration": 33,
+      "view_count": 3608318,
+      "view_count_checked_at": "2026-09-25T15:55:11+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 60,
+      "video_id": "OVXIvtUq8Ns",
+      "url": "https://www.youtube.com/shorts/OVXIvtUq8Ns",
+      "title": "버스에서 던진 충격적인 한마디 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-07-08",
+      "duration": 21,
+      "view_count": 6204951,
+      "view_count_checked_at": "2026-09-25T15:53:23+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 61,
+      "video_id": "FthCdi6QiRE",
+      "url": "https://www.youtube.com/shorts/FthCdi6QiRE",
+      "title": "아델이 두 눈을 의심한 이유",
+      "published_at": null,
+      "upload_date": "2025-07-07",
+      "duration": 21,
+      "view_count": 17267405,
+      "view_count_checked_at": "2026-09-25T15:50:56+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 62,
+      "video_id": "G3Ffxc8iZ1Q",
+      "url": "https://www.youtube.com/shorts/G3Ffxc8iZ1Q",
+      "title": "랜딩 하면 해고되는 이유",
+      "published_at": null,
+      "upload_date": "2025-07-06",
+      "duration": 38,
+      "view_count": 2034716,
+      "view_count_checked_at": "2026-09-25T15:57:04+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 63,
+      "video_id": "LIEWU4TbVJU",
+      "url": "https://www.youtube.com/shorts/LIEWU4TbVJU",
+      "title": "소년이 큐브를 보고 깜놀한 이유 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-07-04",
+      "duration": 14,
+      "view_count": 33622125,
+      "view_count_checked_at": "2026-09-25T15:50:39+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 64,
+      "video_id": "-8apYPVviTo",
+      "url": "https://www.youtube.com/shorts/-8apYPVviTo",
+      "title": "아들한테 장난치면 큰일나는 이유",
+      "published_at": null,
+      "upload_date": "2025-06-26",
+      "duration": 18,
+      "view_count": 1680688,
+      "view_count_checked_at": "2026-09-25T15:57:42+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 65,
+      "video_id": "YyDwCRSZI4w",
+      "url": "https://www.youtube.com/shorts/YyDwCRSZI4w",
+      "title": "WWE 경기, 레슬러보다 엄마가 위대한 이유",
+      "published_at": null,
+      "upload_date": "2025-06-24",
+      "duration": 33,
+      "view_count": 6466760,
+      "view_count_checked_at": "2026-09-25T15:53:17+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 66,
+      "video_id": "ZN5hO77FP14",
+      "url": "https://www.youtube.com/shorts/ZN5hO77FP14",
+      "title": "CNN 리포터 아무나 못 하는 이유",
+      "published_at": null,
+      "upload_date": "2025-06-21",
+      "duration": 37,
+      "view_count": 10893026,
+      "view_count_checked_at": "2026-09-25T15:51:45+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 67,
+      "video_id": "eV8tAFStRZM",
+      "url": "https://www.youtube.com/shorts/eV8tAFStRZM",
+      "title": "와ㅆ... 이륙하라며?!?!",
+      "published_at": null,
+      "upload_date": "2025-06-19",
+      "duration": 29,
+      "view_count": 2290982,
+      "view_count_checked_at": "2026-09-25T15:56:40+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 68,
+      "video_id": "eKI53SYGG-E",
+      "url": "https://www.youtube.com/shorts/eKI53SYGG-E",
+      "title": "전투기 조종사의 꿈을 못 버린 기장",
+      "published_at": null,
+      "upload_date": "2025-06-18",
+      "duration": 15,
+      "view_count": 4025189,
+      "view_count_checked_at": "2026-09-25T15:54:58+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 69,
+      "video_id": "cwg6ZcFpufI",
+      "url": "https://www.youtube.com/shorts/cwg6ZcFpufI",
+      "title": "세상에서 제일 큰 비극...",
+      "published_at": null,
+      "upload_date": "2025-06-17",
+      "duration": 14,
+      "view_count": 4475751,
+      "view_count_checked_at": "2026-09-25T15:54:30+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 70,
+      "video_id": "LG3sh2fll8Q",
+      "url": "https://www.youtube.com/shorts/LG3sh2fll8Q",
+      "title": "투수가 가랑이에 손만 넣고 안 던지는 이유",
+      "published_at": null,
+      "upload_date": "2025-06-15",
+      "duration": 53,
+      "view_count": 17348612,
+      "view_count_checked_at": "2026-09-25T15:51:00+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 71,
+      "video_id": "98btSAHPmOA",
+      "url": "https://www.youtube.com/shorts/98btSAHPmOA",
+      "title": "아빠가 갑자기 이성을 잃은 이유",
+      "published_at": null,
+      "upload_date": "2025-06-13",
+      "duration": 11,
+      "view_count": 5017230,
+      "view_count_checked_at": "2026-09-25T15:54:07+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 72,
+      "video_id": "6LT-rXxPVSA",
+      "url": "https://www.youtube.com/shorts/6LT-rXxPVSA",
+      "title": "딸을 절대 이길 수 없는 이유",
+      "published_at": null,
+      "upload_date": "2025-06-05",
+      "duration": 15,
+      "view_count": 2045548,
+      "view_count_checked_at": "2026-09-25T15:56:59+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 73,
+      "video_id": "oy7cwv9GcW0",
+      "url": "https://www.youtube.com/shorts/oy7cwv9GcW0",
+      "title": "CG가 없던 시절 고전으로 화살 맞는 법",
+      "published_at": null,
+      "upload_date": "2025-05-30",
+      "duration": 18,
+      "view_count": 1786580,
+      "view_count_checked_at": "2026-09-25T15:57:38+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 74,
+      "video_id": "mMLh1dwkCBI",
+      "url": "https://www.youtube.com/shorts/mMLh1dwkCBI",
+      "title": "과일 이름으로 피아노 쉽게 마스터 하는 법",
+      "published_at": null,
+      "upload_date": "2025-05-28",
+      "duration": 31,
+      "view_count": 12891579,
+      "view_count_checked_at": "2026-09-25T15:51:32+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 75,
+      "video_id": "KNFQBAJo3e4",
+      "url": "https://www.youtube.com/shorts/KNFQBAJo3e4",
+      "title": "손님과 우버기사가 뇌정지 온 이유",
+      "published_at": null,
+      "upload_date": "2025-05-18",
+      "duration": 23,
+      "view_count": 1587743,
+      "view_count_checked_at": "2026-09-25T15:57:56+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 76,
+      "video_id": "lI7-vaRaxVo",
+      "url": "https://www.youtube.com/shorts/lI7-vaRaxVo",
+      "title": "야외에서 음식 리뷰하면 안 되는 이유",
+      "published_at": null,
+      "upload_date": "2025-05-16",
+      "duration": 20,
+      "view_count": 9470869,
+      "view_count_checked_at": "2026-09-25T15:51:53+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 77,
+      "video_id": "7MZAX5Q7jJU",
+      "url": "https://www.youtube.com/shorts/7MZAX5Q7jJU",
+      "title": "우버를 함부로 타면 안 되는 이유 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-05-14",
+      "duration": 27,
+      "view_count": 8253857,
+      "view_count_checked_at": "2026-09-25T15:52:23+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 78,
+      "video_id": "Q73pUvZGc-k",
+      "url": "https://www.youtube.com/shorts/Q73pUvZGc-k",
+      "title": "적조차 리스펙한 넘사벽 스킬 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-05-12",
+      "duration": 16,
+      "view_count": 13165024,
+      "view_count_checked_at": "2026-09-25T15:51:20+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 79,
+      "video_id": "oxmZyCbV6B0",
+      "url": "https://www.youtube.com/shorts/oxmZyCbV6B0",
+      "title": "선수 아내 앞에서 빠던하면 벌어지는 일",
+      "published_at": null,
+      "upload_date": "2025-04-23",
+      "duration": 17,
+      "view_count": 17915158,
+      "view_count_checked_at": "2026-09-25T15:51:04+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 80,
+      "video_id": "YJRZ1YfukTc",
+      "url": "https://www.youtube.com/shorts/YJRZ1YfukTc",
+      "title": "아빠가 듣지 못한다는 걸 깨달은 딸",
+      "published_at": null,
+      "upload_date": "2025-04-22",
+      "duration": 22,
+      "view_count": 17786068,
+      "view_count_checked_at": "2026-09-25T15:51:02+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 81,
+      "video_id": "XQKROAVocq8",
+      "url": "https://www.youtube.com/shorts/XQKROAVocq8",
+      "title": "무슬림의 진짜 실체를 폭로한 경찰ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-04-21",
+      "duration": 19,
+      "view_count": 5211509,
+      "view_count_checked_at": "2026-09-25T15:54:01+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 82,
+      "video_id": "2yVODcV8bgc",
+      "url": "https://www.youtube.com/shorts/2yVODcV8bgc",
+      "title": "에미넴이 인터뷰하다가 개빡친 이유",
+      "published_at": null,
+      "upload_date": "2025-04-20",
+      "duration": 18,
+      "view_count": 6582382,
+      "view_count_checked_at": "2026-09-25T15:53:07+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 83,
+      "video_id": "SBfn2I39gGY",
+      "url": "https://www.youtube.com/shorts/SBfn2I39gGY",
+      "title": "일본의 욱일기를 보자 미 해군이 꺼낸 물건",
+      "published_at": null,
+      "upload_date": "2025-04-18",
+      "duration": 13,
+      "view_count": 996906,
+      "view_count_checked_at": "2026-09-25T15:59:04+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 84,
+      "video_id": "Zw8R4qEDRnE",
+      "url": "https://www.youtube.com/shorts/Zw8R4qEDRnE",
+      "title": "팔이 없다는 걸 한참 뒤에야 깨달은 군인",
+      "published_at": null,
+      "upload_date": "2025-04-16",
+      "duration": 33,
+      "view_count": 9161199,
+      "view_count_checked_at": "2026-09-25T15:52:02+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 85,
+      "video_id": "zI3P3Q5Xqbg",
+      "url": "https://www.youtube.com/shorts/zI3P3Q5Xqbg",
+      "title": "남은 음료 완벽히 테이크아웃 하는 방법",
+      "published_at": null,
+      "upload_date": "2025-04-15",
+      "duration": 10,
+      "view_count": 7081517,
+      "view_count_checked_at": "2026-09-25T15:53:01+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 86,
+      "video_id": "M0xWTr4GQWQ",
+      "url": "https://www.youtube.com/shorts/M0xWTr4GQWQ",
+      "title": "장인이 장비를 탓하지 않는 이유",
+      "published_at": null,
+      "upload_date": "2025-04-14",
+      "duration": 17,
+      "view_count": 5401629,
+      "view_count_checked_at": "2026-09-25T15:53:51+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 87,
+      "video_id": "3cmUnwj0hX0",
+      "url": "https://www.youtube.com/shorts/3cmUnwj0hX0",
+      "title": "동료들 퇴근 못하게 자물쇠로 잠그는 이유",
+      "published_at": null,
+      "upload_date": "2025-04-13",
+      "duration": 15,
+      "view_count": 6388085,
+      "view_count_checked_at": "2026-09-25T15:53:21+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 88,
+      "video_id": "_KO9KVBEE4g",
+      "url": "https://www.youtube.com/shorts/_KO9KVBEE4g",
+      "title": "토네이도 온다고!!! 끔찍한 기장의 선택",
+      "published_at": null,
+      "upload_date": "2025-03-30",
+      "duration": 22,
+      "view_count": 2020917,
+      "view_count_checked_at": "2026-09-25T15:57:10+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 89,
+      "video_id": "Tuzw8aHFcU4",
+      "url": "https://www.youtube.com/shorts/Tuzw8aHFcU4",
+      "title": "타이슨 코치가 알리 필살기 무력화 하는 법",
+      "published_at": null,
+      "upload_date": "2025-03-28",
+      "duration": 22,
+      "view_count": 1497389,
+      "view_count_checked_at": "2026-09-25T15:58:06+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 90,
+      "video_id": "wB2lbnxFlBc",
+      "url": "https://www.youtube.com/shorts/wB2lbnxFlBc",
+      "title": "백만장자를 노숙자로 오해한 아이",
+      "published_at": null,
+      "upload_date": "2025-03-23",
+      "duration": 35,
+      "view_count": 2643980,
+      "view_count_checked_at": "2026-09-25T15:56:04+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 91,
+      "video_id": "gYy7XhrGXGA",
+      "url": "https://www.youtube.com/shorts/gYy7XhrGXGA",
+      "title": "상대가 두렵고 무서워웠던 체스 챔피언",
+      "published_at": null,
+      "upload_date": "2025-03-22",
+      "duration": 25,
+      "view_count": 2136466,
+      "view_count_checked_at": "2026-09-25T15:56:53+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 92,
+      "video_id": "UQONOSzv4Rg",
+      "url": "https://www.youtube.com/shorts/UQONOSzv4Rg",
+      "title": "F15 조종사가 급유하다 개빡친 이유",
+      "published_at": null,
+      "upload_date": "2025-03-18",
+      "duration": 27,
+      "view_count": 2958101,
+      "view_count_checked_at": "2026-09-25T15:55:46+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 93,
+      "video_id": "DOEuDYkBRsg",
+      "url": "https://www.youtube.com/shorts/DOEuDYkBRsg",
+      "title": "브라질에서 총 게임 하면 벌어지는 일 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-03-12",
+      "duration": 32,
+      "view_count": 7731753,
+      "view_count_checked_at": "2026-09-25T15:52:37+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 94,
+      "video_id": "8RpVgVWV3Zs",
+      "url": "https://www.youtube.com/shorts/8RpVgVWV3Zs",
+      "title": "당뇨병 환자를 오해한 교수님 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-02-18",
+      "duration": 17,
+      "view_count": 10052012,
+      "view_count_checked_at": "2026-09-25T15:51:41+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 95,
+      "video_id": "GjQ_jWzTZh8",
+      "url": "https://www.youtube.com/shorts/GjQ_jWzTZh8",
+      "title": "경찰이 주소를 잘못 알면 벌어지는 일",
+      "published_at": null,
+      "upload_date": "2025-02-14",
+      "duration": 18,
+      "view_count": 3528176,
+      "view_count_checked_at": "2026-09-25T15:55:23+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 96,
+      "video_id": "kCknUFR_-Yc",
+      "url": "https://www.youtube.com/shorts/kCknUFR_-Yc",
+      "title": "똑똑한 남자가 결혼에 성공하는 이유 ㄷㄷ",
+      "published_at": null,
+      "upload_date": "2025-02-12",
+      "duration": 33,
+      "view_count": 1313187,
+      "view_count_checked_at": "2026-09-25T15:58:25+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 97,
+      "video_id": "AG5O4OVpriI",
+      "url": "https://www.youtube.com/shorts/AG5O4OVpriI",
+      "title": "차에서 떨어져도 절대 다치지 않는 방법",
+      "published_at": null,
+      "upload_date": "2025-02-02",
+      "duration": 21,
+      "view_count": 6629677,
+      "view_count_checked_at": "2026-09-25T15:53:05+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 98,
+      "video_id": "gjwJOIThyW4",
+      "url": "https://www.youtube.com/shorts/gjwJOIThyW4",
+      "title": "광부들이 지하 3,000m에서 일하는 방법",
+      "published_at": null,
+      "upload_date": "2025-01-29",
+      "duration": 20,
+      "view_count": 4104910,
+      "view_count_checked_at": "2026-09-25T15:54:52+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 99,
+      "video_id": "X68G37tGhoA",
+      "url": "https://www.youtube.com/shorts/X68G37tGhoA",
+      "title": "골프공 꺼내다가 온몸에 소름돋은 이유",
+      "published_at": null,
+      "upload_date": "2025-01-15",
+      "duration": 19,
+      "view_count": 7651674,
+      "view_count_checked_at": "2026-09-25T15:52:41+00:00",
+      "kind": "short"
+    },
+    {
+      "rank": 100,
+      "video_id": "Vd6114jN7oI",
+      "url": "https://www.youtube.com/shorts/Vd6114jN7oI",
+      "title": "빌런이 되고 싶었던 한 어린이의 최후",
+      "published_at": null,
+      "upload_date": "2025-01-09",
+      "duration": 21,
+      "view_count": 3242493,
+      "view_count_checked_at": "2026-09-25T15:55:38+00:00",
+      "kind": "short"
+    }
   ]
 }
