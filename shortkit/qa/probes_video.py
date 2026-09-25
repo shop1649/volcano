@@ -205,14 +205,16 @@ def scan(ctx: QAContext, width: int = 540, zoom_every: int = 1) -> dict:
             if c.id not in anchors:
                 if des is not None and len(kp) >= 20:
                     anchors[c.id] = (t, kp, des, 1.0)
-                    zoom_rows[c.id].append([t, 1.0, None, None, len(kp)])
+                    # [t, scale vs the clip's first anchor, fixed point x/y (canvas px) of the transform anchor -> t,
+                    #  inliers, anchor time, scale anchor -> t]
+                    zoom_rows[c.id].append([t, 1.0, None, None, len(kp), t, 1.0])
             else:
                 est = _similarity(anchors[c.id][1], anchors[c.id][2], kp, des)
                 if est is not None:
                     sc_, fx, fy, inl = est
                     base = anchors[c.id][3]
                     zoom_rows[c.id].append([t, base * sc_, fx / s + cx0 if fx is not None else None,
-                                            fy / s + cy0 if fy is not None else None, inl])
+                                            fy / s + cy0 if fy is not None else None, inl, anchors[c.id][0], sc_])
                     if inl < 25 and des is not None and len(kp) >= 40:   # re-anchor (chain) when matches thin out
                         anchors[c.id] = (t, kp, des, base * sc_)
         # --- decorations (colour tracking)
@@ -593,6 +595,85 @@ def motion_explains(ctx: QAContext, t_prev: float, t_cur: float, region) -> dict
             "scale": round(sc_, 4), "residual_ratio": round(res / raw, 3) if raw > 0 else None}
 
 
+def overlay_mask(ctx: QAContext, t: float, shape: tuple[int, int], pad: float = 12.0) -> np.ndarray:
+    """Canvas pixels (full resolution) drawn over the picture at output time t by the plan: captions (ink bbox + box
+    rect, padded for pop scaling / outline) and decorations (keyframe box), so area measurements can leave them out."""
+    H, W = shape
+    m = np.zeros((H, W), bool)
+
+    def put(x, y, w, h, p):
+        x0, y0 = int(max(0, math.floor(x - p))), int(max(0, math.floor(y - p)))
+        x1, y1 = int(min(W, math.ceil(x + w + p))), int(min(H, math.ceil(y + h + p)))
+        if x1 > x0 and y1 > y0:
+            m[y0:y1, x0:x1] = True
+    for c in ctx.resolved.captions:
+        if c.start - 0.05 <= t <= c.end + 0.05:
+            sc_ = max(1.0, float((c.motion_in or {}).get("scale_from") or 1.0))
+            grow = 0.5 * (sc_ - 1.0) * max(c.bbox.w, c.bbox.h)
+            put(c.bbox.x, c.bbox.y, c.bbox.w, c.bbox.h, pad + grow + float((c.motion_in or {}).get("offset_px") or 0))
+            rect = (c.box or {}).get("rect")
+            if (c.box or {}).get("enabled") and rect:
+                put(*[float(v) for v in rect], pad)
+    for d in ctx.resolved.decorations:
+        if d.start - 0.05 <= t <= d.end + 0.05:
+            size = float((d.style or {}).get("size_px") or 0)
+            for k in d.keyframes or []:
+                w_, h_ = float(k.get("w") or size or 100), float(k.get("h") or size or 100)
+                r_ = max(w_, h_)
+                put(float(k["x"]) - r_, float(k["y"]) - r_, 2 * r_, 2 * r_, pad)
+    return m
+
+
+FLASH_SCOPE_MIN_OUTSIDE = 0.02    # outside-region share of the canvas needed to see where a flash reaches
+FLASH_SCOPE_MIN_CONTRAST = 40.0   # RGB distance between the flash colour and the outside picture before the flash
+
+
+def flash_scope(ctx: QAContext, c, obs: dict) -> dict:
+    """Where the flash of boundary clip ``c`` brightens the output (motion.transitions.flash.scope): the frame at the
+    flash peak vs a frame before the flash, OUTSIDE the video region (captions / decorations left out) and inside it.
+    Progress toward the flash colour p = projection of (peak - before) on (flash colour - before): inside p_in, outside
+    p_out.  canvas: p_out >= 0.5 p_in; region: p_out <= 0.1 while p_in >= 0.3; otherwise 못 잼.  Needs a visible area
+    outside the region whose colour differs from the flash colour."""
+    from . import hex_rgb
+
+    fr = 1.0 / ctx.fps
+    tr = c.transition_in
+    col = np.array(hex_rgb(tr.color or obs.get("color") or "#FFFFFF", (255, 255, 255)), np.float32)
+    t_peak = float(obs.get("peak_t") if obs.get("peak_t") is not None else c.out_start)
+    t_before = max(0.0, float(obs.get("t") or c.out_start) - 3 * fr)
+    A = grab(ctx.mp4, t_before).astype(np.float32)
+    P = grab(ctx.mp4, t_peak).astype(np.float32)
+    H, W = P.shape[:2]
+    rx, ry, rw, rh = (int(round(v)) for v in rect_xywh(c.region))
+    inside = np.zeros((H, W), bool)
+    inside[max(0, ry):min(H, ry + rh), max(0, rx):min(W, rx + rw)] = True
+    ov = overlay_mask(ctx, t_peak, (H, W)) | overlay_mask(ctx, t_before, (H, W))
+    outside = ~inside & ~ov
+    inside &= ~ov
+    out = {"t_peak": rnd(t_peak, 4), "t_before": rnd(t_before, 4), "outside_share": rnd(float(outside.mean()), 4)}
+    if outside.mean() < FLASH_SCOPE_MIN_OUTSIDE or inside.sum() < 100:
+        return {**out, "status": "unmeasured", "reason": "영상 영역 밖(자막·장식 제외) 화면이 거의 없음 — 범위 구별 불가"}
+
+    def progress(mask):
+        a = A[mask].mean(axis=0)
+        p = P[mask].mean(axis=0)
+        d = col - a
+        den = float((d * d).sum())
+        return (float(((p - a) * d).sum() / den) if den > 1e-6 else None), float(np.sqrt(den))
+    p_in, _ = progress(inside)
+    p_out, contrast = progress(outside)
+    out.update({"progress_inside": rnd(p_in, 3), "progress_outside": rnd(p_out, 3), "outside_contrast": rnd(contrast, 1)})
+    if contrast < FLASH_SCOPE_MIN_CONTRAST or p_in is None or p_out is None:
+        return {**out, "status": "unmeasured", "reason": "영역 밖 화면이 플래시 색과 거의 같음 — 범위 구별 불가"}
+    if p_in < 0.3:
+        return {**out, "status": "unmeasured", "reason": f"플래시 정점에서 영상 영역의 밝아짐이 약함(p={p_in:.2f})"}
+    if p_out >= 0.5 * p_in:
+        return {**out, "status": "measured", "scope": "canvas"}
+    if p_out <= 0.1:
+        return {**out, "status": "measured", "scope": "region"}
+    return {**out, "status": "unmeasured", "reason": f"영역 밖이 일부만 밝아짐(p_out {p_out:.2f}, p_in {p_in:.2f})"}
+
+
 def analyze_transitions(ctx: QAContext, sc: dict) -> dict:
     fps = sc["fps"]
     fr = 1.0 / fps
@@ -633,6 +714,12 @@ def analyze_transitions(ctx: QAContext, sc: dict) -> dict:
         elif ok and tr.type == "flash":
             timing_ok = (obs["t"] - fr <= c.out_start + dur and obs["t"] + obs["dur"] + fr >= c.out_start - dur
                          and abs(obs["dur"] - dur) <= 2 * fr + 1e-3)
+        if obs.get("type") == "flash":
+            exp["scope"] = getattr(tr, "scope", None) if tr.type == "flash" else None
+            try:
+                obs["scope_obs"] = flash_scope(ctx, c, obs)
+            except Exception as e:  # never a silent pass
+                obs["scope_obs"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
         bounds.append({"clip_id": c.id, "expected": exp, "observed": obs, "type_ok": ok, "timing_ok": timing_ok})
         claimed.append((c.out_start - max(dur, 0.2) - 2 * fr, c.out_start + max(dur, 0.2) + 2 * fr))
     # unexpected hard cuts / flashes
@@ -909,6 +996,10 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
             fy = [r[3] for r in rows if r[3] is not None]
             if fx and fy:
                 item["measured_center_canvas"] = [rnd(float(np.median(fx)), 1), rnd(float(np.median(fy)), 1)]
+            try:
+                item["recenter_obs"] = zoom_recenter_obs(c, rows)
+            except Exception as e:  # never a silent pass
+                item["recenter_obs"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
         # the picture can also change scale because the SOURCE moves (people walking to the camera,
         # camera zoom): measure the same thing on the source frames and divide it out
         try:
@@ -936,6 +1027,75 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
         run = run + 1 if zf else 0
         best = max(best, run)
     return {"clips": out, "max_consecutive_measured": best}
+
+
+RECENTER_MIN_STEP = 0.05          # |scale(anchor -> t) - 1| needed for a sample's fixed point (ill-conditioned below)
+RECENTER_SEP_FRAC = 0.1           # the two renderer rules must put the fixed point this far apart (share of the region's
+                                  # shorter side) to be told apart (= reference.motion.RECENTER_CENTRE_ZONE)
+RECENTER_TOL_FRAC = 0.05          # measured fixed point within this share of the shorter side of a rule's
+                                  # (= reference.motion.RECENTER_PURE_DRIFT)
+
+
+def rule_fixed_point(clip, t_a: float, t_b: float) -> list[float] | None:
+    """Canvas position of the point that stays put between output times t_a and t_b under the RENDERER's geometry
+    (shortkit.edit.resolve.src_to_region: region-local q = s * (p - crop_xy) + T): p = (T_b - k T_a) / (1 - k),
+    k = s_b / s_a.  None when the scale barely changes (no fixed point)."""
+    from ..edit.resolve import src_to_region
+
+    sa, txa, tya = src_to_region(clip, t_a - clip.out_start)
+    sb, txb, tyb = src_to_region(clip, t_b - clip.out_start)
+    k = sb / sa
+    if abs(1.0 - k) < 1e-3:
+        return None
+    R = clip.region
+    return [float(R.x + (txb - k * txa) / (1.0 - k)), float(R.y + (tyb - k * tya) / (1.0 - k))]
+
+
+def zoom_recenter_obs(clip, rows: list) -> dict:
+    """motion.zoom.recenter in the output: the fixed point of each measured frame-to-anchor similarity transform (ORB +
+    RANSAC in the scan) against the fixed point the renderer's rule gives for the same two times with recenter false
+    (the zoom centre stays where it is) and true (the centre travels to the region centre).  The observed rule is the
+    one within RECENTER_TOL_FRAC of the shorter region side while the other is not; when the two rules put the fixed
+    point less than RECENTER_SEP_FRAC apart (zoom about the region centre) the output cannot tell them apart."""
+    import dataclasses
+
+    if clip.zoom is None:
+        return {"status": "not_applicable"}
+    R = clip.region
+    side = float(min(R.w, R.h))
+    variants = {flag: dataclasses.replace(clip, zoom=dataclasses.replace(clip.zoom, recenter=flag)) for flag in (False, True)}
+    samples = []
+    for r in rows:
+        if len(r) < 7 or r[2] is None or r[3] is None or r[6] is None or abs(float(r[6]) - 1.0) < RECENTER_MIN_STEP:
+            continue
+        t, ta = float(r[0]), float(r[5])
+        exp = {flag: rule_fixed_point(v, ta, t) for flag, v in variants.items()}
+        if exp[False] is None or exp[True] is None:
+            continue
+        m = [float(r[2]), float(r[3])]
+        samples.append({"t": rnd(t, 3), "anchor_t": rnd(ta, 3), "scale": rnd(float(r[6]), 4), "measured": [rnd(v, 1) for v in m],
+                        "rule_false": [rnd(v, 1) for v in exp[False]], "rule_true": [rnd(v, 1) for v in exp[True]],
+                        "err_false": math.hypot(m[0] - exp[False][0], m[1] - exp[False][1]),
+                        "err_true": math.hypot(m[0] - exp[True][0], m[1] - exp[True][1]),
+                        "sep": math.hypot(exp[False][0] - exp[True][0], exp[False][1] - exp[True][1])})
+    out = {"method": "출력 프레임끼리의 유사변환(ORB+RANSAC) 고정점 vs 렌더러 규칙(edit.resolve.src_to_region)의 recenter "
+                     "false/true 고정점", "n": len(samples), "tolerance_px": rnd(RECENTER_TOL_FRAC * side, 1),
+           "separation_min_px": rnd(RECENTER_SEP_FRAC * side, 1),
+           "samples": [{k: (rnd(v, 1) if isinstance(v, float) else v) for k, v in smp.items()} for smp in samples[:12]]}
+    if len(samples) < 3:
+        return {**out, "status": "unmeasured", "reason": f"배율이 {RECENTER_MIN_STEP:g} 이상 바뀐 표본 {len(samples)}개(< 3)"}
+    ef = float(np.median([x["err_false"] for x in samples]))
+    et = float(np.median([x["err_true"] for x in samples]))
+    sep = float(np.median([x["sep"] for x in samples]))
+    out.update({"err_false_px": rnd(ef, 1), "err_true_px": rnd(et, 1), "separation_px": rnd(sep, 1)})
+    tol = RECENTER_TOL_FRAC * side
+    if sep < RECENTER_SEP_FRAC * side:
+        return {**out, "status": "unmeasured", "reason": "두 규칙의 고정점이 거의 같음(영역 중앙 근처 확대) — 구별 불가"}
+    if ef <= tol < et:
+        return {**out, "status": "measured", "recenter": False}
+    if et <= tol < ef:
+        return {**out, "status": "measured", "recenter": True}
+    return {**out, "status": "unmeasured", "reason": "측정 고정점이 어느 규칙과도(또는 둘 다와) 허용오차 안에서 맞지 않음"}
 
 
 def source_scale(ctx: QAContext, clip, t0: float, t1: float, work_w: int = 540) -> float | None:
@@ -1971,6 +2131,190 @@ def protected_rects_canvas(ctx: QAContext) -> list[dict]:
 
 
 # ----------------------------------------------------------------------------- entry point
+# ----------------------------------------------------------------------------- drawn arrow geometry (reference detector)
+ARROW_RATIO_TOL = 0.05       # docs/validation/mockloop.md: deco_ratio tolerance of the detector on renderer-drawn arrows
+ARROW_OUTLINE_TOL_PX = 1.5   # docs/validation/mockloop.md: deco_outline_px
+
+
+def analyze_arrow_geometry(ctx: QAContext) -> dict:
+    """Arrow shape of every planned arrow decoration measured in the OUTPUT with the reference analyzer's own detector
+    (shortkit.reference.motion.detect_decorations: head length / head width / shaft width ratios of the length, outline
+    width and colour), captions of the plan masked out like the analyzer masks the reference's captions."""
+    arrows = [d for d in ctx.resolved.decorations if d.kind == "arrow"]
+    if not arrows:
+        return {"items": []}
+    from ..reference.motion import detect_decorations
+
+    caps = []
+    for c in ctx.resolved.captions:
+        it = {"bbox": [c.bbox.x, c.bbox.y, c.bbox.w, c.bbox.h], "start": c.start, "end": c.end}
+        rect = (c.box or {}).get("rect")
+        if (c.box or {}).get("enabled") and rect:
+            it["style"] = {"box": {"present": "present", "bbox": [float(v) for v in rect]}}
+        caps.append(it)
+    det = detect_decorations(ctx.mp4, captions={"items": caps}, max_seconds=max(d.end for d in arrows) + 0.5)
+    items = []
+    for d in arrows:
+        cands = [it for it in det.get("items") or [] if it.get("kind") == "arrow"
+                 and min(float(it["end"]), d.end) - max(float(it["t"]), d.start) > 0]
+        if not cands:
+            items.append({"id": d.id, "status": "unmeasured",
+                          "reason": "출력에서 이 장식 시간대의 화살표를 검출하지 못함(참고 검출기)",
+                          "rejected": det.get("rejected")})
+            continue
+        best = max(cands, key=lambda it: min(float(it["end"]), d.end) - max(float(it["t"]), d.start))
+        items.append({"id": d.id, "status": "measured",
+                      **{k: best.get(k) for k in ("head_len_ratio", "head_width_ratio", "shaft_width_ratio", "outline_px",
+                                                  "outline_color", "size_px", "color", "rotation_deg", "frame_t", "bbox",
+                                                  "t", "end")}})
+    return {"items": items, "detector": "shortkit.reference.motion.detect_decorations", "detector_status": det.get("status"),
+            "resolution": det.get("resolution"), "rejected": det.get("rejected")}
+
+
+# ----------------------------------------------------------------------------- video-region fit and background blur
+FIT_BAND_MIN_SHARE = 0.005   # region share where the cover and contain renderings differ, needed to tell them apart
+FIT_DIFF_THR = 20.0          # per-pixel max channel difference between the two renderings that counts as "differs"
+BLUR_SIGMAS = tuple(float(v) for v in np.round(np.geomspace(2.0, 160.0, 29), 2))
+
+
+def _render_canvas(ctx: QAContext, clip, t: float, bg_sigma: float | None = None) -> tuple[np.ndarray, np.ndarray | None]:
+    """(canvas, source frame) the RENDERER draws for ``clip`` at output time t (shortkit.edit.render.Compositor:
+    background + fitted picture; captions are burned later and are not in it)."""
+    from ..edit.render import Compositor
+
+    comp = Compositor(ctx.resolved)
+    try:
+        if bg_sigma is not None:
+            comp.bg = dict(comp.bg, blur_sigma=float(bg_sigma))
+        return comp.clip_canvas(clip, t), None
+    finally:
+        comp.close()
+
+
+def _source_frame(ctx: QAContext, clip, t: float) -> np.ndarray:
+    """The source frame the renderer's reader gives for ``clip`` at output time t (what its blurred background uses)."""
+    from ..edit.render import ClipReader, EPS_T
+    from ..edit.resolve import src_time_at
+
+    rd = ClipReader(clip)
+    try:
+        s_ = min(src_time_at(clip, t - clip.out_start), clip.src_out - 2 * EPS_T)
+        return rd.frame_at(s_).copy()
+    finally:
+        rd.close()
+
+
+def _sample_time(ctx: QAContext, clip) -> float | None:
+    """A frame time well inside the clip (away from transitions), on the output frame grid."""
+    fr = 1.0 / ctx.fps
+    a = clip.out_start + max(0.3, float(clip.transition_in.dur or 0.0) + 2 * fr)
+    b = clip.out_end - 0.3
+    if b <= a:
+        return None
+    k = math.floor(((a + b) / 2.0) * ctx.fps + 1e-6)
+    return k / ctx.fps
+
+
+def analyze_canvas_geometry(ctx: QAContext) -> dict:
+    """canvas.video_region.fit per clip and canvas.background.blur_sigma, measured in the output by comparing the output
+    frame with the renderer's own renderings (Compositor) of the alternatives:
+      fit   -- inside the region, where the cover and contain renderings differ (the footage edges: contain leaves
+               background bars, cover fills them): the rendering the output matches;
+      blur  -- outside the region (captions / decorations left out): the blur sigma whose background rendering matches
+               the output best (grid search), only when background.type is blur_source."""
+    import dataclasses
+
+    out: dict = {"fit": [], "blur": None}
+    bg = (ctx.resolved.canvas or {}).get("background") or {}
+    for c in ctx.resolved.clips:
+        t = _sample_time(ctx, c)
+        item = {"clip_id": c.id, "expected": c.fit, "t": rnd(t, 4)}
+        if t is None:
+            out["fit"].append({**item, "status": "unmeasured", "reason": "클립이 너무 짧음"})
+            continue
+        try:
+            O = grab(ctx.mp4, t).astype(np.float32)
+            rend = {f: _render_canvas(ctx, dataclasses.replace(c, fit=f), t)[0].astype(np.float32) for f in ("cover", "contain")}
+        except Exception as e:  # never a silent pass
+            out["fit"].append({**item, "status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]})
+            continue
+        H, W = O.shape[:2]
+        rx, ry, rw, rh = (int(round(v)) for v in rect_xywh(c.region))
+        reg = np.zeros((H, W), bool)
+        reg[max(0, ry):min(H, ry + rh), max(0, rx):min(W, rx + rw)] = True
+        band = reg & (np.abs(rend["cover"] - rend["contain"]).max(axis=2) > FIT_DIFF_THR) & ~overlay_mask(ctx, t, (H, W))
+        share = float(band.sum()) / max(1, int(reg.sum()))
+        item["band_share"] = rnd(share, 4)
+        if share < FIT_BAND_MIN_SHARE:
+            out["fit"].append({**item, "status": "unmeasured",
+                               "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"})
+            continue
+        err = {f: float(np.abs(O[band] - rend[f][band]).mean()) for f in rend}
+        item["err"] = {f: rnd(v, 2) for f, v in err.items()}
+        best = min(err, key=err.get)
+        other = "contain" if best == "cover" else "cover"
+        if err[best] <= 25.0 and err[best] <= 0.5 * err[other]:
+            out["fit"].append({**item, "status": "measured", "fit": best})
+        else:
+            out["fit"].append({**item, "status": "unmeasured", "reason": "출력이 두 렌더링 어느 쪽과도 뚜렷이 맞지 않음"})
+    if bg.get("type") == "blur_source":
+        out["blur"] = _background_blur(ctx, bg)
+    return out
+
+
+def _background_blur(ctx: QAContext, bg: dict) -> dict:
+    from ..edit.render import Compositor
+
+    per = []
+    for c in ctx.resolved.clips:
+        t = _sample_time(ctx, c)
+        if t is None:
+            continue
+        try:
+            O = grab(ctx.mp4, t).astype(np.float32)
+            fr = _source_frame(ctx, c, t)
+        except Exception as e:
+            per.append({"clip_id": c.id, "status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]})
+            continue
+        H, W = O.shape[:2]
+        rx, ry, rw, rh = rect_xywh(region_union(ctx))
+        outside = np.ones((H, W), bool)
+        outside[max(0, int(ry)):min(H, int(math.ceil(ry + rh))), max(0, int(rx)):min(W, int(math.ceil(rx + rw)))] = False
+        outside &= ~overlay_mask(ctx, t, (H, W))
+        if outside.mean() < 0.02:
+            per.append({"clip_id": c.id, "status": "unmeasured", "reason": "영상 영역 밖 배경이 거의 없음"})
+            continue
+        comp = Compositor(ctx.resolved)
+        try:
+            errs = []
+            for sg in BLUR_SIGMAS:
+                comp.bg = dict(bg, blur_sigma=sg)
+                errs.append(float(np.abs(O[outside] - comp._background(fr).astype(np.float32)[outside]).mean()))
+        finally:
+            comp.close()
+        e = np.array(errs)
+        i = int(np.argmin(e))
+        sig = BLUR_SIGMAS[i]
+        if 0 < i < len(e) - 1:          # parabola through the minimum on log sigma
+            x = np.log(np.array(BLUR_SIGMAS[i - 1:i + 2]))
+            a, b_, _ = np.polyfit(x, e[i - 1:i + 2], 2)
+            if a > 0:
+                sig = float(np.exp(np.clip(-b_ / (2 * a), x[0], x[2])))
+        contrast = float((e.max() - e.min()) / max(1e-6, e.max()))
+        rec = {"clip_id": c.id, "t": rnd(t, 4), "sigma": rnd(sig, 2), "err_min": rnd(float(e.min()), 2),
+               "err_max": rnd(float(e.max()), 2), "contrast": rnd(contrast, 3), "edge_of_grid": i in (0, len(e) - 1)}
+        if contrast < 0.2 or i in (0, len(e) - 1):
+            rec.update(status="unmeasured", reason="배경이 밋밋하거나 최소가 격자 끝 — 흐림 정도를 가려낼 수 없음")
+        else:
+            rec["status"] = "measured"
+        per.append(rec)
+    meas = [p for p in per if p.get("status") == "measured"]
+    return {"per_clip": per, "status": "measured" if meas else "unmeasured",
+            "sigma": rnd(float(np.median([p["sigma"] for p in meas])), 2) if meas else None,
+            "method": "출력 배경(영상 영역·자막·장식 밖) vs 렌더러(edit.render.Compositor._background)가 sigma 후보마다 그린 배경 "
+                      "— 평균 절대 오차 최소(로그 sigma 포물선 보정)"}
+
+
 def probe_video(ctx: QAContext) -> dict:
     res: dict = {"resolution": [ctx.info.width, ctx.info.height], "fps": rnd(ctx.info.fps, 3),
                  "duration": rnd(ctx.info.duration, 4), "errors": {}}
@@ -1987,7 +2331,8 @@ def probe_video(ctx: QAContext) -> dict:
         except Exception as e:  # a failing analysis becomes 'unmeasured' rows, never a crash
             res["errors"][name] = f"{type(e).__name__}: {e}"
     res["_scan"] = sc                      # in-memory only (dropped before saving)
-    for name, fn in (("mapping", analyze_mapping), ("residual", analyze_residual), ("provenance", analyze_provenance)):
+    for name, fn in (("mapping", analyze_mapping), ("residual", analyze_residual), ("provenance", analyze_provenance),
+                     ("arrows", analyze_arrow_geometry), ("canvas_geometry", analyze_canvas_geometry)):
         try:
             res[name] = fn(ctx)
         except Exception as e:

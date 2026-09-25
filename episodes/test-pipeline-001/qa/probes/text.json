@@ -138,6 +138,54 @@
       ],
       "offset": 19.2667,
       "offset_note": "영상 끝까지 표시",
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              215,
+              296,
+              651,
+              79
+            ],
+            "ink_bbox": [
+              215,
+              296,
+              651,
+              79
+            ],
+            "color": "#FFFFFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 101.6,
+        "frames": {
+          "rest": 0.12,
+          "before": null,
+          "after": null,
+          "mid": 9.6934
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -617,6 +665,54 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              272,
+              481,
+              536,
+              43
+            ],
+            "ink_bbox": [
+              272,
+              481,
+              536,
+              43
+            ],
+            "color": "#E5E5E5",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 30.5,
+        "frames": {
+          "rest": 0.32,
+          "before": null,
+          "after": 4.0667,
+          "mid": 2.16
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -1120,6 +1216,77 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              664,
+              754,
+              150,
+              37
+            ],
+            "ink_bbox": [
+              664,
+              754,
+              150,
+              37
+            ],
+            "color": "#FFFEFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#565655",
+            "box": {
+              "present": "present",
+              "polarity": "dark",
+              "bbox": [
+                650,
+                747,
+                178,
+                51
+              ],
+              "pad_x": 14,
+              "pad_y": 7,
+              "contrast": 71.0,
+              "pad_fill_x": 14,
+              "pad_fill_y": 7,
+              "pad_note": "outline not separable from the box: pad measured from the glyph fill"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "박스가 있어 그림자를 따로 재지 않음(레퍼런스 분석기와 같은 규칙)"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "box_color": {
+        "status": "measured",
+        "color": "#000000",
+        "alpha": 0.645,
+        "color_observed": "#585858",
+        "t_before": 0.2666,
+        "t_after": 3.9334,
+        "method": "reference.textboxes.box_alpha(등장 전 프레임 vs 휴지 프레임, 정적 화소 회귀)",
+        "box_rect_source": "출력에서 찾은 박스"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 23.0,
+        "frames": {
+          "rest": 0.57,
+          "before": 0.2666,
+          "after": 3.9334,
+          "mid": 2.2184
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -1611,6 +1778,54 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              254,
+              1403,
+              573,
+              62
+            ],
+            "ink_bbox": [
+              254,
+              1403,
+              573,
+              62
+            ],
+            "color": "#FFFFFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 62.7,
+        "frames": {
+          "rest": 1.54,
+          "before": 1.2,
+          "after": 3.9667,
+          "mid": 2.72
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -2098,6 +2313,54 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              287,
+              1403,
+              510,
+              62
+            ],
+            "ink_bbox": [
+              287,
+              1403,
+              510,
+              62
+            ],
+            "color": "#FFFFFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 62.7,
+        "frames": {
+          "rest": 4.34,
+          "before": 4.0,
+          "after": 7.5,
+          "mid": 5.8866
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -2585,6 +2848,54 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              247,
+              1403,
+              588,
+              62
+            ],
+            "ink_bbox": [
+              247,
+              1403,
+              588,
+              62
+            ],
+            "color": "#FFFFFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 62.7,
+        "frames": {
+          "rest": 7.94,
+          "before": 7.6,
+          "after": 9.9667,
+          "mid": 8.92
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -3064,6 +3375,126 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              269,
+              1405,
+              542,
+              66
+            ],
+            "ink_bbox": [
+              269,
+              1405,
+              542,
+              66
+            ],
+            "color": "#FDE200",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "quote_marks": {
+        "ocr": {
+          "kind": "partial",
+          "open": "",
+          "close": "\""
+        },
+        "shape": {
+          "status": "measured",
+          "open": {
+            "present": true,
+            "glyph": "\"",
+            "iou": 0.797,
+            "rival_iou": 0.642,
+            "bbox": [
+              0,
+              4,
+              27,
+              23
+            ],
+            "n_components": 2,
+            "scores": [
+              [
+                "\"",
+                0.797
+              ],
+              [
+                "”",
+                0.642
+              ],
+              [
+                "“",
+                0.57
+              ],
+              [
+                "'",
+                0.518
+              ]
+            ]
+          },
+          "close": {
+            "present": true,
+            "glyph": "\"",
+            "iou": 0.797,
+            "rival_iou": 0.628,
+            "bbox": [
+              513,
+              4,
+              27,
+              23
+            ],
+            "n_components": 2,
+            "scores": [
+              [
+                "\"",
+                0.797
+              ],
+              [
+                "”",
+                0.628
+              ],
+              [
+                "“",
+                0.595
+              ],
+              [
+                "「",
+                0.499
+              ]
+            ]
+          }
+        }
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 55.4,
+        "frames": {
+          "rest": 10.22,
+          "before": 10.0333,
+          "after": 12.3667,
+          "mid": 11.26
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -3572,6 +4003,104 @@
           0.001
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              416,
+              1109,
+              246,
+              71
+            ],
+            "ink_bbox": [
+              409,
+              1102,
+              260,
+              85
+            ],
+            "color": "#FEE300",
+            "outline_px": 6.89,
+            "outline_color": "#0A0000",
+            "outline_visibility": "visible",
+            "bg_color": "#58504C",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": 0.0,
+            "shadow_color": null,
+            "shadow": {
+              "method": "오른쪽 아래(+2,+2) 고리가 왼쪽 위(−2,−2) 고리보다 배경과 다른 화소가 뚜렷이 많으면 그림자 있음 → IoU(배경과 다른 테두리 밖 화소, 오른쪽 아래로 k px 옮긴 잉크) 최대인 k(포물선 보정)",
+              "ring_lower_right": 0.448,
+              "ring_upper_left": 0.254,
+              "scores": [
+                [
+                  2,
+                  0.036
+                ],
+                [
+                  3,
+                  0.073
+                ],
+                [
+                  4,
+                  0.107
+                ],
+                [
+                  5,
+                  0.137
+                ],
+                [
+                  6,
+                  0.165
+                ],
+                [
+                  7,
+                  0.192
+                ],
+                [
+                  8,
+                  0.219
+                ],
+                [
+                  9,
+                  0.244
+                ],
+                [
+                  10,
+                  0.268
+                ],
+                [
+                  11,
+                  0.29
+                ],
+                [
+                  12,
+                  0.31
+                ]
+              ],
+              "status": "measured",
+              "shadow_px": 0.0,
+              "shadow_color": null
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 83.2,
+        "frames": {
+          "rest": 15.32,
+          "before": 15.0,
+          "after": 17.5667,
+          "mid": 16.41
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",
@@ -4072,6 +4601,54 @@
           0.0
         ]
       ],
+      "line_style": {
+        "lines": [
+          {
+            "status": "measured",
+            "fill_bbox": [
+              186,
+              1403,
+              709,
+              62
+            ],
+            "ink_bbox": [
+              186,
+              1403,
+              709,
+              62
+            ],
+            "color": "#FFFFFF",
+            "outline_px": null,
+            "outline_color": null,
+            "outline_visibility": "indistinguishable",
+            "bg_color": "#000000",
+            "box": {
+              "present": "absent"
+            },
+            "shadow_px": null,
+            "shadow_color": null,
+            "shadow": {
+              "status": "unmeasured",
+              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+            }
+          }
+        ],
+        "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"
+      },
+      "emoji": {
+        "status": "measured",
+        "n_blobs": 0,
+        "blobs": [],
+        "min_area_px": 62.7,
+        "frames": {
+          "rest": 15.34,
+          "before": 15.0,
+          "after": 19.0667,
+          "mid": 17.17
+        },
+        "static_check": true,
+        "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"
+      },
       "font": {
         "status": "measured",
         "method": "identify",

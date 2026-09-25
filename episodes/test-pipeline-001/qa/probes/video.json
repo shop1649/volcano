@@ -33,7 +33,8 @@
           "type": "flash",
           "t": 7.5,
           "dur": 0.12,
-          "color": "#FFFFFF"
+          "color": "#FFFFFF",
+          "scope": "region"
         },
         "observed": {
           "type": "flash",
@@ -41,7 +42,17 @@
           "peak_t": 7.5,
           "dur": 0.1,
           "color": "#FDFDFD",
-          "score": 120.9
+          "score": 120.9,
+          "scope_obs": {
+            "t_peak": 7.5,
+            "t_before": 7.3667,
+            "outside_share": 0.6169,
+            "progress_inside": 1.007,
+            "progress_outside": -0.0,
+            "outside_contrast": 441.7,
+            "status": "measured",
+            "scope": "region"
+          }
         },
         "type_ok": true,
         "timing_ok": true
@@ -387,6 +398,259 @@
           731.0,
           970.9
         ],
+        "recenter_obs": {
+          "method": "출력 프레임끼리의 유사변환(ORB+RANSAC) 고정점 vs 렌더러 규칙(edit.resolve.src_to_region)의 recenter false/true 고정점",
+          "n": 79,
+          "tolerance_px": 30.4,
+          "separation_min_px": 60.8,
+          "samples": [
+            {
+              "t": 1.3,
+              "anchor_t": 0.0,
+              "scale": 1.1,
+              "measured": [
+                719.5,
+                962.6
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1087.3,
+                1016.3
+              ],
+              "err_false": 14.7,
+              "err_true": 371.7,
+              "sep": 358.7
+            },
+            {
+              "t": 1.4,
+              "anchor_t": 0.0,
+              "scale": 1.1,
+              "measured": [
+                728.4,
+                971.0
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1084.2,
+                1016.3
+              ],
+              "err_false": 3.0,
+              "err_true": 358.7,
+              "sep": 355.7
+            },
+            {
+              "t": 1.4,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                737.1,
+                968.0
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1083.2,
+                1016.3
+              ],
+              "err_false": 6.6,
+              "err_true": 349.5,
+              "sep": 354.7
+            },
+            {
+              "t": 1.4,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                731.7,
+                970.5
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.8,
+                1016.3
+              ],
+              "err_false": 0.8,
+              "err_true": 354.0,
+              "sep": 354.2
+            },
+            {
+              "t": 1.5,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                723.8,
+                969.1
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.5,
+                1016.3
+              ],
+              "err_false": 7.9,
+              "err_true": 361.8,
+              "sep": 354.0
+            },
+            {
+              "t": 1.5,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                727.6,
+                972.4
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.4,
+                1016.3
+              ],
+              "err_false": 4.0,
+              "err_true": 357.5,
+              "sep": 353.8
+            },
+            {
+              "t": 1.5,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                730.9,
+                970.9
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.3,
+                1016.3
+              ],
+              "err_false": 0.6,
+              "err_true": 354.3,
+              "sep": 353.8
+            },
+            {
+              "t": 1.6,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                731.0,
+                971.1
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.2,
+                1016.3
+              ],
+              "err_false": 0.4,
+              "err_true": 354.1,
+              "sep": 353.7
+            },
+            {
+              "t": 1.6,
+              "anchor_t": 0.0,
+              "scale": 1.3,
+              "measured": [
+                726.3,
+                970.4
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.2,
+                1016.3
+              ],
+              "err_false": 5.2,
+              "err_true": 358.9,
+              "sep": 353.7
+            },
+            {
+              "t": 1.6,
+              "anchor_t": 0.0,
+              "scale": 1.3,
+              "measured": [
+                729.0,
+                976.1
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.2,
+                1016.3
+              ],
+              "err_false": 5.5,
+              "err_true": 355.5,
+              "sep": 353.7
+            },
+            {
+              "t": 1.7,
+              "anchor_t": 0.0,
+              "scale": 1.2,
+              "measured": [
+                731.1,
+                973.0
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.2,
+                1016.3
+              ],
+              "err_false": 1.8,
+              "err_true": 353.8,
+              "sep": 353.7
+            },
+            {
+              "t": 1.7,
+              "anchor_t": 0.0,
+              "scale": 1.3,
+              "measured": [
+                730.6,
+                972.3
+              ],
+              "rule_false": [
+                731.4,
+                971.3
+              ],
+              "rule_true": [
+                1082.2,
+                1016.3
+              ],
+              "err_false": 1.3,
+              "err_true": 354.3,
+              "sep": 353.7
+            }
+          ],
+          "err_false_px": 3.0,
+          "err_true_px": 354.0,
+          "separation_px": 353.7,
+          "status": "measured",
+          "recenter": false
+        },
         "source_ratio": 1.0001,
         "zoom_ratio_corrected": 1.2504,
         "status": "measured",
@@ -2043,6 +2307,82 @@
         "reason": "출처 기록 없음(warehouse/overlays/650166430c4b….json) — `python -m shortkit clean detect --source assets/test/generated/video/head-pose-face-detection-female-and-male.mp4`"
       }
     ]
+  },
+  "arrows": {
+    "items": [
+      {
+        "id": "d_arrow",
+        "status": "measured",
+        "head_len_ratio": 0.45,
+        "head_width_ratio": 0.619,
+        "shaft_width_ratio": 0.238,
+        "outline_px": 5.34,
+        "outline_color": "#FFFDFC",
+        "size_px": 120.1,
+        "color": "#FD2928",
+        "rotation_deg": 359.5,
+        "frame_t": 8.133,
+        "bbox": [
+          506,
+          730,
+          74,
+          119
+        ],
+        "t": 8.0,
+        "end": 10.767
+      }
+    ],
+    "detector": "shortkit.reference.motion.detect_decorations",
+    "detector_status": "experimental",
+    "resolution": [
+      1080,
+      1920
+    ],
+    "rejected": {
+      "short": 1,
+      "small": 0,
+      "not_sudden": 0,
+      "text_like": 0,
+      "not_flat": 0,
+      "shape": 0
+    }
+  },
+  "canvas_geometry": {
+    "fit": [
+      {
+        "clip_id": "s1",
+        "expected": "cover",
+        "t": 2.0,
+        "band_share": 0.001,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s2",
+        "expected": "cover",
+        "t": 5.7333,
+        "band_share": 0.0035,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s3",
+        "expected": "cover",
+        "t": 10.2333,
+        "band_share": 0.003,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s4",
+        "expected": "cover",
+        "t": 16.0,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      }
+    ],
+    "blur": null
   },
   "protected": [
     {

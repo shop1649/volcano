@@ -124,5 +124,7 @@ def test_cut_rows_use_the_reference_definition(temp_root):
     want = cut_structure([2.0, 6.5, 8.0], 10.0)
     assert rows["structure.cuts:rate_ref"]["observed"]["cuts_per_10s"] == want["cuts_per_10s"] == 3.0
     assert rows["structure.cuts:shot_len_ref"]["observed"]["shot_len_median_s"] == want["shot_len_median_s"] == 2.0
-    assert checks.declarations()["structure.cuts"] == ["structure.cuts_per_10s.p10", "structure.cuts_per_10s.p90",
-                                                       "structure.shot_len_s.p10", "structure.shot_len_s.p90"]
+    # wave 5: the rows also read p50 (the output's position against the reference median is reported)
+    assert checks.declarations()["structure.cuts"] == ["structure.cuts_per_10s.p10", "structure.cuts_per_10s.p50",
+                                                       "structure.cuts_per_10s.p90", "structure.shot_len_s.p10",
+                                                       "structure.shot_len_s.p50", "structure.shot_len_s.p90"]

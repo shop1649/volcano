@@ -5,27 +5,27 @@
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스(같은 절대 시각 비교): 없음(못 잼) (분석 파일: 없음)
 - 포맷 UNCLASSIFIED 대표 영상(formats.yaml): 못 잼 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- 측정 시각: 2026-09-25T08:48:03+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
+- 측정 시각: 2026-09-25T10:38:28+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
-## 최종 관문: **불합격 — 못 잼 68건(필수 1, 참고 67)**
+## 최종 관문: **불합격 — 못 잼 71건(필수 1, 참고 70)**
 - ✗ G2: 필수 항목 못 잼 1건 — 못 잼은 완료가 아님 — caption.reveal:reveal
 - △ R1: 레퍼런스 같은 시각 비교 없음/불충분: 레퍼런스 영상 없음 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- △ P1: 프리셋 미측정(임시값) 키 270개
-- △ P2: 레퍼런스 대비 못 잼 61건
+- △ P1: 프리셋 미측정(임시값) 키 266개
+- △ P2: 레퍼런스 대비 못 잼 64건
 - △ P3: 테스트 모드 출력(파이프라인 검증용) — 게시 불가
 - △ P4: 필수 표시가 없는 못 잼 6건 — 못 잰 항목은 완료로 치지 않음
 
 ## 요약
-- 전체 213행: 같다 145 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 68
-- 계획 대비(출력이 계획대로인가): {'same': 145, 'unmeasured': 7}
-- 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 61}
-- 프리셋 미측정(임시값) 키: 270개
+- 전체 218행: 같다 147 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 71
+- 계획 대비(출력이 계획대로인가): {'same': 147, 'unmeasured': 7}
+- 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 64}
+- 프리셋 미측정(임시값) 키: 266개
 
 | 분류 | 같다 | 다르다 | 못 잼 |
 |---|---:|---:|---:|
-| 화면 구성 | 4 | 0 | 3 |
+| 화면 구성 | 4 | 0 | 5 |
 | 글자 위치 | 14 | 0 | 8 |
-| 자막 내용·말투 | 8 | 0 | 3 |
+| 자막 내용·말투 | 9 | 0 | 3 |
 | 자막 스타일 | 7 | 0 | 4 |
 | 폰트 | 11 | 0 | 4 |
 | 자막 타이밍 | 7 | 0 | 4 |
@@ -36,7 +36,7 @@
 | 식별 요소 | 1 | 0 | 2 |
 | 로고 잔류 | 1 | 0 | 2 |
 | 얼굴·손·물체 가림 | 18 | 0 | 0 |
-| 음악 구간 | 10 | 0 | 5 |
+| 음악 구간 | 11 | 0 | 6 |
 | 원음 | 1 | 0 | 2 |
 | 효과음 종류별 개수 | 9 | 0 | 5 |
 | 사건과의 시차 | 3 | 0 | 0 |
@@ -55,9 +55,11 @@
 | 화면 해상도·프레임레이트 (레퍼런스 대비) | 못 잼 | {"canvas.width":1080,"canvas.height":1920,"canvas.fps":30} | {"width":1080,"height":1920,"fps":30.0} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: canvas.width, canvas.height, canvas.fps — 출력이 임시값… |
 | 영상 영역 위치·크기 | 못 잼 | {"rect":[0.0,656.0,1080.0,608.0],"resolution":[1080,1920]} | {"rect":[0.0,656.0,1080.0,608.0],"resolution":[1080,1920]} | 같다 (참고) | 아니오 | 움직이는 화소·배경색 차이로 측정(휴리스틱) |
 | 영상 영역 (레퍼런스 대비) | 못 잼 | {"canvas.video_region.x":0,"canvas.video_region.y":656,"canvas.video_region.w":1080,"canv… | {"rect":[0.0,656.0,1080.0,608.0]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: canvas.video_region.x, canvas.video_region.y, can… |
-| 배경(색/소스 블러) | 못 잼 | {"type":"color","color":"#000000"} | {"type":"color","color":"#000000","temporal_std":0.01} | 같다 (참고) | 아니오 | blur_sigma(블러 강도)는 출력에서 재지 않음 — 이 행이 검사하는 키가 아님 |
+| 배경(색/소스 블러) | 못 잼 | {"type":"color","color":"#000000"} | {"type":"color","color":"#000000","temporal_std":0.01} | 같다 (참고) | 아니오 | 흐림 정도(blur_sigma)는 canvas.background:blur 행 |
 | 배경 (레퍼런스 대비) | 못 잼 | {"canvas.background.type":"color","canvas.background.color":"#000000"} | {"type":"color","color":"#000000","temporal_std":0.01} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color —… |
 | 자막이 안전 여백 안에 있음 | 못 잼 | {"left":54,"right":54,"top":110,"bottom":250} | {"min_margin_px":{"left":81,"top":297,"right":79,"bottom":455}} | 같다 (참고) | 아니오 | — |
+| 영상 영역 채우기(cover/contain) | — | {"s1":"cover","s2":"cover","s3":"cover","s4":"cover","s5":"cover"} | {"clips":[{"clip_id":"s1","t":2.4,"status":"unmeasured","fit":null,"err":null,"band_share… | 못 잼 (참고) | 아니오 | 모든 클립에서 cover 와 contain 렌더링이 같아(소스 비율 = 영역 비율) 채우기 방식을 출력에서 구별할 수 없음 |
+| 영상 영역 채우기 (레퍼런스 대비) | 못 잼 | {"canvas.video_region.fit":"cover"} | — | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 … |
 
 ### 글자 위치
 
@@ -99,24 +101,25 @@
 | 자막 문구(OCR) [c_sit4·situation] "그리고 둘 다 떠난다" | — | 그리고 둘 다 떠난다 | {"ocr":"그리고 둘 다 떠난다","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
 | 반전 전에 반전 내용을 미리 말하지 않음 | — | {"reveal":{"none":true,"reason":"빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 … | — | 못 잼 | 아니오 | plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~… |
 | 자막 말투(종결어미, OCR) | 못 잼 | 반말_구어체 | {"n":4,"counts":{"명사형/기타":2,"반말":4},"mode":"반말_구어체","items":[{"text":"빈 방 에 들어온 사람들","cla… | 같다 (참고) | 아니오 | OCR 문구의 종결 어미를 레퍼런스 분석기·validate 와 같은 분류기(reference.aggregate.ending_… |
-| 자막 이모지 사용 | — | {"text.tone.emoji":false} | — | 못 잼 (참고) | 아니오 | 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음 |
+| 자막 이모지(색 글리프) — 계획 대비 | — | {"planned_emoji":{"c_title":0,"c_desc":0,"c_sit1":0,"c_sit2":0,"c_rx":0,"c_sit3":0,"c_sit… | {"per_caption":[{"caption":"c_title","planned":0,"observed":0,"status":"measured"},{"capt… | 같다 (참고) | 아니오 | 자막이 그린 화소 중 표시 중 정지·채도 높음·자막 색(채움·강조·외곽선·그림자·박스)과 그 혼합이 아닌 덩어리를 색 글리프… |
+| 자막 이모지 (레퍼런스 대비) | 못 잼 | {"text.tone.emoji":false} | {"captions_with_emoji":0,"unmeasured_captions":[]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.… |
 | 자막 말투 (레퍼런스 대비) | 못 잼 | {"text.tone.register":"반말_구어체"} | {"register":"반말_구어체"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.tone.register — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 … |
 
 ### 자막 스타일
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| 자막 색·외곽선·박스 [c_title·title] "빈 방에 들어온 사람들" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [c_desc·description] "설정 연결 검증 테스트 2편" | 못 잼 | {"color":"#E6E6E6","outline_px":4.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#E5E5E5","outline_px":11,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [c_sit1·situation] "한 사람이 빈 방을 가로질러 나간" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.54s [프레임](frames/cap_c_sit1_0000540.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [c_sit2·situation] "한 남성이 카메라 앞까지 걸어온다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=5.24s [프레임](frames/cap_c_sit2_0005240.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [c_rx·reaction] "빤히" | 못 잼 | {"color":"#FFE400","outline_px":7.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FEE300","outline_px":7,"outline_color":"#040000","box_alpha":0.024,"highl… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) |
-| 자막 색·외곽선·박스 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌) |
-| 자막 색·외곽선·박스 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.color":"#E6E6E6"} | {"fill_color":"#E5E5E5"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와… |
-| 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.color":"#FFE400","text.roles.reaction.outline_px":7,"text.roles.rea… | {"fill_color":"#FEE300","outline_px":7.0,"outline_color":"#040000","box_alpha":0.024} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.ou… |
-| 자막 색·외곽선·박스 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.color":"#FFFFFF"} | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같… |
-| 자막 색·외곽선·박스 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.color":"#FFFFFF"} | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판… |
+| 자막 색·외곽선·그림자·박스 [c_title·title] "빈 방에 들어온 사람들" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.12s [프레임](frames/cap_c_title_0000120.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [c_desc·description] "설정 연결 검증 테스트 2편" | 못 잼 | {"color":"#E6E6E6","outline_px":4.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#E5E5E5","outline_px":11,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.32s [프레임](frames/cap_c_desc_0000320.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [c_sit1·situation] "한 사람이 빈 방을 가로질러 나간" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=0.54s [프레임](frames/cap_c_sit1_0000540.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [c_sit2·situation] "한 남성이 카메라 앞까지 걸어온다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=5.24s [프레임](frames/cap_c_sit2_0005240.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [c_rx·reaction] "빤히" | 못 잼 | {"color":"#FFE400","outline_px":7.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FEE300","outline_px":7,"outline_color":"#040000","box_alpha":0.024,"highl… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음 |
+| 자막 색·외곽선·그림자·박스 [c_sit3·situation] "두 사람이 나란히 와서 선다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [c_sit4·situation] "그리고 둘 다 떠난다" | 못 잼 | {"color":"#FFFFFF","outline_px":6.0,"outline_color":"#000000","box":false,"box_alpha":nul… | {"fill_color":"#FFFFFF","outline_px":16,"outline_color":"#000000","box_alpha":null,"highl… | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50… |
+| 자막 색·외곽선·그림자·박스 [description] (레퍼런스 대비) | 못 잼 | {"text.roles.description.color":"#E6E6E6"} | {"fill_color":"#E5E5E5"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와… |
+| 자막 색·외곽선·그림자·박스 [reaction] (레퍼런스 대비) | 못 잼 | {"text.roles.reaction.color":"#FFE400","text.roles.reaction.outline_px":7,"text.roles.rea… | {"fill_color":"#FEE300","outline_px":7.0,"outline_color":"#040000","box_alpha":0.024} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.ou… |
+| 자막 색·외곽선·그림자·박스 [situation] (레퍼런스 대비) | 못 잼 | {"text.roles.situation.color":"#FFFFFF"} | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같… |
+| 자막 색·외곽선·그림자·박스 [title] (레퍼런스 대비) | 못 잼 | {"text.roles.title.color":"#FFFFFF"} | {"fill_color":"#FFFFFF"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판… |
 
 ### 폰트
 
@@ -191,8 +194,8 @@
 | 소스 구간 [s4] | — | {"src_in":32.0,"src_out":37.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.056,"samples":[{"t":14.636,"expected_src_t":33.136,"matched_src_t":33.083,… | 같다 | 아니오 | t=14.64s |
 | 소스 구간 [s5] | — | {"src_in":42.0,"src_out":44.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.037,"samples":[{"t":19.34,"expected_src_t":42.42,"matched_src_t":42.417,"n… | 같다 | 아니오 | t=19.34s |
 | 같은 원본 장면 반복(표시 없는 다시보기) 0 | — | {"unmarked_repeats":0,"min_overlap_s":0.05} | {"repeats":[],"not_measured":[]} | 같다 | 아니오 | 출력에서 잰 클립별 소스 구간이 서로 겹치지 않음 |
-| 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.cuts_per_10s.p10":null,"structure.cuts_per_10s.p90":null} | {"cuts_per_10s":1.333,"n_cuts":3,"duration":22.5,"types":["cut","flash"]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10… |
-| 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.shot_len_s.p10":null,"structure.shot_len_s.p90":null} | {"shot_len_median_s":4.917,"shots_s":[4.8,8.667,5.033,4.0]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p9… |
+| 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.cuts_per_10s.p10":null,"structure.cuts_per_10s.p50":null,"structure.cuts_per_… | {"cuts_per_10s":1.333,"n_cuts":3,"duration":22.5,"types":["cut","flash"]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: structure.cuts_per_10s.p10, structure.cuts_per_10… |
+| 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.shot_len_s.p10":null,"structure.shot_len_s.p50":null,"structure.shot_len_s.p9… | {"shot_len_median_s":4.917,"shots_s":[4.8,8.667,5.033,4.0]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: structure.shot_len_s.p10, structure.shot_len_s.p5… |
 
 ### 모션(확대·정지·전환)
 
@@ -200,7 +203,7 @@
 |---|---|---|---|---|---|---|
 | 전환 종류·길이 [s2] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":48.27} | 같다 | 아니오 | t=4.80s |
 | 전환 종류·길이 [s3] | 못 잼 | {"type":"cut","dur":0.0,"visible":"none"} | {"type":"none","dur":null,"score":0.5} | 같다 | 아니오 | t=9.80s 같은 장면이 이어지는 편집점: 보이는 전환이 없어야 맞음(계획 cut = 이어 붙이기) |
-| 전환 종류·길이 [s4] | 못 잼 | {"type":"flash","dur":0.12,"color":"#FFFFFF"} | {"type":"flash","dur":0.1,"score":122.6,"color":"#FDFDFD"} | 같다 | 아니오 | t=13.47s 플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위(scope: 영상… |
+| 전환 종류·길이 [s4] | 못 잼 | {"type":"flash","dur":0.12,"color":"#FFFFFF","scope":"region"} | {"type":"flash","dur":0.1,"score":122.6,"color":"#FDFDFD","scope":"region","scope_measure… | 같다 | 아니오 | t=13.47s 플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위 region (기… |
 | 전환 종류·길이 [s5] | 못 잼 | {"type":"cut","dur":0.0} | {"type":"cut","dur":0.0,"score":10.49} | 같다 | 아니오 | t=18.50s |
 | 재생 속도 [s5] | 못 잼 | 0.5 | {"speed":0.499,"samples":11,"quantisation_frac":0.0476} | 같다 | 아니오 | — |
 | 줌 없음 확인 [s1] | — | {"final_ratio":1.0} | {"max_dev":0.0003,"final_ratio":1.0,"source_ratio":0.9999,"corrected":1.0001,"median_inli… | 같다 (참고) | 아니오 | 소스 자체의 카메라 줌도 여기에 잡힘 |
@@ -209,12 +212,12 @@
 | 줌 없음 확인 [s4] | — | {"final_ratio":1.0} | {"max_dev":0.7453,"final_ratio":1.1449,"source_ratio":0.9988,"corrected":1.1462,"median_i… | 같다 (참고) | 아니오 | 특징점 배율 곡선은 0.75 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9… |
 | 줌 없음 확인 [s5] | — | {"final_ratio":1.0} | {"max_dev":0.1897,"final_ratio":1.1884,"source_ratio":1.0003,"corrected":1.188,"median_in… | 같다 (참고) | 아니오 | 특징점 배율 곡선은 0.19 움직였지만, 출력 프레임이 계획 기하(줌 없음)로 놓은 소스 프레임과 같음 (NCC 중앙 0.9… |
 | 연속 세그먼트 줌 횟수(같은 효과 쌓기 금지) | 못 잼 | {"max":1} | {"measured":0} | 같다 | 아니오 | — |
-| 줌 배율·길이·가속 곡선 (레퍼런스 대비) | 못 잼 | {"motion.zoom.scale_to":1.25} | — | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하… |
+| 줌 배율·길이·가속 곡선·고정점 규칙 (레퍼런스 대비) | 못 잼 | {"motion.zoom.scale_to":1.25} | — | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하… |
 | 정지(프리즈) [s3] | 못 잼 | {"start":10.8,"hold":0.7} | {"presence":"present","start":10.8,"hold":0.7,"mean_diff":0.0182} | 같다 | 아니오 | t=10.80s |
 | 계획에 없는 정지 화면 | — | [] | [] | 같다 | 아니오 | 소스도 정지해 있으면 제외; 판단 불가(소스 없음)면 포함 |
 | 영상당 정지 횟수 | 못 잼 | {"max":2} | {"count":1} | 같다 | 아니오 | — |
 | 정지 길이 (레퍼런스 대비) | 못 잼 | {"motion.freeze.hold_s":0.7} | {"hold_s":0.7} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.freeze.hold_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하… |
-| 전환 종류·길이·플래시 색 (레퍼런스 대비) | 못 잼 | {"motion.transitions.default":"cut","motion.transitions.flash.dur_s":0.12,"motion.transit… | {"mode":"cut","flash_dur":0.1,"flash_color":"#FDFDFD"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: motion.transitions.default, motion.transitions.fl… |
+| 전환 종류·길이·플래시 색·범위 (레퍼런스 대비) | 못 잼 | {"motion.transitions.default":"cut","motion.transitions.flash.dur_s":0.12,"motion.transit… | {"mode":"cut","flash_dur":0.1,"flash_color":"#FDFDFD","flash_scope":"region"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.fl… |
 | 느린 재생 배율 (레퍼런스 대비) | 못 잼 | {"motion.speed.slowmo_factor":0.5} | {"slowmo":0.499} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: motion.speed.slowmo_factor — 출력이 임시값과 같아도 레퍼런스와 같… |
 | 확대(줌) 있다/없다 (레퍼런스 대비) | 못 잼 | {"presence.zoom":"unmeasured"} | {"presence":"absent","basis":"모든 클립에서 배율 변화 없음(출력 측정)","reference_share":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: presence.zoom — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레… |
 | 정지 있다/없다 (레퍼런스 대비) | 못 잼 | {"presence.freeze":"unmeasured"} | {"presence":"present","basis":"출력의 반복 프레임 구간 1개","reference_share":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: presence.freeze — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.… |
@@ -241,7 +244,7 @@
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
 | 레퍼런스 채널명·식별 문구 없음 | {"identity_exclusions.forbidden_text":"해당 없음(rule… | {"absent":["조슈아매거진","조슈아 매거진","joshuamagazine","joshua magazine","JOSHUA MAGAZINE"]} | {"hits":[],"frames_ocr":26} | 같다 | 아니오 | 1초 간격 전체 프레임 + 각 클립 중간 OCR |
-| 레퍼런스 로고 템플릿 없음 | {"identity_exclusions.logo_templates_dir":"해당 없음(… | {"templates_dir":"presets/joshuamagazine/reference/identity_templates"} | — | 못 잼 (참고) | 아니오 | 레퍼런스 로고 템플릿이 없어 글자 없는 로고 대조 못 함 — 레퍼런스 영상에서 로고를 잘라 presets/joshuamaga… |
+| 레퍼런스 로고 템플릿 없음 | {"identity_exclusions.logo_templates_dir":"해당 없음(… | {"templates_dir":"presets/joshuamagazine/reference/identity_templates","manifest":"preset… | {"manifest":{"file":"presets/joshuamagazine/reference/identity_templates/manifest.json","… | 못 잼 (참고) | 아니오 | 식별 템플릿 기록이 완전하지 않음(상태 unmeasured): 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+… |
 | 레퍼런스와 같은 녹화(영상) 재사용 없음 | — | {"same_recording_as_reference":false} | {"excluded":null,"matched_ref_video_id":null,"distance":null,"matched_keyframes":0,"n_key… | 못 잼 (참고) | 아니오 | 레퍼런스 영상 지문(exclusions.jsonl reference_footage) 없음 → 같은 녹화 여부 못 잼 (URL… |
 
 ### 로고 잔류
@@ -291,6 +294,8 @@
 | 덕킹은 출력에서 잰 말소리 밑에서만 | {"audio.ducking.only_under_kept_dialogue":"해당 없음(… | {"planned_speech_out":[],"max_without_speech_s":0.25} | {"ducks":[],"speech_out":[],"speech_status":"measured"} | 같다 | 아니오 | 출력에서 잰 덕킹 없음(시작·끝 페이드·의도적 정적 제외) |
 | 덕킹은 원음이 실제로 들리는 곳에서만 | — | 덕킹 구간 ⊆ 원음 존재 구간 | {"ducks_without_original":[],"original_present":[]} | 같다 | 아니오 | — |
 | 계획에 없는 BGM 끊김 | — | [] | [] | 같다 | 아니오 | — |
+| BGM 크기(최종 프로그램 음량 기준) | 못 잼 | {"gain_db":0.0,"definition":"깨끗한 음원 대비 dB, 최종 프로그램 음량에서"} | {"level_db":0.63,"ls_gain_db":-0.07,"mix_lufs":-14.7,"target_lufs":-14.0} | 같다 | 아니오 | t=0.00s 깨끗한 음원 LS 이득(0.25 s 창 이득의 p90 = BGM 기준 레벨, dB) + 목표 LUFS − 출력 통합 LUFS… |
+| BGM 크기 (레퍼런스 대비) | 못 잼 | {"audio.bgm.gain_db":0.0} | {"level_db":0.63} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: audio.bgm.gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않… |
 | BGM 있다/없다 (레퍼런스 대비) | 못 잼 | {"presence.bgm":"unmeasured"} | {"presence":"present","basis":"계획한 음원 파형을 출력에서 찾음","reference_share":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: presence.bgm — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼… |
 | 덕킹 있다/없다 (레퍼런스 대비) | 못 잼 | {"presence.ducking":"unmeasured"} | {"presence":"present","basis":"출력에서 잰 BGM 낮춤 1구간","reference_share":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: presence.ducking — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음… |
 | 의도적 정적 있다/없다 (레퍼런스 대비) | 못 잼 | {"presence.intentional_silence":"unmeasured"} | {"presence":"absent","basis":"BGM 이득 곡선에 끊김 없음(시작·끝 페이드 제외)","reference_share":null} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: presence.intentional_silence — 출력이 임시값과 같아도 레퍼런스와… |
@@ -316,9 +321,9 @@
 | 효과음 개수 [click] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=10.80s |
 | 효과음 개수 [ding] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=16.30s |
 | 효과음 개수 [whoosh] (계획 대비) | — | 1 | 1 | 같다 | 아니오 | t=4.55s |
-| 효과음 [fx1] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"whoosh"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(2026-09-… | 못 잼 (참고) | 아니오 | t=4.55s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(yout… |
-| 효과음 [fx2] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"click"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(2026-09-… | 못 잼 (참고) | 아니오 | t=10.80s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(yout… |
-| 효과음 [fx3] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"ding"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(2026-09-… | 못 잼 (참고) | 아니오 | t=16.30s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(yout… |
+| 효과음 [fx1] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"whoosh"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(상태 unmea… | 못 잼 (참고) | 아니오 | t=4.55s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 5… |
+| 효과음 [fx2] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"click"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(상태 unmea… | 못 잼 (참고) | 아니오 | t=10.80s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 5… |
+| 효과음 [fx3] 종류 = 소리 지문(카탈로그 대비) | 못 잼 | {"type":"ding"} | {"catalog_type":null,"status":"unmeasured","type_id":null,"reason":"효과음 카탈로그 미측정(상태 unmea… | 못 잼 (참고) | 아니오 | t=16.30s 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 5… |
 | 효과음 종류별 개수 (레퍼런스 포맷 범위 대비) | 못 잼 | 레퍼런스 카탈로그의 포맷별 관측 범위 | {"종류 못 정함":3} | 못 잼 (참고) | 아니오 | sfx_catalog.json 미측정: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), De… |
 | 효과음 크기 (레퍼런스 대비) | 못 잼 | {"audio.sfx.gain_db_default":-8.0} | {"gain_db":-8.11} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: audio.sfx.gain_db_default — 출력이 임시값과 같아도 레퍼런스와 같다… |
 
@@ -351,7 +356,7 @@
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
 | 영상 길이 | — | 22.5 | 22.5 | 같다 | 아니오 | — |
-| 영상 길이 (레퍼런스 분포 대비) | 못 잼 | {"structure.duration_s.p10":null,"structure.duration_s.p90":null} | {"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: structure.duration_s.p10, structure.duration_s.p9… |
+| 영상 길이 (레퍼런스 분포 대비) | 못 잼 | {"structure.duration_s.p10":null,"structure.duration_s.p50":null,"structure.duration_s.p9… | {"duration":22.5} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 3개: structure.duration_s.p10, structure.duration_s.p5… |
 | 첫 시간제 자막 시각 (레퍼런스 대비) | 못 잼 | {"structure.first_caption_at_s":0.0} | {"first_caption_at_s":0.267,"caption":"c_sit1","role":"situation"} | 못 잼 (참고) | 아니오 | t=0.27s 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와… |
 | 표지 프레임에 제목 문구 표시 | 못 잼 | {"t":0.0,"text":"빈 방에 들어온 사람들","role":"title","source":"first_frame"} | {"ocr":"빈 방 에 들어온 사람들","similarity":1.0,"role_caption_visible":true} | 같다 (참고) | 아니오 | t=0.00s |
 | 표지 구성 (레퍼런스 대비) | 못 잼 | {"cover.source":"first_frame","cover.text_role":"title"} | {"t":0.0,"source":"first_frame","text_role":"title","text_role_visible":true,"similarity"… | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스… |
@@ -369,57 +374,60 @@
 
 - 화면 해상도·프레임레이트 (레퍼런스 대비) (`canvas.format:format_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.width, canvas.height, canvas.fps — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 영상 영역 (레퍼런스 대비) (`canvas.video_region:region_ref`): 레퍼런스 미측정(임시값) 키 4개: canvas.video_region.x, canvas.video_region.y, canvas.video_region.w, canvas.video_region.h — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
-- 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+- 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: canvas.background.blur_sigma — background.type=color(흐린 원본 배경 아님) → 흐림 정도가 쓰이지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
+- 영상 영역 채우기(cover/contain) (`canvas.video_region:fit`): 모든 클립에서 cover 와 contain 렌더링이 같아(소스 비율 = 영역 비율) 채우기 방식을 출력에서 구별할 수 없음 — 제작 영향: 화면 구성을 확인하지 못함
+- 영상 영역 채우기 (레퍼런스 대비) (`canvas.video_region:fit_ref`): 레퍼런스 미측정(임시값) 키 1개: canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 구별 가능한 클립의 채우기 방식(최빈) — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - **필수** 반전 전에 반전 내용을 미리 말하지 않음 (`caption.reveal:reveal`): plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics 5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖 사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음)이라고 적었을 뿐 출력에서 잰 것이 아님 — 보호할 키워드가 없어 자막을 대조할 수 없음; 사람이 보고 `shortkit qa human-check --kind watch` 로 기록 — 제작 영향: 자막 문구·말투를 확인하지 못함
-- 자막 이모지 사용 (`caption.tone:emoji`): 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음 — 제작 영향: 자막 문구·말투를 확인하지 못함
+- 자막 이모지 (레퍼런스 대비) (`caption.tone:emoji_ref`): 레퍼런스 미측정(임시값) 키 1개: text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. text.tone.emoji=false → 모든 자막에 색 글리프 0개(못 잰 자막이 있으면 못 잼); true → 허용 — 제작 영향: 자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음
 - 자막 위치 [description] (레퍼런스 대비) (`caption.position:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.anchor.x, text.roles.description.anchor.y — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [description] (레퍼런스 대비) (`caption.size:description_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.description.size_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [description] (레퍼런스 대비) (`caption.style:description_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음 — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·그림자·박스 [description] (레퍼런스 대비) (`caption.style:description_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌 — 제작 영향: 글자 색 불일치
 - 자막 글꼴·굵기 [description] (레퍼런스 대비) (`caption.font:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.font_name, text.roles.description.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 글꼴 = 역할 합동 판정이 동일(identical)인 면; 굵기 = 그 면의 OS/2 굵기 ≥ typography.BOLD_MIN_WEIGHT(ref fonts 와 같은 규칙) — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [description] (레퍼런스 대비) (`caption.timing:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [description] (레퍼런스 대비) (`caption.motion:description_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [description] (레퍼런스 대비) (`caption.timing:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [description] (레퍼런스 대비) (`caption.motion:description_ref`): 레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [reaction] (레퍼런스 대비) (`caption.position:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.anchor.x, text.roles.reaction.anchor.y — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [reaction] (레퍼런스 대비) (`caption.size:reaction_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.reaction.size_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [reaction] (레퍼런스 대비) (`caption.style:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음 — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·그림자·박스 [reaction] (레퍼런스 대비) (`caption.style:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌 — 제작 영향: 글자 색 불일치
 - 자막 글꼴·굵기 [reaction] (레퍼런스 대비) (`caption.font:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.font_name, text.roles.reaction.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 글꼴 = 역할 합동 판정이 동일(identical)인 면; 굵기 = 그 면의 OS/2 굵기 ≥ typography.BOLD_MIN_WEIGHT(ref fonts 와 같은 규칙) — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [reaction] (레퍼런스 대비) (`caption.timing:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) (`caption.motion:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [reaction] (레퍼런스 대비) (`caption.timing:reaction_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [reaction] (레퍼런스 대비) (`caption.motion:reaction_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [situation] (레퍼런스 대비) (`caption.position:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.anchor.x, text.roles.situation.anchor.y — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [situation] (레퍼런스 대비) (`caption.size:situation_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.situation.size_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [situation] (레퍼런스 대비) (`caption.style:situation_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음 — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·그림자·박스 [situation] (레퍼런스 대비) (`caption.style:situation_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌 — 제작 영향: 글자 색 불일치
 - 자막 글꼴·굵기 [situation] (레퍼런스 대비) (`caption.font:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.font_name, text.roles.situation.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 글꼴 = 역할 합동 판정이 동일(identical)인 면; 굵기 = 그 면의 OS/2 굵기 ≥ typography.BOLD_MIN_WEIGHT(ref fonts 와 같은 규칙) — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [situation] (레퍼런스 대비) (`caption.timing:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
-- 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) (`caption.motion:situation_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [situation] (레퍼런스 대비) (`caption.timing:situation_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s — 제작 영향: 자막 등장 타이밍 불일치
+- 자막 등장·퇴장 모션 [situation] (레퍼런스 대비) (`caption.motion:situation_ref`): 레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 위치 [title] (레퍼런스 대비) (`caption.position:title_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.title.anchor.x, text.roles.title.anchor.y — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [title] (레퍼런스 대비) (`caption.size:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.size_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
-- 자막 색·외곽선·박스 [title] (레퍼런스 대비) (`caption.style:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음 — 제작 영향: 글자 색 불일치
+- 자막 색·외곽선·그림자·박스 [title] (레퍼런스 대비) (`caption.style:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌 — 제작 영향: 글자 색 불일치
 - 자막 글꼴·굵기 [title] (레퍼런스 대비) (`caption.font:title_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.title.font_name, text.roles.title.bold — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 글꼴 = 역할 합동 판정이 동일(identical)인 면; 굵기 = 그 면의 OS/2 굵기 ≥ typography.BOLD_MIN_WEIGHT(ref fonts 와 같은 규칙) — 제작 영향: 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치
-- 자막 표시 시간 [title] (레퍼런스 대비) (`caption.timing:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
-- 자막 등장·퇴장 모션 [title] (레퍼런스 대비) (`caption.motion:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
+- 자막 표시 시간 [title] (레퍼런스 대비) (`caption.timing:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0); timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
+- 자막 등장·퇴장 모션 [title] (레퍼런스 대비) (`caption.motion:title_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌 — 제작 영향: 자막 등장·퇴장 모션 불일치
 - 자막 말투 (레퍼런스 대비) (`caption.tone:tone_ref`): 레퍼런스 미측정(임시값) 키 1개: text.tone.register — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음
-- 줌 배율·길이·가속 곡선 (레퍼런스 대비) (`video.zoom:zoom_ref`): 레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 줌 중심 되돌리기(recenter)는 재지 않음 — 제작 영향: 확대·정지·전환의 크기/길이 불일치
+- 줌 배율·길이·가속 곡선·고정점 규칙 (레퍼런스 대비) (`video.zoom:zoom_ref`): 레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 고정점 규칙(recenter) = 출력에서 잰 줌 고정점이 렌더러 규칙(edit.resolve.src_to_region)의 false/true 중 어느 쪽과 맞는지; 재지 못한 키는 행에서 뺌 — 제작 영향: 확대·정지·전환의 크기/길이 불일치
 - 정지 길이 (레퍼런스 대비) (`video.freeze:freeze_ref`): 레퍼런스 미측정(임시값) 키 1개: motion.freeze.hold_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 확대·정지·전환의 크기/길이 불일치
-- 전환 종류·길이·플래시 색 (레퍼런스 대비) (`video.transitions:transitions_ref`): 레퍼런스 미측정(임시값) 키 3개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위(scope)는 재지 않음 — 제작 영향: 확대·정지·전환의 크기/길이 불일치
+- 전환 종류·길이·플래시 색·범위 (레퍼런스 대비) (`video.transitions:transitions_ref`): 레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color, motion.transitions.flash.scope — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위 = 플래시 정점에서 영상 영역 밖(자막·장식 제외)이 플래시 색으로 밝아졌는지(canvas) 아닌지(region); 재지 못한 키는 행에서 뺌 — 제작 영향: 확대·정지·전환의 크기/길이 불일치
 - 느린 재생 배율 (레퍼런스 대비) (`video.speed:speed_ref`): 레퍼런스 미측정(임시값) 키 1개: motion.speed.slowmo_factor — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 확대·정지·전환의 크기/길이 불일치
 - 장식 스타일 [circle] (레퍼런스 대비) (`decor.style:d_circle_ref`): 레퍼런스 미측정(임시값) 키 3개: decorations.circle.color, decorations.circle.stroke_px, decorations.circle.blink_hz — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화살표·원 등 장식 스타일 불일치
 - 장식 스타일 [box] (레퍼런스 대비) (`decor.style:d_box_ref`): 레퍼런스 미측정(임시값) 키 3개: decorations.box.color, decorations.box.stroke_px, decorations.box.blink_hz — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화살표·원 등 장식 스타일 불일치
-- 레퍼런스 로고 템플릿 없음 (`identity.logo_templates:all`): 레퍼런스 로고 템플릿이 없어 글자 없는 로고 대조 못 함 — 레퍼런스 영상에서 로고를 잘라 presets/joshuamagazine/reference/identity_templates 에 넣어야 함(템플릿을 만드는 단계가 아직 없음; 글자 로고는 OCR 검사만) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
+- 레퍼런스 로고 템플릿 없음 (`identity.logo_templates:all`): 식별 템플릿 기록이 완전하지 않음(상태 unmeasured): 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError("('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용 — `shortkit ref identity-templates` 다시 실행 — 글자 없는 로고는 OCR 검사(identity.forbidden_text)로 잡히지 않음 — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
 - 레퍼런스와 같은 녹화(영상) 재사용 없음 (`identity.reference_footage:all`): 레퍼런스 영상 지문(exclusions.jsonl reference_footage) 없음 → 같은 녹화 여부 못 잼 (URL 규칙만 확인) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
 - 원본 오버레이 검출 기록 [v_room] (`clean.residual:prov:v_room`): 출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
 - 원본 오버레이 검출 기록 [v_face] (`clean.residual:prov:v_face`): 출처 기록 없음(warehouse/overlays/d88ab9aa0363….json) — `python -m shortkit clean detect --source assets/test/generated/video/face-demographics-walking-and-pause.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
 - BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) (`audio.bgm:clean_file`): 레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사 — 제작 영향: BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가
 - BGM 곡·버전·속도·구간 (레퍼런스 대비) (`audio.bgm:bgm_ref`): 레퍼런스 미측정(임시값) 키 5개: audio.bgm.track_id, audio.bgm.title, audio.bgm.version, audio.bgm.tempo_ratio, audio.bgm.section_start_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. audio_bgm.is_match: 곡(track_id/제목)·버전·속도·구간이 모두 레퍼런스와 같아야 같다; 계획이 파일 경로로 BGM 을 지정해 라이브러리 곡 id 가 없음 → 곡 일치는 못 잼 — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
+- BGM 크기 (레퍼런스 대비) (`audio.bgm:level_ref`): 레퍼런스 미측정(임시값) 키 1개: audio.bgm.gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스와 같은 정의(ref audio-measure: 깨끗한 음원 LS 이득 + 목표 LUFS − 믹스 LUFS) — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
 - 보존 원음 크기 (레퍼런스 대비) (`audio.original:orig_ref`): 레퍼런스 미측정(임시값) 키 1개: audio.original.keep_gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 크기 = 보존 원음 통합 음량 − 프로그램 통합 음량(LU), ref audio-measure 와 같은 정의 — 제작 영향: 보존 원음 크기 불일치
-- 효과음 [fx1] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx1`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
-- 효과음 [fx2] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx2`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
-- 효과음 [fx3] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx3`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
+- 효과음 [fx1] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx1`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
+- 효과음 [fx2] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx2`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
+- 효과음 [fx3] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx3`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
 - 효과음 종류별 개수 (레퍼런스 포맷 범위 대비) (`audio.sfx.count:catalog`): sfx_catalog.json 미측정: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
 - 효과음 크기 (레퍼런스 대비) (`audio.sfx.placement:sfx_gain_ref`): 레퍼런스 미측정(임시값) 키 1개: audio.sfx.gain_db_default — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 효과음 크기 불일치
 - 음량 (레퍼런스 대비) (`audio.loudness:loudness_ref`): 레퍼런스 미측정(임시값) 키 2개: audio.loudness.integrated_lufs, audio.loudness.true_peak_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 최종 음량 불일치
-- 영상 길이 (레퍼런스 분포 대비) (`structure.duration:duration_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.duration_s.p10, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
+- 영상 길이 (레퍼런스 분포 대비) (`structure.duration:duration_ref`): 레퍼런스 미측정(임시값) 키 3개: structure.duration_s.p10, structure.duration_s.p50, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼 — 제작 영향: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
 - 첫 시간제 자막 시각 (레퍼런스 대비) (`structure.duration:first_caption_ref`): 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 정의: 제목·설명을 뺀 첫 시간제 자막의 출력 등장 시각(레퍼런스 분석기 structure.first_caption_at_s 와 같음) — 제작 영향: 영상 길이·전개 구조 불일치
-- 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) (`structure.cuts:rate_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD) — 제작 영향: 영상 길이·전개 구조 불일치
-- 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) (`structure.cuts:shot_len_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD) — 제작 영향: 영상 길이·전개 구조 불일치
+- 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) (`structure.cuts:rate_ref`): 레퍼런스 미측정(임시값) 키 3개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p50, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼 — 제작 영향: 영상 길이·전개 구조 불일치
+- 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) (`structure.cuts:shot_len_ref`): 레퍼런스 미측정(임시값) 키 3개: structure.shot_len_s.p10, structure.shot_len_s.p50, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼 — 제작 영향: 영상 길이·전개 구조 불일치
 - 표지 구성 (레퍼런스 대비) (`cover.frame:cover_ref`): 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 표지 프레임(cover.source: first_frame = 0초)에서 cover.text_role 역할 자막의 문구를 OCR 로 확인 — 제작 영향: 표지 구성 불일치
 - 확대(줌) 있다/없다 (레퍼런스 대비) (`presence:zoom`): 레퍼런스 미측정(임시값) 키 1개: presence.zoom — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스가 없다 → 우리도 없어야 같다; 레퍼런스 영상 모두 있다 → 우리도 있어야 같다; 일부 영상에만 있다 → 있다/없다 모두 관측 범위 안 — 제작 영향: 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음
 - 정지 있다/없다 (레퍼런스 대비) (`presence:freeze`): 레퍼런스 미측정(임시값) 키 1개: presence.freeze — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스가 없다 → 우리도 없어야 같다; 레퍼런스 영상 모두 있다 → 우리도 있어야 같다; 일부 영상에만 있다 → 있다/없다 모두 관측 범위 안 — 제작 영향: 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음
@@ -441,7 +449,7 @@
 - `episodes/test-coverage-001/qa/compare_sheet_p02.png`
 
 ## 결함 기록 (defects.jsonl)
-- 열림 1 / 이번에 고침 확인 0 / 재발 1 / 새로 등록 0 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
+- 열림 1 / 이번에 고침 확인 0 / 재발 0 / 새로 등록 0 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
 - 같은 검사 재확인: test-pipeline-001: caption.font=ok, caption.reveal=ok
 - 같은 검사 재확인: test-qa-bad: caption.font=problem, caption.reveal=problem
 - 같은 검사 재확인: test-qa-good: caption.font=ok, caption.reveal=problem

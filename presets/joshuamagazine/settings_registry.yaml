@@ -1,6 +1,6 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-25T08:33:22+00:00'
+synced_at: '2026-09-25T10:59:01+00:00'
 access_logs:
 - episodes/test-coverage-001/build/preset_access.json
 - episodes/test-coverage-001/build/preset_access_all.json
@@ -421,7 +421,8 @@ entries:
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
-    qa_checks: []
+    qa_checks:
+    - canvas.background
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: no_method
     measurement_route:
@@ -635,7 +636,9 @@ entries:
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - canvas.video_region
     impact_if_unmeasured: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
     resolution_state: no_method
     measurement_route:
@@ -1137,7 +1140,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -1171,7 +1175,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -1235,7 +1240,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -1308,7 +1314,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -1351,7 +1358,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -1793,7 +1801,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -1894,7 +1903,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: null
     resolution_state: resolved
     measurement_route:
@@ -2269,7 +2280,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -2303,7 +2315,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -2367,7 +2380,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -2440,7 +2454,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -2483,7 +2498,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -2926,7 +2942,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -3027,7 +3044,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: null
     resolution_state: resolved
     measurement_route:
@@ -3404,7 +3423,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -3438,7 +3458,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -3502,7 +3523,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -3575,7 +3597,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -3618,7 +3641,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -4062,7 +4086,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -4163,7 +4188,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: null
     resolution_state: resolved
     measurement_route:
@@ -4539,7 +4566,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -4573,7 +4601,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -4637,7 +4666,9 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -4711,7 +4742,9 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -4754,7 +4787,9 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -5197,7 +5232,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -5299,7 +5335,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: null
     resolution_state: resolved
     measurement_route:
@@ -5675,7 +5713,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -5709,7 +5748,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -5773,7 +5813,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -5846,7 +5887,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -5889,7 +5931,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -6331,7 +6374,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -6432,7 +6476,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: 자막 등장 타이밍 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -6501,7 +6547,9 @@ entries:
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.quote
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -6837,7 +6885,8 @@ entries:
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     value_resolution:
@@ -6871,7 +6920,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 레퍼런스와의 일치 여부를 판정할 수 없음
     resolution_state: blocked_network
     measurement_route:
@@ -6935,7 +6985,8 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -7008,7 +7059,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -7051,7 +7103,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.style
     impact_if_unmeasured: 자막 박스 유무·색·여백 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -7495,7 +7548,8 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    qa_checks:
+    - caption.motion
     impact_if_unmeasured: 자막 등장·퇴장 모션 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -7596,7 +7650,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - caption.timing
     impact_if_unmeasured: null
     resolution_state: resolved
     measurement_route:
@@ -7718,10 +7774,10 @@ entries:
       to proxy'', OSError(''Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용'
   text.tone.sentence_end_examples:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: meta
+    status: not_applicable
     value: []
-    value_origin: provisional
+    value_origin: meta
     evidence: []
     measurement:
       file: presets/joshuamagazine/measurements/visual_tone.json
@@ -7735,12 +7791,8 @@ entries:
     code:
     - shortkit/edit/proposal.py:tone_style_guide
     qa_checks: []
-    impact_if_unmeasured: 제안서의 말투 안내(종결 어미 예시)가 비어 있음 → 대본 말투가 레퍼런스와 다를 수 있음
-    resolution_state: blocked_network
-    measurement_route:
-      route: automatic
-      how: 'AGENTS.md 5장 A: ref collect → download → audio-analyze → analyze → classify → fonts → aggregate → audio-measure
-        → preset apply-measurements'
+    impact_if_unmeasured: null
+    resolution_state: resolved
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
       to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
@@ -7768,7 +7820,8 @@ entries:
     - shortkit/edit/proposal.py:tone_style_guide
     - shortkit/edit/validate.py:check_tone
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - caption.tone
     impact_if_unmeasured: 자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음
     resolution_state: blocked_network
     measurement_route:
@@ -7955,7 +8008,9 @@ entries:
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - video.zoom
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -8158,7 +8213,9 @@ entries:
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - video.transitions
     impact_if_unmeasured: 확대·정지·전환의 크기/길이 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -8369,7 +8426,9 @@ entries:
       unit: px
     code:
     - shortkit/edit/resolve.py:resolve_decorations
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - decor.style
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
     value_resolution:
@@ -8406,7 +8465,9 @@ entries:
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_decorations
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - decor.style
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -8480,7 +8541,9 @@ entries:
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - decor.style
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -8515,7 +8578,9 @@ entries:
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - decor.style
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -8550,7 +8615,9 @@ entries:
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - decor.style
     impact_if_unmeasured: 화살표·원 등 장식 스타일 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9090,7 +9157,9 @@ entries:
       unit: dB
     code:
     - shortkit/edit/audio.py:build_audio_plan
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - audio.bgm
     impact_if_unmeasured: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
     resolution_state: blocked_network
     measurement_route:
@@ -9196,10 +9265,16 @@ entries:
     value_origin: rule
     evidence: []
     measurement: null
-    code: []
+    code:
+    - shortkit/edit/audio.py:bgm_loop_xfade_s
     qa_checks: []
     impact_if_unmeasured: null
     resolution_state: resolved
+    code_basis:
+      kind: conditional_reader
+      reader: shortkit/edit/audio.py:bgm_loop_xfade_s
+      condition: audio.bgm.loop 가 true 이고 음악(section_start 부터, tempo 적용)이 에피소드보다 짧을 때만 읽음
+      test: tests/core/test_conditional_readers.py::test_loop_xfade_reader
   audio.original.default:
     scope: fixed
     category: rule
@@ -9265,7 +9340,8 @@ entries:
     code:
     - shortkit/edit/audio.py:build_audio_plan
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - audio.original
     impact_if_unmeasured: 원음 켜고 끄는 경계 처리 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9340,7 +9416,8 @@ entries:
     code:
     - shortkit/edit/audio.py:build_audio_plan
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - audio.ducking
     impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9369,7 +9446,8 @@ entries:
     code:
     - shortkit/edit/audio.py:build_audio_plan
     - shortkit/qa/checks.py:pget
-    qa_checks: []
+    qa_checks:
+    - audio.ducking
     impact_if_unmeasured: 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9508,7 +9586,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/audio.py:build_audio_plan
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - audio.silence
     impact_if_unmeasured: 의도적 정적 처리 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9590,7 +9670,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - structure.duration
     impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
     resolution_state: blocked_network
     measurement_route:
@@ -9637,10 +9719,10 @@ entries:
       to proxy'', OSError(''Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용'
   structure.duration_s.n:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: meta
+    status: not_applicable
     value: 0
-    value_origin: provisional
+    value_origin: meta
     evidence: []
     measurement:
       file: presets/joshuamagazine/measurements/visual_structure.json
@@ -9657,12 +9739,8 @@ entries:
     code:
     - shortkit/edit/validate.py:check_structure
     qa_checks: []
-    impact_if_unmeasured: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
-    resolution_state: blocked_network
-    measurement_route:
-      route: automatic
-      how: 'AGENTS.md 5장 A: ref collect → download → audio-analyze → analyze → classify → fonts → aggregate → audio-measure
-        → preset apply-measurements'
+    impact_if_unmeasured: null
+    resolution_state: resolved
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
       to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
@@ -9689,6 +9767,7 @@ entries:
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
+    - shortkit/qa/checks.py:pget
     qa_checks:
     - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
@@ -9723,7 +9802,9 @@ entries:
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9756,6 +9837,7 @@ entries:
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
+    - shortkit/qa/checks.py:pget
     qa_checks:
     - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
@@ -9770,10 +9852,10 @@ entries:
       to proxy'', OSError(''Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용'
   structure.cuts_per_10s.n:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: meta
+    status: not_applicable
     value: 0
-    value_origin: provisional
+    value_origin: meta
     evidence: []
     measurement:
       file: presets/joshuamagazine/measurements/visual_structure.json
@@ -9791,12 +9873,8 @@ entries:
     code:
     - shortkit/edit/validate.py:check_cut_structure
     qa_checks: []
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
-    resolution_state: blocked_network
-    measurement_route:
-      route: automatic
-      how: 'AGENTS.md 5장 A: ref collect → download → audio-analyze → analyze → classify → fonts → aggregate → audio-measure
-        → preset apply-measurements'
+    impact_if_unmeasured: null
+    resolution_state: resolved
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
       to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect
@@ -9823,6 +9901,7 @@ entries:
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
+    - shortkit/qa/checks.py:pget
     qa_checks:
     - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
@@ -9857,7 +9936,9 @@ entries:
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
-    qa_checks: []
+    - shortkit/qa/checks.py:pget
+    qa_checks:
+    - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
     resolution_state: blocked_network
     measurement_route:
@@ -9890,6 +9971,7 @@ entries:
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
+    - shortkit/qa/checks.py:pget
     qa_checks:
     - structure.cuts
     impact_if_unmeasured: 영상 길이·전개 구조 불일치
@@ -9904,10 +9986,10 @@ entries:
       to proxy'', OSError(''Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용'
   structure.shot_len_s.n:
     scope: fixed
-    category: style
-    status: unmeasured
+    category: meta
+    status: not_applicable
     value: 0
-    value_origin: provisional
+    value_origin: meta
     evidence: []
     measurement:
       file: presets/joshuamagazine/measurements/visual_structure.json
@@ -9925,12 +10007,8 @@ entries:
     code:
     - shortkit/edit/validate.py:check_cut_structure
     qa_checks: []
-    impact_if_unmeasured: 영상 길이·전개 구조 불일치
-    resolution_state: blocked_network
-    measurement_route:
-      route: automatic
-      how: 'AGENTS.md 5장 A: ref collect → download → audio-analyze → analyze → classify → fonts → aggregate → audio-measure
-        → preset apply-measurements'
+    impact_if_unmeasured: null
+    resolution_state: resolved
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
       DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: (''Unable to connect
       to proxy'', OSError(''Tunnel connection failed: 403 Forbidden'')) (caused by ProxyError("(''Unable to connect

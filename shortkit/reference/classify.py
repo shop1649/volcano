@@ -104,7 +104,9 @@ def video_features(preset: str, vid: str) -> dict | None:
         f["crossfade_per_10s"] = per10(sum(c["type"] == "crossfade" for c in cuts))
     if caps:
         items = caps.get("items") or []
-        timed = [c for c in items if c["role"] not in ("title", "description", "identity_mark", "unknown")]
+        from .aggregate import FIRST_CAPTION_EXCLUDED_ROLES   # one definition (aggregate imports this module)
+
+        timed = [c for c in items if c["role"] not in FIRST_CAPTION_EXCLUDED_ROLES]
         f["captions_per_10s"] = per10(len(timed))
         f["caption_mean_dur_s"] = round(float(np.mean([c["end"] - c["start"] for c in timed])), 3) if timed else 0.0
         for r in ("situation", "dialogue", "reaction", "speaker"):

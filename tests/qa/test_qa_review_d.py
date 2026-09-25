@@ -252,7 +252,7 @@ def test_exit_motion_is_compared_and_unmeasurable_types_are_not_same():
     b = _builder()
     checks._motion_rows(b, _cap(), dict(m, motion_out_obs={"type": "fade", "fade_dur_s": 0.3}), "speaker", "[c1]", {}, fr)
     assert {r["row_id"]: r for r in b.rows}["caption.motion:c1:out"]["status"] == "different"
-    # a slide entrance is not measured by the probe: 못 잼, never 'same'
+    # a slide entrance is measured only by the slide track (probes_text.slide_track); without it: 못 잼, never 'same'
     b = _builder()
     checks._motion_rows(b, _cap(motion_in={"type": "slide_up", "dur_s": 0.2, "offset_px": 40}),
                         dict(m, motion_in_obs={"type": "none"}), "speaker", "[c1]", {}, fr)
@@ -329,13 +329,16 @@ def test_cut_structure_rows_measure_the_output_and_need_the_preset_keys(temp_roo
         "shot_len_median_s"] == pytest.approx(3.0)
     # once `ref aggregate` provides the keys (SYNTHETIC measured values), the output is judged against them
     y = read_yaml(temp_root / P / "preset.yaml")
-    y["structure"]["cuts_per_10s"] = {"p10": 3.0, "p90": 6.0}
-    y["structure"]["shot_len_s"] = {"p10": 1.0, "p90": 4.0}
+    # (wave 5: the rows read p50 too -- the output's position against the reference median)
+    y["structure"]["cuts_per_10s"] = {"p10": 3.0, "p50": 4.0, "p90": 6.0}
+    y["structure"]["shot_len_s"] = {"p10": 1.0, "p50": 2.5, "p90": 4.0}
     write_yaml(temp_root / P / "preset.yaml", y)
-    _measured_layer(temp_root, {"structure": {"cuts_per_10s": {"p10": 3.0, "p90": 6.0}, "shot_len_s": {"p10": 1.0, "p90": 4.0}}})
+    _measured_layer(temp_root, {"structure": {"cuts_per_10s": {"p10": 3.0, "p50": 4.0, "p90": 6.0},
+                                              "shot_len_s": {"p10": 1.0, "p50": 2.5, "p90": 4.0}}})
     _measure(temp_root, "visual_structure", [{"key": k, "status": "measured", "value": v, "overall": {"n": 10}}
-                                             for k, v in (("structure.cuts_per_10s.p10", 3.0), ("structure.cuts_per_10s.p90", 6.0),
-                                                          ("structure.shot_len_s.p10", 1.0), ("structure.shot_len_s.p90", 4.0))])
+                                             for k, v in (("structure.cuts_per_10s.p10", 3.0), ("structure.cuts_per_10s.p50", 4.0),
+                                                          ("structure.cuts_per_10s.p90", 6.0), ("structure.shot_len_s.p10", 1.0),
+                                                          ("structure.shot_len_s.p50", 2.5), ("structure.shot_len_s.p90", 4.0))])
     b = _builder()
     checks._rows_cut_structure(b, {"video": video})
     rows = {r["row_id"]: r for r in b.rows}

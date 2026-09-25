@@ -7,7 +7,8 @@ ground truth we control exactly, plus the matching ``build/resolved.json`` and `
           c1 head-pose (12 fps) -> crossfade 0.3 s -> c2 dirty_source (fake watermark, delogo'd in
           the GOOD variant) -> flash 0.12 s -> c3 classroom with zoom 1.0->1.3 (ease out) and a
           0.6 s freeze at the end
-  text    title (whole video), situation (pop 0.85), speaker label (box, fade), dialogue,
+  text    title (whole video), situation (pop 0.85), speaker label (box, fade; the box drawn by the production
+          shortkit.edit.captions.box_events at ink + pad like the renderer), dialogue,
           reaction (pop 1.35) rendered by libass from our own ASS file
   deco    red circle ring moving (200,600)->(400,650) over 3.0-4.5 s, blinking 2 Hz
   audio   music_bed_a from 12.0 s at -16 dB, ducked -10 dB under the SPEECH of the kept original line
@@ -164,19 +165,45 @@ def link_fonts(fonts_dir: Path) -> None:
             os.symlink(f, dst)
 
 
-def build_ass(bad: bool, rest_only: bool = False) -> str:
+BOX = dict(color="#000000", alpha=0.65, pad_x=9, pad_y=4)
+
+
+def box_rects(bboxes: dict) -> dict[str, list[int]]:
+    """Box rect of every boxed caption the way the production renderer places it (shortkit.edit.captions
+    .box_rect_from_ink: ink bbox incl. outline + pad per side, integer px)."""
+    from shortkit.edit.captions import box_rect_from_ink
+
+    out = {}
+    for c in CAPTIONS:
+        if c.get("box"):
+            x, y, w, h = bboxes[c["id"]]
+            out[c["id"]] = box_rect_from_ink((x, y, x + w, y + h), BOX["pad_x"], BOX["pad_y"])
+    return out
+
+
+def _box_dialogues(c: dict, rect: list[int]) -> list[str]:
+    """The box of caption ``c`` drawn by the production function (shortkit.edit.captions.box_events)."""
+    from types import SimpleNamespace
+
+    from shortkit.edit.captions import box_events
+
+    typ, dur, _sf = c["motion"]
+    ms = int(round(dur * 1000))
+    cap = SimpleNamespace(start=c["start"], end=c["end"], box={"rect": rect, "color": BOX["color"], "alpha": BOX["alpha"]})
+    evs = box_events(cap, c["id"], ms if typ == "fade" else 0, typ, ms, {"type": typ, "dur_s": dur})
+    return [f"Dialogue: 0,{_ass_time(e.start)},{_ass_time(e.end)},{e.style},,0,0,0,,{e.text}" for e in evs]
+
+
+def build_ass(bad: bool, rest_only: bool = False, rects: dict | None = None) -> str:
     """Our own ASS (captions + decoration).  rest_only: every caption without motion, one per
-    second, used to derive the ground-truth ink bboxes on a black canvas."""
+    second, used to derive the ground-truth ink bboxes on a black canvas.  ``rects``: box rects of the boxed
+    captions (``box_rects``), drawn below the text like the production renderer does."""
     styles = []
     for c in CAPTIONS:
         face = _face(c["font"])
         fs = face.ass_fontsize(c["size"])
-        if c.get("box"):
-            styles.append(f"Style: {c['id']},{face.ass_name},{fs:.3f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
-                          f"{_ass_color('#000000', 0x59)},&H00000000,{face.weight},0,0,0,100,100,0,0,3,6,0,5,0,0,0,1")
-        else:
-            styles.append(f"Style: {c['id']},{face.ass_name},{fs:.3f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
-                          f"&H00000000,&H00000000,{face.weight},0,0,0,100,100,0,0,1,{c['outline']},0,5,0,0,0,1")
+        styles.append(f"Style: {c['id']},{face.ass_name},{fs:.3f},{_ass_color(c['color'])},{_ass_color(c['color'])},"
+                      f"&H00000000,&H00000000,{face.weight},0,0,0,100,100,0,0,1,{c['outline']},0,5,0,0,0,1")
     styles.append(f"Style: deco,{_face(FONT_BLACK).ass_name},20,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1")
     ev = []
     for i, c in enumerate(CAPTIONS):
@@ -194,6 +221,11 @@ def build_ass(bad: bool, rest_only: bool = False) -> str:
         elif typ == "fade":
             tag += f"\\fad({int(dur * 1000)},{int(dur * 1000)})"
         ev.append(f"Dialogue: 1,{_ass_time(c['start'])},{_ass_time(c['end'])},{c['id']},,0,0,0,,{{{tag}}}{c['text']}")
+        if c.get("box") and rects and c["id"] in rects:
+            rect = list(rects[c["id"]])
+            if bad:
+                rect[1] += BAD["caption_dy"].get(c["id"], 0)
+            ev += _box_dialogues(c, rect)
     if not rest_only:
         d = DECO
         r = d["size"] / 2
@@ -366,7 +398,7 @@ def caption_truth_bboxes(work: Path) -> dict[str, list[float]]:
 
 
 # ----------------------------------------------------------------------------- IR / plan
-def build_resolved(episode_id: str, bboxes: dict, voc: dict | None = None) -> ResolvedEdit:
+def build_resolved(episode_id: str, bboxes: dict, voc: dict | None = None, rects: dict | None = None) -> ResolvedEdit:
     clips = []
     for c in CLIPS:
         z = c.get("zoom")
@@ -387,7 +419,8 @@ def build_resolved(episode_id: str, bboxes: dict, voc: dict | None = None) -> Re
             anchor=tuple(c["anchor"]), align="center", valign="middle", bbox=Rect(*b), font_name=c["font"], font_file=None,
             size_px=float(c["size"]), color=c["color"], highlight=[], highlight_color="#FFFFFF", outline_px=float(c["outline"]),
             outline_color="#000000", shadow_px=0.0,
-            box={"enabled": bool(c.get("box")), "color": "#000000", "alpha": 0.65, "pad_x": 9, "pad_y": 4},
+            box={"enabled": bool(c.get("box")), "color": BOX["color"], "alpha": BOX["alpha"], "pad_x": BOX["pad_x"],
+                 "pad_y": BOX["pad_y"], **({"rect": list((rects or {})[c["id"]])} if c.get("box") and rects else {})},
             motion_in={"type": typ, "dur_s": dur, "scale_from": sf, "offset_px": 0},
             motion_out={"type": "fade" if typ == "fade" else "none", "dur_s": dur if typ == "fade" else 0.0},
             grounding={"kind": "seen"}))
@@ -442,10 +475,11 @@ def render_episode(episode_id: str, bad: bool = False) -> dict:
     (ep / "output").mkdir(parents=True, exist_ok=True)
     bboxes = caption_truth_bboxes(ep / "build")
     voc = make_vocals(episode_id)
-    res = build_resolved(episode_id, bboxes, voc)
+    rects = box_rects(bboxes)
+    res = build_resolved(episode_id, bboxes, voc, rects)
     write_json(ep / "build" / "resolved.json", res.to_dict())
     ass = ep / "build" / "captions.ass"
-    ass.write_text(build_ass(bad), encoding="utf-8")
+    ass.write_text(build_ass(bad, rects=rects), encoding="utf-8")
     wav = ep / "build" / "synthetic_mix.wav"
     ainfo = build_audio(bad, wav, voc)
     write_yaml(ep / "plan.yaml", build_plan(episode_id, ainfo["orig_rel_lu"], voc))

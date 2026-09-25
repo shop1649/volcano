@@ -493,6 +493,9 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
     cx, cy = x + w / 2, y + h / 2
     margin = float(cap.outline_px or 0) + 12
     rw, rh = w * grow + 2 * margin, h * grow + 2 * margin
+    slide = (mi.get("type") or "none") == "slide_up"
+    if slide:                    # the entrance starts offset_px below the rest position: keep it in the crop
+        rh += 2 * (abs(float(mi.get("offset_px") or 0.0)) + 8)
     X, Y, RW, RH = crop_ints([cx - rw / 2, cy - rh / 2, rw, rh], W, H)
     m_full = ink_mask(rest_png, cap)
     mask = np.zeros((RH, RW), bool)
@@ -549,6 +552,18 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
                 if out.get("motion_in_obs") is not None:
                     out["motion_in_obs"]["fade_dur_s"] = fade_length(ts, p, rising=True)
         out["presence_in"] = [[rnd(a, 3), rnd(b, 3)] for a, b in zip(ts, p)]
+        if slide:
+            sl = slide_track(ts, frs, rest, cap, fps)
+            out["slide_track"] = sl
+            if sl.get("status") == "measured":
+                # the glyphs are away from their rest pixels while sliding: the presence onset (rest pixels) comes late;
+                # the first frame the caption's ink shows at all is the onset
+                out["onset"] = sl["onset"]
+                out["onset_frame_t"] = sl["onset"]
+                out["onset_note"] = "slide: 자막 잉크가 처음 보이는 프레임(휴지 위치와 무관)"
+                out["motion_in_obs"] = {"type": sl["type"], "slide_measured": True, "offset_px": sl.get("offset_px"),
+                                        "offset_first_px": sl.get("offset_first_px"), "dur_s": sl.get("dur_s"),
+                                        "track": sl.get("track")}
     # ---------------- offset
     if cap.end >= ctx.info.duration - 1.5 * fr:
         ts2, frs2 = grab_window(ctx.mp4, max(0.0, ctx.info.duration - 0.5), 0.5, crop=[X, Y, RW, RH])
@@ -597,6 +612,75 @@ def measure_timing(ctx: QAContext, cap, loc: dict, rest_png: np.ndarray) -> dict
     return out
 
 
+SLIDE_MIN_OFFSET_PX = 3.0       # a first-frame displacement below max(this, 10 % of the ink height) is not a slide
+
+
+def _row_profile(m: np.ndarray) -> np.ndarray:
+    return m.sum(axis=1).astype(np.float64)
+
+
+def _vshift(prof_rest: np.ndarray, prof: np.ndarray, lo: int, hi: int) -> float | None:
+    """Vertical displacement d (px, + = lower on screen) maximising sum(rest[i] * frame[i + d]); parabolic sub-pixel."""
+    n = len(prof_rest)
+    sc = []
+    for d in range(lo, hi + 1):
+        a0, a1 = max(0, -d), min(n, n - d)
+        sc.append(float((prof_rest[a0:a1] * prof[a0 + d:a1 + d]).sum()) if a1 > a0 else 0.0)
+    sc = np.array(sc)
+    if not len(sc) or sc.max() <= 0:
+        return None
+    k = int(np.argmax(sc))
+    d = float(lo + k)
+    if 0 < k < len(sc) - 1:
+        den = sc[k - 1] - 2 * sc[k] + sc[k + 1]
+        if den < 0:
+            d += 0.5 * (sc[k - 1] - sc[k + 1]) / den
+    return d
+
+
+def slide_track(ts, frs, rest: np.ndarray, cap, fps: float) -> dict:
+    """slide_up entrance measured on the caption's own ink (fill colours, ``ink_mask``) in the frames around the onset:
+    per frame the vertical displacement from the rest position (row-profile correlation).  offset_px = the
+    displacement at the first frame the caption shows, from the straight line fitted to the moving frames (libass
+    \\move is linear); dur_s = first shown -> first frame back at rest (|d| <= 0.5 px)."""
+    mi = cap.motion_in or {}
+    off_plan = abs(float(mi.get("offset_px") or 0.0))
+    m_rest = ink_mask(rest, cap)
+    c_rest = int(m_rest.sum())
+    if c_rest < 20:
+        return {"status": "unmeasured", "reason": "휴지 프레임의 자막 잉크가 너무 적음"}
+    pr = _row_profile(m_rest)
+    hi = int(math.ceil(off_plan + 12))
+    track = []
+    for t, f in zip(ts, frs):
+        m = ink_mask(f, cap)
+        cnt = int(m.sum())
+        vis = cnt >= 0.25 * c_rest
+        d = _vshift(pr, _row_profile(m), -6, hi) if vis else None
+        track.append((float(t), vis, d, cnt))
+    first = next((i for i, (_, v, d, _c) in enumerate(track) if v and d is not None), None)
+    if first is None:
+        return {"status": "unmeasured", "reason": "등장 창 안에서 자막 잉크를 찾지 못함"}
+    if first == 0 and track[0][2] is not None and track[0][2] <= 0.5:
+        return {"status": "unmeasured", "reason": "측정 창 시작부터 이미 휴지 위치에 보임(등장 순간이 창 밖)"}
+    settle = next((i for i in range(first, len(track)) if track[i][2] is not None and abs(track[i][2]) <= 0.5), None)
+    moving = [(t, d) for t, v, d, _c in track[first:settle if settle is not None else len(track)] if v and d is not None]
+    rows_on = np.nonzero(m_rest.any(axis=1))[0]
+    ink_h = float(rows_on.max() - rows_on.min() + 1) if len(rows_on) else 0.0
+    d0 = float(track[first][2])
+    off_fit = d0
+    if len(moving) >= 2:
+        tt = np.array([x[0] for x in moving])
+        dd = np.array([x[1] for x in moving])
+        sl_, ic = np.polyfit(tt, dd, 1)
+        off_fit = float(sl_ * track[first][0] + ic)
+    typ = "slide_up" if off_fit >= max(SLIDE_MIN_OFFSET_PX, 0.1 * ink_h) else "none"
+    return {"status": "measured", "type": typ, "onset": round(track[first][0], 4), "offset_first_px": rnd(d0, 2),
+            "offset_px": rnd(off_fit, 2), "dur_s": rnd(track[settle][0] - track[first][0], 4) if settle is not None else None,
+            "track": [[rnd(t, 3), bool(v), rnd(d, 2)] for t, v, d, _c in track[max(0, first - 2):first + 12]],
+            "method": "자막 채움색 잉크의 행 투영 상관으로 휴지 위치 대비 세로 이동(px) → 첫 표시 프레임의 이동(직선 맞춤) = offset_px"}
+
+
 def _motion_in(ts, frs, p, i0, rest, mask, cap, fps) -> dict:
     cols = np.nonzero(mask.any(axis=0))[0]
     if not len(cols):
@@ -628,6 +712,406 @@ def _motion_in(ts, frs, p, i0, rest, mask, cap, fps) -> dict:
     return {"motion_in_obs": {"type": typ, "scale_first": rnd(s0, 3), "presence_first": rnd(pp[0] if pp else None, 3),
                               "dur_s": rnd(settle / fps, 3) if settle is not None else None,
                               "scales": [rnd(s, 3) for s in scales[:8]], "presence": [rnd(v, 3) for v in pp[:8]]}}
+
+
+# ----------------------------------------------------------------------------- drop shadow
+SHADOW_MAX_PX = 12            # largest offset searched
+SHADOW_DIFF_RGB = 40.0        # a shadow pixel differs from the local background by more than this (reference rule)
+SHADOW_MIN_IOU = 0.35         # best IoU between the measured halo and the offset ink below this: no shadow
+SHADOW_BUSY_SHARE = 0.5       # the up-left (-2, -2) ring is 'different from the background' this often: busy
+SHADOW_ASYM = 0.35            # lower-right minus upper-left ring share needed for a shadow (reference.textboxes rule)
+
+
+def drop_shadow(crop: np.ndarray, ink: np.ndarray, bg_col) -> dict:
+    """Drop shadow of a caption line = a copy of the ink (fill + outline) offset (k, k) down-right, drawn in the shadow
+    colour (the renderer's ASS convention; reference.textboxes describes the same thing).  The halo H = pixels outside
+    the (1-px dilated) ink that differ from the local background by > SHADOW_DIFF_RGB.  A shadow exists when the ring of
+    the ink shifted (+2, +2) holds clearly more halo than the ring shifted (-2, -2) (share difference > SHADOW_ASYM, the
+    reference's asymmetry rule); its offset = the k whose predicted shadow P_k = ink shifted by (k, k) minus the ink
+    best matches H (IoU, sub-pixel parabola), colour = median of H within P_k.  No asymmetry -> 0 (a busy upper-left
+    ring -> 못 잼).  A 1-px offset is not separable from anti-aliasing (k starts at 2).
+    (reference.textboxes._shadow stops at k = 1 -- its first ring lies inside the dilated ink -- and so can only
+    return 0; QA does not reuse it.)  None when the background is too dark (luma < 50) or too busy to tell."""
+    cv2 = _cv2()
+    if bg_col is None:
+        return {"status": "unmeasured", "reason": "배경색을 모름"}
+    bg = np.asarray(bg_col, np.float32)
+    if float(np.dot(bg, [0.2126, 0.7152, 0.0722])) < 50:
+        return {"status": "unmeasured", "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"}
+    Hc, Wc = ink.shape
+    ink = ink.astype(bool)
+    near = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
+    zone = cv2.dilate(ink.astype(np.uint8), np.ones((2 * SHADOW_MAX_PX + 5,) * 2, np.uint8)).astype(bool)
+    diff = np.sqrt(((crop.astype(np.float32) - bg) ** 2).sum(axis=2)) > SHADOW_DIFF_RGB
+    halo = diff & ~near & zone
+
+    def shifted(k: int) -> np.ndarray:
+        out = np.zeros_like(ink)
+        if k >= 0:
+            out[k:, k:] = ink[:Hc - k, :Wc - k]
+        else:
+            out[:Hc + k, :Wc + k] = ink[-k:, -k:]
+        return out & ~near
+    p2, n2 = shifted(2), shifted(-2)
+    fp2 = float(halo[p2].mean()) if p2.any() else None       # lower-right ring just outside the ink
+    fn2 = float(halo[n2].mean()) if n2.any() else None       # upper-left ring (no shadow there)
+    scores = []
+    for k in range(2, SHADOW_MAX_PX + 1):
+        P = shifted(k)
+        if not P.any():
+            break
+        u = float((P | halo).sum())
+        scores.append((float((P & halo).sum()) / u if u else 0.0, k))
+    out = {"method": "오른쪽 아래(+2,+2) 고리가 왼쪽 위(−2,−2) 고리보다 배경과 다른 화소가 뚜렷이 많으면 그림자 있음 → "
+                     "IoU(배경과 다른 테두리 밖 화소, 오른쪽 아래로 k px 옮긴 잉크) 최대인 k(포물선 보정)",
+           "ring_lower_right": rnd(fp2, 3), "ring_upper_left": rnd(fn2, 3), "scores": [[k, rnd(v, 3)] for v, k in scores]}
+    if fp2 is None or fn2 is None or not scores:
+        return {**out, "status": "unmeasured", "reason": "잉크가 너무 작음"}
+    if fp2 - fn2 <= SHADOW_ASYM:
+        if fn2 > SHADOW_BUSY_SHARE:
+            return {**out, "status": "unmeasured", "reason": "배경이 복잡해 그림자를 가려낼 수 없음"}
+        # the ring where a >= 2 px drop shadow would be is no more 'different' than the opposite ring: no shadow
+        return {**out, "status": "measured", "shadow_px": 0.0, "shadow_color": None}
+    best, k = max(scores)
+    if best < SHADOW_MIN_IOU:
+        return {**out, "status": "unmeasured", "iou": rnd(best, 3),
+                "reason": "오른쪽 아래가 배경과 더 다르지만 옮긴 잉크 모양과 맞지 않음(그림자 폭을 정할 수 없음)"}
+    sel = shifted(k) & halo
+    # sub-pixel: parabola through the best k and its neighbours (the measured ink is ~0.5 px wider than the drawn one,
+    # which moves the whole-pixel optimum by up to one step)
+    kv = {kk: v for v, kk in scores}
+    kf = float(k)
+    if k - 1 in kv and k + 1 in kv:
+        den = kv[k - 1] - 2 * kv[k] + kv[k + 1]
+        if den < 0:
+            kf = k + 0.5 * (kv[k - 1] - kv[k + 1]) / den
+    return {**out, "status": "measured", "shadow_px": round(kf, 2), "shadow_px_int": k, "iou": rnd(best, 3),
+            "shadow_color": rgb_hex(np.median(crop[sel], axis=0)) if sel.sum() >= 10 else None}
+
+
+# ----------------------------------------------------------------------------- line style (reference definitions)
+def caption_line_styles(frame: np.ndarray, cap, loc: dict) -> dict:
+    """Outline / drop shadow / background box of the caption AT REST measured in the output with the reference
+    analyzer's own line measurement (``reference.textboxes.measure_line``: shadow = dark copy offset down-right,
+    box = 4-sided luminance step around the glyph fill, pad = step distance minus a visible outline), per line; a
+    multi-line boxed caption also gets the block box (``_find_box`` around the union of the lines, like
+    ``textboxes._block_box``).  Canvas px."""
+    from ..reference.textboxes import _crop_with_pad, _find_box, measure_line
+
+    cv2 = _cv2()
+    op = float(cap.outline_px or 0)
+    g = int(math.ceil(op)) + 1
+    H, W = frame.shape[:2]
+    lines = []
+    for lb in loc.get("line_boxes") or []:
+        x, y, w, h = (int(round(v)) for v in lb)
+        b = (max(0, x - g), max(0, y - g), w + 2 * g, h + 2 * g)
+        crop, (ox, oy) = _crop_with_pad(frame, b, max(10, int(b[3])))
+        core = (b[0] - ox, b[1] - oy, b[2], b[3])
+        try:
+            m = measure_line(crop, core)
+        except Exception as e:  # never a silent pass
+            lines.append({"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]})
+            continue
+        if m is None:
+            lines.append({"status": "unmeasured", "reason": "measure_line: 글자 채움을 찾지 못함"})
+            continue
+        box = dict(m.get("box") or {})
+        if box.get("bbox"):
+            bx, by, bw, bh = box["bbox"]
+            box["bbox"] = [int(bx + ox), int(by + oy), int(bw), int(bh)]
+        fx, fy, fw, fh = m["fill_bbox"]
+        ix, iy, iw, ih = m["ink_bbox"]
+        rec = {"status": "measured", "fill_bbox": [fx + ox, fy + oy, fw, fh], "ink_bbox": [ix + ox, iy + oy, iw, ih],
+               **{k: m.get(k) for k in ("color", "outline_px", "outline_color", "outline_visibility", "bg_color")},
+               "box": box, "shadow_px": None, "shadow_color": None}
+        if box.get("present") == "present":
+            rec["shadow"] = {"status": "unmeasured", "reason": "박스가 있어 그림자를 따로 재지 않음(레퍼런스 분석기와 같은 규칙)"}
+        else:
+            sh = drop_shadow(crop, m["ink"], hex_rgb(m.get("bg_color")) if m.get("bg_color") else None)
+            rec["shadow"] = sh
+            if sh.get("status") == "measured":
+                rec["shadow_px"], rec["shadow_color"] = sh["shadow_px"], sh.get("shadow_color")
+        lines.append(rec)
+    out: dict = {"lines": lines, "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"}
+    ok = [ln for ln in lines if ln.get("status") == "measured"]
+    if len(ok) >= 2:
+        fb = [ln["fill_bbox"] for ln in ok]
+        x0, y0 = min(f[0] for f in fb), min(f[1] for f in fb)
+        x1, y1 = max(f[0] + f[2] for f in fb), max(f[1] + f[3] for f in fb)
+        lh = float(np.median([f[3] for f in fb]))
+        pad = max(10, int(1.4 * lh) + 4)
+        X0, Y0 = max(0, x0 - pad), max(0, y0 - pad)
+        X1, Y1 = min(W, x1 + pad), min(H, y1 + pad)
+        L = cv2.cvtColor(frame[Y0:Y1, X0:X1], cv2.COLOR_RGB2GRAY).astype(np.float32)
+        try:
+            blk = _find_box(L, (x0 - X0, y0 - Y0, x1 - x0, y1 - y0), line_h=lh)
+        except Exception as e:
+            blk = {"present": "unmeasured", "note": f"{type(e).__name__}: {e}"[:200]}
+        if blk.get("present") == "present":
+            bx, by, bw, bh = blk["bbox"]
+            blk["bbox"] = [int(bx + X0), int(by + Y0), int(bw), int(bh)]
+            blk["pad_fill_x"], blk["pad_fill_y"] = blk["pad_x"], blk["pad_y"]
+            vis = _mode_str([ln.get("outline_visibility") for ln in ok])
+            olp = _median_f([ln.get("outline_px") for ln in ok])
+            if vis == "visible" and olp:
+                blk["pad_x"] = int(max(0, round(blk["pad_x"] - olp)))
+                blk["pad_y"] = int(max(0, round(blk["pad_y"] - olp)))
+            elif vis != "none":
+                blk["pad_note"] = "outline not separable from the box: pad measured from the glyph fill"
+        out["block_box"] = blk
+    return out
+
+
+def _median_f(vals) -> float | None:
+    v = [float(x) for x in vals if x is not None]
+    return float(np.median(v)) if v else None
+
+
+def _mode_str(vals) -> str | None:
+    v = [x for x in vals if x is not None]
+    return Counter(v).most_common(1)[0][0] if v else None
+
+
+def caption_box_color(ctx: QAContext, cap, box_bbox, text_bbox, rest: np.ndarray, t_before: float | None,
+                      t_after: float | None) -> dict:
+    """Colour and opacity of the caption box in the output with the reference analyzer's regression
+    (``reference.textboxes.box_alpha``: box = a*C + (1-a)*background on static pixels, background = the frame before
+    the box appears, static = unchanged between that frame and the one after the box is gone)."""
+    from ..reference.textboxes import box_alpha
+
+    if t_before is None or t_before < 0:
+        return {"status": "unmeasured", "reason": "자막이 영상 시작부터 떠 있어 박스 뒤 배경 프레임이 없음"}
+    B = grab(ctx.mp4, t_before)
+    seg_out = []
+    mo = {}
+    if t_after is not None and t_after < float(ctx.info.duration) - 1e-3:
+        seg_out = [(t_after, grab(ctx.mp4, t_after))]
+        mo = {"background_frame_t": t_after}
+    box = {"present": "present", "bbox": [int(round(v)) for v in box_bbox]}
+    item = {"style": {"box": box}, "bbox": [int(round(v)) for v in text_bbox]}
+    ref = {"_seg_in": [(t_before, B), (-1.0, rest)], "_seg_out": seg_out, "motion_in": {"background_frame_t": t_before},
+           "motion_out": mo, "region": {"x": 0, "y": 0}}
+    r = box_alpha(item, ref)
+    if r.get("color") is None:
+        return {"status": "unmeasured", "reason": r.get("alpha_note") or "박스 색을 풀지 못함(알파 ≤ 0.05)",
+                "alpha": r.get("alpha"), "color_observed": r.get("color_observed")}
+    return {"status": "measured", "color": r["color"], "alpha": r.get("alpha"), "color_observed": r.get("color_observed"),
+            "t_before": rnd(t_before, 4), "t_after": rnd(t_after, 4) if seg_out else None,
+            "method": "reference.textboxes.box_alpha(등장 전 프레임 vs 휴지 프레임, 정적 화소 회귀)"}
+
+
+# ----------------------------------------------------------------------------- dialogue quote marks
+QUOTE_CANDIDATES = ('"', "\u201c", "\u201d", "'", "\u2018", "\u2019", "\u300c", "\u300d", "\u300e", "\u300f")
+QUOTE_SHAPE_MIN_IOU = 0.5        # an end cluster is that glyph when its IoU with the rendered glyph reaches this ...
+QUOTE_SHAPE_MARGIN = 0.05        # ... and beats every OTHER-looking candidate by this much
+
+
+def _font_path_of(cap) -> tuple[str | None, int]:
+    from ..reference.typography import font_ref
+
+    for nm in (cap.font_name, getattr(cap, "font_file", None)):
+        if not nm:
+            continue
+        try:
+            fr = font_ref(nm)
+            return str(fr.abspath), int(getattr(fr, "index", 0) or 0)
+        except Exception:
+            continue
+    return None, 0
+
+
+def _glyph_mask(ch: str, font_path: str, index: int, size_px: float) -> np.ndarray | None:
+    from ..reference.typography import render_coverage
+
+    cov, _ = render_coverage(ch, font_path, size_px, face_index=index)
+    m = cov >= 0.5
+    if not m.any():
+        return None
+    ys, xs = np.nonzero(m)
+    return m[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+
+
+def _shape_iou(obs: np.ndarray, ref: np.ndarray) -> float:
+    cv2 = _cv2()
+    r = cv2.resize(ref.astype(np.uint8), (obs.shape[1], obs.shape[0]), interpolation=cv2.INTER_NEAREST).astype(bool)
+    u = float((obs | r).sum())
+    return float((obs & r).sum()) / u if u else 0.0
+
+
+def _end_cluster(m: np.ndarray, side: str) -> tuple[np.ndarray | None, dict]:
+    """The quote-like marks at one end of a text line (fill mask of the line box): walking in from that end, the
+    consecutive components that lie wholly in the upper part of the line (bottom <= top + 55 % of the line's tallest
+    component) -- an opening / closing quote; the walk stops at the first other component (a glyph, '!' ...)."""
+    cv2 = _cv2()
+    n, lab, st, _ = cv2.connectedComponentsWithStats(m.astype(np.uint8), 8)
+    comps = [(i, st[i]) for i in range(1, n) if st[i][4] >= 3]
+    if not comps:
+        return None, {"reason": "성분 없음"}
+    hmax = max(c[1][3] for c in comps)
+    top_line = min(c[1][1] for c in comps)
+    upper = lambda c: c[1][1] + c[1][3] <= top_line + 0.55 * hmax   # noqa: E731
+    order = sorted(comps, key=(lambda c: c[1][0]) if side == "open" else (lambda c: -(c[1][0] + c[1][2])))
+    small = []
+    for c in order:
+        if not upper(c):
+            break
+        small.append(c)
+    if not small or len(small) == len(comps):
+        return None, {"reason": "끝에 윗부분 표시(따옴표 모양) 없음"}
+    x0 = min(c[1][0] for c in small)
+    y0 = min(c[1][1] for c in small)
+    x1 = max(c[1][0] + c[1][2] for c in small)
+    y1 = max(c[1][1] + c[1][3] for c in small)
+    cm = np.isin(lab[y0:y1, x0:x1], [c[0] for c in small])
+    return cm, {"bbox": [int(x0), int(y0), int(x1 - x0), int(y1 - y0)], "n_components": len(small)}
+
+
+def quote_marks_obs(frame: np.ndarray, cap, loc: dict) -> dict:
+    """Quote marks of a rendered dialogue caption: the reference definition (``reference.textboxes.quote_pair`` on the
+    OCR text: first / last character) plus a glyph-shape check that does not depend on OCR -- the small marks at the
+    open end of the first line and the close end of the last line (fill mask) against every candidate quote glyph
+    rendered in the caption's own face and size (IoU after bbox alignment)."""
+    from ..reference.textboxes import quote_pair
+
+    ocr = quote_pair(str(loc.get("ocr") or "").replace("\n", " "))
+    out: dict = {"ocr": ocr}
+    boxes = sorted(loc.get("line_boxes") or [], key=lambda b: b[1])
+    fp, idx = _font_path_of(cap)
+    if not boxes or fp is None:
+        out["shape"] = {"status": "unmeasured", "reason": "줄 상자 또는 글꼴 파일 없음"}
+        return out
+    refs = {}
+    for ch in QUOTE_CANDIDATES:
+        try:
+            g = _glyph_mask(ch, fp, idx, float(cap.size_px))
+        except Exception:
+            g = None
+        if g is not None:
+            refs[ch] = g
+    shape: dict = {"status": "measured"}
+    for side, lb in (("open", boxes[0]), ("close", boxes[-1])):
+        x, y, w, h = (int(round(v)) for v in lb)
+        m = ink_mask(frame[max(0, y):y + h, max(0, x):x + w], cap)
+        cm, info = _end_cluster(m, side)
+        if cm is None:
+            shape[side] = {"present": False, **info}
+            continue
+        scores = sorted(((_shape_iou(cm, g), ch) for ch, g in refs.items()), reverse=True)
+        best_iou, best = scores[0] if scores else (0.0, None)
+        # the runner-up that LOOKS different (a straight double quote and U+201C render differently; the same glyph
+        # drawn for two code points is not a competitor)
+        rival = next((sc for sc, ch in scores[1:] if refs[ch].shape != refs[best].shape
+                      or not np.array_equal(refs[ch], refs[best])), 0.0) if best else 0.0
+        conf = best_iou >= QUOTE_SHAPE_MIN_IOU and best_iou - rival >= QUOTE_SHAPE_MARGIN
+        shape[side] = {"present": best_iou >= QUOTE_SHAPE_MIN_IOU, "glyph": best if conf else None,
+                       "iou": rnd(best_iou, 3), "rival_iou": rnd(rival, 3), **info,
+                       "scores": [[ch, rnd(sc, 3)] for sc, ch in scores[:4]]}
+    out["shape"] = shape
+    return out
+
+
+# ----------------------------------------------------------------------------- colour glyphs (emoji) in captions
+EMOJI_SAT_MIN = 0.35 * 255       # colour glyph pixels: HSV saturation ...
+EMOJI_VAL_MIN = 0.25 * 255       # ... and value
+EMOJI_FAR_RGB = 60.0             # farther than this from every caption colour and every blend between two of them
+EMOJI_DRAWN_RGB = 30.0           # changed by at least this when the caption appears / disappears
+EMOJI_STATIC_RGB = 12.0          # unchanged (at most this) between two rest frames of the caption
+
+
+def _seg_dist(px: np.ndarray, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    d = b - a
+    den = float((d * d).sum())
+    if den < 1e-6:
+        return np.sqrt(((px - a) ** 2).sum(axis=-1))
+    u = np.clip(((px - a) * d).sum(axis=-1) / den, 0.0, 1.0)
+    q = a + u[..., None] * d
+    return np.sqrt(((px - q) ** 2).sum(axis=-1))
+
+
+def emoji_obs(ctx: QAContext, cap, loc: dict, rest: np.ndarray, t_rest: float, onset: float | None,
+              offset: float | None) -> dict:
+    """Colour glyphs (emoji) drawn inside a caption: pixels of the caption area that the caption draws (they change
+    when it appears / disappears), that stay put while it is shown (the footage behind moves), that are saturated and
+    whose colour is none of the caption's colours (fill, highlight, outline, shadow, box) nor a blend of two of them
+    -- grouped into blobs of at least (0.12 x size_px)^2 px."""
+    cv2 = _cv2()
+    fr = 1.0 / ctx.fps
+    size = float(cap.size_px or 40)
+    x0 = min(cap.bbox.x, (loc.get("bbox") or [cap.bbox.x])[0]) - 0.3 * size
+    y0 = min(cap.bbox.y, (loc.get("bbox") or [0, cap.bbox.y])[1]) - 0.3 * size
+    x1 = max(cap.bbox.x + cap.bbox.w, sum((loc.get("bbox") or [0, 0, 0, 0])[0::2])) + 0.3 * size
+    y1 = max(cap.bbox.y + cap.bbox.h, sum((loc.get("bbox") or [0, 0, 0, 0])[1::2])) + 0.3 * size
+    H, W = rest.shape[:2]
+    X0, Y0, X1, Y1 = int(max(0, x0)), int(max(0, y0)), int(min(W, x1)), int(min(H, y1))
+    if X1 - X0 < 4 or Y1 - Y0 < 4:
+        return {"status": "unmeasured", "reason": "자막 영역이 화면 밖"}
+    R = rest[Y0:Y1, X0:X1].astype(np.float32)
+    D = float(ctx.info.duration)
+    t_pre = (onset - 2 * fr) if onset is not None and onset - 2 * fr >= 0 else None
+    t_post = (offset + 2 * fr) if offset is not None and offset + 2 * fr < D - fr else None
+    drawn = np.ones(R.shape[:2], bool)
+    bg = (ctx.resolved.canvas or {}).get("background") or {}
+    if t_pre is None and t_post is None:
+        # shown the whole video: only over a plain colour background (outside every clip region) is it known what the
+        # caption covers
+        from . import rect_intersection
+
+        over_video = any(rect_intersection([X0, Y0, X1 - X0, Y1 - Y0], [c.region.x, c.region.y, c.region.w, c.region.h]) > 0
+                         for c in ctx.resolved.clips)
+        bgc = hex_rgb(bg.get("color")) if bg.get("type") == "color" else None
+        if over_video or bgc is None:
+            return {"status": "unmeasured", "reason": "자막이 영상 전체에 떠 있고 영상 위(또는 흐린 배경 위)에 있어 자막이 없는 "
+                                                      "같은 자리 화면이 없음"}
+        drawn = np.sqrt(((R - np.array(bgc, np.float32)) ** 2).sum(axis=2)) > EMOJI_DRAWN_RGB
+    for tt in (t_pre, t_post):
+        if tt is not None:
+            F = grab(ctx.mp4, tt)[Y0:Y1, X0:X1].astype(np.float32)
+            drawn &= np.abs(R - F).max(axis=2) > EMOJI_DRAWN_RGB
+    t_mid = None
+    if onset is not None and offset is not None and offset - t_rest > 0.3:
+        t_mid = (t_rest + offset) / 2.0
+    static = np.ones(R.shape[:2], bool)
+    if t_mid is not None:
+        F2 = grab(ctx.mp4, t_mid)[Y0:Y1, X0:X1].astype(np.float32)
+        static = np.abs(R - F2).max(axis=2) <= EMOJI_STATIC_RGB
+    hsv = cv2.cvtColor(rest[Y0:Y1, X0:X1], cv2.COLOR_RGB2HSV)
+    colored = (hsv[..., 1] >= EMOJI_SAT_MIN) & (hsv[..., 2] >= EMOJI_VAL_MIN)
+    cols = [hex_rgb(c) for c in (cap.color, cap.highlight_color if cap.highlight else None, cap.outline_color,
+                                 getattr(cap, "shadow_color", None) if float(cap.shadow_px or 0) > 0 else None,
+                                 (cap.box or {}).get("color") if (cap.box or {}).get("enabled") else None)]
+    cols = [np.array(c, np.float32) for c in cols if c is not None]
+    far = np.ones(R.shape[:2], bool)
+    for i, a in enumerate(cols):
+        far &= np.sqrt(((R - a) ** 2).sum(axis=2)) > EMOJI_FAR_RGB
+        # yuv420 chroma subsampling keeps the luma of a coloured glyph edge but halves its chroma: the colour moves
+        # toward the grey of the same luma
+        luma = float(0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2])
+        far &= _seg_dist(R, a, np.full(3, luma, np.float32)) > EMOJI_FAR_RGB
+        for b_ in cols[i + 1:]:
+            far &= _seg_dist(R, a, b_) > EMOJI_FAR_RGB
+    # ... and bleeds a few px around the glyphs (HIGHLIGHT_ZONE_PX): colour next to caption-coloured ink is its bleed
+    ink = np.zeros(R.shape[:2], bool)
+    for c in (cap.color, cap.highlight_color if cap.highlight else None):
+        rgb = hex_rgb(c)
+        if rgb is not None:
+            ink |= color_mask(rest[Y0:Y1, X0:X1], rgb, HIGHLIGHT_CORE_TOL)
+    k = 2 * (HIGHLIGHT_ZONE_PX + 1) + 1
+    near_ink = cv2.dilate(ink.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool)
+    cand = drawn & static & colored & far & ~near_ink
+    n, lab, st, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(cand.astype(np.uint8), cv2.MORPH_CLOSE,
+                                                                       np.ones((3, 3), np.uint8)), 8)
+    amin = (0.12 * size) ** 2
+    blobs = []
+    for i in range(1, n):
+        if st[i][4] >= amin:
+            mm = lab == i
+            blobs.append({"bbox": [int(st[i][0] + X0), int(st[i][1] + Y0), int(st[i][2]), int(st[i][3])],
+                          "area": int(st[i][4]), "color": rgb_hex(np.median(R[mm], axis=0))})
+    return {"status": "measured", "n_blobs": len(blobs), "blobs": blobs[:6], "min_area_px": rnd(amin, 1),
+            "frames": {"rest": rnd(t_rest, 4), "before": rnd(t_pre, 4), "after": rnd(t_post, 4), "mid": rnd(t_mid, 4)},
+            "static_check": t_mid is not None,
+            "method": "자막이 그린(등장 전/퇴장 후와 다른) + 표시 중 정지 + 채도 높음 + 자막 색·색 사이 혼합이 아닌 화소 덩어리"}
 
 
 # ----------------------------------------------------------------------------- font
@@ -1051,6 +1535,7 @@ def probe_captions(ctx: QAContext) -> list[dict]:
                     item.update(measure_timing(ctx, cap, loc, frame))
                 except Exception as e:
                     item["timing_error"] = f"{type(e).__name__}: {e}"[:300]
+                item.update(caption_style_extras(ctx, cap, loc, frame, t_rest, item))
                 item["font"] = measure_font(frame, cap, loc["bbox"], loc, ctx)
                 try:
                     pool = rest_pool_crops(ctx, cap, loc, frame)
@@ -1063,6 +1548,43 @@ def probe_captions(ctx: QAContext) -> list[dict]:
             item["found"] = False
             item["error"] = f"{type(e).__name__}: {e}"[:300]
         out.append(item)
+    return out
+
+
+def caption_style_extras(ctx: QAContext, cap, loc: dict, frame: np.ndarray, t_rest: float, item: dict) -> dict:
+    """Output measurements behind the caption style rows that are not part of locate/timing: reference-definition line
+    style (outline, drop shadow, box pad), box colour (regression), dialogue quote marks, colour glyphs (emoji)."""
+    out: dict = {}
+    fr = 1.0 / ctx.fps
+    try:
+        out["line_style"] = caption_line_styles(frame, cap, loc)
+    except Exception as e:  # never a silent pass
+        out["line_style"] = {"lines": [], "error": f"{type(e).__name__}: {e}"[:300]}
+    on, off = item.get("onset"), item.get("offset")
+    boxed = [ln["box"] for ln in (out["line_style"].get("lines") or []) if (ln.get("box") or {}).get("present") == "present"]
+    blk = out["line_style"].get("block_box") or {}
+    bb = blk.get("bbox") if blk.get("present") == "present" else (boxed[0]["bbox"] if len(boxed) == 1 else None)
+    if (cap.box or {}).get("enabled"):
+        rect = bb or (cap.box or {}).get("rect")
+        if rect:
+            try:
+                g = float(cap.outline_px or 0) + 1
+                tb = loc["bbox"]
+                out["box_color"] = caption_box_color(ctx, cap, rect, [tb[0] - g, tb[1] - g, tb[2] + 2 * g, tb[3] + 2 * g], frame,
+                                                     (on if on is not None else cap.start) - 2 * fr,
+                                                     ((off if off is not None else cap.end) + 2 * fr))
+                out["box_color"]["box_rect_source"] = "출력에서 찾은 박스" if bb else "IR box.rect(출력에서 박스 경계 못 찾음)"
+            except Exception as e:
+                out["box_color"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:300]}
+    if cap.role == "dialogue":
+        try:
+            out["quote_marks"] = quote_marks_obs(frame, cap, loc)
+        except Exception as e:
+            out["quote_marks"] = {"shape": {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:300]}}
+    try:
+        out["emoji"] = emoji_obs(ctx, cap, loc, frame, t_rest, on, off)
+    except Exception as e:
+        out["emoji"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:300]}
     return out
 
 

@@ -52,7 +52,8 @@
           "type": "flash",
           "t": 13.5,
           "dur": 0.12,
-          "color": "#FFFFFF"
+          "color": "#FFFFFF",
+          "scope": "region"
         },
         "observed": {
           "type": "flash",
@@ -60,7 +61,17 @@
           "peak_t": 13.5,
           "dur": 0.1,
           "color": "#FDFDFD",
-          "score": 122.6
+          "score": 122.6,
+          "scope_obs": {
+            "t_peak": 13.5,
+            "t_before": 13.3667,
+            "outside_share": 0.6384,
+            "progress_inside": 1.008,
+            "progress_outside": -0.0,
+            "outside_contrast": 441.7,
+            "status": "measured",
+            "scope": "region"
+          }
         },
         "type_ok": true,
         "timing_ok": true
@@ -3575,6 +3586,54 @@
         "reason": "출처 기록 없음(warehouse/overlays/d88ab9aa0363….json) — `python -m shortkit clean detect --source assets/test/generated/video/face-demographics-walking-and-pause.mp4`"
       }
     ]
+  },
+  "arrows": {
+    "items": []
+  },
+  "canvas_geometry": {
+    "fit": [
+      {
+        "clip_id": "s1",
+        "expected": "cover",
+        "t": 2.4,
+        "band_share": 0.0009,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s2",
+        "expected": "cover",
+        "t": 7.3,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s3",
+        "expected": "cover",
+        "t": 11.6333,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s4",
+        "expected": "cover",
+        "t": 16.0,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      },
+      {
+        "clip_id": "s5",
+        "expected": "cover",
+        "t": 20.5,
+        "band_share": 0.0,
+        "status": "unmeasured",
+        "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+      }
+    ],
+    "blur": null
   },
   "protected": [
     {

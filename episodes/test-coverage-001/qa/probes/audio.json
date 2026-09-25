@@ -2674,7 +2674,36 @@
       0.99,
       0.999,
       0.952
-    ]
+    ],
+    "level": {
+      "status": "measured",
+      "level_db": 0.63,
+      "ls_gain_db": -0.07,
+      "mix_lufs": -14.7,
+      "target_lufs": -14.0,
+      "method": "깨끗한 음원 LS 이득(0.25 s 창 이득의 p90 = BGM 기준 레벨, dB) + 목표 LUFS − 출력 통합 LUFS (ref audio-measure 의 audio.bgm.gain_db 와 같은 정의)"
+    },
+    "ramps": {
+      "silences": {
+        "method": "BGM 파형 LS 이득(3 ms 창) 이 정적 앞 기준 레벨(가장자리 -1.2~-0.6 s 중앙값) 대비 -2 → -30 dB 를 지나는 시간 → 렌더러 모양(dB 선형 0→-120 dB) 에 같은 측정을 한 표로 fade_s 환산",
+        "blocker": null,
+        "items": []
+      },
+      "ducking": {
+        "observed": {
+          "presence": "unmeasured",
+          "blocker": "대사(원음) 구간 없음 — 덕킹 여부를 판정할 근거 없음",
+          "method": "BGM 이득 곡선(깨끗한 음원 정렬 LS, 10 ms) 에서 대사 전(-1.2~-0.25 s)·대사 중(+0.3 s~끝-0.1 s) 중앙값 차 = 깊이; 10→90 % 경사 시간/0.8 = attack/release (선형 dB 경사 모델)"
+        },
+        "planned_reading": {
+          "presence": "unmeasured",
+          "blocker": "대사(원음) 구간 없음 — 덕킹 여부를 판정할 근거 없음",
+          "method": "BGM 이득 곡선(깨끗한 음원 정렬 LS, 10 ms) 에서 대사 전(-1.2~-0.25 s)·대사 중(+0.3 s~끝-0.1 s) 중앙값 차 = 깊이; 10→90 % 경사 시간/0.8 = attack/release (선형 dB 경사 모델)"
+        },
+        "per_segment": [],
+        "speech_used": []
+      }
+    }
   },
   "sfx_templates": [
     "click:assets/test/generated/sfx/click.wav",
@@ -2746,7 +2775,7 @@
         "catalog_type": {
           "status": "unmeasured",
           "type_id": null,
-          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+          "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
         }
       },
       {
@@ -2767,7 +2796,7 @@
         "catalog_type": {
           "status": "unmeasured",
           "type_id": null,
-          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+          "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
         }
       },
       {
@@ -2788,7 +2817,7 @@
         "catalog_type": {
           "status": "unmeasured",
           "type_id": null,
-          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+          "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
         }
       }
     ],
@@ -2797,7 +2826,8 @@
     "subaudible_matches": [],
     "catalog_classification": {
       "status": "unmeasured",
-      "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+      "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "catalog_status": "unmeasured"
     }
   },
   "unexplained_onsets": [],

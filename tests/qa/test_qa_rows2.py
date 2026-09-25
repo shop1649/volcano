@@ -66,7 +66,9 @@ def test_first_caption_uses_the_reference_analyzer_definition(temp_root):
     fc = checks.first_timed_caption(caps, onsets)
     assert fc["t"] == pytest.approx(ref["value"]) and fc["caption"] == "k"
     # the roles QA leaves out are exactly the analyzer's: a title-only change moves neither
-    assert checks.FIRST_CAPTION_EXCLUDED_ROLES == ("title", "description", "identity_mark", "unknown")
+    from shortkit.reference import aggregate
+
+    assert checks.FIRST_CAPTION_EXCLUDED_ROLES is aggregate.FIRST_CAPTION_EXCLUDED_ROLES
 
 
 def test_first_caption_unmeasured_when_an_earlier_caption_was_not_measured():

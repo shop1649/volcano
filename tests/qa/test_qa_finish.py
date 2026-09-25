@@ -254,9 +254,12 @@ def test_timing_reference_row_reads_persist_with_the_analyzer_definition(temp_ro
     assert row["status"] == ("different" if want == "whole_video" else row["status"])
 
 
-def test_dialogue_lead_is_not_declared_or_carried():
+def test_dialogue_lead_is_declared_only_for_the_timing_check():
+    """wave 5: text.roles.dialogue.timing.lead_s has an output check (caption.timing:dialogue_lead_ref, the lead over the
+    speech measured in the output); the other roles' lead_s are declared there too and are 'not applicable' (0 by
+    definition) through role_not_applicable -- tests/qa/test_qa_outputs.py."""
     decl = checks.declarations()
-    assert not [k for ks in decl.values() for k in ks if k.endswith("timing.lead_s")]
+    assert sorted(c for c, ks in decl.items() if any(k.endswith("timing.lead_s") for k in ks)) == ["caption.timing"]
 
 
 # ============================================================================ 3. reveal / replay / cover-up

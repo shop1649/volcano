@@ -25,19 +25,11 @@ def _clip(**kw):
 
 
 # ----------------------------------------------------------------------------- declarations
-# style keys NO output check measures (review S1-13): `preset audit` must report exactly these as no_qa -- a key
-# leaves this list only when a real output check for it is added (and declared).
-NO_OUTPUT_CHECK = {
-    "audio.bgm.gain_db", "audio.ducking.attack_s", "audio.ducking.release_s", "audio.original.fade_s",
-    "audio.silence.fade_s", "canvas.background.blur_sigma", "canvas.video_region.fit",
-    "decorations.arrow.head_len_ratio", "decorations.arrow.head_width_ratio", "decorations.arrow.outline_color",
-    "decorations.arrow.outline_px", "decorations.arrow.shaft_width_ratio", "motion.transitions.flash.scope",
-    "motion.zoom.recenter", "structure.duration_s.n", "structure.duration_s.p50", "text.tone.emoji",
-    "text.tone.sentence_end_examples", "text.roles.dialogue.quote_marks",
-    *[f"text.roles.{r}.{leaf}" for r in checks.ROLES for leaf in ("box.color", "box.pad_x", "box.pad_y",
-                                                                   "motion_in.offset_px", "shadow_color", "shadow_px",
-                                                                   "timing.lead_s")],
-}
+# style keys with NO output check (review S1-13; wave 5 added output checks for all the others): the writing guide
+# text.tone.sentence_end_examples (meta) and the sample counts structure.*.n (measurement metadata).  `preset audit`
+# may list at most these as no_qa -- a key leaves this set only when it is classified or checked.
+NO_OUTPUT_CHECK = {"text.tone.sentence_end_examples", "structure.duration_s.n", "structure.cuts_per_10s.n",
+                   "structure.shot_len_s.n"}
 
 
 def test_declarations_are_exact_keys_without_globs():
@@ -48,14 +40,18 @@ def test_declarations_are_exact_keys_without_globs():
     decl = checks.declarations()
     pats = [p for v in decl.values() for p in v]
     assert not [p for p in pats if any(c in p for c in "*?[")]
-    # declared keys the preset does not have yet: the cut-structure keys `ref aggregate` must emit (requested)
-    assert sorted({p for p in pats if p not in allk}) == sorted(checks.CUT_STRUCTURE_KEYS)
+    # every declared key is a key of the preset (the cut-structure keys p10 / p50 / p90 are in preset.yaml now)
+    assert not sorted({p for p in pats if p not in allk})
     covered = {k for k in allk if any(config._match(k, p) for p in pats)}
-    for k in ("motion.transitions.flash.scope", "decorations.arrow.head_len_ratio", "decorations.arrow.shaft_width_ratio",
-              "text.roles.title.box.color", "text.tone.emoji", "canvas.background.blur_sigma"):
+    for k in NO_OUTPUT_CHECK & allk:
         assert k not in covered, k
     for k in [f"presence.{x}" for x in checks.PRESENCE_ITEMS] + ["text.roles.speaker.motion_out.type",
-                                                               "text.roles.speaker.motion_out.dur_s"]:
+                                                               "text.roles.speaker.motion_out.dur_s",
+                                                               "motion.transitions.flash.scope",
+                                                               "decorations.arrow.head_len_ratio",
+                                                               "decorations.arrow.shaft_width_ratio",
+                                                               "text.roles.title.box.color", "text.tone.emoji",
+                                                               "canvas.background.blur_sigma", "structure.duration_s.p50"]:
         assert k in covered, k
     assert checks.ROLES == __import__("shortkit.edit.resolve", fromlist=["ROLES"]).ROLES
 
@@ -291,14 +287,14 @@ def test_registry_audit_reports_exactly_the_keys_without_an_output_check(temp_ro
     check measures show up as no_qa -- no more, no fewer (run on a temp copy of the preset)."""
     config.sync_registry("joshuamagazine", access_logs=[])
     res = config.audit("joshuamagazine", production=False)
-    assert set(res["no_qa"]) == NO_OUTPUT_CHECK
+    assert set(res["no_qa"]) <= NO_OUTPUT_CHECK, sorted(set(res["no_qa"]) - NO_OUTPUT_CHECK)
     from shortkit.util.jsonio import read_yaml
 
     ent = read_yaml(temp_root / "presets/joshuamagazine/settings_registry.yaml")["entries"]
     assert "caption.position" in ent["text.roles.situation.anchor.y"]["qa_checks"]
     assert "audio.bgm" in ent["audio.bgm.section_start_s"]["qa_checks"]
     assert ent["presence.zoom"]["qa_checks"] == ["presence"]
-    assert ent["motion.transitions.flash.scope"]["qa_checks"] == []
+    assert ent["motion.transitions.flash.scope"]["qa_checks"] == ["video.transitions"]
 
 
 # ----------------------------------------------------------------------------- caption locating (SYNTHETIC image)

@@ -1,10 +1,13 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-25T08:43:22+00:00",
+  "saved_at": "2026-09-25T10:34:19+00:00",
   "reads": {
     "approval.first_episode_requires_approval": [
       "shortkit/edit/plan.py:approval_state_for"
+    ],
+    "audio.bgm.gain_db": [
+      "shortkit/qa/checks.py:pget"
     ],
     "audio.bgm.section_start_s": [
       "shortkit/qa/checks.py:pget"
@@ -64,6 +67,9 @@
     "audio.sfx.max_event_offset_s": [
       "shortkit/qa/checks.py:pget"
     ],
+    "audio.silence.fade_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "canvas.background.color": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -74,6 +80,9 @@
       "shortkit/qa/checks.py:pget"
     ],
     "canvas.height": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "canvas.video_region.fit": [
       "shortkit/qa/checks.py:pget"
     ],
     "canvas.video_region.h": [
@@ -105,6 +114,21 @@
     "decorations.arrow.color": [
       "shortkit/qa/checks.py:pget"
     ],
+    "decorations.arrow.head_len_ratio": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "decorations.arrow.head_width_ratio": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "decorations.arrow.outline_color": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "decorations.arrow.outline_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "decorations.arrow.shaft_width_ratio": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "decorations.arrow.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -132,6 +156,9 @@
     "motion.transitions.flash.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
+    "motion.transitions.flash.scope": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "motion.zoom.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -139,6 +166,9 @@
       "shortkit/qa/checks.py:pget"
     ],
     "motion.zoom.max_consecutive": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "motion.zoom.recenter": [
       "shortkit/qa/checks.py:pget"
     ],
     "motion.zoom.scale_to": [
@@ -177,10 +207,16 @@
     "structure.cuts_per_10s.p10": [
       "shortkit/qa/checks.py:pget"
     ],
+    "structure.cuts_per_10s.p50": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "structure.cuts_per_10s.p90": [
       "shortkit/qa/checks.py:pget"
     ],
     "structure.duration_s.p10": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "structure.duration_s.p50": [
       "shortkit/qa/checks.py:pget"
     ],
     "structure.duration_s.p90": [
@@ -194,6 +230,9 @@
       "shortkit/qa/report.py:input_fingerprints"
     ],
     "structure.shot_len_s.p10": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "structure.shot_len_s.p50": [
       "shortkit/qa/checks.py:pget"
     ],
     "structure.shot_len_s.p90": [
@@ -247,6 +286,9 @@
     "text.roles.description.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.description.timing.lead_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.roles.description.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -289,10 +331,16 @@
     "text.roles.dialogue.persist": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.dialogue.quote_marks": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.roles.dialogue.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.size_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.dialogue.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.dialogue.timing.min_dur_s": [
@@ -352,6 +400,9 @@
     "text.roles.reaction.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.reaction.timing.lead_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.roles.reaction.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -406,6 +457,9 @@
     "text.roles.situation.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.situation.timing.lead_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.roles.situation.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -421,7 +475,16 @@
     "text.roles.speaker.box.alpha": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.speaker.box.color": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.roles.speaker.box.enabled": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_x": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.color": [
@@ -461,6 +524,9 @@
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.size_px": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.timing.min_dur_s": [
@@ -511,6 +577,9 @@
     "text.roles.title.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
+    "text.roles.title.timing.lead_s": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "text.tone.emoji": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -532,10 +601,10 @@
       "fp": "fa8bc1858240664f"
     },
     "shortkit/qa/probes_audio.py:classify_sfx_detections": {
-      "fp": "ac2e2dd8fd1922ff"
+      "fp": "3a2ba399b6b5e9fd"
     },
     "shortkit/qa/probes_audio.py:probe_audio": {
-      "fp": "165c051e4c914a4c"
+      "fp": "d1640a101efcd118"
     },
     "shortkit/qa/probes_text.py:probe_cover": {
       "fp": "06895fb791687973"

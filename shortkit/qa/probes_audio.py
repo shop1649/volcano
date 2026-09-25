@@ -349,11 +349,16 @@ def classify_sfx_detections(ctx: QAContext, dets: list[dict]) -> dict:
     except KeyError:
         rel = None
     cat = read_json(paths.absp(rel)) if rel else None
-    if not cat or cat.get("status") != "measured":
-        why = "효과음 카탈로그 미측정(" + str((cat or {}).get("blocker") or "없음")[:160] + ") — 종류 지문 없음"
+    from ..edit.validate import catalog_counts_measured
+
+    # a 'partial' catalog (every target video analysed and counted; only a per-type column such as emotion missing)
+    # has its type fingerprints: the rule of episode validate (edit.validate.catalog_counts_measured) decides
+    if not cat or not catalog_counts_measured(cat):
+        why = ("효과음 카탈로그 미측정(상태 " + str((cat or {}).get("status") or "없음") + ": "
+               + str((cat or {}).get("blocker") or "없음")[:160] + ") — 종류 지문 없음")
         for d in dets:
             d["catalog_type"] = {"status": "unmeasured", "type_id": None, "reason": why}
-        return {"status": "unmeasured", "reason": why}
+        return {"status": "unmeasured", "reason": why, "catalog_status": (cat or {}).get("status")}
     cents = []
     for t in cat.get("types") or []:
         c = (t.get("fingerprint") or {}).get("centroid")
@@ -385,7 +390,8 @@ def classify_sfx_detections(ctx: QAContext, dets: list[dict]) -> dict:
                    "runner_up": ({"type_id": sims[1][1], "similarity": round(float(sims[1][0]), 3)} if len(sims) > 1 else None)}
         by_file[f] = ent
         d["catalog_type"] = dict(ent)
-    return {"status": "measured", "types_with_centroid": len(cents), "files": len(by_file)}
+    return {"status": "measured", "types_with_centroid": len(cents), "files": len(by_file),
+            "catalog_status": cat.get("status")}
 
 
 def db(v, floor: float = -120.0):
@@ -804,6 +810,107 @@ def kept_levels_obs(ctx: QAContext, orig_rows: list[dict], mix_lufs: float | Non
 
 
 # ----------------------------------------------------------------------------- main probe
+# ----------------------------------------------------------------------------- BGM level and edge ramps
+# The reference analyzers measure these on the reference mix (shortkit.reference.audio_original / audio_bgm); QA runs
+# the SAME functions on the output so both sides are read with one definition:
+#   level      audio.bgm.gain_db = LS gain of the clean file + (target LUFS - mix LUFS)   (ref audio-measure)
+#   silences   measure_silence_ramps  (renderer shape: dB-linear 0 -> -120 dB)            -> audio.silence.fade_s
+#   ducking    measure_ducking on the BGM gain curve under the speech measured in the output -> attack_s / release_s
+#   originals  measure_original_ramps (renderer shape: linear amplitude)                  -> audio.original.fade_s
+def bgm_level_obs(plateau_gain_db: float | None, target_lufs: float | None, mix_lufs: float | None) -> dict:
+    """BGM level at the final programme loudness as `ref audio-measure` defines audio.bgm.gain_db: the LS gain of the
+    clean file in the mix (dB, the BGM plateau = 90th percentile of the 0.25 s window gains) + target LUFS - the mix's
+    measured integrated LUFS."""
+    method = ("깨끗한 음원 LS 이득(0.25 s 창 이득의 p90 = BGM 기준 레벨, dB) + 목표 LUFS − 출력 통합 LUFS "
+              "(ref audio-measure 의 audio.bgm.gain_db 와 같은 정의)")
+    if plateau_gain_db is None or target_lufs is None or mix_lufs is None:
+        return {"status": "unmeasured", "method": method,
+                "reason": "BGM 이득 또는 출력 음량을 재지 못함" if plateau_gain_db is None or mix_lufs is None else "목표 음량 없음"}
+    return {"status": "measured", "level_db": rnd(plateau_gain_db + float(target_lufs) - float(mix_lufs), 2),
+            "ls_gain_db": rnd(plateau_gain_db, 2), "mix_lufs": mix_lufs, "target_lufs": target_lufs, "method": method}
+
+
+def _bgm_model(bgm_sig: np.ndarray, aligned: np.ndarray, sr: int):
+    """A reference BgmModel (waveform mode) of the output: the clean file aligned to the output (unit gain) and the
+    BGM gain curve of ``bgm_sig`` against it (reference.audio_bgm.gain_curve_waveform)."""
+    from ..reference.audio_bgm import GAIN_HOP_S, BgmModel, gain_curve_waveform
+
+    t, g, on = gain_curve_waveform(bgm_sig, aligned, sr)
+    return BgmModel(mode="waveform", sr=sr, aligned=aligned, valid=None, t=t, gain=g,
+                    gain_db=20 * np.log10(np.maximum(g, 1e-5)), clean_on=on, hop_s=GAIN_HOP_S)
+
+
+def planned_bgm_signal(ctx: QAContext, aligned: np.ndarray, sr: int) -> np.ndarray:
+    """The planned BGM of the IR (fades x envelope, the renderer's own functions) on the aligned clean file: what the
+    output's BGM would be if the renderer drew exactly the plan."""
+    from ..edit.render import _lin_fade, envelope_gain
+
+    b = ctx.resolved.audio.bgm
+    n = len(aligned)
+    g = _lin_fade(n, sr, float(b.fade_in_s or 0.0), float(b.fade_out_s or 0.0)) * envelope_gain(b.envelope or [], n, sr)
+    return (aligned.astype(np.float64) * g).astype(np.float32)
+
+
+def bgm_ramps(ctx: QAContext, bgm_sig: np.ndarray, aligned: np.ndarray, sr: int, speech: list | None) -> dict:
+    """Intentional-silence ramps and ducking attack / release of the output's BGM, each measured twice with the same
+    reference function: on the output (``bgm_sig`` = mix minus the fitted original sound and SFX) and on the planned
+    BGM signal (IR envelope on the same aligned clean file) -- the planned reading is what the measurement gives for
+    the renderer's planned ramp (window blur included), so observed vs planned compares like with like."""
+    from ..reference.audio_original import measure_ducking, measure_silence_ramps
+
+    out: dict = {}
+    b = ctx.resolved.audio.bgm
+    obs_m = _bgm_model(bgm_sig, aligned, sr)
+    plan_sig = planned_bgm_signal(ctx, aligned, sr)
+    plan_m = _bgm_model(plan_sig, aligned, sr)
+    items_o = [{"start": float(a), "end": float(c), "bgm_cut": True} for a, c in (b.silences or [])]
+    items_p = [dict(x) for x in items_o]
+    try:
+        meth = measure_silence_ramps(bgm_sig, obs_m, items_o, sr)
+        measure_silence_ramps(plan_sig, plan_m, items_p, sr)
+        out["silences"] = {"method": meth.get("method"), "blocker": meth.get("blocker"),
+                           "items": [{"range": [rnd(o["start"], 3), rnd(o["end"], 3)], "observed": o.get("ramps"),
+                                      "planned_reading": p.get("ramps")} for o, p in zip(items_o, items_p)]}
+    except Exception as e:  # never a silent pass
+        out["silences"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:300]}
+    sp = [{"start": float(a), "end": float(c)} for a, c in (speech or [])]
+    try:
+        do = measure_ducking(obs_m, sp)
+        dp = measure_ducking(plan_m, sp)
+        keep = ("presence", "blocker", "depth_db", "attack_s", "release_s", "method")
+        out["ducking"] = {"observed": {k: do.get(k) for k in keep if k in do},
+                          "planned_reading": {k: dp.get(k) for k in keep if k in dp},
+                          "per_segment": [{"start": rnd(x["start"], 3), "end": rnd(x["end"], 3),
+                                           **{k: x.get(k) for k in ("status", "depth_db", "attack_s", "release_s",
+                                                                    "blocker")},
+                                           "planned_reading": {k: y.get(k) for k in ("status", "depth_db", "attack_s",
+                                                                                      "release_s")}}
+                                          for x, y in zip(do.get("per_segment") or [], dp.get("per_segment") or [])],
+                          "speech_used": [[rnd(x["start"], 3), rnd(x["end"], 3)] for x in sp]}
+    except Exception as e:
+        out["ducking"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:300]}
+    return out
+
+
+def original_ramps(ctx: QAContext, orig_sig: np.ndarray, sr: int) -> dict:
+    """On/off edge ramps of the kept original sound in the output (reference.audio_original.measure_original_ramps on
+    ``orig_sig`` = mix minus the fitted BGM and SFX), per kept range of the IR; in the renderer's audio.original.fade_s
+    units.  Only edges followed by stationary sound are measurable (speech starting at the edge shows its own attack)."""
+    from ..reference.audio_original import measure_original_ramps
+
+    segs = [{"start": float(o.out_start), "end": float(o.out_end)} for o in ctx.resolved.audio.originals]
+    if not segs:
+        return {"items": []}
+    edges = measure_original_ramps(orig_sig, segs, sr)
+    items = []
+    for i, o in enumerate(ctx.resolved.audio.originals):
+        # measure_original_ramps returns (on, off) per segment in order ('t' of a measured edge is its crossing time)
+        es = [dict(e, edge_t=round(float(o.out_start if e["edge"] == "on" else o.out_end), 3))
+              for e in edges[2 * i:2 * i + 2]]
+        items.append({"index": i, "clip_id": o.clip_id, "planned_fade_s": o.fade_s, "edges": es})
+    return {"items": items, "method": "reference.audio_original.measure_original_ramps(출력 − 찾은 BGM·효과음)"}
+
+
 def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
     from .. import paths
     from ..util.media import lufs
@@ -1048,7 +1155,27 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
             if all_cols else y.copy()
         out["originals"]["voice_out"] = kept_audio_checks(ctx, voice_out, sr, bgm_al is not None)
     except Exception as e:
+        voice_out = None
         out["errors"]["voice_out"] = f"{type(e).__name__}: {e}"
+    # ---------------- BGM level at programme loudness, silence / ducking ramps, kept-original edge ramps
+    if bgm_al is not None:
+        b_info["level"] = bgm_level_obs(b_info.get("plateau_gain_db"), res.audio.target_lufs,
+                                        (out.get("loudness") or {}).get("integrated_lufs"))
+        try:
+            others = [k for k, nm in enumerate(names) if nm.startswith("orig:")] + list(range(len(cols), len(all_cols)))
+            bgm_sig = (y.astype(np.float64) - fitted_part(all_cols, Gf, others, n, sr, FINE)).astype(np.float32)
+            sp_out = ((out["originals"].get("voice_out") or {}).get("speech") or {})
+            b_info["ramps"] = bgm_ramps(ctx, bgm_sig, bgm_al, sr,
+                                        sp_out.get("spans") if sp_out.get("status") == "measured" else None)
+            if sp_out.get("status") != "measured":
+                b_info["ramps"]["ducking_speech_note"] = "출력 말소리를 재지 못함: " + str(sp_out.get("reason") or "")
+        except Exception as e:
+            out["errors"]["bgm_ramps"] = f"{type(e).__name__}: {e}"
+    if voice_out is not None and res.audio.originals:
+        try:
+            out["originals"]["ramps"] = original_ramps(ctx, voice_out, sr)
+        except Exception as e:
+            out["errors"]["original_ramps"] = f"{type(e).__name__}: {e}"
     # ---------------- SFX gains relative to the BGM heard at the same moment
     env = _planned_bgm_env(ctx)
     y_lp = lowpass(y, sr) if dets else y

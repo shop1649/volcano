@@ -5,7 +5,7 @@
   "preset_name": "joshuamagazine",
   "format_id": "UNCLASSIFIED",
   "mode": "test",
-  "measured_at": "2026-09-25T08:48:03+00:00",
+  "measured_at": "2026-09-25T10:38:28+00:00",
   "principle": "최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)",
   "output": {
     "path": "episodes/test-coverage-001/output/test-coverage-001.mp4",
@@ -58,23 +58,23 @@
     "clean_verify": true
   },
   "timing_s": {
-    "text_s": 182.6,
-    "video_s": 45.7,
-    "audio_s": 9.2,
-    "total_s": 251.3
+    "text_s": 178.8,
+    "video_s": 47.6,
+    "audio_s": 8.3,
+    "total_s": 247.7
   },
   "summary": {
-    "total": 213,
-    "same": 145,
+    "total": 218,
+    "same": 147,
     "different": 0,
-    "unmeasured": 68,
+    "unmeasured": 71,
     "intended_change": 0,
     "different_unintended": 0,
     "by_category": {
       "화면 구성": {
         "same": 4,
         "different": 0,
-        "unmeasured": 3
+        "unmeasured": 5
       },
       "글자 위치": {
         "same": 14,
@@ -82,7 +82,7 @@
         "unmeasured": 8
       },
       "자막 내용·말투": {
-        "same": 8,
+        "same": 9,
         "different": 0,
         "unmeasured": 3
       },
@@ -137,9 +137,9 @@
         "unmeasured": 0
       },
       "음악 구간": {
-        "same": 10,
+        "same": 11,
         "different": 0,
-        "unmeasured": 5
+        "unmeasured": 6
       },
       "원음": {
         "same": 1,
@@ -179,11 +179,11 @@
     },
     "by_kind": {
       "output_vs_plan": {
-        "same": 145,
+        "same": 147,
         "unmeasured": 7
       },
       "style_vs_reference": {
-        "unmeasured": 61
+        "unmeasured": 64
       }
     }
   },
@@ -229,7 +229,25 @@
       "item": "배경 (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: canvas.background.blur_sigma — background.type=color(흐린 원본 배경 아님) → 흐림 정도가 쓰이지 않음.",
+      "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치",
+      "covered_by": null
+    },
+    {
+      "row_id": "canvas.video_region:fit",
+      "item": "영상 영역 채우기(cover/contain)",
+      "required": false,
+      "kind": "output_vs_plan",
+      "reason": "모든 클립에서 cover 와 contain 렌더링이 같아(소스 비율 = 영역 비율) 채우기 방식을 출력에서 구별할 수 없음",
+      "impact": "화면 구성을 확인하지 못함",
+      "covered_by": null
+    },
+    {
+      "row_id": "canvas.video_region:fit_ref",
+      "item": "영상 영역 채우기 (레퍼런스 대비)",
+      "required": false,
+      "kind": "style_vs_reference",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 구별 가능한 클립의 채우기 방식(최빈)",
       "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치",
       "covered_by": null
     },
@@ -243,12 +261,12 @@
       "covered_by": null
     },
     {
-      "row_id": "caption.tone:emoji",
-      "item": "자막 이모지 사용",
+      "row_id": "caption.tone:emoji_ref",
+      "item": "자막 이모지 (레퍼런스 대비)",
       "required": false,
-      "kind": "output_vs_plan",
-      "reason": "출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음",
-      "impact": "자막 문구·말투를 확인하지 못함",
+      "kind": "style_vs_reference",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. text.tone.emoji=false → 모든 자막에 색 글리프 0개(못 잰 자막이 있으면 못 잼); true → 허용",
+      "impact": "자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음",
       "covered_by": null
     },
     {
@@ -271,10 +289,10 @@
     },
     {
       "row_id": "caption.style:description_ref",
-      "item": "자막 색·외곽선·박스 [description] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [description] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "impact": "글자 색 불일치",
       "covered_by": null
     },
@@ -292,7 +310,7 @@
       "item": "자막 표시 시간 [description] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "impact": "자막 등장 타이밍 불일치",
       "covered_by": null
     },
@@ -301,7 +319,7 @@
       "item": "자막 등장·퇴장 모션 [description] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "reason": "레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "impact": "자막 등장·퇴장 모션 불일치",
       "covered_by": null
     },
@@ -325,10 +343,10 @@
     },
     {
       "row_id": "caption.style:reaction_ref",
-      "item": "자막 색·외곽선·박스 [reaction] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [reaction] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "impact": "글자 색 불일치",
       "covered_by": null
     },
@@ -346,7 +364,7 @@
       "item": "자막 표시 시간 [reaction] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "impact": "자막 등장 타이밍 불일치",
       "covered_by": null
     },
@@ -355,7 +373,7 @@
       "item": "자막 등장·퇴장 모션 [reaction] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "impact": "자막 등장·퇴장 모션 불일치",
       "covered_by": null
     },
@@ -379,10 +397,10 @@
     },
     {
       "row_id": "caption.style:situation_ref",
-      "item": "자막 색·외곽선·박스 [situation] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [situation] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "impact": "글자 색 불일치",
       "covered_by": null
     },
@@ -400,7 +418,7 @@
       "item": "자막 표시 시간 [situation] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "impact": "자막 등장 타이밍 불일치",
       "covered_by": null
     },
@@ -409,7 +427,7 @@
       "item": "자막 등장·퇴장 모션 [situation] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "reason": "레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "impact": "자막 등장·퇴장 모션 불일치",
       "covered_by": null
     },
@@ -433,10 +451,10 @@
     },
     {
       "row_id": "caption.style:title_ref",
-      "item": "자막 색·외곽선·박스 [title] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [title] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "impact": "글자 색 불일치",
       "covered_by": null
     },
@@ -454,7 +472,7 @@
       "item": "자막 표시 시간 [title] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의);",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0); timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의);",
       "impact": "레퍼런스와의 일치 여부를 판정할 수 없음",
       "covered_by": null
     },
@@ -463,7 +481,7 @@
       "item": "자막 등장·퇴장 모션 [title] (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "impact": "자막 등장·퇴장 모션 불일치",
       "covered_by": null
     },
@@ -478,10 +496,10 @@
     },
     {
       "row_id": "video.zoom:zoom_ref",
-      "item": "줌 배율·길이·가속 곡선 (레퍼런스 대비)",
+      "item": "줌 배율·길이·가속 곡선·고정점 규칙 (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 줌 중심 되돌리기(recenter)는 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 고정점 규칙(recenter) = 출력에서 잰 줌 고정점이 렌더러 규칙(edit.resolve.src_to_region)의 false/true 중 어느 쪽과 맞는지; 재지 못한 키는 행에서 뺌",
       "impact": "확대·정지·전환의 크기/길이 불일치",
       "covered_by": null
     },
@@ -496,10 +514,10 @@
     },
     {
       "row_id": "video.transitions:transitions_ref",
-      "item": "전환 종류·길이·플래시 색 (레퍼런스 대비)",
+      "item": "전환 종류·길이·플래시 색·범위 (레퍼런스 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 3개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위(scope)는 재지 않음",
+      "reason": "레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color, motion.transitions.flash.scope — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위 = 플래시 정점에서 영상 영역 밖(자막·장식 제외)이 플래시 색으로 밝아졌는지(canvas) 아닌지(region); 재지 못한 키는 행에서 뺌",
       "impact": "확대·정지·전환의 크기/길이 불일치",
       "covered_by": null
     },
@@ -535,7 +553,7 @@
       "item": "레퍼런스 로고 템플릿 없음",
       "required": false,
       "kind": "output_vs_plan",
-      "reason": "레퍼런스 로고 템플릿이 없어 글자 없는 로고 대조 못 함 — 레퍼런스 영상에서 로고를 잘라 presets/joshuamagazine/reference/identity_templates 에 넣어야 함(템플릿을 만드는 단계가 아직 없음; 글자 로고는 OCR 검사만)",
+      "reason": "식별 템플릿 기록이 완전하지 않음(상태 unmeasured): 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용 — `shortkit ref identity-templates` 다시 실행 — 글자 없는 로고는 OCR 검사(identity.forbidden_text)로 잡히지 않음",
       "impact": "레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험",
       "covered_by": null
     },
@@ -585,6 +603,15 @@
       "covered_by": null
     },
     {
+      "row_id": "audio.bgm:level_ref",
+      "item": "BGM 크기 (레퍼런스 대비)",
+      "required": false,
+      "kind": "style_vs_reference",
+      "reason": "레퍼런스 미측정(임시값) 키 1개: audio.bgm.gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스와 같은 정의(ref audio-measure: 깨끗한 음원 LS 이득 + 목표 LUFS − 믹스 LUFS)",
+      "impact": "BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가",
+      "covered_by": null
+    },
+    {
       "row_id": "audio.original:orig_ref",
       "item": "보존 원음 크기 (레퍼런스 대비)",
       "required": false,
@@ -598,7 +625,7 @@
       "item": "효과음 [fx1] 종류 = 소리 지문(카탈로그 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "impact": "레퍼런스와의 일치 여부를 판정할 수 없음",
       "covered_by": null
     },
@@ -607,7 +634,7 @@
       "item": "효과음 [fx2] 종류 = 소리 지문(카탈로그 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "impact": "레퍼런스와의 일치 여부를 판정할 수 없음",
       "covered_by": null
     },
@@ -616,7 +643,7 @@
       "item": "효과음 [fx3] 종류 = 소리 지문(카탈로그 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "reason": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "impact": "레퍼런스와의 일치 여부를 판정할 수 없음",
       "covered_by": null
     },
@@ -652,7 +679,7 @@
       "item": "영상 길이 (레퍼런스 분포 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: structure.duration_s.p10, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "reason": "레퍼런스 미측정(임시값) 키 3개: structure.duration_s.p10, structure.duration_s.p50, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "impact": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능",
       "covered_by": null
     },
@@ -670,7 +697,7 @@
       "item": "컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "reason": "레퍼런스 미측정(임시값) 키 3개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p50, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "impact": "영상 길이·전개 구조 불일치",
       "covered_by": null
     },
@@ -679,7 +706,7 @@
       "item": "샷 길이 중앙값 (레퍼런스 포맷 분포 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "reason": "레퍼런스 미측정(임시값) 키 3개: structure.shot_len_s.p10, structure.shot_len_s.p50, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "impact": "영상 길이·전개 구조 불일치",
       "covered_by": null
     },
@@ -918,7 +945,7 @@
     }
   },
   "preset_unmeasured_keys": {
-    "count": 270,
+    "count": 266,
     "keys": [
       "audio.bgm.fade_in_s",
       "audio.bgm.fade_out_s",
@@ -992,16 +1019,13 @@
       "presence.original_audio",
       "presence.speed_change",
       "presence.zoom",
-      "structure.cuts_per_10s.n",
       "structure.cuts_per_10s.p10",
       "structure.cuts_per_10s.p50",
       "structure.cuts_per_10s.p90",
-      "structure.duration_s.n",
       "structure.duration_s.p10",
       "structure.duration_s.p50",
       "structure.duration_s.p90",
       "structure.first_caption_at_s",
-      "structure.shot_len_s.n",
       "structure.shot_len_s.p10",
       "structure.shot_len_s.p50",
       "structure.shot_len_s.p90",
@@ -1188,8 +1212,7 @@
       "text.roles.title.size_px",
       "text.roles.title.timing.min_dur_s",
       "text.tone.emoji",
-      "text.tone.register",
-      "text.tone.sentence_end_examples"
+      "text.tone.register"
     ]
   },
   "rows": [
@@ -1356,7 +1379,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "blur_sigma(블러 강도)는 출력에서 재지 않음 — 이 행이 검사하는 키가 아님",
+      "note": "흐림 정도(blur_sigma)는 canvas.background:blur 행",
       "required": false,
       "keys": [
         "canvas.background.type",
@@ -1384,13 +1407,16 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "note": "레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: canvas.background.blur_sigma — background.type=color(흐린 원본 배경 아님) → 흐림 정도가 쓰이지 않음.",
       "required": false,
       "keys": [
         "canvas.background.type",
         "canvas.background.color"
       ],
-      "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치"
+      "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치",
+      "not_applicable": {
+        "canvas.background.blur_sigma": "background.type=color(흐린 원본 배경 아님) → 흐림 정도가 쓰이지 않음"
+      }
     },
     {
       "check_id": "canvas.safe_margin",
@@ -1426,6 +1452,104 @@
         "canvas.safe_margin.top",
         "canvas.safe_margin.bottom"
       ]
+    },
+    {
+      "check_id": "canvas.video_region",
+      "row_id": "canvas.video_region:fit",
+      "item": "영상 영역 채우기(cover/contain)",
+      "category": "화면 구성",
+      "kind": "output_vs_plan",
+      "reference": null,
+      "expected": {
+        "s1": "cover",
+        "s2": "cover",
+        "s3": "cover",
+        "s4": "cover",
+        "s5": "cover"
+      },
+      "observed": {
+        "clips": [
+          {
+            "clip_id": "s1",
+            "t": 2.4,
+            "status": "unmeasured",
+            "fit": null,
+            "err": null,
+            "band_share": 0.0009,
+            "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+          },
+          {
+            "clip_id": "s2",
+            "t": 7.3,
+            "status": "unmeasured",
+            "fit": null,
+            "err": null,
+            "band_share": 0.0,
+            "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+          },
+          {
+            "clip_id": "s3",
+            "t": 11.6333,
+            "status": "unmeasured",
+            "fit": null,
+            "err": null,
+            "band_share": 0.0,
+            "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+          },
+          {
+            "clip_id": "s4",
+            "t": 16.0,
+            "status": "unmeasured",
+            "fit": null,
+            "err": null,
+            "band_share": 0.0,
+            "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+          },
+          {
+            "clip_id": "s5",
+            "t": 20.5,
+            "status": "unmeasured",
+            "fit": null,
+            "err": null,
+            "band_share": 0.0,
+            "reason": "소스 비율이 영상 영역 비율과 같아 cover 와 contain 렌더링이 같음 — 구별 불가"
+          }
+        ]
+      },
+      "tolerance": "잰 클립마다 출력이 계획한 채우기 방식의 렌더링과 맞음(다른 방식 오차의 절반 이하)",
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {
+        "t": null
+      },
+      "note": "모든 클립에서 cover 와 contain 렌더링이 같아(소스 비율 = 영역 비율) 채우기 방식을 출력에서 구별할 수 없음",
+      "required": false,
+      "keys": [],
+      "impact": "화면 구성을 확인하지 못함"
+    },
+    {
+      "check_id": "canvas.video_region",
+      "row_id": "canvas.video_region:fit_ref",
+      "item": "영상 영역 채우기 (레퍼런스 대비)",
+      "category": "화면 구성",
+      "kind": "style_vs_reference",
+      "reference": "못 잼",
+      "expected": {
+        "canvas.video_region.fit": "cover"
+      },
+      "observed": null,
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "레퍼런스 미측정(임시값) 키 1개: canvas.video_region.fit — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 구별 가능한 클립의 채우기 방식(최빈)",
+      "required": false,
+      "keys": [
+        "canvas.video_region.fit"
+      ],
+      "impact": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치"
     },
     {
       "check_id": "caption.position",
@@ -1552,7 +1676,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_title",
-      "item": "자막 색·외곽선·박스 [c_title·title] \"빈 방에 들어온 사람들\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_title·title] \"빈 방에 들어온 사람들\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -1562,7 +1686,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FFFFFF",
@@ -1571,7 +1696,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -1579,7 +1704,7 @@
         "t": 0.12,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_title_0000120.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.title.color"
@@ -1688,7 +1813,7 @@
         "note": "첫 프레임부터 완전히 표시(등장 모션 없음)",
         "dur_s_compared": null
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -1827,7 +1952,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_desc",
-      "item": "자막 색·외곽선·박스 [c_desc·description] \"설정 연결 검증 테스트 2편\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_desc·description] \"설정 연결 검증 테스트 2편\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -1837,7 +1962,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#E5E5E5",
@@ -1846,7 +1972,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -1854,7 +1980,7 @@
         "t": 0.32,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_desc_0000320.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.description.color"
@@ -1986,7 +2112,7 @@
         "fade_dur_s": 0.2,
         "dur_s_compared": 0.2
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2157,7 +2283,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_sit1",
-      "item": "자막 색·외곽선·박스 [c_sit1·situation] \"한 사람이 빈 방을 가로질러 나간\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_sit1·situation] \"한 사람이 빈 방을 가로질러 나간\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -2167,7 +2293,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FFFFFF",
@@ -2176,7 +2303,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2184,7 +2311,7 @@
         "t": 0.54,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_sit1_0000540.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.situation.color"
@@ -2316,7 +2443,7 @@
         "fade_dur_s": 0.167,
         "dur_s_compared": 0.133
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2488,7 +2615,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_sit2",
-      "item": "자막 색·외곽선·박스 [c_sit2·situation] \"한 남성이 카메라 앞까지 걸어온다\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_sit2·situation] \"한 남성이 카메라 앞까지 걸어온다\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -2498,7 +2625,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FFFFFF",
@@ -2507,7 +2635,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2515,7 +2643,7 @@
         "t": 5.24,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_sit2_0005240.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.situation.color"
@@ -2647,7 +2775,7 @@
         "fade_dur_s": 0.167,
         "dur_s_compared": 0.133
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2825,7 +2953,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_rx",
-      "item": "자막 색·외곽선·박스 [c_rx·reaction] \"빤히\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_rx·reaction] \"빤히\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -2835,7 +2963,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FEE300",
@@ -2844,7 +2973,7 @@
         "box_alpha": 0.024,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -2852,7 +2981,7 @@
         "t": 10.22,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_rx_0010219.png"
       },
-      "note": "",
+      "note": "그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.reaction.color",
@@ -2987,7 +3116,7 @@
         "fade_dur_s": 0.067,
         "dur_s_compared": 0.1
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3159,7 +3288,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_sit3",
-      "item": "자막 색·외곽선·박스 [c_sit3·situation] \"두 사람이 나란히 와서 선다\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_sit3·situation] \"두 사람이 나란히 와서 선다\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -3169,7 +3298,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FFFFFF",
@@ -3178,7 +3308,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3186,7 +3316,7 @@
         "t": 13.94,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_sit3_0013939.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.situation.color"
@@ -3318,7 +3448,7 @@
         "fade_dur_s": 0.167,
         "dur_s_compared": 0.133
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3490,7 +3620,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:c_sit4",
-      "item": "자막 색·외곽선·박스 [c_sit4·situation] \"그리고 둘 다 떠난다\"",
+      "item": "자막 색·외곽선·그림자·박스 [c_sit4·situation] \"그리고 둘 다 떠난다\"",
       "category": "자막 스타일",
       "kind": "output_vs_plan",
       "reference": "못 잼",
@@ -3500,7 +3630,8 @@
         "outline_color": "#000000",
         "box": false,
         "box_alpha": null,
-        "highlight": []
+        "highlight": [],
+        "shadow_px": 0.0
       },
       "observed": {
         "fill_color": "#FFFFFF",
@@ -3509,7 +3640,7 @@
         "box_alpha": null,
         "highlight_px": null
       },
-      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%)",
+      "tolerance": "색 거리 ≤ 45, 외곽선 ±max(2px,35%), 그림자 ±1px, 박스 여백 ±2px",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -3517,7 +3648,7 @@
         "t": 18.94,
         "frame": "episodes/test-coverage-001/qa/frames/cap_c_sit4_0018940.png"
       },
-      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌)",
+      "note": "배경이 외곽선 색과 같아 외곽선 두께·색은 못 잼(판정에서 뺌); 그림자 못 잼(판정에서 뺌): 배경이 어두워(휘도 < 50) 그림자가 보이지 않음",
       "required": true,
       "keys": [
         "text.roles.situation.color"
@@ -3649,7 +3780,7 @@
         "fade_dur_s": 0.167,
         "dur_s_compared": 0.1
       },
-      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유)",
+      "tolerance": "종류 일치, 길이 ±1.5프레임, pop 첫 프레임 배율 오차 ≤ 0.08(+35% 여유), slide 첫 프레임 이동 ±max(3px, 10%)+1프레임 이동량",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -4492,23 +4623,103 @@
     {
       "check_id": "caption.tone",
       "row_id": "caption.tone:emoji",
-      "item": "자막 이모지 사용",
+      "item": "자막 이모지(색 글리프) — 계획 대비",
       "category": "자막 내용·말투",
       "kind": "output_vs_plan",
       "reference": null,
       "expected": {
+        "planned_emoji": {
+          "c_title": 0,
+          "c_desc": 0,
+          "c_sit1": 0,
+          "c_sit2": 0,
+          "c_rx": 0,
+          "c_sit3": 0,
+          "c_sit4": 0
+        }
+      },
+      "observed": {
+        "per_caption": [
+          {
+            "caption": "c_title",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_desc",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_sit1",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_sit2",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_rx",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_sit3",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          },
+          {
+            "caption": "c_sit4",
+            "planned": 0,
+            "observed": 0,
+            "status": "measured"
+          }
+        ]
+      },
+      "tolerance": "계획에 이모지가 없는 자막에 색 글리프 0개, 있는 자막에 1개 이상",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {
+        "t": null
+      },
+      "note": "자막이 그린 화소 중 표시 중 정지·채도 높음·자막 색(채움·강조·외곽선·그림자·박스)과 그 혼합이 아닌 덩어리를 색 글리프로 셈",
+      "required": false,
+      "keys": []
+    },
+    {
+      "check_id": "caption.tone",
+      "row_id": "caption.tone:emoji_ref",
+      "item": "자막 이모지 (레퍼런스 대비)",
+      "category": "자막 내용·말투",
+      "kind": "style_vs_reference",
+      "reference": "못 잼",
+      "expected": {
         "text.tone.emoji": false
       },
-      "observed": null,
+      "observed": {
+        "captions_with_emoji": 0,
+        "unmeasured_captions": []
+      },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.tone.emoji — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. text.tone.emoji=false → 모든 자막에 색 글리프 0개(못 잰 자막이 있으면 못 잼); true → 허용",
       "required": false,
-      "keys": [],
-      "impact": "자막 문구·말투를 확인하지 못함"
+      "keys": [
+        "text.tone.emoji"
+      ],
+      "impact": "자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음"
     },
     {
       "check_id": "caption.position",
@@ -4566,7 +4777,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:description_ref",
-      "item": "자막 색·외곽선·박스 [description] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [description] (레퍼런스 대비)",
       "category": "자막 스타일",
       "kind": "style_vs_reference",
       "reference": "못 잼",
@@ -4581,7 +4792,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.description.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.description.color"
@@ -4641,13 +4852,16 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.description.timing.min_dur_s, text.roles.description.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "required": false,
       "keys": [
         "text.roles.description.timing.min_dur_s",
         "text.roles.description.persist"
       ],
-      "impact": "자막 등장 타이밍 불일치"
+      "impact": "자막 등장 타이밍 불일치",
+      "not_applicable": {
+        "text.roles.description.timing.lead_s": "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0)"
+      }
     },
     {
       "check_id": "caption.motion",
@@ -4671,7 +4885,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "note": "레퍼런스 미측정(임시값) 키 3개: text.roles.description.motion_in.type, text.roles.description.motion_in.dur_s, text.roles.description.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.description.motion_in.type",
@@ -4736,7 +4950,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:reaction_ref",
-      "item": "자막 색·외곽선·박스 [reaction] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [reaction] (레퍼런스 대비)",
       "category": "자막 스타일",
       "kind": "style_vs_reference",
       "reference": "못 잼",
@@ -4757,7 +4971,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.color, text.roles.reaction.outline_px, text.roles.reaction.outline_color, text.roles.reaction.box.enabled — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.reaction.color",
@@ -4820,13 +5034,16 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.reaction.timing.min_dur_s, text.roles.reaction.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "required": false,
       "keys": [
         "text.roles.reaction.timing.min_dur_s",
         "text.roles.reaction.persist"
       ],
-      "impact": "자막 등장 타이밍 불일치"
+      "impact": "자막 등장 타이밍 불일치",
+      "not_applicable": {
+        "text.roles.reaction.timing.lead_s": "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0)"
+      }
     },
     {
       "check_id": "caption.motion",
@@ -4852,7 +5069,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.reaction.motion_in.type, text.roles.reaction.motion_in.dur_s, text.roles.reaction.motion_in.scale_from, text.roles.reaction.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.reaction.motion_in.type",
@@ -4918,7 +5135,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:situation_ref",
-      "item": "자막 색·외곽선·박스 [situation] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [situation] (레퍼런스 대비)",
       "category": "자막 스타일",
       "kind": "style_vs_reference",
       "reference": "못 잼",
@@ -4933,7 +5150,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.situation.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.situation.color"
@@ -4993,13 +5210,16 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
+      "note": "레퍼런스 미측정(임시값) 키 2개: text.roles.situation.timing.min_dur_s, text.roles.situation.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의); timed 이면 측정한 최소 표시 시간 ≥ timing.min_dur_s − 0.05 s",
       "required": false,
       "keys": [
         "text.roles.situation.timing.min_dur_s",
         "text.roles.situation.persist"
       ],
-      "impact": "자막 등장 타이밍 불일치"
+      "impact": "자막 등장 타이밍 불일치",
+      "not_applicable": {
+        "text.roles.situation.timing.lead_s": "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0)"
+      }
     },
     {
       "check_id": "caption.motion",
@@ -5025,7 +5245,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "note": "레퍼런스 미측정(임시값) 키 4개: text.roles.situation.motion_in.type, text.roles.situation.motion_in.dur_s, text.roles.situation.motion_in.scale_from, text.roles.situation.motion_out.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.situation.motion_in.type",
@@ -5091,7 +5311,7 @@
     {
       "check_id": "caption.style",
       "row_id": "caption.style:title_ref",
-      "item": "자막 색·외곽선·박스 [title] (레퍼런스 대비)",
+      "item": "자막 색·외곽선·그림자·박스 [title] (레퍼런스 대비)",
       "category": "자막 스타일",
       "kind": "style_vs_reference",
       "reference": "못 잼",
@@ -5106,7 +5326,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도(측정될 때)의 중앙값; 그림자·박스 여백·박스 색은 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; 재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.title.color"
@@ -5165,13 +5385,14 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의);",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.persist — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 적용되지 않아 판정에서 뺀 키: timing.lead_s — 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0); timing.min_dur_s — persist=whole_video(영상 전체에 떠 있음). persist: 역할 자막 하나가 영상 길이의 90% 이상 보이면 whole_video(레퍼런스 분석기와 같은 정의);",
       "required": false,
       "keys": [
         "text.roles.title.persist"
       ],
       "impact": "레퍼런스와의 일치 여부를 판정할 수 없음",
       "not_applicable": {
+        "text.roles.title.timing.lead_s": "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0)",
         "text.roles.title.timing.min_dur_s": "persist=whole_video(영상 전체에 떠 있음)"
       }
     },
@@ -5193,7 +5414,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율을 비교; 측정 못 한 키는 행에서 뺌",
+      "note": "레퍼런스 미측정(임시값) 키 1개: text.roles.title.motion_in.type — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "text.roles.title.motion_in.type"
@@ -5266,7 +5487,7 @@
         "dur": 0.0,
         "score": 48.27
       },
-      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리",
+      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리, 플래시 범위(영역/화면) 일치",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -5324,7 +5545,7 @@
         "dur": null,
         "score": 0.5
       },
-      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리",
+      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리, 플래시 범위(영역/화면) 일치",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -5372,26 +5593,39 @@
       "expected": {
         "type": "flash",
         "dur": 0.12,
-        "color": "#FFFFFF"
+        "color": "#FFFFFF",
+        "scope": "region"
       },
       "observed": {
         "type": "flash",
         "dur": 0.1,
         "score": 122.6,
-        "color": "#FDFDFD"
+        "color": "#FDFDFD",
+        "scope": "region",
+        "scope_measure": {
+          "t_peak": 13.5,
+          "t_before": 13.3667,
+          "outside_share": 0.6384,
+          "progress_inside": 1.008,
+          "progress_outside": -0.0,
+          "outside_contrast": 441.7,
+          "status": "measured",
+          "scope": "region"
+        }
       },
-      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리",
+      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리, 플래시 범위(영역/화면) 일치",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
       "evidence": {
         "t": 13.4667
       },
-      "note": "플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위(scope: 영상 영역/전체 화면)는 재지 않음",
+      "note": "플래시 최대 밝기 시 영상 영역 평균색 #FDFDFD (기대 #FFFFFF, 거리 ≤ 45); 플래시 범위 region (기대 region): 영상 영역 밖 밝아짐 -0.0 / 안 1.008",
       "required": true,
       "keys": [
         "motion.transitions.flash.dur_s",
-        "motion.transitions.flash.color"
+        "motion.transitions.flash.color",
+        "motion.transitions.flash.scope"
       ]
     },
     {
@@ -5435,7 +5669,7 @@
         "dur": 0.0,
         "score": 10.49
       },
-      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리",
+      "tolerance": "종류 일치, 길이 ±2프레임, 플래시 색 거리, 플래시 범위(영역/화면) 일치",
       "status": "same",
       "intended_change": false,
       "change_ref": null,
@@ -6155,7 +6389,7 @@
     {
       "check_id": "video.zoom",
       "row_id": "video.zoom:zoom_ref",
-      "item": "줌 배율·길이·가속 곡선 (레퍼런스 대비)",
+      "item": "줌 배율·길이·가속 곡선·고정점 규칙 (레퍼런스 대비)",
       "category": "모션(확대·정지·전환)",
       "kind": "style_vs_reference",
       "reference": "못 잼",
@@ -6168,7 +6402,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 줌 중심 되돌리기(recenter)는 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 1개: motion.zoom.scale_to — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 고정점 규칙(recenter) = 출력에서 잰 줌 고정점이 렌더러 규칙(edit.resolve.src_to_region)의 false/true 중 어느 쪽과 맞는지; 재지 못한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "motion.zoom.scale_to"
@@ -6275,31 +6509,34 @@
     {
       "check_id": "video.transitions",
       "row_id": "video.transitions:transitions_ref",
-      "item": "전환 종류·길이·플래시 색 (레퍼런스 대비)",
+      "item": "전환 종류·길이·플래시 색·범위 (레퍼런스 대비)",
       "category": "모션(확대·정지·전환)",
       "kind": "style_vs_reference",
       "reference": "못 잼",
       "expected": {
         "motion.transitions.default": "cut",
         "motion.transitions.flash.dur_s": 0.12,
-        "motion.transitions.flash.color": "#FFFFFF"
+        "motion.transitions.flash.color": "#FFFFFF",
+        "motion.transitions.flash.scope": "region"
       },
       "observed": {
         "mode": "cut",
         "flash_dur": 0.1,
-        "flash_color": "#FDFDFD"
+        "flash_color": "#FDFDFD",
+        "flash_scope": "region"
       },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 3개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위(scope)는 재지 않음",
+      "note": "레퍼런스 미측정(임시값) 키 4개: motion.transitions.default, motion.transitions.flash.dur_s, motion.transitions.flash.color, motion.transitions.flash.scope — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 플래시 범위 = 플래시 정점에서 영상 영역 밖(자막·장식 제외)이 플래시 색으로 밝아졌는지(canvas) 아닌지(region); 재지 못한 키는 행에서 뺌",
       "required": false,
       "keys": [
         "motion.transitions.default",
         "motion.transitions.flash.dur_s",
-        "motion.transitions.flash.color"
+        "motion.transitions.flash.color",
+        "motion.transitions.flash.scope"
       ],
       "impact": "확대·정지·전환의 크기/길이 불일치"
     },
@@ -6952,15 +7189,25 @@
         "identity_exclusions.logo_templates_dir": "해당 없음(infra)"
       },
       "expected": {
-        "templates_dir": "presets/joshuamagazine/reference/identity_templates"
+        "templates_dir": "presets/joshuamagazine/reference/identity_templates",
+        "manifest": "presets/joshuamagazine/reference/identity_templates/manifest.json"
       },
-      "observed": null,
+      "observed": {
+        "manifest": {
+          "file": "presets/joshuamagazine/reference/identity_templates/manifest.json",
+          "status": "unmeasured",
+          "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+          "source_snapshot": "2026-09-24T17:56:07+00:00",
+          "templates": 0,
+          "review": 0
+        }
+      },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 로고 템플릿이 없어 글자 없는 로고 대조 못 함 — 레퍼런스 영상에서 로고를 잘라 presets/joshuamagazine/reference/identity_templates 에 넣어야 함(템플릿을 만드는 단계가 아직 없음; 글자 로고는 OCR 검사만)",
+      "note": "식별 템플릿 기록이 완전하지 않음(상태 unmeasured): 레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용 — `shortkit ref identity-templates` 다시 실행 — 글자 없는 로고는 OCR 검사(identity.forbidden_text)로 잡히지 않음",
       "required": false,
       "keys": [
         "identity_exclusions.logo_templates_dir"
@@ -8157,6 +8404,61 @@
       "keys": []
     },
     {
+      "check_id": "audio.bgm",
+      "row_id": "audio.bgm:level",
+      "item": "BGM 크기(최종 프로그램 음량 기준)",
+      "category": "음악 구간",
+      "kind": "output_vs_plan",
+      "reference": "못 잼",
+      "expected": {
+        "gain_db": 0.0,
+        "definition": "깨끗한 음원 대비 dB, 최종 프로그램 음량에서"
+      },
+      "observed": {
+        "level_db": 0.63,
+        "ls_gain_db": -0.07,
+        "mix_lufs": -14.7,
+        "target_lufs": -14.0
+      },
+      "tolerance": "±1.3 dB (audio.loudness.tolerance_lu + LS 측정 잡음 0.3)",
+      "status": "same",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {
+        "t": 0.0
+      },
+      "note": "깨끗한 음원 LS 이득(0.25 s 창 이득의 p90 = BGM 기준 레벨, dB) + 목표 LUFS − 출력 통합 LUFS (ref audio-measure 의 audio.bgm.gain_db 와 같은 정의)",
+      "required": true,
+      "keys": [
+        "audio.bgm.gain_db"
+      ]
+    },
+    {
+      "check_id": "audio.bgm",
+      "row_id": "audio.bgm:level_ref",
+      "item": "BGM 크기 (레퍼런스 대비)",
+      "category": "음악 구간",
+      "kind": "style_vs_reference",
+      "reference": "못 잼",
+      "expected": {
+        "audio.bgm.gain_db": 0.0
+      },
+      "observed": {
+        "level_db": 0.63
+      },
+      "tolerance": null,
+      "status": "unmeasured",
+      "intended_change": false,
+      "change_ref": null,
+      "evidence": {},
+      "note": "레퍼런스 미측정(임시값) 키 1개: audio.bgm.gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스와 같은 정의(ref audio-measure: 깨끗한 음원 LS 이득 + 목표 LUFS − 믹스 LUFS)",
+      "required": false,
+      "keys": [
+        "audio.bgm.gain_db"
+      ],
+      "impact": "BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가"
+    },
+    {
       "check_id": "audio.original",
       "row_id": "audio.original:off",
       "item": "원음 OFF 구간에 원음 없음(기본 OFF)",
@@ -8599,7 +8901,7 @@
         "catalog_type": null,
         "status": "unmeasured",
         "type_id": null,
-        "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
       },
       "tolerance": "레퍼런스 카탈로그 종류 지문과 유사도 ≥ 문턱(reference.sfx_map.MATCH_THRESHOLD)",
       "status": "unmeasured",
@@ -8608,7 +8910,7 @@
       "evidence": {
         "t": 4.5522
       },
-      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "required": false,
       "keys": [
         "audio.sfx.catalog"
@@ -8629,7 +8931,7 @@
         "catalog_type": null,
         "status": "unmeasured",
         "type_id": null,
-        "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
       },
       "tolerance": "레퍼런스 카탈로그 종류 지문과 유사도 ≥ 문턱(reference.sfx_map.MATCH_THRESHOLD)",
       "status": "unmeasured",
@@ -8638,7 +8940,7 @@
       "evidence": {
         "t": 10.8
       },
-      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "required": false,
       "keys": [
         "audio.sfx.catalog"
@@ -8659,7 +8961,7 @@
         "catalog_type": null,
         "status": "unmeasured",
         "type_id": null,
-        "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        "reason": "효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
       },
       "tolerance": "레퍼런스 카탈로그 종류 지문과 유사도 ≥ 문턱(reference.sfx_map.MATCH_THRESHOLD)",
       "status": "unmeasured",
@@ -8668,7 +8970,7 @@
       "evidence": {
         "t": 16.3
       },
-      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
+      "note": "소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(상태 unmeasured: 2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음",
       "required": false,
       "keys": [
         "audio.sfx.catalog"
@@ -8828,6 +9130,7 @@
       "reference": "못 잼",
       "expected": {
         "structure.duration_s.p10": null,
+        "structure.duration_s.p50": null,
         "structure.duration_s.p90": null
       },
       "observed": {
@@ -8838,10 +9141,11 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: structure.duration_s.p10, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음.",
+      "note": "레퍼런스 미측정(임시값) 키 3개: structure.duration_s.p10, structure.duration_s.p50, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "required": false,
       "keys": [
         "structure.duration_s.p10",
+        "structure.duration_s.p50",
         "structure.duration_s.p90"
       ],
       "impact": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능"
@@ -8884,6 +9188,7 @@
       "reference": "못 잼",
       "expected": {
         "structure.cuts_per_10s.p10": null,
+        "structure.cuts_per_10s.p50": null,
         "structure.cuts_per_10s.p90": null
       },
       "observed": {
@@ -8900,10 +9205,11 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "note": "레퍼런스 미측정(임시값) 키 3개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p50, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "required": false,
       "keys": [
         "structure.cuts_per_10s.p10",
+        "structure.cuts_per_10s.p50",
         "structure.cuts_per_10s.p90"
       ],
       "impact": "영상 길이·전개 구조 불일치"
@@ -8917,6 +9223,7 @@
       "reference": "못 잼",
       "expected": {
         "structure.shot_len_s.p10": null,
+        "structure.shot_len_s.p50": null,
         "structure.shot_len_s.p90": null
       },
       "observed": {
@@ -8933,10 +9240,11 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "note": "레퍼런스 미측정(임시값) 키 3개: structure.shot_len_s.p10, structure.shot_len_s.p50, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD). 판정: 레퍼런스 영상별 값의 p10 ≤ 출력 ≤ p90 이면 같다; 레퍼런스 중앙값(p50) 대비 위치(observed.vs_reference_median)를 함께 적음 — p50 이 [p10, p90] 밖이면 분포 기록이 잘못된 것이라 못 잼",
       "required": false,
       "keys": [
         "structure.shot_len_s.p10",
+        "structure.shot_len_s.p50",
         "structure.shot_len_s.p90"
       ],
       "impact": "영상 길이·전개 구조 불일치"
@@ -9378,7 +9686,7 @@
     "complete": false,
     "mode": "test",
     "production_rules": false,
-    "checked_at": "2026-09-25T08:48:03+00:00",
+    "checked_at": "2026-09-25T10:38:28+00:00",
     "failures": [
       {
         "rule": "G2",
@@ -9396,7 +9704,7 @@
       },
       {
         "rule": "P1",
-        "message": "프리셋 미측정(임시값) 키 270개",
+        "message": "프리셋 미측정(임시값) 키 266개",
         "rows": [
           "audio.bgm.fade_in_s",
           "audio.bgm.fade_out_s",
@@ -9452,11 +9760,13 @@
       },
       {
         "rule": "P2",
-        "message": "레퍼런스 대비 못 잼 61건",
+        "message": "레퍼런스 대비 못 잼 64건",
         "rows": [
           "canvas.format:format_ref",
           "canvas.video_region:region_ref",
           "canvas.background:background_ref",
+          "canvas.video_region:fit_ref",
+          "caption.tone:emoji_ref",
           "caption.position:description_ref",
           "caption.size:description_ref",
           "caption.style:description_ref",
@@ -9489,6 +9799,7 @@
           "decor.style:d_circle_ref",
           "decor.style:d_box_ref",
           "audio.bgm:bgm_ref",
+          "audio.bgm:level_ref",
           "audio.original:orig_ref",
           "audio.sfx.type:fx1",
           "audio.sfx.type:fx2",
@@ -9526,7 +9837,7 @@
         "rule": "P4",
         "message": "필수 표시가 없는 못 잼 6건 — 못 잰 항목은 완료로 치지 않음",
         "rows": [
-          "caption.tone:emoji",
+          "canvas.video_region:fit",
           "identity.logo_templates:all",
           "identity.reference_footage:all",
           "clean.residual:prov:v_room",
@@ -9536,10 +9847,10 @@
       }
     ],
     "unmeasured": {
-      "total": 68,
+      "total": 71,
       "required": 1,
-      "not_required": 67,
-      "not_required_uncovered": 67
+      "not_required": 70,
+      "not_required_uncovered": 70
     },
     "approval": {
       "state": {
@@ -9563,13 +9874,13 @@
       "mode": "test",
       "episode_index": 2
     },
-    "verdict_ko": "불합격 — 못 잼 68건(필수 1, 참고 67)"
+    "verdict_ko": "불합격 — 못 잼 71건(필수 1, 참고 70)"
   },
   "defects": {
     "new": 0,
     "verified_now": 0,
-    "reopened": 1,
-    "still_open": 0,
+    "reopened": 0,
+    "still_open": 1,
     "not_rechecked": 0,
     "resolved_without_fix": 0,
     "unmeasured_now": 0,
