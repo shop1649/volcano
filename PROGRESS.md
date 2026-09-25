@@ -23,19 +23,20 @@
 5. 검증: test-pipeline-001 / test-coverage-001 렌더·편집 프로젝트(melt SSIM 0.997)·QA(다르다 0),
    합성 정답 레퍼런스 5편으로 측정→적용→렌더→QA 전체 고리(docs/validation/mockloop.md: 222키 중 153 통과·11 방법 한계·0 오탐).
 
-## 진행 중 (2026-09-25 오후)
-- 적대적 검토: 요청문 11개 절 × 6개 조각 검토 → 회의적 검증 → 확정 결함 79건(치명 4·주요 54·경미 21).
-  - 수정 완료: 참조 기준 표본·80만+ 전편 분석(A 16), 소재·로고(E 6), 번들·설치·문서(F 12), 레지스트리(B 9),
-    plan 검증(C 21: 9 완료·12 부분, 나머지는 QA/참조 쪽 일)
-  - 컨테이너 재시작(2026-09-25 05:39)으로 QA 수정 에이전트의 마지막 확인 단계가 끊김 → 코드 변경은 커밋되어 있음.
-  - 진행 중: D-finish(QA 쪽 잔여 + 4개 에피소드 최종 QA), A2(포맷별 정보 공개 순서·카탈로그 감정 상태·음원 창고 stem 거부).
+## 적대적 검토 (2026-09-25 완료)
+- 요청문 11개 절 × 6개 조각 검토 → 회의적 검증 → 확정 결함 79건(치명 4·주요 54·경미 21) → 전부 수정 또는 "못 잼"으로 기록.
+- 뒤이은 수정: QA 출력 검사 61개 키 추가(`preset audit --test`: no_code 0 · no_qa 0), 공용 그림자 추정기, 슬라이드 어휘,
+  lead_s 정의 통일(27fb18b), 테스트 기대값 정리(e4a30b6).
+
+## 진행 중 (2026-09-25 저녁)
+- 최종 복원 검증: PRESET_BUNDLE.md → 빈 폴더에 복원(내장 복원 블록 그대로) → setup.sh → doctor --network → 테스트 자산 →
+  새 에피소드 test-restore-001(로고·출처·원어 자막을 합성한 dirty-source, clean detect/plan) → 렌더·내보내기·melt 대조·QA → pytest.
+  기록: docs/validation/final_restore_log.md.
+- 문서: docs/VALIDATION.md(검증 환경·결과·미검증 환경), docs/DELIVERABLES.md(납품물 위치). mockloop.md 에 측정 시점 주의 추가.
 
 ## 남은 단계
-1. D-finish / A2 결과 확인 → `preset sync` → `preset audit --test` 가 no_code 0·no_qa 0 인지 확인.
-2. docs/VALIDATION.md(검증 OS·미검증 환경·수치), docs/DELIVERABLES.md(납품물 위치), README/AGENTS 최종화.
-3. PRESET_BUNDLE.md 생성 → 깨끗한 폴더 복원(내장 복원 명령 그대로) → setup.sh → doctor → 테스트 자산 →
-   다른 소스로 새 에피소드(MP4 + 편집 프로젝트 + QA) → 결과를 VALIDATION.md 에 기록.
-4. 커밋·푸시.
+1. 복원 검증 결과를 docs/VALIDATION.md 4절·DELIVERABLES.md 표에 채움.
+2. PRESET_BUNDLE.md 다시 생성(최종 문서 포함) → 빠른 재복원 확인(파일 목록이 git HEAD 와 같은지) → 커밋·푸시.
 
 ## 재개 방법
 - `git log --oneline | head` 로 마지막 커밋 확인 → 위 "남은 단계"의 첫 항목부터.

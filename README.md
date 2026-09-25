@@ -5,6 +5,7 @@
 - 에이전트(Claude Code / Codex) 지침: [`AGENTS.md`](AGENTS.md)
 - 현재 미확정 항목과 제작 영향: [`presets/joshuamagazine/unresolved.md`](presets/joshuamagazine/unresolved.md)
 - 검증 범위(무엇을 실제로 돌려 봤는지): [`docs/VALIDATION.md`](docs/VALIDATION.md)
+- 납품물 위치(영상·편집 프로젝트·QA·창고, 무엇이 테스트용인지): [`docs/DELIVERABLES.md`](docs/DELIVERABLES.md)
 - 진행 기록·재개 지점: [`PROGRESS.md`](PROGRESS.md)
 - 다른 컴퓨터로 옮길 단일 파일: [`PRESET_BUNDLE.md`](PRESET_BUNDLE.md) (복원 명령이 파일 맨 위에 있음)
 

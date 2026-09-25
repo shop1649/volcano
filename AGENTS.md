@@ -201,6 +201,8 @@ python -m shortkit qa gate --episode <ep-id> --production
 | `assets/library/{music,sfx}/` | 사용자 제공 깨끗한 음악·효과음 창고 |
 | `docs/CONTRACT.md` | 모듈 간 인터페이스 계약 |
 | `docs/VALIDATION.md` | 실제로 돌려 본 검증과 검증하지 않은 환경 |
+| `docs/DELIVERABLES.md` | 납품물(영상·편집 프로젝트·비교 시트·QA·창고) 위치와 테스트용 여부 |
+| `docs/validation/` | 합성 레퍼런스 고리(mockloop), 깨끗한 폴더 복원 기록(final_restore_log.md) |
 | `PRESET_BUNDLE.md` | 다른 컴퓨터용 단일 MD(복원 명령 포함) |
 
 
