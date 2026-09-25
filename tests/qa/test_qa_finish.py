@@ -121,6 +121,10 @@ def _rows_from_saved_probes(ep: str, monkeypatch) -> tuple[list[dict], list[tupl
     pdir = REAL_ROOT / "episodes" / ep / "qa" / "probes"
     if not (pdir / "text.json").is_file():
         pytest.skip(f"{ep}: saved probes missing (run `shortkit qa run --episode {ep}`)")
+    if not (REAL_ROOT / "episodes" / ep / "output" / f"{ep}.mp4").is_file():
+        # output MP4s are not in the single-MD bundle (regenerable media): a clean restore has none until
+        # `shortkit episode all <ep>` re-renders it
+        pytest.skip(f"{ep}: output MP4 missing (not bundled; run `shortkit episode all {ep}`)")
     if not (REAL_ROOT / "episodes" / ep / "build" / "resolved.json").is_file():
         # build/ is not in git or the bundle (a fresh clone / clean restore): re-derive the IR from the plan
         import os
