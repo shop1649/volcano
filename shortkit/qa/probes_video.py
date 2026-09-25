@@ -365,17 +365,23 @@ def _warp_planned(c, src_frame: np.ndarray, t: float, zoom_extra: float = 1.0, w
     return cv2.cvtColor(cv2.warpAffine(src_frame, M, (work_w, wh), flags=cv2.INTER_AREA), cv2.COLOR_RGB2GRAY).astype(np.float32)
 
 
-def planned_frame_match(ctx: QAContext, c, t: float, search_s: float | None = None, zoom_alt: float | None = None) -> dict:
+def planned_frame_match(ctx: QAContext, c, t: float, search_s: float | None = None,
+                        zoom_alt: float | tuple | list | None = None, masked: bool = False) -> dict:
     """Does the OUTPUT frame at t show the planned source frame under the planned geometry?
     Source frames within +-``search_s`` (default 1.5 source frames) of the planned source time are
-    tried; -> {ncc, src_t, expected_src_t[, ncc_alt]} where ncc_alt is the same match with the picture
-    scaled by ``zoom_alt`` (a zoom the plan does not have) -- the gap tells whether the geometry
-    test can see a zoom of that size at all.  Empty dict when a file cannot be read."""
+    tried; -> {ncc, src_t, expected_src_t[, ncc_alt]} where ncc_alt is the best of the same match with the
+    picture scaled by each ``zoom_alt`` factor (scales the plan does not have) -- the gap tells whether the
+    geometry test can see a scale error of that size at all.  ``masked``: captions, decorations and clean-op
+    rects on screen at t are left out (``overlay_keep_mask``), so text drawn over the footage does not lower
+    the match.  Empty dict when a file cannot be read."""
     from .. import paths
 
     p = paths.absp(c.source_path)
     if not p.is_file():
         return {}
+    # the output frame shown at t is frame k = floor(t fps), drawn by the renderer at k / fps: the planned geometry
+    # and source time are those of that instant (inside a zoom ramp the scale changes a few % per frame)
+    t = math.floor(max(0.0, t) * float(ctx.fps) + 1e-6) / float(ctx.fps)
     try:
         of = grab(ctx.mp4, t)
         rate = _info(p).fps or 30.0
@@ -387,11 +393,22 @@ def planned_frame_match(ctx: QAContext, c, t: float, search_s: float | None = No
     if not frs:
         return {}
     og = _region_gray(ctx, c, of)
-    vals = [ncc(_warp_planned(c, f, t), og) for f in frs]
+    keep = None
+    if masked:
+        rx, ry, rw, _rh = rect_xywh(c.region)
+        km = overlay_keep_mask(ctx, c, t, rx, ry, GEO_WORK_W / rw, og.shape)
+        keep = km if km.mean() >= 0.2 else None
+
+    def score(g):
+        return ncc(g[keep], og[keep]) if keep is not None else ncc(g, og)
+    vals = [score(_warp_planned(c, f, t)) for f in frs]
     j = int(np.argmax(vals))
     out = {"t": rnd(t, 3), "expected_src_t": rnd(es, 3), "src_t": rnd(ts[j], 3), "ncc": rnd(vals[j], 4)}
+    if masked:
+        out["masked_frac"] = rnd(0.0 if keep is None else 1.0 - float(keep.mean()), 3)
     if zoom_alt is not None:
-        out["ncc_alt"] = rnd(ncc(_warp_planned(c, frs[j], t, zoom_extra=zoom_alt), og), 4)
+        alts = [zoom_alt] if isinstance(zoom_alt, (int, float)) else list(zoom_alt)
+        out["ncc_alt"] = rnd(max(score(_warp_planned(c, frs[j], t, zoom_extra=float(a))) for a in alts), 4)
     return out
 
 
@@ -399,10 +416,13 @@ GEO_NCC_MIN = 0.95          # output frame == planned source frame under the pla
 GEO_ALT_MARGIN = 0.02       # ... and a 4 % zoom of it fits clearly worse (the test can see such a zoom)
 
 
-def geometry_check(ctx: QAContext, c, n: int = 5, zoom_alt: float = 1.04) -> dict:
+def geometry_check(ctx: QAContext, c, n: int = 5, zoom_alt: float | tuple = 1.04, extra_times=(),
+                   masked: bool = True) -> dict:
     """Planned geometry verified directly: at ``n`` times across the clip (outside transitions and
-    freezes) the output region equals the planned source frame placed by ``clip_transform`` (NCC >=
-    GEO_NCC_MIN) and the same frame zoomed by ``zoom_alt`` fits worse by >= GEO_ALT_MARGIN.  Feature-based
+    freezes) plus ``extra_times`` (e.g. inside a planned zoom ramp) the output region equals the planned
+    source frame placed by ``clip_transform`` -- fit AND the eased zoom at that instant -- (NCC >=
+    GEO_NCC_MIN) and the same frame scaled by ``zoom_alt`` (one factor or several) fits worse by >=
+    GEO_ALT_MARGIN.  Captions / decorations / clean rects on screen are masked (``masked``).  Feature-based
     scale curves are fooled by large moving subjects (people walking to the camera); this is not."""
     fr = 1.0 / ctx.fps
     clips = ctx.resolved.clips
@@ -422,17 +442,28 @@ def geometry_check(ctx: QAContext, c, n: int = 5, zoom_alt: float = 1.04) -> dic
         L = max(0.0, b - a)
         times += [a + (q - acc) for q in targets if acc <= q < acc + L]
         acc += L
-    rows = [r for r in (planned_frame_match(ctx, c, t, zoom_alt=zoom_alt) for t in times) if r]
+    extra = sorted(float(t) for t in extra_times if any(a <= float(t) <= b for a, b in ranges))
+    rows = [r for r in (planned_frame_match(ctx, c, t, zoom_alt=zoom_alt, masked=masked) for t in times) if r]
+    rows_x = [dict(r, extra=True) for r in (planned_frame_match(ctx, c, t, zoom_alt=zoom_alt, masked=masked)
+                                            for t in extra) if r]
     if len(rows) < 3:
-        return {"status": "unmeasured", "reason": "프레임을 읽지 못함", "samples": rows}
-    nccs = [r["ncc"] for r in rows]
-    gaps = [r["ncc"] - r["ncc_alt"] for r in rows]
+        return {"status": "unmeasured", "reason": "프레임을 읽지 못함", "samples": rows + rows_x}
+    allr = rows + rows_x
+    nccs = [r["ncc"] for r in allr]
+    gaps = [r["ncc"] - r["ncc_alt"] for r in allr]
     confirmed = float(np.median(nccs)) >= GEO_NCC_MIN and min(nccs) >= GEO_NCC_MIN - 0.03 and \
         float(np.median(gaps)) >= GEO_ALT_MARGIN
+    if rows_x:
+        # every extra (in-ramp) instant must itself fit the plan better than the scaled alternatives
+        confirmed = confirmed and all(r["ncc"] >= GEO_NCC_MIN - 0.03 and r["ncc"] - r["ncc_alt"] > 0 for r in rows_x)
+    alts = [zoom_alt] if isinstance(zoom_alt, (int, float)) else list(zoom_alt)
     return {"status": "measured", "confirmed": bool(confirmed), "ncc_median": rnd(float(np.median(nccs)), 4),
-            "ncc_min": rnd(min(nccs), 4), "zoom_alt": zoom_alt, "alt_gap_median": rnd(float(np.median(gaps)), 4),
-            "samples": rows,
-            "method": "출력 영상 영역 vs 계획 기하(clip_transform)로 놓은 소스 프레임 NCC, 4% 확대 대안과 비교"}
+            "ncc_min": rnd(min(nccs), 4), "zoom_alt": [rnd(float(a), 4) for a in alts] if len(alts) > 1 else alts[0],
+            "alt_gap_median": rnd(float(np.median(gaps)), 4), "n_extra": len(rows_x), "masked": bool(masked),
+            "samples": allr,
+            "method": ("출력 영상 영역 vs 계획 기하(clip_transform: 맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임 NCC"
+                       + (" (자막·장식·정리 영역 제외)" if masked else "")
+                       + f", 배율 {'/'.join(f'{float(a):.3f}' for a in alts)} 대안과 비교")}
 
 
 # ----------------------------------------------------------------------------- transitions
@@ -1017,6 +1048,18 @@ def analyze_zoom(ctx: QAContext, sc: dict) -> dict:
                 item["geometry"] = geometry_check(ctx, c)
             except Exception as e:
                 item["geometry"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
+        elif z is not None and abs(z.scale_to - z.scale_from) > 1e-3:
+            # planned zoom: the same direct check with the eased zoom of the plan at each instant, plus instants
+            # INSIDE the zoom ramp (25/50/75 %) where a wrong scale, timing or ease shows as a scale error; a
+            # +-4 % scale of the planned picture must fit worse.  The scale curve above is fooled by a subject
+            # walking to the camera (test-restore-001 s1: 1.89x over 6.8 s measured, plan 1.25x over 0.35 s)
+            z0 = c.out_start + z.start
+            ramp = [z0 + max(z.dur, 1e-3) * q for q in (0.25, 0.5, 0.75)]
+            try:
+                item["geometry"] = geometry_check(ctx, c, zoom_alt=(1.04, 1 / 1.04), extra_times=ramp)
+                item["geometry"]["ramp_times"] = [rnd(t, 3) for t in ramp]
+            except Exception as e:
+                item["geometry"] = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
         out.append(item)
     # consecutive zoom count (same effect stacked on consecutive segments): a clip counts when it zooms by
     # plan, or when its scale curve moves and the planned (unzoomed) geometry does NOT reproduce the output
@@ -1374,6 +1417,14 @@ def overlay_keep_mask(ctx: QAContext, c, t: float, rx: float, ry: float, k: floa
     return keep
 
 
+def play_time(c, t: float) -> float:
+    """Output time minus the part of the clip's freeze hold already shown at t (footage playback clock)."""
+    f = getattr(c, "freeze", None)
+    if f is None:
+        return float(t)
+    return float(t) - min(max(float(t) - float(f.out_start), 0.0), float(f.hold))
+
+
 def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
     """For each clip, which source time does the output actually show?  (NCC of the output
     video region against the geometrically fitted source frames around the planned time)."""
@@ -1510,7 +1561,10 @@ def analyze_mapping(ctx: QAContext, work_w: int = 240) -> dict:
             item["status"] = "measured"
             item["offset_p50"] = rnd(float(np.median([s["offset"] for s in good])), 3)
             if len(good) >= 2:
-                tt = np.array([s["t"] for s in good])
+                # the playback clock of the footage: output time minus the freeze hold already shown (samples lie
+                # outside the hold) -- a slope over raw output times across a freeze reads as slow motion
+                # (test-restore-001 s3: 0.883 for a 1.0x clip with a 0.7 s hold)
+                tt = np.array([play_time(c, s["t"]) for s in good])
                 ss = np.array([s["matched_src_t"] for s in good])
                 if tt.max() - tt.min() > 0.3:
                     item["speed_obs"] = rnd(float(np.polyfit(tt, ss, 1)[0]), 3)

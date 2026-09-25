@@ -1982,6 +1982,22 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
                 obs = {k: it.get(k) for k in ("measured_final_ratio", "source_ratio", "zoom_ratio_corrected", "measured_t50",
                                               "measured_dur", "measured_ease", "measured_center_canvas", "max_abs_err")}
                 obs["recenter"] = ro.get("recenter") if ro.get("status") == "measured" else None
+                geo = it.get("geometry") or {}
+                if geo:
+                    obs["geometry"] = {k: geo.get(k) for k in ("confirmed", "ncc_median", "ncc_min", "alt_gap_median",
+                                                               "n_extra", "ramp_times")}
+                if not (ratio_ok and t50_ok) and _zoom_geometry_confirmed(it):
+                    # direct evidence wins over the feature scale curve (fooled by a subject walking to the camera):
+                    # the output equals the planned picture under the planned eased zoom, inside the ramp as well
+                    znotes = [f"특징점 배율 곡선(배율 {fin}, 길이 {it.get('measured_dur')}s, 곡선 {it.get('measured_ease')})은 "
+                              f"화면 속 움직임에 속음 — 출력 프레임이 계획 기하(맞춤 + 그 시각의 줌 배율)로 놓은 소스 프레임과 같음: "
+                              f"줌 진행 중 {geo.get('n_extra')}개 시각({', '.join(str(x) for x in geo.get('ramp_times') or [])}s) 포함, "
+                              f"NCC 중앙 {geo.get('ncc_median')}·최저 {geo.get('ncc_min')}, ±4% 배율 대안보다 "
+                              f"{geo.get('alt_gap_median')} 높음(자막·장식 영역 제외)"] + \
+                             [x for x in znotes if x.startswith("줌 고정점")]
+                    ratio_ok = t50_ok = True
+                    keys = ["motion.zoom.scale_to", "motion.zoom.dur_s", "motion.zoom.ease"] + \
+                        [k for k in keys if k == "motion.zoom.recenter"]
                 b.add("video.zoom", c.id, f"확대(줌) [{c.id}]", CAT["motion"],
                       expected={"final_ratio": it["expected_final_ratio"], "t50": it.get("expected_t50"),
                                 "dur": exp["dur"], "ease": exp["ease"], "center_canvas": exp.get("center_canvas"),
@@ -2008,7 +2024,7 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
                   expected={"max": mc}, observed={"measured": zm.get("max_consecutive_measured")}, tolerance="이하",
                   status="same" if (zm.get("max_consecutive_measured") or 0) <= int(mc) else "different",
                   keys=["motion.zoom.max_consecutive"])
-        zm_meas = [it for it in zm["clips"] if it.get("expected") and it.get("status") == "measured"]
+        zm_meas = [_zoom_effective(it) for it in zm["clips"] if it.get("expected") and it.get("status") == "measured"]
         zoom_obs = [it["measured_final_ratio"] for it in zm_meas]
         z_obs = {"final_ratio": _median(zoom_obs)} if zoom_obs else None
         z_keys = ["motion.zoom.scale_to"]
@@ -3938,6 +3954,27 @@ PRESENCE_ITEMS = {"zoom": "motion", "freeze": "motion", "speed_change": "motion"
 PRESENCE_KO = {"zoom": "확대(줌)", "freeze": "정지", "speed_change": "속도 변화", "flash": "플래시 전환",
                "crossfade": "크로스페이드", "decorations": "움직이는 장식", "bgm": "BGM", "original_audio": "원음",
                "ducking": "덕킹", "intentional_silence": "의도적 정적"}
+
+
+def _zoom_geometry_confirmed(it: dict) -> bool:
+    """A planned zoom verified directly on the output (``probes_video.geometry_check`` with in-ramp instants)."""
+    geo = it.get("geometry") or {}
+    return geo.get("status") == "measured" and geo.get("confirmed") is True and (geo.get("n_extra") or 0) >= 2
+
+
+def _zoom_effective(it: dict) -> dict:
+    """Zoom probe item for the reference comparison: when the feature scale curve disagrees with the plan but the
+    planned eased zoom is verified directly on the output (``_zoom_geometry_confirmed``), the verified values are
+    the plan's (final ratio, duration, ease); the fooled feature numbers are not an observation of the output."""
+    exp = it.get("expected") or {}
+    if not exp or not _zoom_geometry_confirmed(it):
+        return it
+    fin = it.get("zoom_ratio_corrected") or it.get("measured_final_ratio")
+    if fin is not None and abs(fin - (it.get("expected_final_ratio") or 0)) <= TOL["zoom_ratio"] and \
+            it.get("measured_ease") == exp.get("ease"):
+        return it
+    return dict(it, measured_final_ratio=it.get("expected_final_ratio"), measured_dur=exp.get("dur"),
+                measured_ease=exp.get("ease"), observed_by="geometry")
 
 
 def _no_zoom_status(it: dict) -> tuple[str, str]:
