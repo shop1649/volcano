@@ -37,6 +37,9 @@ python -m pip install -U pip
 python -m pip install -e ".[ocr,otio,test]"
 python -m pip install -U yt-dlp
 if [ "$DEMUCS" = 1 ]; then
+  # CPU build of torch first: the default Linux wheel pulls several GB of CUDA libraries (verified 2026-09-25:
+  # torch 2.14.0+cpu + demucs 4.1.0, htdemucs weights load). With an NVIDIA GPU use pytorch.org's CUDA command instead.
+  python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
   python -m pip install demucs
 fi
 [ -f local.yaml ] || cp local.example.yaml local.yaml
