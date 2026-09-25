@@ -31,17 +31,20 @@
 - 뒤이은 수정: QA 출력 검사 61개 키 추가(`preset audit --test`: no_code 0 · no_qa 0), 공용 그림자 추정기, 슬라이드 어휘,
   lead_s 정의 통일(27fb18b), 테스트 기대값 정리(e4a30b6).
 
-## 진행 중 (2026-09-25 저녁)
-- 최종 복원 검증: PRESET_BUNDLE.md → 빈 폴더에 복원(내장 복원 블록 그대로) → setup.sh → doctor --network → 테스트 자산 →
-  새 에피소드 test-restore-001(로고·출처·원어 자막을 합성한 dirty-source, clean detect/plan) → 렌더·내보내기·melt 대조·QA → pytest.
-  기록: docs/validation/final_restore_log.md.
-- 문서: docs/VALIDATION.md(검증 환경·결과·미검증 환경), docs/DELIVERABLES.md(납품물 위치). mockloop.md 에 측정 시점 주의 추가.
+## 깨끗한 폴더 복원 검증 (2026-09-25)
+- 1차(번들 17e4e0a): 복원·setup·doctor·새 에피소드 test-restore-001(MP4·편집 프로젝트·melt 대조 통과)·QA·pytest 까지 실행.
+  기록: docs/validation/final_restore_log.md. 찾은 문제 7가지를 모두 고침:
+  QA 오탐 2(80ca995), 깨끗한 복원 테스트 7개(e9245b6), 보호 영역 위 국소 복원 검사·zoom 경고 시간 창·dirty-source --out·
+  번들 mockloop 스크립트·속도 행(d9b6b63).
+- 고친 코드로 QA 재측정: test-pipeline-001 184/0/89(관문 통과·완료 아님), test-coverage-001 151/0/75(G2 6),
+  test-restore-001 164/0/85(G2 12: 사람 확인 필요 — 반전, 글자 없는 로고, 손 위 복원).
 
-## 남은 단계
-1. 복원 검증 결과를 docs/VALIDATION.md 4절·DELIVERABLES.md 표에 채움.
-2. PRESET_BUNDLE.md 다시 생성(최종 문서 포함) → 빠른 재복원 확인(파일 목록이 git HEAD 와 같은지) → 커밋·푸시.
+## 진행 중
+- 전체 pytest(느린 테스트 포함) → preset sync/audit --test → PRESET_BUNDLE.md 다시 생성 → 2차 복원 검증
+  (scratchpad fr2/run2.sh: 복원 블록 그대로 → 바이트 대조 → setup → doctor → 테스트 자산 → pytest not slow →
+  test-restore-001 재렌더·sha256 대조·export·QA·gate) → VALIDATION.md 4절 2차·final_restore_log.md 2차 기록 → 커밋·푸시.
 
 ## 재개 방법
-- `git log --oneline | head` 로 마지막 커밋 확인 → 위 "남은 단계"의 첫 항목부터.
+- `git log --oneline | head` 로 마지막 커밋 확인 → 위 "진행 중"의 첫 항목부터.
 - 네트워크가 열린 환경이면: `python -m shortkit doctor --network` → AGENTS.md 5장 A(레퍼런스 분석)부터.
 - 테스트 전체: `OMP_THREAD_LIMIT=1 python -m pytest -q` (느린 테스트 제외: `-m "not slow"`).

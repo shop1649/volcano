@@ -13,8 +13,8 @@
 | 파일 | 소스 | 모드 | 비고 |
 |---|---|---|---|
 | `episodes/test-pipeline-001/output/test-pipeline-001.mp4` | Intel `classroom`(+ espeak-ng TTS 한 줄) + `head-pose-face-detection` (CC BY 4.0) | test | 19.25 s, 1080×1920 30 fps. QA 관문 통과, 완료 아님 |
-| `episodes/test-coverage-001/output/test-coverage-001.mp4` | Intel `people-detection` + `face-demographics-walking-and-pause` (CC BY 4.0) | test | 22.5 s. QA 관문 **실패**(G2 `caption.reveal`: 반전 보호 판정에 사람의 시청 기록이 필요) |
-| `episodes/test-restore-001/output/test-restore-001.mp4` | 깨끗한 폴더에 번들을 복원한 뒤 앞의 두 편과 **다른** 소스로 만든 편. 소스는 로고·출처 표시·원어 자막을 일부러 합성한 `dirty-source` 로, 오버레이 제거 단계까지 거친다 | test | 기록: `docs/validation/final_restore_log.md` |
+| `episodes/test-coverage-001/output/test-coverage-001.mp4` | Intel `people-detection` + `face-demographics-walking-and-pause` (CC BY 4.0) | test | 22.5 s. QA 관문 **실패**(G2: 반전 보호·고정 카메라 소스의 글자 없는 로고 — 사람 확인 필요) |
+| `episodes/test-restore-001/output/test-restore-001.mp4` | 깨끗한 폴더에 번들을 복원한 뒤 앞의 두 편과 **다른** 소스로 만든 편. 소스는 로고·출처 표시·원어 자막을 일부러 합성한 `dirty-source` 로, 오버레이 제거 단계까지 거친다 | test | 18.50 s. QA 관문 **실패**(G2 12건: 사람 확인 필요 — 반전, 글자 없는 로고 10, 복원이 손을 덮음 1). 기록: `docs/validation/final_restore_log.md` |
 
 영상마다 평가 모드, 소스 출처, 해시가 `episodes/<id>/qa/report.json` 의 `inputs`, `output` 에 있다.
 
@@ -24,7 +24,7 @@
 
 | 파일 | 열 수 있는 프로그램 | 검증 |
 |---|---|---|
-| `<id>.mlt` | Shotcut (MLT XML) | **melt 로 실제 렌더해 마스터와 1초 격자 비교**. test-pipeline-001 SSIM 0.9975 · 소리 포락선 상관 0.9966, test-coverage-001 SSIM 0.9923 · 0.9999 (`verify.json`) |
+| `<id>.mlt` | Shotcut (MLT XML) | **melt 로 실제 렌더해 마스터와 1초 격자 비교**. test-pipeline-001 SSIM 0.9975 · 소리 포락선 상관 0.9966, test-coverage-001 SSIM 0.9923 · 0.9999, test-restore-001 SSIM 0.9942 · 0.9998 (`verify.json`) |
 | `<id>.fcpxml` | DaVinci Resolve / Final Cut Pro (FCPXML 1.9) | **못 잼**: 이 기계에 두 프로그램이 없음. 형식·시간 일관성만 테스트 |
 | `<id>.otio` | OpenTimelineIO 를 읽는 편집기(Kdenlive 등) | **못 잼**: 자체 렌더러 없음. 쓰기→읽기 왕복만 테스트 |
 | `captions.ass` | Aegisub / 텍스트 편집기 | 마스터 렌더가 쓴 파일과 같음 |
@@ -34,6 +34,8 @@
 
 `project/media/`(정지 프레임 PNG 같은 중간 파일)와 소스 영상(`assets/test/generated/`)은 용량 때문에 git 에 넣지 않았다.
 다시 만들려면 `python -m shortkit testassets fetch-video ...`, `python -m shortkit episode export <id>` 를 실행한다.
+test-restore-001 은 소스를 `python -m shortkit testassets dirty-source --video face-demographics-walking-and-pause.mp4
+--out dirty_source_facewalk` 로 먼저 만든다. 이 컴퓨터에서는 같은 sha256 `b861fc2d…` 로 다시 만들어졌다.
 명령은 `docs/validation/final_restore_log.md` 에 있다.
 
 ## 3. 미리 합성되어 개별 편집이 안 되는 부분
@@ -82,9 +84,9 @@ QA 요약(테스트 모드):
 
 | 에피소드 | 행 | 같다 | 다르다 | 못 잼 | 관문 |
 |---|---|---|---|---|---|
-| test-pipeline-001 | 269 | 180 | 0 | 89 | 통과, 완료 아님(P1 미측정 프리셋, R1 레퍼런스 비교 없음) |
-| test-coverage-001 | 218 | 147 | 0 | 71 | 실패(G2 `caption.reveal`) |
-| test-restore-001 | `docs/validation/final_restore_log.md` 참고 | | | | |
+| test-pipeline-001 | 273 | 184 | 0 | 89 | 통과, 완료 아님(P1 미측정 프리셋, R1 레퍼런스 비교 없음) |
+| test-coverage-001 | 226 | 151 | 0 | 75 | 실패(G2 6건: 사람 확인 필요) |
+| test-restore-001 | 249 | 164 | 0 | 85 | 실패(G2 12건: 사람 확인 필요 — 그중 1건은 국소 복원이 손을 덮은 곳) |
 
 "못 잼"은 완료로 올리지 않는다. 오디오는 모두 기계 측정이다. **사람이 들어서 확인한 것은 없다(사람 청취 필요).**
 
