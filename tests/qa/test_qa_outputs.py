@@ -64,26 +64,50 @@ def test_drop_shadow_is_measured_in_the_output(caps_out):
     # a caption without a drop shadow over the same background reads 0 (no lower-right asymmetry)
     assert checks.line_style_summary(meas["ns"])["shadow_px"] == 0.0
     assert checks._style_extras(caps["ns"], meas["ns"], "description")[4] is True
-    # over a dark background a dark shadow is invisible: 못 잼, left out of the row
-    assert checks.line_style_summary(meas["dl"])["shadow_px"] is None
+    # the yellow dialogue line (5 px black outline, no shadow, grey texture) reads 0 as well.  Before the shared
+    # estimator its fill was taken to be the black outline (reference.textboxes._resolve_fill_side now picks the
+    # enclosed yellow ink) and the line read 못 잼 -- that was a mis-measurement, not a dark background.
+    dl = checks.line_style_summary(meas["dl"])
+    assert dl["shadow_px"] == 0.0
+    assert all(checks._cdist(ln["color"], "#FFE400") <= checks.TOL["color_rgb"]
+               for ln in meas["dl"]["line_style"]["lines"])
+    # over a dark background a dark shadow is invisible: 못 잼 (shared estimator; the row then leaves the key out)
+    from shortkit.util.textmeasure import drop_shadow
+    ln = meas["sh"]["line_style"]["lines"][0]
+    assert ln["shadow"]["status"] == "measured"
+    dark = drop_shadow(np.zeros((40, 40, 3), np.uint8), np.eye(40, dtype=bool), (20, 20, 20))
+    assert dark["status"] == "unmeasured" and dark["shadow_px"] is None
 
 
-def test_reference_shadow_function_cannot_see_a_shadow(caps_out):
-    """Documents why QA has its own estimator: reference.textboxes._shadow ends its search at k=1 (that ring lies
-    inside the dilated ink) and returns 0 even for the 5 px shadow drawn here."""
-    import cv2
-
+def test_reference_and_qa_share_one_shadow_estimator(caps_out, monkeypatch):
+    """The reference analyzer's line measurement (reference.textboxes.measure_line) and QA read the drop shadow with the
+    SAME estimator (shortkit.util.textmeasure.drop_shadow).  The old reference function ended its search at k=1 (that
+    ring lies inside the dilated ink) and returned 0 for the 5 px shadow drawn here; it is gone."""
+    from shortkit.qa import probes_text
     from shortkit.qa.probes_video import grab
-    from shortkit.reference.textboxes import _crop_with_pad, _shadow, measure_line
+    from shortkit.reference import textboxes as tb
+    from shortkit.util import textmeasure
 
+    assert not hasattr(tb, "_shadow") and not hasattr(probes_text, "drop_shadow")
     ctx, caps, meas = caps_out
     x, y, w, h = (int(round(v)) for v in meas["sh"]["line_boxes"][0])
     b = (x - 5, y - 5, w + 10, h + 10)
-    crop, _ = _crop_with_pad(grab(ctx.mp4, 1.0), b, max(10, b[3]))
-    m = measure_line(crop, (b[0] - _[0], b[1] - _[1], b[2], b[3]))
-    bg = tuple(int(m["bg_color"][i:i + 2], 16) for i in (1, 3, 5))
-    assert _shadow(crop, m["ink"], bg)[0] == 0.0
-    assert cv2 is not None
+    crop, org = tb._crop_with_pad(grab(ctx.mp4, 1.0), b, max(10, b[3]))
+    m = tb.measure_line(crop, (b[0] - org[0], b[1] - org[1], b[2], b[3]))
+    assert m["shadow"]["algo"] == textmeasure.SHADOW_ALGO and m["shadow"]["status"] == "measured"
+    assert m["shadow_px"] == pytest.approx(5.0, abs=checks.SHADOW_TOL_PX)
+    assert checks._cdist(m["shadow_color"], "#2040C0") <= checks.TOL["color_rgb"]
+    # QA's line record is that same estimator's record: spy on the shared function
+    calls = []
+    real = textmeasure.drop_shadow
+    monkeypatch.setattr(textmeasure, "drop_shadow", lambda *a, **k: calls.append(1) or real(*a, **k))
+    cap = caps["sh"]
+    loc = {"line_boxes": meas["sh"]["line_boxes"]}
+    rec = probes_text.caption_line_styles(grab(ctx.mp4, 1.0), cap, loc)
+    assert calls, "QA must measure the shadow through shortkit.util.textmeasure.drop_shadow"
+    ln = rec["lines"][0]
+    assert ln["shadow"]["algo"] == textmeasure.SHADOW_ALGO
+    assert ln["shadow_px"] == pytest.approx(5.0, abs=checks.SHADOW_TOL_PX)
 
 
 def test_box_padding_and_colour_are_measured_in_the_output(caps_out):
@@ -145,8 +169,12 @@ def test_slide_offset_applies_only_to_slide_up_roles():
     b = _set(b, {"text.roles.dialogue.motion_in.type": "slide_up", "text.roles.situation.motion_in.type": "pop"})
     assert "text.roles.dialogue.motion_in.offset_px" not in checks.role_not_applicable(b, "dialogue", [])
     assert "text.roles.situation.motion_in.offset_px" in checks.role_not_applicable(b, "situation", [])
-    b = _set(_builder(), {"text.roles.dialogue.motion_in.type": "slide"})    # the reference analyzer's name
-    assert "text.roles.dialogue.motion_in.offset_px" not in checks.role_not_applicable(b, "dialogue", [])
+    # one vocabulary: the reference analyzer also writes 'slide_up' (reference.textboxes.slide_kind); QA keeps no
+    # alias.  A measured non-upward slide is not the renderer's slide_up (resolve refuses it), so its offset is not
+    # the slide_up offset.
+    assert not hasattr(checks, "_mi_type")
+    b = _set(_builder(), {"text.roles.dialogue.motion_in.type": "slide_down"})
+    assert "text.roles.dialogue.motion_in.offset_px" in checks.role_not_applicable(b, "dialogue", [])
 
 
 def test_quote_marks_by_glyph_shape(caps_out):
@@ -210,10 +238,11 @@ def test_dialogue_lead_is_measured_against_the_output_speech():
     cap = SimpleNamespace(id="d", role="dialogue", start=2.0, end=4.0)
     meas = {"d": {"onset": 2.1, "offset": 4.0, "found": True}}
     leads = checks.dialogue_leads([cap], meas, {"status": "measured", "spans": [[1.9, 3.5]]})
-    assert leads[0]["lead_s"] == pytest.approx(0.2)
+    # lead_s = speech onset - caption start: the caption shows 0.2 s AFTER the line starts -> -0.2
+    assert leads[0]["lead_s"] == pytest.approx(-0.2) and leads[0]["speech_onset"] == pytest.approx(1.9)
     assert checks.dialogue_leads([cap], meas, {"status": "measured", "spans": [[5.0, 6.0]]})[0].get("lead_s") is None
     probes = {"audio": {"originals": {"voice_out": {"speech": {"status": "measured", "spans": [[1.9, 3.5]]}}}}}
-    for lead, st in ((0.2, "same"), (0.0, "different")):
+    for lead, st in ((-0.2, "same"), (0.0, "different"), (0.2, "different")):
         b = _set(_all_measured(_builder()), {"text.roles.dialogue.timing.lead_s": lead})
         checks._lead_ref_row(b, [cap], meas, probes, 1.0 / FPS)
         r = _rows(b)["caption.timing:dialogue_lead_ref"]
@@ -221,6 +250,25 @@ def test_dialogue_lead_is_measured_against_the_output_speech():
     b = _all_measured(_builder())
     checks._lead_ref_row(b, [cap], meas, {"audio": {}}, 1.0 / FPS)
     assert _rows(b)["caption.timing:dialogue_lead_ref"]["status"] == "unmeasured"
+
+
+def test_dialogue_lead_same_case_as_reference_and_resolve():
+    """The synthetic case shared with tests/edit/test_motion_lead_semantics.py (resolve) and
+    tests/reference_visual/test_rv_slide_lead.py (analyzer): the line is heard at 3.0 s, the caption shows at 2.8 s
+    -> lead_s = +0.2 (the caption appears before the line).  QA reads it with the analyzer's own function."""
+    from shortkit.reference.textboxes import dialogue_lead
+
+    cap = SimpleNamespace(id="d", role="dialogue", start=2.8, end=4.4)
+    meas = {"d": {"onset": 2.8, "offset": 4.4, "found": True}}
+    sp = {"status": "measured", "spans": [[3.0, 4.0]]}
+    lead = checks.dialogue_leads([cap], meas, sp)[0]
+    assert lead["lead_s"] == pytest.approx(0.2) and lead["speech_onset"] == pytest.approx(3.0)
+    assert lead["lead_s"] == pytest.approx(dialogue_lead(2.8, 4.4, [(3.0, 4.0)])[0])
+    probes = {"audio": {"originals": {"voice_out": {"speech": sp}}}}
+    for pv, st in ((0.2, "same"), (-0.2, "different")):     # -0.2 = the old (caption start - onset) sign
+        b = _set(_all_measured(_builder()), {"text.roles.dialogue.timing.lead_s": pv})
+        checks._lead_ref_row(b, [cap], meas, probes, 1.0 / FPS)
+        assert _rows(b)["caption.timing:dialogue_lead_ref"]["status"] == st
 
 
 def test_lead_does_not_apply_to_other_roles_by_definition():

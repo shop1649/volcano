@@ -499,8 +499,21 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
             except cap_mod.FontError as e:
                 issues.append(issue("error", "font_missing", f"{role}: {e}", f"text.roles.{role}.font_name"))
             for key, allowed in (("motion_in", MOTION_IN_TYPES), ("motion_out", MOTION_OUT_TYPES)):
-                if st[key]["type"] not in allowed:
-                    issues.append(issue("error", "motion_type", f"{role}.{key}.type={st[key]['type']} 미지원({allowed})",
+                mtype = st[key]["type"]
+                if mtype in allowed:
+                    continue
+                if isinstance(mtype, str) and mtype.startswith("slide"):
+                    # the reference analyzer names a measured slide by its direction (reference.textboxes.slide_kind);
+                    # only an upward entrance is what this renderer draws.  Never mapped to a near type.
+                    issues.append(issue(
+                        "error", "motion_unsupported_slide",
+                        f"{role}.{key}.type={mtype}: 레퍼런스에서 잰 이 이동(방향)은 렌더러가 그리지 못합니다 "
+                        f"(지원: {', '.join(allowed)}; slide_up = 등장 시 offset_px 아래에서 위로). 비슷한 종류로 바꾸지 "
+                        "않고 거부합니다 — 렌더러에 그 방향을 구현하거나, 의도한 변경이면 requested_changes.yaml 에 "
+                        "기록하세요" + (" ('slide' 는 방향을 기록하기 전 분석값: ref analyze 재실행)" if mtype == "slide" else ""),
+                        f"text.roles.{role}.{key}.type"))
+                else:
+                    issues.append(issue("error", "motion_type", f"{role}.{key}.type={mtype} 미지원({allowed})",
                                         f"text.roles.{role}.{key}.type"))
             if st["anchor"]["align"] not in ("left", "center", "right") or \
                     st["anchor"]["valign"] not in ("top", "middle", "bottom"):
@@ -518,6 +531,9 @@ def resolve_captions(ctx: ResolveContext, canvas: dict, duration: float, build_r
                 text = q0 + text
             if not text.endswith(q1) or len(text) == 1:
                 text = text + q1
+        # lead_s = speech onset - caption start (positive = the caption appears before the line is heard; the one
+        # definition shared with reference.textboxes.dialogue_lead and qa.checks.dialogue_leads).  A dialogue
+        # caption's plan start is the moment its line is heard, so it is drawn lead_s earlier.
         start = max(0.0, float(c["start"]) - float(st["timing"]["lead_s"]))
         end = float(c["end"])
         if st["persist"] == "whole_video":

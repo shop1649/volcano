@@ -3,8 +3,8 @@
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
   "source": "episodes/test-coverage-001/build/preset_access.json",
-  "saved_at": "2026-09-25T08:21:27+00:00",
-  "archived_at": "2026-09-25T08:27:27+00:00",
+  "saved_at": "2026-09-25T11:49:18+00:00",
+  "archived_at": "2026-09-25T12:11:22+00:00",
   "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
   "reads": {
     "approval.later_episodes_require_approval": [
@@ -714,7 +714,7 @@
       "basis": "recorded"
     },
     "shortkit/edit/resolve.py:resolve_captions": {
-      "fp": "de852a28ef25940e",
+      "fp": "7e5e4567cbc193dc",
       "basis": "recorded"
     },
     "shortkit/edit/resolve.py:resolve_clips": {
@@ -746,7 +746,7 @@
       "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_cut_structure": {
-      "fp": "58d267f4a757e2ca",
+      "fp": "66bf3e7b14f41a9d",
       "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_format": {

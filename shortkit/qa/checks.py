@@ -511,7 +511,7 @@ def role_not_applicable(b: "RowBuilder", role: str, caps: list) -> dict[str, str
         na[k("line_spacing")] = "max_lines=1 이고 이 편의 자막도 한 줄(줄 간격이 없음)"
     if role != "dialogue" and abs(_num(b.pget(k("timing.lead_s")), 0.0)) < 1e-9:
         # the registry's applicability rule (config.APPLICABILITY: definition, neutral value 0)
-        na[k("timing.lead_s")] = "정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사 외 역할은 기준 사건이 없음(값 0)"
+        na[k("timing.lead_s")] = "정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사 외 역할은 기준 사건이 없음(값 0)"
     if b.pget(k("persist")) == "whole_video":
         na[k("timing.min_dur_s")] = "persist=whole_video(영상 전체에 떠 있음)"
     mi = b.pget(k("motion_in.type"))
@@ -519,7 +519,7 @@ def role_not_applicable(b: "RowBuilder", role: str, caps: list) -> dict[str, str
         na[k("motion_in.dur_s")] = "motion_in.type=none"
     if mi != "pop":
         na[k("motion_in.scale_from")] = f"motion_in.type={mi}(pop 아님)"
-    if _mi_type(mi) != "slide_up":
+    if mi != "slide_up":
         na[k("motion_in.offset_px")] = f"motion_in.type={mi}(slide_up 아님 → 이동 거리가 쓰이지 않음)"
     if b.pget(k("motion_out.type")) in (None, "none"):
         na[k("motion_out.dur_s")] = "motion_out.type=none"
@@ -1120,12 +1120,6 @@ MOTION_DUR_TOL_FRAMES = 1.5
 SLIDE_OFFSET_TOL = (3.0, 0.1)    # slide start offset: max(3 px, 10 %) + one frame of travel (onset off the frame grid)
 
 
-def _mi_type(v):
-    """Entrance type name: the reference analyzer reports a slide as 'slide' (reference.textboxes), the renderer draws
-    'slide_up' (edit.resolve.MOTION_IN_TYPES) -- the same upward slide."""
-    return "slide_up" if v in ("slide", "slide_up") else v
-
-
 def slide_offset_tol(offset_px: float, dur_s: float, fr: float) -> float:
     off = abs(float(offset_px or 0.0))
     travel = off * fr / float(dur_s) if dur_s and float(dur_s) > 0 else 0.0
@@ -1183,7 +1177,7 @@ def _motion_rows(b: "RowBuilder", cap, m: dict, role: str, label: str, ev: dict,
               status="unmeasured", keys=keys, evidence=ev,
               note="slide_up 이동 추적 실패: " + str((m.get("slide_track") or {}).get("reason") or "측정 없음"))
     else:
-        ok = _mi_type(mo["type"]) == et
+        ok = mo["type"] == et
         notes = []
         if ok and et == "slide_up":
             d_s = mo.get("dur_s")
@@ -1267,13 +1261,13 @@ def _motion_ref_row(b: "RowBuilder", role: str, rc_found: list[dict], na: dict, 
     obs: dict = {}
     keys: list[str] = []
     if tin:
-        obs["in_type"] = _mode([_mi_type(x.get("type")) for x in tin])
+        obs["in_type"] = _mode([x.get("type") for x in tin])
         keys.append(k("motion_in.type"))
-        pin = _mi_type(b.pget(k("motion_in.type")))
+        pin = b.pget(k("motion_in.type"))
         if pin not in MEASURABLE_MOTION_IN:
             obs = None
     if obs is not None and tin and obs.get("in_type") == "slide_up":
-        sl = [x for x in tin if _mi_type(x.get("type")) == "slide_up" and x.get("slide_measured")]
+        sl = [x for x in tin if x.get("type") == "slide_up" and x.get("slide_measured")]
         ds = [x.get("dur_s") for x in sl if x.get("dur_s") is not None]
         if ds:
             obs["in_dur_s"] = _r(_median(ds), 3)
@@ -1308,7 +1302,7 @@ def _motion_ref_row(b: "RowBuilder", role: str, rc_found: list[dict], na: dict, 
     def cmp(o, r):
         parts = []
         if "in_type" in o:
-            parts.append(o["in_type"] == _mi_type(r.get(k("motion_in.type"))))
+            parts.append(o["in_type"] == r.get(k("motion_in.type")))
         if "in_offset_px" in o:
             ro_ = abs(float(r.get(k("motion_in.offset_px")) or 0.0))
             parts.append(abs(o["in_offset_px"] - ro_) <= slide_offset_tol(ro_, b.pget(k("motion_in.dur_s")), fr))
@@ -1323,7 +1317,8 @@ def _motion_ref_row(b: "RowBuilder", role: str, rc_found: list[dict], na: dict, 
             parts.append(abs(o["in_scale_first"] - sf) <= TOL["scale_first"] + abs(sf - 1.0) * 0.35)
         return _all(*parts)
     note = ("레퍼런스 대비 등장·퇴장 모션: 측정한 최빈 종류와 길이(중앙값)·pop 첫 배율·slide 첫 프레임 이동을 비교"
-            "(레퍼런스의 'slide' = 렌더러의 'slide_up'); 측정 못 한 키는 행에서 뺌"
+            "(레퍼런스 분석기와 렌더러가 같은 용어: slide_up = 아래에서 위로 등장; 다른 방향의 slide_* 는 렌더러가 "
+            "그리지 못해 resolve 가 거부); 측정 못 한 키는 행에서 뺌"
             if obs is not None else "프리셋 모션 종류가 출력에서 측정하지 않는 종류 — 못 잼")
     b.style_row("caption.motion", f"{role}_ref", f"자막 등장·퇴장 모션 [{role}] (레퍼런스 대비)", CAT["cap_motion"],
                 keys or [k("motion_in.type"), k("motion_out.type")], obs if obs else None, cmp, na=na, note=note)
@@ -1334,9 +1329,12 @@ LEAD_TOL_S = 0.1     # + one frame: the speech edges come from the energy-extent
 
 
 def dialogue_leads(caps: list, meas: dict, speech: dict) -> list[dict]:
-    """lead_s of each dialogue caption in the OUTPUT with the reference analyzer's definition (reference.textboxes:
-    caption start - start of the earliest speech span overlapping the caption): caption onset measured in the output,
-    speech = the kept voice measured in the output (mix minus BGM and SFX, probes_audio.kept_audio_checks)."""
+    """lead_s of each dialogue caption in the OUTPUT with the reference analyzer's own function
+    (reference.textboxes.dialogue_lead: onset of the earliest speech span overlapping the caption MINUS the caption
+    start; positive = the caption appears before the line is heard): caption onset measured in the output, speech =
+    the kept voice measured in the output (mix minus BGM and SFX, probes_audio.kept_audio_checks)."""
+    from ..reference.textboxes import dialogue_lead
+
     out = []
     spans = [(float(a), float(c)) for a, c in (speech.get("spans") or [])] if speech.get("status") == "measured" else None
     for cap in caps:
@@ -1349,12 +1347,11 @@ def dialogue_leads(caps: list, meas: dict, speech: dict) -> list[dict]:
             rec["reason"] = "출력 말소리 못 잼: " + str(speech.get("reason") or "오디오 측정 없음")
         else:
             end = float(off if off is not None else cap.end)
-            ov = [(a, c) for a, c in spans if min(end, c) - max(float(on), a) > 0]
-            if not ov:
+            lead, a0 = dialogue_lead(float(on), end, spans)
+            if lead is None:
                 rec["reason"] = "자막과 겹치는 출력 말소리 없음(기준 사건 없음)"
             else:
-                a0 = min(a for a, _ in ov)
-                rec.update({"speech_onset": _r(a0, 3), "lead_s": _r(float(on) - a0, 3)})
+                rec.update({"speech_onset": _r(a0, 3), "lead_s": _r(lead, 3)})
         out.append(rec)
     return out
 
@@ -1365,12 +1362,13 @@ def _lead_ref_row(b: "RowBuilder", caps_r: list, meas: dict, probes: dict, fr: f
     leads = dialogue_leads(caps_r, meas, sp)
     got = [x["lead_s"] for x in leads if x.get("lead_s") is not None]
     tol = LEAD_TOL_S + fr
-    b.style_row("caption.timing", "dialogue_lead_ref", "대사 자막 등장 − 말소리 시작 (레퍼런스 대비)", CAT["cap_timing"],
+    b.style_row("caption.timing", "dialogue_lead_ref", "말소리 시작 − 대사 자막 등장 (레퍼런스 대비)", CAT["cap_timing"],
                 ["text.roles.dialogue.timing.lead_s"],
                 {"lead_s": _r(_median(got), 3), "per_caption": leads} if got else None,
                 lambda o, r: abs(o["lead_s"] - float(r["text.roles.dialogue.timing.lead_s"] or 0.0)) <= tol,
                 evidence={"t": next((x["onset"] for x in leads if x.get("lead_s") is not None), None)},
-                note=(f"정의(레퍼런스 분석기와 같음): 대사 자막 시작 − 겹치는 말소리 시작, 둘 다 출력에서 잼(자막 등장 = 문자 검사, "
+                note=(f"정의(레퍼런스 분석기·렌더러와 같음, reference.textboxes.dialogue_lead): 겹치는 말소리 시작 − 대사 자막 시작"
+                      "(+ = 말보다 먼저 뜸), 둘 다 출력에서 잼(자막 등장 = 문자 검사, "
                       f"말소리 = 출력 − BGM·효과음의 음성 구간); 허용 ±{tol:.3f}s"
                       + ("" if got else " — " + "; ".join(f"{x['caption']}: {x.get('reason')}" for x in leads))))
 
@@ -1448,7 +1446,8 @@ def _style_ref_row(b: "RowBuilder", role: str, rc_found: list[dict], caps_r: lis
     b.style_row("caption.style", f"{role}_ref", f"자막 색·외곽선·그림자·박스 [{role}] (레퍼런스 대비)", CAT["cap_style"],
                 keys, obs, cmp, na=na,
                 note="측정한 채움색·외곽선(배경과 구별될 때)·박스 불투명도의 중앙값 + 레퍼런스 분석기와 같은 정의"
-                     "(reference.textboxes.measure_line / box_alpha)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; "
+                     "(reference.textboxes.measure_line / box_alpha; 그림자는 레퍼런스와 같은 추정기 "
+                     "shortkit.util.textmeasure.drop_shadow)로 잰 그림자·박스 여백(박스 경계 − 보이는 잉크)·박스 색; "
                      "재지 못한 키(어두운 배경의 그림자, 박스가 안 보이는 경우 등)는 행에서 뺌")
 
 
@@ -1462,7 +1461,8 @@ def box_alpha_obs(m: dict) -> float | None:
     return m.get("box_alpha_obs")
 
 
-SHADOW_TOL_PX = 1.0     # probes_text.drop_shadow: whole-pixel IoU search + sub-pixel parabola
+SHADOW_TOL_PX = 1.0     # shortkit.util.textmeasure.drop_shadow (shared with the reference analyzer): whole-pixel IoU
+#                         search + sub-pixel parabola; SYNTHETIC libass renders read 1-7 px shadows within +1.0/-0.3 px
 PAD_TOL_PX = 2.0        # docs/validation/mockloop.md pad_px tolerance (the reference's box pad on renderer-drawn boxes)
 
 

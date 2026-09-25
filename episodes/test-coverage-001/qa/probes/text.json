@@ -165,6 +165,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }
@@ -692,6 +696,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }
@@ -1227,6 +1235,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }
@@ -1770,6 +1782,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }
@@ -2323,11 +2339,54 @@
             "box": {
               "present": "absent"
             },
-            "shadow_px": null,
+            "shadow_px": 0.0,
             "shadow_color": null,
             "shadow": {
-              "status": "unmeasured",
-              "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": 0.0,
+              "shadow_color": null,
+              "rings_upper_left": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.3,
+                0.01,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "rings_lower_right": [
+                0.98,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.53,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "extent_upper_left_px": 7.3,
+              "extent_lower_right_px": 7.51,
+              "symmetric_px": 7.3,
+              "asymmetry_px": 0.21,
+              "status": "measured"
             }
           }
         ],
@@ -2865,6 +2924,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }
@@ -3388,6 +3451,10 @@
             "shadow_px": null,
             "shadow_color": null,
             "shadow": {
+              "algo": "shortkit.util.textmeasure.drop_shadow/1",
+              "method": "글자 채움 기준 왼쪽 위(그림자 없는 쪽)와 오른쪽 아래의 '배경과 다른 화소' 폭 차이 ≥ 0.75px 이면 그림자 있음 → (채움 + 왼쪽 위 폭)을 오른쪽 아래로 k px 옮긴 모양과 배경과 다른 화소의 IoU 최대 k(포물선 보정), 색 = 그 안에서 배경과 가장 다른 30% 화소의 중앙값",
+              "shadow_px": null,
+              "shadow_color": null,
               "status": "unmeasured",
               "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"
             }

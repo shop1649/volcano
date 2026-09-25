@@ -1,6 +1,6 @@
 # test-coverage-001 편집 프로젝트
 
-- 생성 2026-09-25T08:23:44+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-25T11:51:00+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 22.50s · 마스터 `episodes/test-coverage-001/output/test-coverage-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 
@@ -182,8 +182,8 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/ding.wav 이 종류 'ding' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
   - [bgm_identity_unmeasured] 프리셋 BGM 제목·버전 미식별(못 잼: title=None, version=None): 쓰는 음악 파일이 레퍼런스 곡·버전과 같은지 판정 불가
   - [presence_unmeasured] 레퍼런스의 효과 사용 여부 못 잼: zoom(안 씀), freeze(씀), speed_change(씀), flash(씀), crossfade(안 씀), decorations(씀), bgm(씀), original_audio(안 씀), ducking(안 씀), intentional_silence(안 씀) — 이 plan 의 선택을 레퍼런스와 비교할 수 없음
-  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 270개로 렌더합니다(레퍼런스 일치 아님)
-- 프리셋 미측정(못 잼) 값 203개로 만든 편집이다(레퍼런스 일치 아님).
+  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 266개로 렌더합니다(레퍼런스 일치 아님)
+- 프리셋 미측정(못 잼) 값 200개로 만든 편집이다(레퍼런스 일치 아님).
 - plan sha256 `1804b3d52d1ce50a547762ed7d6f89f73f2e5b41ab90f71fdaffa00c4a98857f`
 - 승인 상태: 필요=False 승인됨=False
 - 소스 v_room: `assets/test/generated/video/people-detection.mp4` sha256=18ffe8672d741e3e… 창고 id=None

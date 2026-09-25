@@ -1,7 +1,7 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-25T10:43:12+00:00",
+  "saved_at": "2026-09-25T12:11:09+00:00",
   "reads": {
     "approval.later_episodes_require_approval": [
       "shortkit/edit/plan.py:approval_state_for"

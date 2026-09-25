@@ -715,84 +715,16 @@ def _motion_in(ts, frs, p, i0, rest, mask, cap, fps) -> dict:
 
 
 # ----------------------------------------------------------------------------- drop shadow
-SHADOW_MAX_PX = 12            # largest offset searched
-SHADOW_DIFF_RGB = 40.0        # a shadow pixel differs from the local background by more than this (reference rule)
-SHADOW_MIN_IOU = 0.35         # best IoU between the measured halo and the offset ink below this: no shadow
-SHADOW_BUSY_SHARE = 0.5       # the up-left (-2, -2) ring is 'different from the background' this often: busy
-SHADOW_ASYM = 0.35            # lower-right minus upper-left ring share needed for a shadow (reference.textboxes rule)
-
-
-def drop_shadow(crop: np.ndarray, ink: np.ndarray, bg_col) -> dict:
-    """Drop shadow of a caption line = a copy of the ink (fill + outline) offset (k, k) down-right, drawn in the shadow
-    colour (the renderer's ASS convention; reference.textboxes describes the same thing).  The halo H = pixels outside
-    the (1-px dilated) ink that differ from the local background by > SHADOW_DIFF_RGB.  A shadow exists when the ring of
-    the ink shifted (+2, +2) holds clearly more halo than the ring shifted (-2, -2) (share difference > SHADOW_ASYM, the
-    reference's asymmetry rule); its offset = the k whose predicted shadow P_k = ink shifted by (k, k) minus the ink
-    best matches H (IoU, sub-pixel parabola), colour = median of H within P_k.  No asymmetry -> 0 (a busy upper-left
-    ring -> 못 잼).  A 1-px offset is not separable from anti-aliasing (k starts at 2).
-    (reference.textboxes._shadow stops at k = 1 -- its first ring lies inside the dilated ink -- and so can only
-    return 0; QA does not reuse it.)  None when the background is too dark (luma < 50) or too busy to tell."""
-    cv2 = _cv2()
-    if bg_col is None:
-        return {"status": "unmeasured", "reason": "배경색을 모름"}
-    bg = np.asarray(bg_col, np.float32)
-    if float(np.dot(bg, [0.2126, 0.7152, 0.0722])) < 50:
-        return {"status": "unmeasured", "reason": "배경이 어두워(휘도 < 50) 그림자가 보이지 않음"}
-    Hc, Wc = ink.shape
-    ink = ink.astype(bool)
-    near = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
-    zone = cv2.dilate(ink.astype(np.uint8), np.ones((2 * SHADOW_MAX_PX + 5,) * 2, np.uint8)).astype(bool)
-    diff = np.sqrt(((crop.astype(np.float32) - bg) ** 2).sum(axis=2)) > SHADOW_DIFF_RGB
-    halo = diff & ~near & zone
-
-    def shifted(k: int) -> np.ndarray:
-        out = np.zeros_like(ink)
-        if k >= 0:
-            out[k:, k:] = ink[:Hc - k, :Wc - k]
-        else:
-            out[:Hc + k, :Wc + k] = ink[-k:, -k:]
-        return out & ~near
-    p2, n2 = shifted(2), shifted(-2)
-    fp2 = float(halo[p2].mean()) if p2.any() else None       # lower-right ring just outside the ink
-    fn2 = float(halo[n2].mean()) if n2.any() else None       # upper-left ring (no shadow there)
-    scores = []
-    for k in range(2, SHADOW_MAX_PX + 1):
-        P = shifted(k)
-        if not P.any():
-            break
-        u = float((P | halo).sum())
-        scores.append((float((P & halo).sum()) / u if u else 0.0, k))
-    out = {"method": "오른쪽 아래(+2,+2) 고리가 왼쪽 위(−2,−2) 고리보다 배경과 다른 화소가 뚜렷이 많으면 그림자 있음 → "
-                     "IoU(배경과 다른 테두리 밖 화소, 오른쪽 아래로 k px 옮긴 잉크) 최대인 k(포물선 보정)",
-           "ring_lower_right": rnd(fp2, 3), "ring_upper_left": rnd(fn2, 3), "scores": [[k, rnd(v, 3)] for v, k in scores]}
-    if fp2 is None or fn2 is None or not scores:
-        return {**out, "status": "unmeasured", "reason": "잉크가 너무 작음"}
-    if fp2 - fn2 <= SHADOW_ASYM:
-        if fn2 > SHADOW_BUSY_SHARE:
-            return {**out, "status": "unmeasured", "reason": "배경이 복잡해 그림자를 가려낼 수 없음"}
-        # the ring where a >= 2 px drop shadow would be is no more 'different' than the opposite ring: no shadow
-        return {**out, "status": "measured", "shadow_px": 0.0, "shadow_color": None}
-    best, k = max(scores)
-    if best < SHADOW_MIN_IOU:
-        return {**out, "status": "unmeasured", "iou": rnd(best, 3),
-                "reason": "오른쪽 아래가 배경과 더 다르지만 옮긴 잉크 모양과 맞지 않음(그림자 폭을 정할 수 없음)"}
-    sel = shifted(k) & halo
-    # sub-pixel: parabola through the best k and its neighbours (the measured ink is ~0.5 px wider than the drawn one,
-    # which moves the whole-pixel optimum by up to one step)
-    kv = {kk: v for v, kk in scores}
-    kf = float(k)
-    if k - 1 in kv and k + 1 in kv:
-        den = kv[k - 1] - 2 * kv[k] + kv[k + 1]
-        if den < 0:
-            kf = k + 0.5 * (kv[k - 1] - kv[k + 1]) / den
-    return {**out, "status": "measured", "shadow_px": round(kf, 2), "shadow_px_int": k, "iou": rnd(best, 3),
-            "shadow_color": rgb_hex(np.median(crop[sel], axis=0)) if sel.sum() >= 10 else None}
+# The drop shadow is measured by ONE estimator shared with the reference analyzer:
+# shortkit.util.textmeasure.drop_shadow, called inside reference.textboxes.measure_line (caption_line_styles below
+# reads its record).  QA keeps no estimator of its own.
 
 
 # ----------------------------------------------------------------------------- line style (reference definitions)
 def caption_line_styles(frame: np.ndarray, cap, loc: dict) -> dict:
     """Outline / drop shadow / background box of the caption AT REST measured in the output with the reference
-    analyzer's own line measurement (``reference.textboxes.measure_line``: shadow = dark copy offset down-right,
+    analyzer's own line measurement (``reference.textboxes.measure_line``: shadow = shared estimator
+    ``shortkit.util.textmeasure.drop_shadow`` (copy of the ink offset (k, k) down-right),
     box = 4-sided luminance step around the glyph fill, pad = step distance minus a visible outline), per line; a
     multi-line boxed caption also gets the block box (``_find_box`` around the union of the lines, like
     ``textboxes._block_box``).  Canvas px."""
@@ -825,13 +757,15 @@ def caption_line_styles(frame: np.ndarray, cap, loc: dict) -> dict:
         rec = {"status": "measured", "fill_bbox": [fx + ox, fy + oy, fw, fh], "ink_bbox": [ix + ox, iy + oy, iw, ih],
                **{k: m.get(k) for k in ("color", "outline_px", "outline_color", "outline_visibility", "bg_color")},
                "box": box, "shadow_px": None, "shadow_color": None}
-        if box.get("present") == "present":
-            rec["shadow"] = {"status": "unmeasured", "reason": "박스가 있어 그림자를 따로 재지 않음(레퍼런스 분석기와 같은 규칙)"}
-        else:
-            sh = drop_shadow(crop, m["ink"], hex_rgb(m.get("bg_color")) if m.get("bg_color") else None)
-            rec["shadow"] = sh
-            if sh.get("status") == "measured":
-                rec["shadow_px"], rec["shadow_color"] = sh["shadow_px"], sh.get("shadow_color")
+        # the shared estimator's record (shortkit.util.textmeasure.drop_shadow via measure_line: the same function
+        # the reference analyzer measured the preset value with; inside a box it is 못 잼 on both sides)
+        sh = dict(m.get("shadow") or {"status": "unmeasured", "reason": "measure_line: 그림자 기록 없음"})
+        rec["shadow"] = sh
+        if sh.get("status") == "measured":
+            rec["shadow_px"], rec["shadow_color"] = sh.get("shadow_px"), sh.get("shadow_color")
+        for k in ("outline_side", "outline_all_around", "fill_side"):
+            if m.get(k) is not None:
+                rec[k] = m[k]
         lines.append(rec)
     out: dict = {"lines": lines, "method": "reference.textboxes.measure_line(출력 휴지 프레임, 줄마다)"}
     ok = [ln for ln in lines if ln.get("status") == "measured"]

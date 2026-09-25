@@ -4,7 +4,7 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-25T08:33:19+00:00",
+  "generated_at": "2026-09-25T11:47:18+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
@@ -37,7 +37,7 @@
       "resolution": null,
       "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p10",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -56,7 +56,7 @@
       "resolution": null,
       "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -75,7 +75,7 @@
       "resolution": null,
       "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -94,7 +94,7 @@
       "resolution": null,
       "method": "latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → 표본 수",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -113,7 +113,7 @@
       "resolution": null,
       "method": "영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은 정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p10",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -145,7 +145,7 @@
       "resolution": null,
       "method": "영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은 정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -177,7 +177,7 @@
       "resolution": null,
       "method": "영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은 정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -209,7 +209,7 @@
       "resolution": null,
       "method": "영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은 정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → 표본 수",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -241,7 +241,7 @@
       "resolution": null,
       "method": "영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts 의 '샷 길이 중앙값'과 같은 단위) → p10",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -273,7 +273,7 @@
       "resolution": null,
       "method": "영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts 의 '샷 길이 중앙값'과 같은 단위) → p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -305,7 +305,7 @@
       "resolution": null,
       "method": "영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts 의 '샷 길이 중앙값'과 같은 단위) → p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -337,7 +337,7 @@
       "resolution": null,
       "method": "영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts 의 '샷 길이 중앙값'과 같은 단위) → 표본 수",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -369,7 +369,7 @@
       "resolution": null,
       "method": "영상별 첫 시간제 자막(제목·설명 제외) 시작 시각",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {

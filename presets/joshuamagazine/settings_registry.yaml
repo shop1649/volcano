@@ -1,6 +1,6 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-25T10:59:01+00:00'
+synced_at: '2026-09-25T12:11:24+00:00'
 access_logs:
 - episodes/test-coverage-001/build/preset_access.json
 - episodes/test-coverage-001/build/preset_access_all.json
@@ -241,7 +241,7 @@ entries:
         은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
         너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
         y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -279,7 +279,7 @@ entries:
         은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
         너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
         y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -317,7 +317,7 @@ entries:
         은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상
         너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]),
         y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: fps
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -350,7 +350,7 @@ entries:
       by_format: {}
       resolution: null
       method: '영상 밖 영역: 정지+단색 → color, 변하지만 흐림 → blur_source'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -383,7 +383,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 밖 정지 영역의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -417,7 +417,7 @@ entries:
       by_format: {}
       resolution: null
       method: null
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -460,7 +460,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -505,7 +505,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -550,7 +550,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -595,7 +595,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -632,7 +632,7 @@ entries:
       by_format: {}
       resolution: null
       method: null
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -678,7 +678,7 @@ entries:
       method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
         와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
         안쪽에 자막을 둠)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -724,7 +724,7 @@ entries:
       method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
         와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
         안쪽에 자막을 둠)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -770,7 +770,7 @@ entries:
       method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
         와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
         안쪽에 자막을 둠)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -816,7 +816,7 @@ entries:
       method: '영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe
         와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다
         안쪽에 자막을 둠)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_canvas
@@ -948,7 +948,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -984,7 +984,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1017,7 +1017,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1058,7 +1058,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1094,7 +1094,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1134,8 +1134,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1171,7 +1172,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1203,7 +1204,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1236,7 +1237,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1269,7 +1270,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1310,7 +1311,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1354,7 +1355,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1390,7 +1391,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1431,7 +1432,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1468,7 +1469,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1502,7 +1503,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1544,7 +1545,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1589,7 +1590,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1625,7 +1626,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1657,7 +1658,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1688,8 +1689,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1723,7 +1725,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1756,7 +1758,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1796,8 +1798,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1831,8 +1833,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1866,7 +1868,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1898,8 +1900,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1916,7 +1918,7 @@ entries:
       given: 정의
       given_value: null
       given_origin: definition
-      reason: '정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
+      reason: '정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
       production_use: 0(계획 plan 의 자막 시각 그대로)
       rule: text.roles.{role}.timing.lead_s
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
@@ -1940,7 +1942,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -1972,7 +1974,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2088,7 +2090,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2124,7 +2126,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2157,7 +2159,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2198,7 +2200,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2234,7 +2236,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2274,8 +2276,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2311,7 +2314,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2343,7 +2346,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2376,7 +2379,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2409,7 +2412,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2450,7 +2453,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2494,7 +2497,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2530,7 +2533,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2571,7 +2574,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2608,7 +2611,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2642,7 +2645,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2684,7 +2687,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2729,7 +2732,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2765,7 +2768,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2797,7 +2800,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2828,8 +2831,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2863,7 +2867,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2897,7 +2901,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2937,8 +2941,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -2972,8 +2976,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3007,7 +3011,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3039,8 +3043,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3057,7 +3061,7 @@ entries:
       given: 정의
       given_value: null
       given_origin: definition
-      reason: '정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
+      reason: '정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
       production_use: 0(계획 plan 의 자막 시각 그대로)
       rule: text.roles.{role}.timing.lead_s
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
@@ -3081,7 +3085,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3114,7 +3118,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3230,7 +3234,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3266,7 +3270,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3299,7 +3303,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3340,7 +3344,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3376,7 +3380,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3417,8 +3421,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3454,7 +3459,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3486,7 +3491,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3519,7 +3524,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3552,7 +3557,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3593,7 +3598,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3637,7 +3642,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3673,7 +3678,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3714,7 +3719,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3751,7 +3756,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3785,7 +3790,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3827,7 +3832,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3872,7 +3877,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3908,7 +3913,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3940,7 +3945,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -3971,8 +3976,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4006,7 +4012,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4040,7 +4046,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4081,8 +4087,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4116,8 +4122,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4151,7 +4157,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4183,8 +4189,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4201,7 +4207,7 @@ entries:
       given: 정의
       given_value: null
       given_origin: definition
-      reason: '정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
+      reason: '정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
       production_use: 0(계획 plan 의 자막 시각 그대로)
       rule: text.roles.{role}.timing.lead_s
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
@@ -4225,7 +4231,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4258,7 +4264,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4374,7 +4380,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4410,7 +4416,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4443,7 +4449,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4484,7 +4490,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4520,7 +4526,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4560,8 +4566,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4597,7 +4604,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4629,7 +4636,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4662,7 +4669,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4696,7 +4703,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4738,7 +4745,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4783,7 +4790,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4820,7 +4827,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4861,7 +4868,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4898,7 +4905,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4932,7 +4939,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -4974,7 +4981,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5019,7 +5026,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5055,7 +5062,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5087,7 +5094,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5118,8 +5125,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5153,7 +5161,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5187,7 +5195,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5227,8 +5235,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5262,8 +5270,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5297,7 +5305,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5330,8 +5338,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5348,7 +5356,7 @@ entries:
       given: 정의
       given_value: null
       given_origin: definition
-      reason: '정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
+      reason: '정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
       production_use: 0(계획 plan 의 자막 시각 그대로)
       rule: text.roles.{role}.timing.lead_s
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
@@ -5372,7 +5380,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5405,7 +5413,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5521,7 +5529,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5557,7 +5565,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5590,7 +5598,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5631,7 +5639,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5667,7 +5675,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5707,8 +5715,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5744,7 +5753,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5776,7 +5785,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5809,7 +5818,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5842,7 +5851,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5883,7 +5892,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5927,7 +5936,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -5963,7 +5972,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6004,7 +6013,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6041,7 +6050,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6075,7 +6084,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6117,7 +6126,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6162,7 +6171,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6198,7 +6207,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6230,7 +6239,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6261,8 +6270,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6296,7 +6306,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6329,7 +6339,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6369,8 +6379,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6404,8 +6414,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6439,7 +6449,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6471,8 +6481,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6506,7 +6516,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6543,7 +6553,7 @@ entries:
       method: '대사(dialogue) 자막 OCR 텍스트의 첫 글자·마지막 글자가 따옴표인지(textboxes.quote_pair): 양쪽 다 → 그 쌍, 양쪽 다 없음 → 없음([]),
         한쪽만 → OCR 누락으로 보고 제외 → 영상별 최빈 쌍 → 영상 간 최빈(value = [여는 문자, 닫는 문자] 또는 []). 한계: 대사 역할 판정 자체가 따옴표를 근거로 쓰므로 따옴표
         없는 대사는 말소리 겹침(audio/original.json)이나 글자색으로 대사로 잡힌 경우에만 관측됨; OCR 은 “ 와 " 를 혼동할 수 있음(글자 모양 확인은 사람 관찰로)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6576,7 +6586,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6692,7 +6702,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6728,7 +6738,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 주 색(k-means 2)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6761,7 +6771,7 @@ entries:
       by_format: {}
       resolution: null
       method: 획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6802,7 +6812,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6838,7 +6848,7 @@ entries:
       by_format: {}
       resolution: null
       method: 채움 바로 바깥 1~2px 고리의 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6879,8 +6889,9 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: 오른쪽 아래 방향 비대칭 어두운 복사본 거리
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽
+        위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6916,7 +6927,7 @@ entries:
       by_format: {}
       resolution: null
       method: 그림자 영역 중앙값 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6948,7 +6959,7 @@ entries:
       by_format: {}
       resolution: null
       method: 잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -6981,7 +6992,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7014,7 +7025,7 @@ entries:
       by_format: {}
       resolution: null
       method: 박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7055,7 +7066,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(좌우 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7099,7 +7110,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 박스 가장자리 - 잉크 가장자리(위아래 평균)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7135,7 +7146,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막의 줄 중심 간격 / size_px
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7176,7 +7187,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 영상별 최대 잉크 폭 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7213,7 +7224,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 최대 줄 수 → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: lines
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7247,7 +7258,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: chars
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7289,7 +7300,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: 정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7334,7 +7345,7 @@ entries:
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
       method: '세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7370,7 +7381,7 @@ entries:
       by_format: {}
       resolution: null
       method: 여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7402,7 +7413,7 @@ entries:
       by_format: {}
       resolution: null
       method: 한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7433,8 +7444,9 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은
+        방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7468,7 +7480,7 @@ entries:
       by_format: {}
       resolution: null
       method: 첫 보이는 프레임 → 정지 상태 도달(±1프레임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7502,7 +7514,7 @@ entries:
       by_format: {}
       resolution: null
       method: pop 첫 프레임 크기 / 정지 크기
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7543,8 +7555,8 @@ entries:
         - 1920
         source: preset (provisional)
         note: 캔버스 크기가 측정되지 않아 프리셋 canvas.width/height(임시값일 수 있음)로 환산 — 측정 후 다시 집계
-      method: slide 첫 프레임 위치 차이
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7578,8 +7590,8 @@ entries:
         mode: null
       by_format: {}
       resolution: null
-      method: 퇴장 궤적 분류 → 영상별 최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7613,7 +7625,7 @@ entries:
       by_format: {}
       resolution: null
       method: 정지 상태 → 마지막 보이는 프레임
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7645,8 +7657,8 @@ entries:
         p90: null
       by_format: {}
       resolution: null
-      method: 대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      method: 겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7663,7 +7675,7 @@ entries:
       given: 정의
       given_value: null
       given_origin: definition
-      reason: '정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
+      reason: '정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음'
       production_use: 0(계획 plan 의 자막 시각 그대로)
       rule: text.roles.{role}.timing.lead_s
     blocker: '레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts:
@@ -7687,7 +7699,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 짧은 표시 시간 → 영상 간 p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7720,7 +7732,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상 길이의 90% 이상 표시되면 whole_video
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:read_role_style_tree
@@ -7754,7 +7766,7 @@ entries:
       resolution: null
       method: 주 자막(제목·설명·상황·반응) 마지막 어절의 종결 어미 분류(합쇼체/해요체/음슴체/반말/명사형) → 영상별 최빈 종결(60% 이상이면 그 말투, 아니면 혼합) → 영상 간 최빈값.
         OCR 오인식 영향 있음
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/proposal.py:tone_style_guide
@@ -7786,7 +7798,7 @@ entries:
       by_format: {}
       resolution: null
       method: 종결 어미(마지막 두 글자) 빈도 상위 8개
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/proposal.py:tone_style_guide
@@ -7814,7 +7826,7 @@ entries:
       resolution: null
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/proposal.py:tone_style_guide
@@ -7861,7 +7873,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 확대(zoom_in) 배율 중앙값(ORB 유사변환 누적; 원본 카메라 줌과 구분 못 함)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -7896,7 +7908,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 확대 길이 중앙값(ease 곡선 맞춤이 판정된 사건은 맞춘 곡선의 전체 길이 — 느린 시작·끝 포함, 아니면 프레임당 0.3% 이상 변하는 구간 길이)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -7932,7 +7944,7 @@ entries:
       method: 확대 사건마다 누적 배율 곡선(사건 ±0.5초, 같은 샷)을 렌더러 ease(linear=u, in=u^3, out=1-(1-u)^3, inout) 곡선 c0+A*ease((t-t0)/dur)
         에 맞춤(t0·dur 1/4프레임 격자, c0·A 최소제곱) → 두 번째로 좋은 곡선보다 SSE 1.5배 이상 좋고 잔차 ≤ 진폭 8% 일 때만 그 ease → 영상별 최빈 → 영상 간
         최빈
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -7969,7 +7981,7 @@ entries:
       method: '영상별로 전환(cut/flash/crossfade) 사이 샷을 순서대로 보고 확대(zoom_in/zoom_out) 사건이 시작되는 샷이 연속되는 최대 개수(episode validate
         의 zoom_stacked·QA video.zoom 과 같은 정의: 연속 세그먼트의 줌) → 영상 간 p90(value_rule=p90, 정수; 확대 판정이 있다/없다로 측정된 영상만,
         0 포함). 한계: 원본 카메라 줌도 확대로 보임'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: segments
     code:
     - shortkit/edit/validate.py:check_motion
@@ -8004,7 +8016,7 @@ entries:
       method: '확대 사건의 누적 유사변환 T_k 와 (1-z_k) 로 겉보기 고정점 맞춤: 순수 확대이고 고정점이 영상 영역 안(중심 근처 제외) → false(고정점 제자리 = 렌더러 recenter=false
         로 그대로 재현), 고정점이 영역 밖이거나 확대 중 화면 중심 쪽으로 이동 → true(렌더러 recenter=true: 목표점이 같은 ease 로 중심으로 이동). 중심 근처 확대는 두
         방식 결과가 같아 제외. 한계: 목표점이 중심 가까이 있던 recenter=true 확대도 ''영역 안 고정점''으로 보임'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8038,7 +8050,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8074,7 +8086,7 @@ entries:
       resolution: null
       method: 영상별 정지 화면(프레임 반복, 앞뒤 움직임 있음) 횟수 → 영상 간 p90(value_rule=p90, 정수; 정지 판정이 있다/없다로 측정된 영상만, 0회 포함; episode
         validate 의 freeze_count 와 같은 단위)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: count
     code:
     - shortkit/edit/validate.py:check_motion
@@ -8107,7 +8119,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 가장 많은 전환 종류(cut/flash/crossfade)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8141,7 +8153,7 @@ entries:
       by_format: {}
       resolution: null
       method: 플래시(밝기 급등) 길이 중앙값
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8175,7 +8187,7 @@ entries:
       by_format: {}
       resolution: null
       method: 플래시 최고 밝기 프레임의 평균 색
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8209,7 +8221,7 @@ entries:
       resolution: null
       method: '플래시 최고 밝기 프레임 vs 앞뒤 0.1~0.25초 프레임 중앙값: 영상 영역 밖(가장자리 2% 제외, 밝아질 여유 있는 픽셀) 중 영역 안 평균 상승의 40%(최소 15)
         이상 밝아진 비율 ≥ 0.6 → canvas(화면 전체), ≤ 0.15 → region(영상 영역만), 그 사이·영상이 화면 전체 → 판정 안 함 → 영상별 최빈 → 영상 간 최빈'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8243,7 +8255,7 @@ entries:
       by_format: {}
       resolution: null
       method: 섞임 구간(블렌드 가중치 0→1) 길이 중앙값
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/resolve.py:resolve_clips
@@ -8278,7 +8290,7 @@ entries:
       by_format: {}
       resolution: null
       method: 프레임 복제율 변화로 본 재생 속도 비(프레임 보간 슬로모션은 검출 못 함)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/validate.py:check_motion
@@ -8327,7 +8339,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8373,7 +8385,7 @@ entries:
         → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
         없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
         표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8422,7 +8434,7 @@ entries:
         → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
         없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
         표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8461,7 +8473,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8498,7 +8510,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: Hz
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8537,7 +8549,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8574,7 +8586,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8611,7 +8623,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: ratio
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8647,7 +8659,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8693,7 +8705,7 @@ entries:
         → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
         없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
         표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8733,7 +8745,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: Hz
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8770,7 +8782,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: rgb_hex
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8816,7 +8828,7 @@ entries:
         → 영상 간 분포(수치 p50, 색·범주 최빈값); px 는 레퍼런스 영상 자체 픽셀로 적고 캔버스 해상도로 환산(종횡비가 같은 영상만, resolution 참고); 같은 영상에 사람 관찰이
         없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가 그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source
         표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -8856,7 +8868,7 @@ entries:
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값); 같은 영상에 사람 관찰이 없으면 자동 장식 검출값(analysis/<id>/motion.json decorations — 우리 렌더러가
         그린 합성 모의 영상으로만 검증된 실험 기능)을 사용, 근거에 source 표시'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: Hz
     code:
     - shortkit/edit/resolve.py:resolve_decorations
@@ -9632,7 +9644,7 @@ entries:
       by_format: {}
       resolution: null
       method: latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p10
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
@@ -9666,7 +9678,7 @@ entries:
       by_format: {}
       resolution: null
       method: latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
@@ -9700,7 +9712,7 @@ entries:
       by_format: {}
       resolution: null
       method: latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
@@ -9734,7 +9746,7 @@ entries:
       by_format: {}
       resolution: null
       method: latest100 스냅샷의 영상 길이(플랫폼 메타데이터) → 표본 수
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: videos
     code:
     - shortkit/edit/validate.py:check_structure
@@ -9763,7 +9775,7 @@ entries:
       resolution: null
       method: 영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은
         정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p10
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9798,7 +9810,7 @@ entries:
       resolution: null
       method: 영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은
         정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9833,7 +9845,7 @@ entries:
       resolution: null
       method: 영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은
         정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: cuts/10s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9868,7 +9880,7 @@ entries:
       resolution: null
       method: 영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 세는 것과 같은
         정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포 → 표본 수
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: videos
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9897,7 +9909,7 @@ entries:
       resolution: null
       method: 영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts
         의 '샷 길이 중앙값'과 같은 단위) → p10
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9932,7 +9944,7 @@ entries:
       resolution: null
       method: 영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts
         의 '샷 길이 중앙값'과 같은 단위) → p50
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -9967,7 +9979,7 @@ entries:
       resolution: null
       method: 영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts
         의 '샷 길이 중앙값'과 같은 단위) → p90
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -10002,7 +10014,7 @@ entries:
       resolution: null
       method: 영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts
         의 '샷 길이 중앙값'과 같은 단위) → 표본 수
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: videos
     code:
     - shortkit/edit/validate.py:check_cut_structure
@@ -10030,7 +10042,7 @@ entries:
       by_format: {}
       resolution: null
       method: 영상별 첫 시간제 자막(제목·설명 제외) 시작 시각
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: s
     code:
     - shortkit/edit/validate.py:check_structure
@@ -10066,7 +10078,7 @@ entries:
       by_format: {}
       resolution: null
       method: analysis/<id>/motion.json presence.zoom (ORB 유사변환 누적 배율; 원본 카메라 줌과 구분 못 함)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10102,7 +10114,7 @@ entries:
       by_format: {}
       resolution: null
       method: motion.json presence.freeze (프레임 반복 + 앞뒤 움직임)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10138,7 +10150,7 @@ entries:
       by_format: {}
       resolution: null
       method: motion.json presence.speed (프레임 복제율 변화; 보간식 슬로모션은 검출 못 해 '없다' 대신 못 잼)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10174,7 +10186,7 @@ entries:
       by_format: {}
       resolution: null
       method: shots.json presence.flash (밝기 급등 전환)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10210,7 +10222,7 @@ entries:
       by_format: {}
       resolution: null
       method: shots.json presence.crossfade (블렌드 가중치 0→1 전환)
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10247,7 +10259,7 @@ entries:
       resolution: null
       method: 'motion.json decorations(실험 자동 검출: 화살표·원·네모) 또는 manual_observations.csv 의 decorations.* 관찰 행 → 있다;
         자동 검출기로는 ''없다''를 확정할 수 없어 나머지는 못 잼'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: tri_state
     code:
     - shortkit/edit/validate.py:check_presence
@@ -10425,7 +10437,7 @@ entries:
       resolution: null
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/validate.py:check_cover
@@ -10460,7 +10472,7 @@ entries:
       resolution: null
       method: 'manual_observations.csv 의 관찰 행(영상을 본 사람: watched=yes + observed_by, 스냅샷 영상, 근거 시각 t) → 영상별 중앙값/최빈값
         → 영상 간 분포(수치 p50, 색·범주 최빈값)'
-      measured_at: '2026-09-25T08:33:19+00:00'
+      measured_at: '2026-09-25T11:47:18+00:00'
       unit: null
     code:
     - shortkit/edit/validate.py:check_cover

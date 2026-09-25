@@ -116,6 +116,26 @@ def cat_item(key: str, rows: list[dict], method: str, blocker: str, extra: dict 
     return it
 
 
+def motion_vocab_extra(rows: list[dict], direction: str) -> dict:
+    """Renderer-vocabulary record of a measured caption motion type (``direction`` 'in' | 'out').  Values the renderer
+    does not draw (shortkit.edit.resolve MOTION_IN_TYPES / MOTION_OUT_TYPES) are kept as measured, counted and flagged:
+    resolve refuses them with an error instead of mapping them to a near type.  A bare 'slide' comes from analyses made
+    before slides were named by direction (re-run ``ref analyze``)."""
+    from .textboxes import renderer_motion_vocab
+
+    vocab = renderer_motion_vocab()[0 if direction == "in" else 1]
+    vals = [r["value"] for r in rows if r.get("value") is not None]
+    bad = Counter(v for v in vals if v not in vocab)
+    mode = categorical(vals)["mode"] if vals else None
+    ext: dict[str, Any] = {"renderer_vocabulary": list(vocab), "renderer_supported": (mode in vocab) if mode else None}
+    if bad:
+        ext["unsupported_values"] = dict(sorted(bad.items()))
+        ext["unsupported_note"] = ("렌더러가 그리지 못하는 측정값: " + ", ".join(f"{k}×{v}" for k, v in sorted(bad.items()))
+                                   + (" ('slide' = 방향 기록 전 분석 — ref analyze 재실행 필요)" if "slide" in bad else "")
+                                   + " — 다른 종류로 바꾸지 않음(resolve 가 거부)")
+    return ext
+
+
 def color_item(key: str, rows: list[dict], method: str, blocker: str, extra: dict | None = None) -> dict:
     vals = [r["value"] for r in rows if r.get("value")]
     it: dict[str, Any] = {"key": key, "unit": "rgb_hex", "resolution": None, "method": method,
@@ -924,7 +944,8 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                 add("motion_in.dur_s", vid, d, mi["dur_s"], t, fr)
             if mi.get("scale_from") is not None:
                 add("motion_in.scale_from", vid, d, mi["scale_from"], t, fr)
-            if mi.get("offset_px") is not None and sc:
+            if mi.get("offset_px") is not None and sc and mi.get("type") == "slide_up":
+                # the key is the renderer's slide_up start offset (below rest): other slides are not this key
                 add("motion_in.offset_px", vid, d, round(mi["offset_px"] * sc[1], 1), t, fr, native=mi["offset_px"])
             if mo.get("type"):
                 add("motion_out.type", vid, d, mo["type"], t, fr)
@@ -965,8 +986,11 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
                           blk(f"'{role}': 외곽선을 배경과 구분할 수 있는 사례 없음"), canvas_res, digits=2, extra=sx_extra))
         G.append(color_item(pre + "outline_color", R.get("outline_color", []), "채움 바로 바깥 1~2px 고리의 중앙값 색",
                             blk(f"'{role}': 보이는 외곽선 사례 없음")))
-        G.append(num_item(pre + "shadow_px", R.get("shadow_px", []), "px", "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
-                          blk(f"'{role}': 배경이 복잡해 그림자 판정 불가"), canvas_res, digits=2, extra=sx_extra))
+        G.append(num_item(pre + "shadow_px", R.get("shadow_px", []), "px",
+                          "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow"
+                          "(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), " + m,
+                          blk(f"'{role}': 그림자를 잴 수 있는 사례 없음(어두운/복잡한 배경, 박스)"), canvas_res, digits=2,
+                          extra=sx_extra))
         G.append(color_item(pre + "shadow_color", R.get("shadow_color", []), "그림자 영역 중앙값 색",
                             blk(f"'{role}': 그림자 사례 없음")))
         G.append(cat_item(pre + "box.enabled", R.get("box.enabled", []), "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
@@ -988,23 +1012,28 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
         G.append(num_item(pre + "max_width_px", R.get("max_width_px", []), "px", "영상별 최대 잉크 폭 → 영상 간 p90", rb,
                           canvas_res, rule="p90", digits=1, extra=sx_extra))
         G.append(cat_item(pre + "motion_in.type", R.get("motion_in.type", []),
-                          "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈", blk(
-                              f"'{role}': 등장 모션을 볼 수 있는 사례 없음")))
+                          "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/"
+                          "slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 "
+                          "renderer_supported=false", blk(f"'{role}': 등장 모션을 볼 수 있는 사례 없음"),
+                          extra=motion_vocab_extra(R.get("motion_in.type", []), "in")))
         G.append(num_item(pre + "motion_in.dur_s", R.get("motion_in.dur_s", []), "s",
                           "첫 보이는 프레임 → 정지 상태 도달(±1프레임)", blk(f"'{role}': 등장 모션 사례 없음"), digits=3))
         G.append(num_item(pre + "motion_in.scale_from", R.get("motion_in.scale_from", []), "ratio",
                           "pop 첫 프레임 크기 / 정지 크기", blk(f"'{role}': pop 등장 사례 없음"), digits=3))
         G.append(num_item(pre + "motion_in.offset_px", R.get("motion_in.offset_px", []), "px",
-                          "slide 첫 프레임 위치 차이", blk(f"'{role}': slide 등장 사례 없음"), canvas_res, digits=1,
-                          extra=sx_extra))
-        G.append(cat_item(pre + "motion_out.type", R.get("motion_out.type", []), "퇴장 궤적 분류 → 영상별 최빈",
-                          blk(f"'{role}': 퇴장 모션을 볼 수 있는 사례 없음")))
+                          "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
+                          blk(f"'{role}': slide_up 등장 사례 없음"), canvas_res, digits=1, extra=sx_extra))
+        G.append(cat_item(pre + "motion_out.type", R.get("motion_out.type", []),
+                          "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 "
+                          "renderer_supported=false", blk(f"'{role}': 퇴장 모션을 볼 수 있는 사례 없음"),
+                          extra=motion_vocab_extra(R.get("motion_out.type", []), "out")))
         G.append(num_item(pre + "motion_out.dur_s", R.get("motion_out.dur_s", []), "s", "정지 상태 → 마지막 보이는 프레임",
                           blk(f"'{role}': 퇴장 모션 사례 없음"), digits=3))
         G.append(num_item(pre + "timing.min_dur_s", R.get("timing.min_dur_s", []), "s",
                           "영상별 가장 짧은 표시 시간 → 영상 간 p50", blk(f"'{role}': 시간제 자막 사례 없음"), digits=3))
         G.append(num_item(pre + "timing.lead_s", R.get("timing.lead_s", []), "s",
-                          "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+                          "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, "
+                          "렌더러·QA 와 같은 정의; 오디오 분석 필요)",
                           blk(f"'{role}': 기준 사건(말소리 시작)과 짝지을 수 있는 사례 없음 — 대사 외 역할은 기준 사건 정의 없음"),
                           digits=3))
         G.append(cat_item(pre + "persist", R.get("persist", []), "영상 길이의 90% 이상 표시되면 whole_video", rb))

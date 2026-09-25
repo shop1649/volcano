@@ -1,7 +1,7 @@
 {
   "schema": "shortkit.project_verify/1",
   "episode_id": "test-coverage-001",
-  "checked_at": "2026-09-25T08:22:08+00:00",
+  "checked_at": "2026-09-25T11:49:52+00:00",
   "project_file": "episodes/test-coverage-001/project/test-coverage-001.mlt",
   "master": "episodes/test-coverage-001/output/test-coverage-001.mp4",
   "thresholds": {
@@ -30,7 +30,7 @@
       "melt",
       "test-coverage-001.mlt",
       "-consumer",
-      "avformat:../build/verify/test-coverage-001.melt.8649.tmp.render.mkv",
+      "avformat:../build/verify/test-coverage-001.melt.19982.tmp.render.mkv",
       "progressive=1",
       "vcodec=libx264",
       "preset=veryfast",
@@ -419,7 +419,7 @@
   "other_formats": {
     "fcpxml": {
       "project_file": "episodes/test-coverage-001/project/test-coverage-001.fcpxml",
-      "checked_at": "2026-09-25T08:23:44+00:00",
+      "checked_at": "2026-09-25T11:51:00+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "FCPXML 은 DaVinci Resolve / Final Cut Pro 에서 열어야 렌더할 수 있는데 이 기계에는 둘 다 없음 → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",
@@ -427,7 +427,7 @@
     },
     "otio": {
       "project_file": "episodes/test-coverage-001/project/test-coverage-001.otio",
-      "checked_at": "2026-09-25T08:23:44+00:00",
+      "checked_at": "2026-09-25T11:51:00+00:00",
       "status": "unmeasured",
       "status_ko": "못 잼",
       "why": "OTIO 는 교환용 타임라인이라 자체 렌더러가 없음(가져오는 NLE 에서만 재생 가능) → 렌더 동등성은 못 잼(구조·시간 일관성만 테스트에서 확인)",

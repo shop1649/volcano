@@ -1,6 +1,6 @@
 # test-pipeline-001 편집 프로젝트
 
-- 생성 2026-09-25T04:15:07+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-25T11:48:58+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 19.25s · 마스터 `episodes/test-pipeline-001/output/test-pipeline-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 
@@ -163,6 +163,8 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 - 자막 글꼴: `episodes/test-pipeline-001/build/fonts` (git 에 없는 build 폴더). melt 는 이 폴더(프로젝트 폴더 기준 상대 경로 av.fontsdir)를 쓰는데, 이 상대 경로는 실행 위치 기준으로 해석되므로 Shotcut 에서 글꼴이 다르게 보이면 해당 글꼴을 시스템에 설치한다.
 - 계획 단계 경고:
   - [format_unclassified] 테스트 모드: 포맷 미분류(UNCLASSIFIED) — 포맷별 범위 검사는 못 함
+  - [intro_type_missing] 도입 방식(intro_type)이 없습니다: formats.yaml 의 이 포맷 intro_variants 중 하나를 적는다
+  - [intro_variants_unmeasured] 테스트 모드(포맷 미분류): 도입 방식을 레퍼런스 포맷의 도입 변형과 비교 못 함
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
   - [clean_no_record] 오버레이 기록 없음(warehouse/overlays/7ca6f09cb32c….json) → `python -m shortkit clean detect --source assets/test/generated/classroom_voice.mp4` 후 `clean plan` 결과를 붙여야 함
@@ -170,6 +172,9 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [style_override] plan 이 고정 스타일 decorations.arrow.blink_hz=0.0 Hz(임시값·못 잼) 을 2.0 Hz 로 덮어씁니다: 레퍼런스와 다른 스타일 — 의도한 변경이면 requested_changes.yaml 에 적어 프리셋 값을 바꾸고 plan 에서는 지우기
   - [style_override] plan 이 고정 스타일 audio.sfx.gain_db_default=-8.0 dB(임시값·못 잼) 을 -12.0 dB 로 덮어씁니다: 레퍼런스와 다른 스타일 — 의도한 변경이면 requested_changes.yaml 에 적어 프리셋 값을 바꾸고 plan 에서는 지우기
   - [duration_unmeasured] 영상 길이 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 19.25s 의 적합성 판정 불가
+  - [cuts_per_10s_unmeasured] structure.cuts_per_10s 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 계획의 컷 밀도(10초당 전환 수) 1.558개 (전환 3개: cut@4.00s, flash@7.50s, crossfade@12.75s / 19.25s) 적합성 판정 불가
+  - [shot_len_s_unmeasured] structure.shot_len_s 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 계획의 샷 길이 중앙값 4.625s (전환 3개: cut@4.00s, flash@7.50s, crossfade@12.75s / 19.25s) 적합성 판정 불가
+  - [first_caption_unmeasured] 첫 시간제 자막 시각(structure.first_caption_at_s = 0.0) 미측정(못 잼, 임시값): 이 plan 의 첫 시간제 자막 0.30s 을 레퍼런스와 비교 못 함
   - [zoom_cuts_protected] 확대(zoom) 때문에 보호 영역 '왼쪽 남성 얼굴' 이 화면 밖으로 잘립니다
   - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
   - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
@@ -182,8 +187,8 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/boing.wav 이 종류 'boing' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
   - [bgm_identity_unmeasured] 프리셋 BGM 제목·버전 미식별(못 잼: title=None, version=None): 쓰는 음악 파일이 레퍼런스 곡·버전과 같은지 판정 불가
   - [presence_unmeasured] 레퍼런스의 효과 사용 여부 못 잼: zoom(씀), freeze(씀), speed_change(안 씀), flash(씀), crossfade(씀), decorations(씀), bgm(씀), original_audio(씀), ducking(씀), intentional_silence(씀) — 이 plan 의 선택을 레퍼런스와 비교할 수 없음
-  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 262개로 렌더합니다(레퍼런스 일치 아님)
-- 프리셋 미측정(못 잼) 값 260개로 만든 편집이다(레퍼런스 일치 아님).
+  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 266개로 렌더합니다(레퍼런스 일치 아님)
+- 프리셋 미측정(못 잼) 값 265개로 만든 편집이다(레퍼런스 일치 아님).
 - plan sha256 `1f50c54f34f3b79bd44114460b0a33fb31fe13064b59dd092f03b8fffcf6b7f9`
 - 승인 상태: 필요=False 승인됨=False
 - 소스 v_class: `assets/test/generated/classroom_voice.mp4` sha256=7ca6f09cb32cf87c… 창고 id=None

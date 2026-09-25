@@ -162,6 +162,10 @@ text:
       anchor: {x: 540, y: 1430, align: center, valign: middle}
       motion_in: {type: none, dur_s: 0.0, scale_from: 1.0, offset_px: 0}
       motion_out: {type: none, dur_s: 0.0}
+      # lead_s = 말소리 시작 − 대사 자막 시작 (초). + 면 대사가 들리기 전에 자막이 먼저 뜬다, − 면 들린 뒤에 뜬다.
+      #   레퍼런스 분석(reference.textboxes.dialogue_lead: 자막과 겹치는 가장 이른 말소리 구간의 시작 − 자막 시작),
+      #   렌더러(edit.resolve: plan 의 자막 start = 그 대사가 들리는 시각 → start − lead_s 에 그림),
+      #   QA(qa.checks.dialogue_leads: 출력에서 잰 자막 등장과 출력 말소리로 같은 함수)가 모두 이 한 정의를 쓴다.
       timing: {lead_s: 0.0, min_dur_s: 0.8}
       quote_marks: ['"', '"']
       persist: timed

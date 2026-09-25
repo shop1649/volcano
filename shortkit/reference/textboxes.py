@@ -18,7 +18,9 @@ Pipeline (all coordinates are px in the video's own resolution, stored with ``re
    libass ``Fontsize`` by rendering a calibration line with the role's preset font).
 5. Lines that appear and disappear together and are stacked are grouped into caption items.
 6. Native-frame refinement per item: exact appear/disappear frame, motion_in / motion_out type
-   (pop = scale change, slide = offset, fade = alpha ramp, none) and duration from bbox scale /
+   (pop = scale change, slide_up/slide_down/slide_left/slide_right/slide_diagonal = offset with its direction
+   -- only an upward entrance is the renderer's slide_up, other slides carry renderer_supported: false --,
+   fade = alpha ramp, none) and duration from bbox scale /
    position / alpha trajectories, box alpha by regression against the frame before appearance.
 7. Roles: title (persistent, top), description (persistent/long, directly under the title and
    smaller), speaker (small boxed short label), reaction (short, big, saturated color), and within
@@ -90,7 +92,9 @@ METHOD = {
            "against the box stays in the pad, noted); alpha by linear regression box = a*C + (1-a)*background "
            "using the frame before the text appears",
     "motion": "native frames around appear/disappear; changed-pixel bbox scale/offset vs rest; alpha by "
-              "projection on the rest footprint; pop if |scale-1|>=0.06, slide if offset>=max(3px,0.1h), "
+              "projection on the rest footprint; pop if |scale-1|>=0.06, slide if offset>=max(3px,0.1h) named by the "
+              "movement direction (slide_up = entrance moving up = the renderer's slide_up; slide_down/left/right/"
+              "diagonal and every exit slide are flagged renderer_supported=false), "
               "fade if alpha<=0.75 on the first visible frame",
     "bbox": "visible ink (fill + outline, excluding box and shadow) at rest, [x, y, w, h] px",
 }
@@ -606,13 +610,121 @@ def _drop_corner_background(crop, lab, st, keep, core) -> None:
             keep[i] = False
 
 
-def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | None:
-    """Style of one text line (crop coords).  Returns None if no text-like fill was found."""
+FILL_SIDE_INK_DIST = 60.0     # RGB distance from the border background: the pixel is ink (fill, outline or shadow)
+FILL_SIDE_BG_DIST = 40.0      # background-like pixel: within this RGB distance of the border background colour
+FILL_SIDE_MIN_SHARE = 0.15    # both luminance groups of the ink must hold at least this share of it (3 colours)
+FILL_SIDE_ENCLOSED = 0.3      # a glyph fill enclosed by its outline touches background-like pixels at most this often
+FILL_SIDE_MARGIN = 0.2        # ... and at least this much less often than the other ink group does
+FILL_SIDE_SHADOW_IOU = 0.5    # one group's (k, k) down-right copy matches the other this well: the other is its shadow
+FILL_SIDE_SHADOW_MAX = 12
+FILL_SIDE_SAME = 60.0         # RGB distance: segment_line's fill already has the colour of the group found here
+
+
+def _resolve_fill_side(crop: np.ndarray, seg: dict, core: tuple[int, int, int, int]) -> dict:
+    """Which ink colour is the glyph fill when a line has THREE colours (fill, outline and/or drop shadow,
+    background).
+
+    ``segment_line`` splits the line box at one Otsu threshold, calls the side that dominates the box border the
+    background and drops components that span the box.  With a dark outline -- more so with a dark drop shadow
+    under it -- the threshold falls between the outline and the background, so the dark outline became the 'fill'
+    (or, when the outline spans the box, a few dark specks) and the light glyphs went with the background
+    (SYNTHETIC libass renders: white text + 4 px black outline + 2-6 px black shadow -> fill #000000, OCR
+    '브림자테스트'; yellow text + 5-6 px black outline alike).
+    Here the ink (pixels > 60 RGB from the border background) is split into a light and a dark group; the fill is
+      * the group enclosed by the other (touches background-like pixels <= 30 % of its rim and >= 20 points less
+        often than the other group: the other group is its outline), or
+      * the group whose (k, k) down-right copy is the other group (IoU >= 0.5, better than the reverse by 0.1: the
+        other group is its drop shadow).
+    ``seg`` is returned unchanged when neither holds or when its fill already has that group's colour."""
     import cv2
+
+    x, y, w, h = core
+    C = seg["fill"]
+    Hc, Wc = C.shape
+    x1, y1 = min(Wc, x + w), min(Hc, y + h)
+    inside = np.zeros((Hc, Wc), bool)
+    inside[y:y1, x:x1] = True
+    border = np.zeros((Hc, Wc), bool)
+    border[y:y1, x] = border[y:y1, x1 - 1] = True
+    border[y, x:x1] = border[y1 - 1, x:x1] = True
+    bpx = crop[border]
+    if len(bpx) < 10:
+        return seg
+    img = crop.astype(np.float32)
+    bg = np.median(bpx.astype(np.float32), axis=0)
+    dbg = np.sqrt(((img - bg) ** 2).sum(axis=2))
+    ink = inside & (dbg > FILL_SIDE_INK_DIST)
+    n_ink = int(ink.sum())
+    if n_ink < 30:
+        return seg
+    lum = img @ np.array([0.299, 0.587, 0.114], np.float32)
+    thr = _otsu(lum[ink])
+    light, dark = ink & (lum > thr), ink & (lum <= thr)
+    if min(int(light.sum()), int(dark.sum())) < FILL_SIDE_MIN_SHARE * n_ink:
+        return seg
+    B = inside & (dbg <= FILL_SIDE_BG_DIST)
+    k3 = np.ones((3, 3), np.uint8)
+
+    def bg_touch(M: np.ndarray) -> float:
+        rim = cv2.dilate(M.astype(np.uint8), k3).astype(bool) & ~M & inside
+        return float(B[rim].mean()) if rim.any() else 1.0
+
+    def shadow_fit(A: np.ndarray, S: np.ndarray) -> float:
+        best = 0.0
+        for k in range(1, FILL_SIDE_SHADOW_MAX + 1):
+            P = np.zeros_like(A)
+            P[k:, k:] = A[:Hc - k, :Wc - k]
+            P &= ~A
+            u = float((P | S).sum())
+            best = max(best, float((P & S).sum()) / u if u else 0.0)
+        return best
+
+    tL, tD = bg_touch(light), bg_touch(dark)
+    rec: dict = {"bg_touch_light": round(tL, 3), "bg_touch_dark": round(tD, 3)}
+    pick = None
+    if tL <= FILL_SIDE_ENCLOSED and tL + FILL_SIDE_MARGIN <= tD:
+        pick, rec["how"] = light, "light ink enclosed by the dark ink (dark = outline)"
+    elif tD <= FILL_SIDE_ENCLOSED and tD + FILL_SIDE_MARGIN <= tL:
+        pick, rec["how"] = dark, "dark ink enclosed by the light ink (light = outline)"
+    else:
+        iL, iD = shadow_fit(light, dark), shadow_fit(dark, light)
+        rec.update({"shadow_iou_light": round(iL, 3), "shadow_iou_dark": round(iD, 3)})
+        if iL >= FILL_SIDE_SHADOW_IOU and iL >= iD + 0.1:
+            pick, rec["how"] = light, "dark ink is the light ink's down-right copy (dark = drop shadow)"
+        elif iD >= FILL_SIDE_SHADOW_IOU and iD >= iL + 0.1:
+            pick, rec["how"] = dark, "light ink is the dark ink's down-right copy (light = drop shadow)"
+    if pick is None:
+        return seg
+    pick_col = np.median(crop[pick].astype(np.float32), axis=0)
+    Ci = C & inside
+    if int(Ci.sum()) >= 10 and float(np.linalg.norm(np.median(crop[Ci].astype(np.float32), axis=0) - pick_col)) \
+            <= FILL_SIDE_SAME:
+        return seg                  # segment_line already took this colour as the fill
+    n, lab, st, _ = cv2.connectedComponentsWithStats(pick.astype(np.uint8), 8)
+    keep = np.zeros(n, bool)
+    keep[1:] = st[1:, 4] >= 3
+    fill = keep[lab]
+    if int(fill.sum()) < 10:
+        return seg
+    ys, xs = np.nonzero(fill)
+    rec["replaced_fill_color"] = hexrgb(np.median(crop[Ci].astype(np.float32), axis=0)) if Ci.any() else None
+    return {**seg, "fill": fill, "fill_side": rec,
+            "fill_bbox": (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1))}
+
+
+def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | None:
+    """Style of one text line (crop coords).  Returns None if no text-like fill was found.
+
+    The drop shadow is measured with the shared estimator ``shortkit.util.textmeasure.drop_shadow`` (QA measures
+    our output through this same function); ``shadow`` holds its full record."""
+    import cv2
+
+    from ..util import textmeasure
 
     seg = segment_line(crop, core)
     if seg is None:
         return None
+    seg = _resolve_fill_side(crop, seg, core)
     fill = seg["fill"]
     L = seg["L"]
     Hc, Wc = fill.shape
@@ -630,16 +742,75 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
         far = inbox & (dist > 2.5)
     else:
         far = dist > max(6.0, 0.45 * fh)
-    bg_col = np.median(crop[far].astype(float), axis=0) if far.sum() >= 20 else None
+    bg_far = np.median(crop[far].astype(float), axis=0) if far.sum() >= 20 else None
     dmax = int(max(3, min(0.5 * fh, 20)))
+    ol = _measure_outline(crop, dist, color, bg_far, dmax)
+    # ---- drop shadow (shared estimator; measured against the FILL, so a shadow in the outline colour does not
+    # have to be separated from the outline first).  Not measured inside a box (the box hides it).
+    if box.get("present") == "present":
+        shadow = {"algo": textmeasure.SHADOW_ALGO, "status": "unmeasured", "shadow_px": None, "shadow_color": None,
+                  "reason": "박스가 있어 그림자를 따로 재지 않음"}
+    else:
+        bg_sh = bg_far if bg_far is not None else ol["bg_col"]
+        shadow = textmeasure.drop_shadow(crop, fill, bg_sh)
+    if shadow.get("status") == "measured" and float(shadow.get("shadow_px") or 0) > 0:
+        # a shadow widens every ring on its (lower-right) side -- in the outline's colour it read as a thicker
+        # outline (SYNTHETIC libass: 3 px black outline + 4 px black shadow measured 4.7 px): measure the outline
+        # again on the upper-left side of the glyphs only, where no shadow falls
+        _d, cos = textmeasure.glyph_sides(fill)
+        ul = cos <= -textmeasure.SHADOW_SIDE_COS
+        ol_ul = _measure_outline(crop, dist, color, bg_far, dmax, sel=ul)
+        ol = {**ol_ul, "side": "upper_left", "all_around": {k: ol[k] for k in ("vis", "outline_px", "outline_color")}}
+    vis, outline_px, outline_color, bg_col = ol["vis"], ol["outline_px"], ol["outline_color"], ol["bg_col"]
+    if box.get("present") == "present":
+        # renderer contract (shortkit/edit/resolve.py): box = ink bbox INCLUDING the outline + pad per side.
+        # _find_box measured from the glyph fill, so a visible outline is subtracted; an outline that is not
+        # visible against the box cannot be separated from the pad and stays inside it (noted).
+        box["pad_fill_x"], box["pad_fill_y"] = box["pad_x"], box["pad_y"]
+        if vis == "visible" and outline_px:
+            box["pad_x"] = int(max(0, round(box["pad_x"] - outline_px)))
+            box["pad_y"] = int(max(0, round(box["pad_y"] - outline_px)))
+        elif vis != "none":
+            box["pad_note"] = "outline not separable from the box: pad measured from the glyph fill"
+    # ink = fill + outline
+    ink = fill.copy()
+    if outline_px:
+        ink |= dist <= outline_px + 0.5
+    ys, xs = np.nonzero(ink)
+    ink_bbox = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1))
+    hang = ink_height(fill)
+    res = {"fill": fill, "ink": ink, "fill_bbox": seg["fill_bbox"], "ink_bbox": ink_bbox, "ink_h": hang,
+           "color": color, "highlight_color": highlight, "highlight_share": hl_share,
+           "outline_px": outline_px, "outline_color": outline_color, "outline_visibility": vis,
+           # the colour right next to the glyphs: inside a box that is the box (its interior median), not the
+           # plateau past the first ring step (which leaves a tight box -- the typography masks use this)
+           "bg_color": (hexrgb(bg_far) if (box.get("present") == "present" and bg_far is not None)
+                        else hexrgb(bg_col) if bg_col is not None else None),
+           "shadow_px": shadow.get("shadow_px") if shadow.get("status") == "measured" else None,
+           "shadow_color": shadow.get("shadow_color") if shadow.get("status") == "measured" else None,
+           "shadow": shadow, "box": box}
+    if ol.get("side"):
+        res["outline_side"] = ol["side"]
+        res["outline_all_around"] = ol["all_around"]
+    if seg.get("fill_side"):
+        res["fill_side"] = seg["fill_side"]
+    return res
+
+
+def _measure_outline(crop: np.ndarray, dist: np.ndarray, color: str, bg_far, dmax: int, sel=None) -> dict:
+    """Outline thickness / colour / visibility from the distance rings around the fill (``sel`` = only these
+    pixels, e.g. the upper-left side of the glyphs when a drop shadow lies on the other side).  ``bg_col`` in the
+    result = the local background next to the outline (or the far-field median)."""
+    if sel is None:
+        sel = np.ones(dist.shape, bool)
+    ring12 = (dist > 0.5) & (dist <= 2.0) & sel
+    out_col = np.median(crop[ring12].astype(float), axis=0) if ring12.sum() >= 10 else None
     # What the outline is judged against is the colour just OUTSIDE it (first plateau past the ring
     # profile's first step), not a far-field median: a dark semi-transparent box around the line (found or
     # not -- per-line box search misses the box of a multi-line block) otherwise reads as outline, and a
     # black outline on a near-black box (mockloop: #000 on #070C19) as "indistinguishable".
-    step_thr, local_bg, edge_d = _outline_edge(crop, dist, out_col, dmax)
-    bg_far = bg_col
-    if local_bg is not None:
-        bg_col = local_bg
+    step_thr, local_bg, edge_d = _outline_edge(crop, dist, out_col, dmax, sel=sel)
+    bg_col = local_bg if local_bg is not None else bg_far
     outline_px, outline_color, vis = None, None, "unmeasured"
     if out_col is not None and bg_col is not None:
         d_ob = float(np.linalg.norm(out_col - bg_col))
@@ -658,7 +829,7 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
             total = 0.0
             ended = False
             for d in range(1, dmax + 1):
-                ring = (dist > d - 1) & (dist <= d)
+                ring = (dist > d - 1) & (dist <= d) & sel
                 if ring.sum() < 5:
                     break
                 c = crop[ring].astype(float)
@@ -681,40 +852,14 @@ def measure_line(crop: np.ndarray, core: tuple[int, int, int, int]) -> dict | No
             else:
                 outline_px = round(total, 2)
                 outline_color = hexrgb(out_col)
-    if box.get("present") == "present":
-        # renderer contract (shortkit/edit/resolve.py): box = ink bbox INCLUDING the outline + pad per side.
-        # _find_box measured from the glyph fill, so a visible outline is subtracted; an outline that is not
-        # visible against the box cannot be separated from the pad and stays inside it (noted).
-        box["pad_fill_x"], box["pad_fill_y"] = box["pad_x"], box["pad_y"]
-        if vis == "visible" and outline_px:
-            box["pad_x"] = int(max(0, round(box["pad_x"] - outline_px)))
-            box["pad_y"] = int(max(0, round(box["pad_y"] - outline_px)))
-        elif vis != "none":
-            box["pad_note"] = "outline not separable from the box: pad measured from the glyph fill"
-    # ink = fill + outline
-    ink = fill.copy()
-    if outline_px:
-        ink |= dist <= outline_px + 0.5
-    ys, xs = np.nonzero(ink)
-    ink_bbox = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1))
-    # ---- shadow
-    shadow_px, shadow_color = _shadow(crop, ink, bg_col) if box.get("present") != "present" else (None, None)
-    hang = ink_height(fill)
-    return {"fill": fill, "ink": ink, "fill_bbox": seg["fill_bbox"], "ink_bbox": ink_bbox, "ink_h": hang,
-            "color": color, "highlight_color": highlight, "highlight_share": hl_share,
-            "outline_px": outline_px, "outline_color": outline_color, "outline_visibility": vis,
-            # the colour right next to the glyphs: inside a box that is the box (its interior median), not the
-            # plateau past the first ring step (which leaves a tight box -- the typography masks use this)
-            "bg_color": (hexrgb(bg_far) if (box.get("present") == "present" and bg_far is not None)
-                         else hexrgb(bg_col) if bg_col is not None else None),
-            "shadow_px": shadow_px, "shadow_color": shadow_color, "box": box}
+    return {"vis": vis, "outline_px": outline_px, "outline_color": outline_color, "bg_col": bg_col}
 
 
 OUTLINE_MIN_STEP = 12.0     # RGB distance: smallest ring-colour step read as the outline's outer edge
 OUTLINE_STEP_SIGMA = 4.0    # ... or this many robust noise sigmas of the outline ring, if larger
 
 
-def _outline_edge(crop: np.ndarray, dist: np.ndarray, out_col, dmax: int):
+def _outline_edge(crop: np.ndarray, dist: np.ndarray, out_col, dmax: int, sel=None):
     """Outer edge of the outline ring from the ring-median colour profile.
 
     Returns ``(step_threshold, local_background, edge_d)``: the first ring (d >= 2) whose median colour
@@ -723,7 +868,9 @@ def _outline_edge(crop: np.ndarray, dist: np.ndarray, out_col, dmax: int):
     """
     if out_col is None:
         return OUTLINE_MIN_STEP, None, None
-    core = (dist > 1.0) & (dist <= 2.0)
+    if sel is None:
+        sel = np.ones(dist.shape, bool)
+    core = (dist > 1.0) & (dist <= 2.0) & sel
     if core.sum() < 10:
         return OUTLINE_MIN_STEP, None, None
     c = crop[core].astype(float)
@@ -732,7 +879,7 @@ def _outline_edge(crop: np.ndarray, dist: np.ndarray, out_col, dmax: int):
     thr = max(OUTLINE_MIN_STEP, OUTLINE_STEP_SIGMA * float(np.linalg.norm(mad)))
     meds = []
     for d in range(1, dmax + 4):
-        ring = (dist > d - 1) & (dist <= d)
+        ring = (dist > d - 1) & (dist <= d) & sel
         if ring.sum() < 5:
             break
         meds.append(np.median(crop[ring].astype(float), axis=0))
@@ -797,44 +944,6 @@ def _seg_dist(p, a, b) -> float:
     den = float(ab @ ab)
     t = 0.0 if den < 1e-9 else float(np.clip((p - a) @ ab / den, 0, 1))
     return float(np.linalg.norm(p - (a + t * ab)))
-
-
-def _shadow(crop: np.ndarray, ink: np.ndarray, bg_col) -> tuple[float | None, str | None]:
-    """Drop shadow = dark copy offset down-right (ASS convention). None when undeterminable."""
-    import cv2
-    if bg_col is None:
-        return None, None
-    if float(np.dot(np.asarray(bg_col, float), [0.2126, 0.7152, 0.0722])) < 50:
-        return None, None       # a (dark) shadow on a dark background is invisible: cannot tell
-    Hc, Wc = ink.shape
-    near = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
-    best = 0
-    cols = []
-    busy = 0
-    for k in range(1, 11):
-        pos = np.zeros_like(ink)
-        pos[k:, k:] = ink[:Hc - k, :Wc - k]
-        neg = np.zeros_like(ink)
-        neg[:Hc - k, :Wc - k] = ink[k:, k:]
-        sp, sn = pos & ~near, neg & ~near
-        if sp.sum() < 10 or sn.sum() < 10:
-            break
-        cp = crop[sp].astype(float)
-        cn = crop[sn].astype(float)
-        fp = float((np.linalg.norm(cp - bg_col, axis=1) > 40).mean())
-        fn = float((np.linalg.norm(cn - bg_col, axis=1) > 40).mean())
-        if fn > 0.5:
-            busy += 1
-        if fp - fn > 0.35:
-            best = k
-            cols.append(np.median(cp, axis=0))
-        elif k > best + 1:
-            break
-    if busy >= 2 and best == 0:
-        return None, None      # background too busy to tell
-    if best == 0:
-        return 0.0, None
-    return float(best), hexrgb(np.median(np.stack(cols), axis=0))
 
 
 def _find_box(L: np.ndarray, ink_bbox, line_h: float | None = None) -> dict:
@@ -1217,6 +1326,41 @@ def _alpha_proj(F, B, Rf, K) -> float:
     return float((a * r).sum() / den) if den > 1e-6 else 0.0
 
 
+SLIDE_AXIS_TOL_DEG = 15.0      # a slide within this of a screen axis is named after that axis, else 'slide_diagonal'
+
+
+def renderer_motion_vocab() -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """(entrance types, exit types) the renderer draws -- shortkit.edit.resolve MOTION_IN_TYPES / MOTION_OUT_TYPES, the
+    one vocabulary.  The analyzer names a measured motion with the renderer's word when the renderer draws exactly
+    that motion, else with its own word plus ``renderer_supported: false``; resolve refuses such a preset value
+    (never maps it to a near one)."""
+    from ..edit.resolve import MOTION_IN_TYPES, MOTION_OUT_TYPES
+
+    return tuple(MOTION_IN_TYPES), tuple(MOTION_OUT_TYPES)
+
+
+def slide_kind(dx: float, dy: float, direction: str) -> dict:
+    """Name of a slide from the edge frame's offset (dx, dy) = edge-frame centre minus rest centre (image px, y down).
+
+    Movement: an entrance moves from the edge position to rest (-dx, -dy), an exit from rest to the edge position
+    (dx, dy).  ``direction_deg`` = movement angle, counter-clockwise from screen-right (90 = up).  Types:
+    slide_up / slide_down / slide_left / slide_right (within SLIDE_AXIS_TOL_DEG of the axis) or slide_diagonal.
+    Only an upward ENTRANCE is what the renderer draws (``slide_up``: starts offset_px below rest, moves up)."""
+    mx, my = (-dx, -dy) if direction == "in" else (dx, dy)
+    ang = math.degrees(math.atan2(-my, mx))          # screen y points down: up = +90
+    name = "slide_diagonal"
+    for nm, a in (("slide_right", 0.0), ("slide_up", 90.0), ("slide_left", 180.0), ("slide_down", -90.0)):
+        if abs((ang - a + 180.0) % 360.0 - 180.0) <= SLIDE_AXIS_TOL_DEG:
+            name = nm
+            break
+    vocab = renderer_motion_vocab()[0 if direction == "in" else 1]
+    rec = {"type": name, "direction_deg": round(ang, 1), "renderer_supported": name in vocab}
+    if name not in vocab:
+        rec["note"] = (f"measured {'entrance' if direction == 'in' else 'exit'} {name} ({ang:.0f} deg) is not drawn by the "
+                       f"renderer (supported: {', '.join(vocab)}); recorded as measured, never mapped to another type")
+    return rec
+
+
 def analyze_transition(frames: list[tuple[float, np.ndarray]], tm: dict, direction: str, fps: float) -> dict:
     """Motion of an item entering (``in``: frames end at the rest frame) or leaving (``out``: frames
     start at the rest frame).
@@ -1268,13 +1412,21 @@ def analyze_transition(frames: list[tuple[float, np.ndarray]], tm: dict, directi
             break
     rbox = _bbox_of(_text_like(Rf, tm))
     q0 = traj[first]
-    s0, off = None, 0.0
+    s0, off, dx, dy = None, 0.0, 0.0, 0.0
     if rbox is not None and q0["bbox"] is not None:
         rw, rh = rbox[2], rbox[3]
         s0 = math.sqrt(max(q0["bbox"][2], 1) * max(q0["bbox"][3], 1) / (rw * rh))
-        off = math.hypot(q0["bbox"][0] + q0["bbox"][2] / 2 - (rbox[0] + rw / 2),
-                         q0["bbox"][1] + q0["bbox"][3] / 2 - (rbox[1] + rh / 2))
+        dx = q0["bbox"][0] + q0["bbox"][2] / 2 - (rbox[0] + rw / 2)      # edge frame minus rest (image px, y down)
+        dy = q0["bbox"][1] + q0["bbox"][3] / 2 - (rbox[1] + rh / 2)
+        off = math.hypot(dx, dy)
     rh = rbox[3] if rbox else 10.0
+    if q0["bbox"] is not None:
+        Hc_, Wc_ = Rf.shape[:2]
+        bx_, by_, bw_, bh_ = q0["bbox"]
+        if bx_ <= 1 or by_ <= 1 or bx_ + bw_ >= Wc_ - 1 or by_ + bh_ >= Hc_ - 1:
+            # the edge frame's text is cut by the analysis window: its size / position are not the motion's
+            return {"type": "unmeasured", "t_edge": q0["t"],
+                    "note": "edge frame text touches the analysis window border (motion starts outside it)"}
     t_first = q0["t"]
     t_rest = traj[rest_from]["t"]
     dur = abs(t_rest - t_first)
@@ -1288,7 +1440,7 @@ def analyze_transition(frames: list[tuple[float, np.ndarray]], tm: dict, directi
     elif s0 is not None and abs(s0 - 1) >= 0.06:
         out.update({"type": "pop", "dur_s": round(dur, 3), key_scale: round(s0, 3)})
     elif off >= max(3.0, 0.1 * rh):
-        out.update({"type": "slide", "dur_s": round(dur, 3), "offset_px": round(off, 1)})
+        out.update({"dur_s": round(dur, 3), "offset_px": round(off, 1), **slide_kind(dx, dy, direction)})
     elif q0["alpha"] <= 0.75:
         ramp = [(q["t"], q["alpha"]) for q in traj[first:rest_from + 1]]
         t_zero = t_first - (1.0 / fps if direction == "in" else -1.0 / fps)
@@ -1306,11 +1458,16 @@ def analyze_transition(frames: list[tuple[float, np.ndarray]], tm: dict, directi
     return out
 
 
+REFINE_MARGIN_H = 2.0      # native-frame analysis window: item bbox + this x text height above and below
+
+
 def refine_item(video: Path, item: dict, fps_native: float, sample_dt: float, W: int, H: int,
                 cuts: list[float] | None = None) -> dict:
     """Exact timing, motion in/out and box alpha from native frames around the item edges."""
     x, y, w, h = item["bbox"]
-    ex, ey = int(0.35 * w + 0.6 * h), int(0.9 * h)
+    # vertical margin 2 x text height: a slide entrance starts up to that far from rest and must lie inside the window
+    # (with 0.9 h a 40 px slide_up of a 28 px line started outside it, its clipped first frame read as a 0.66 'pop')
+    ex, ey = int(0.35 * w + 0.6 * h), int(REFINE_MARGIN_H * h)
     R = {"x": max(0, x - ex), "y": max(0, y - ey)}
     R["w"] = min(W, x + w + ex) - R["x"]
     R["h"] = min(H, y + h + ey) - R["y"]
@@ -1571,6 +1728,21 @@ def assign_roles(items: list[dict], duration: float, H: int, speech: list[tuple[
 
 
 # ============================================================================= main entry
+def dialogue_lead(start: float, end: float, speech) -> tuple[float | None, float | None]:
+    """``(lead_s, speech_onset)`` of a dialogue caption shown [start, end]: lead_s = onset of the earliest speech span
+    overlapping the caption MINUS the caption start -- positive = the caption appears BEFORE the line is heard.
+
+    The one definition of ``text.roles.dialogue.timing.lead_s``: the reference analyzer measures it here, the
+    renderer draws a dialogue caption at (plan start = the moment the line is heard) - lead_s
+    (shortkit.edit.resolve.resolve_captions), and QA measures it in the output with this function
+    (shortkit.qa.checks.dialogue_leads).  (None, None) when no speech span overlaps the caption."""
+    ov = [(float(a), float(b)) for a, b in (speech or []) if min(float(end), float(b)) - max(float(start), float(a)) > 0]
+    if not ov:
+        return None, None
+    onset = min(a for a, _ in ov)
+    return onset - float(start), onset
+
+
 def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: float = DEFAULT_FPS,
             region: dict | None = None, out_dir: Path | None = None, save_frames: bool = True,
             role_fonts: dict[str, str] | None = None, max_seconds: float | None = None,
@@ -1629,9 +1801,8 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
         # dialogue timing relative to the real line it quotes (needs the audio analysis)
         it["style"]["lead_s"] = None
         if it["role"] == "dialogue" and speech:
-            ov = [(a, b) for a, b in speech if min(it["end"], b) - max(it["start"], a) > 0]
-            if ov:
-                it["style"]["lead_s"] = round(it["start"] - min(a for a, _ in ov), 3)
+            lead, _onset = dialogue_lead(it["start"], it["end"], speech)
+            it["style"]["lead_s"] = None if lead is None else round(lead, 3)
     fonts_used: dict[str, dict | None] = {}
     for it in items:
         fname = (role_fonts or {}).get(it["role"]) or DEFAULT_CALIB_FONT
@@ -1706,7 +1877,8 @@ def analyze(video: str | Path, video_id: str, preset: str | None = None, fps: fl
 
 
 def _clean_motion(m: dict) -> dict:
-    keep = ("type", "dur_s", "scale_from", "scale_to", "offset_px", "direction_deg", "alpha_first", "note")
+    keep = ("type", "dur_s", "scale_from", "scale_to", "offset_px", "direction_deg", "renderer_supported", "alpha_first",
+            "note")
     return {k: m[k] for k in keep if k in m}
 
 
@@ -1761,6 +1933,7 @@ def _combine_boxes(boxes: list[dict]) -> dict:
 def summarize_roles(items: list[dict], duration: float, W: int) -> dict:
     """Per-video, per-role style summary (medians / modes).  Consumed by `ref aggregate`."""
     out: dict[str, dict] = {}
+    vocab_in, vocab_out = renderer_motion_vocab()
     for role in ROLES:
         its = [c for c in items if c["role"] == role]
         if not its:
@@ -1808,10 +1981,19 @@ def summarize_roles(items: list[dict], duration: float, W: int) -> dict:
                           "scale_from": _median([s["motion_in"].get("scale_from") for s in st
                                                  if s["motion_in"].get("type") == "pop"]) if mi_mode == "pop" else None,
                           "offset_px": _median([s["motion_in"].get("offset_px") for s in st
-                                                if s["motion_in"].get("type") == "slide"]) if mi_mode == "slide" else None},
+                                                if s["motion_in"].get("type") == mi_mode])
+                          if str(mi_mode or "").startswith("slide") else None,
+                          "direction_deg": _median([s["motion_in"].get("direction_deg") for s in st
+                                                    if s["motion_in"].get("type") == mi_mode])
+                          if str(mi_mode or "").startswith("slide") else None,
+                          "renderer_supported": (mi_mode in vocab_in) if mi_mode else None},
             "motion_out": {"type": mo_mode, "n": len(mo_types),
                            "dur_s": _median([s["motion_out"].get("dur_s") for s in st
-                                             if s["motion_out"].get("type") == mo_mode]) if mo_mode else None},
+                                             if s["motion_out"].get("type") == mo_mode]) if mo_mode else None,
+                           "direction_deg": _median([s["motion_out"].get("direction_deg") for s in st
+                                                     if s["motion_out"].get("type") == mo_mode])
+                           if str(mo_mode or "").startswith("slide") else None,
+                           "renderer_supported": (mo_mode in vocab_out) if mo_mode else None},
             "timing": {"min_dur_s": round(min(durs), 3), "dur_p50_s": _median(durs),
                        "lead_s": _median([s.get("lead_s") for s in st])},
             "persist": "whole_video" if any(d >= 0.9 * duration for d in durs) else "timed",

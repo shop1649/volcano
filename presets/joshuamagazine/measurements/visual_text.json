@@ -4,7 +4,7 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-25T08:33:19+00:00",
+  "generated_at": "2026-09-25T11:47:18+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
@@ -40,7 +40,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -70,7 +70,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -100,7 +100,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -127,7 +127,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -145,7 +145,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -163,7 +163,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -181,7 +181,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -202,7 +202,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -229,7 +229,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -248,9 +248,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -277,7 +277,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -295,7 +295,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -313,7 +313,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -331,7 +331,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -353,7 +353,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -383,7 +383,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -410,7 +410,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -429,7 +429,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -448,7 +448,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -470,7 +470,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -495,9 +495,9 @@
       "key": "text.roles.title.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -507,7 +507,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.title.motion_in.dur_s",
@@ -515,7 +522,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -534,7 +541,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -554,9 +561,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -581,9 +588,9 @@
       "key": "text.roles.title.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -593,7 +600,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.title.motion_out.dur_s",
@@ -601,7 +613,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -620,7 +632,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -637,9 +649,9 @@
       "key": "text.roles.title.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -658,7 +670,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -679,7 +691,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -709,7 +721,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -739,7 +751,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -766,7 +778,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -784,7 +796,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -802,7 +814,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -820,7 +832,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -841,7 +853,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -868,7 +880,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -887,9 +899,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -916,7 +928,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -934,7 +946,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -952,7 +964,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -970,7 +982,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -992,7 +1004,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1022,7 +1034,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1049,7 +1061,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1068,7 +1080,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1087,7 +1099,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1109,7 +1121,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1134,9 +1146,9 @@
       "key": "text.roles.description.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1146,7 +1158,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.description.motion_in.dur_s",
@@ -1154,7 +1173,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1173,7 +1192,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1193,9 +1212,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1220,9 +1239,9 @@
       "key": "text.roles.description.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1232,7 +1251,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.description.motion_out.dur_s",
@@ -1240,7 +1264,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1259,7 +1283,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1276,9 +1300,9 @@
       "key": "text.roles.description.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1297,7 +1321,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1318,7 +1342,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1348,7 +1372,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1378,7 +1402,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1405,7 +1429,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1423,7 +1447,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1441,7 +1465,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1459,7 +1483,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1480,7 +1504,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1507,7 +1531,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1526,9 +1550,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1555,7 +1579,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1573,7 +1597,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1591,7 +1615,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1609,7 +1633,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1631,7 +1655,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1661,7 +1685,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1688,7 +1712,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1707,7 +1731,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1726,7 +1750,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1748,7 +1772,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1773,9 +1797,9 @@
       "key": "text.roles.situation.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1785,7 +1809,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.situation.motion_in.dur_s",
@@ -1793,7 +1824,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1812,7 +1843,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1832,9 +1863,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1859,9 +1890,9 @@
       "key": "text.roles.situation.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1871,7 +1902,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.situation.motion_out.dur_s",
@@ -1879,7 +1915,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1898,7 +1934,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1915,9 +1951,9 @@
       "key": "text.roles.situation.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1936,7 +1972,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1957,7 +1993,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -1987,7 +2023,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2017,7 +2053,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2044,7 +2080,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2062,7 +2098,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2080,7 +2116,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2098,7 +2134,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2119,7 +2155,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2146,7 +2182,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2165,9 +2201,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2194,7 +2230,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2212,7 +2248,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2230,7 +2266,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2248,7 +2284,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2270,7 +2306,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2300,7 +2336,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2327,7 +2363,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2346,7 +2382,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2365,7 +2401,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2387,7 +2423,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2412,9 +2448,9 @@
       "key": "text.roles.speaker.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2424,7 +2460,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.speaker.motion_in.dur_s",
@@ -2432,7 +2475,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2451,7 +2494,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2471,9 +2514,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2498,9 +2541,9 @@
       "key": "text.roles.speaker.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2510,7 +2553,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.speaker.motion_out.dur_s",
@@ -2518,7 +2566,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2537,7 +2585,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2554,9 +2602,9 @@
       "key": "text.roles.speaker.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2575,7 +2623,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2596,7 +2644,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2626,7 +2674,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2656,7 +2704,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2683,7 +2731,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2701,7 +2749,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2719,7 +2767,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2737,7 +2785,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2758,7 +2806,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2785,7 +2833,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2804,9 +2852,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2833,7 +2881,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2851,7 +2899,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2869,7 +2917,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2887,7 +2935,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2909,7 +2957,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2939,7 +2987,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2966,7 +3014,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -2985,7 +3033,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3004,7 +3052,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3026,7 +3074,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3051,9 +3099,9 @@
       "key": "text.roles.dialogue.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3063,7 +3111,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.dialogue.motion_in.dur_s",
@@ -3071,7 +3126,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3090,7 +3145,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3110,9 +3165,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3137,9 +3192,9 @@
       "key": "text.roles.dialogue.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3149,7 +3204,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.dialogue.motion_out.dur_s",
@@ -3157,7 +3217,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3176,7 +3236,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3193,9 +3253,9 @@
       "key": "text.roles.dialogue.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3214,7 +3274,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3235,7 +3295,7 @@
       ],
       "method": "한글 잉크 높이 / 보정 글꼴(libass 렌더) 잉크 비율 → libass Fontsize, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3265,7 +3325,7 @@
       ],
       "method": "정렬 기준점(가운데 정렬=잉크 상자 중심, 왼쪽=왼쪽 끝) x, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3295,7 +3355,7 @@
       ],
       "method": "세로 기준점(valign 측정값: top=잉크 상자 위, middle=중심, bottom=아래; 못 잰 영상은 중심), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3322,7 +3382,7 @@
       "resolution": null,
       "method": "한 줄/여러 줄 자막 사이에 고정되는 가장자리(위·중심·아래)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3340,7 +3400,7 @@
       "resolution": null,
       "method": "여러 줄 자막(또는 폭이 다른 자막들)의 왼쪽/가운데/오른쪽 끝 표준편차 최소",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3358,7 +3418,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 주 색(k-means 2)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3376,7 +3436,7 @@
       "resolution": null,
       "method": "획 중심 픽셀의 두 번째 색(12% 이상, 외곽선 혼합색 제외)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3397,7 +3457,7 @@
       ],
       "method": "채움 경계에서 바깥으로 거리 고리별 외곽선색 비율의 합, 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3424,7 +3484,7 @@
       "resolution": null,
       "method": "채움 바로 바깥 1~2px 고리의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3443,9 +3503,9 @@
         1080,
         1920
       ],
-      "method": "오른쪽 아래 방향 비대칭 어두운 복사본 거리",
+      "method": "잉크를 오른쪽 아래로 (k, k) 옮긴 복사본의 거리 k — shortkit.util.textmeasure.drop_shadow(QA 출력 검사와 같은 추정기; 채움 기준 왼쪽 위/오른쪽 아래 폭 차이 → IoU 최대 k), 영상별 역할 중앙값 → 영상 간 분포",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3472,7 +3532,7 @@
       "resolution": null,
       "method": "그림자 영역 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3490,7 +3550,7 @@
       "resolution": null,
       "method": "잉크 상자 4변 밖 밝기 계단(>=15, 같은 부호)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3508,7 +3568,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(나타나기 전 프레임 대비)",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3526,7 +3586,7 @@
       "resolution": null,
       "method": "박스 = a*C + (1-a)*배경 회귀(정지 배경 픽셀)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3548,7 +3608,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(좌우 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3578,7 +3638,7 @@
       ],
       "method": "박스 가장자리 - 잉크 가장자리(위아래 평균)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3605,7 +3665,7 @@
       "resolution": null,
       "method": "여러 줄 자막의 줄 중심 간격 / size_px",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3624,7 +3684,7 @@
       "resolution": null,
       "method": "영상별 한 줄 최대 글자 수(OCR, 공백 포함) → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3643,7 +3703,7 @@
       "resolution": null,
       "method": "영상별 최대 줄 수 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3665,7 +3725,7 @@
       ],
       "method": "영상별 최대 잉크 폭 → 영상 간 p90",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3690,9 +3750,9 @@
       "key": "text.roles.reaction.motion_in.type",
       "unit": null,
       "resolution": null,
-      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈",
+      "method": "원래 프레임률에서 등장 궤적(크기·위치·알파) 분류 → 영상별 최빈; 렌더러 용어(none/fade/pop/slide_up = 아래에서 위로), 그 밖의 이동(slide_down/left/right/diagonal)은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3702,7 +3762,14 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade",
+        "pop",
+        "slide_up"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.reaction.motion_in.dur_s",
@@ -3710,7 +3777,7 @@
       "resolution": null,
       "method": "첫 보이는 프레임 → 정지 상태 도달(±1프레임)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3729,7 +3796,7 @@
       "resolution": null,
       "method": "pop 첫 프레임 크기 / 정지 크기",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3749,9 +3816,9 @@
         1080,
         1920
       ],
-      "method": "slide 첫 프레임 위치 차이",
+      "method": "slide_up(아래에서 위로 등장) 첫 프레임 위치와 정지 위치의 거리",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3776,9 +3843,9 @@
       "key": "text.roles.reaction.motion_out.type",
       "unit": null,
       "resolution": null,
-      "method": "퇴장 궤적 분류 → 영상별 최빈",
+      "method": "퇴장 궤적 분류 → 영상별 최빈; 렌더러 용어(none/fade), 이동 퇴장은 방향과 함께 기록하고 renderer_supported=false",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3788,7 +3855,12 @@
       },
       "by_format": {},
       "evidence": [],
-      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
+      "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+      "renderer_vocabulary": [
+        "none",
+        "fade"
+      ],
+      "renderer_supported": null
     },
     {
       "key": "text.roles.reaction.motion_out.dur_s",
@@ -3796,7 +3868,7 @@
       "resolution": null,
       "method": "정지 상태 → 마지막 보이는 프레임",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3815,7 +3887,7 @@
       "resolution": null,
       "method": "영상별 가장 짧은 표시 시간 → 영상 간 p50",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3832,9 +3904,9 @@
       "key": "text.roles.reaction.timing.lead_s",
       "unit": "s",
       "resolution": null,
-      "method": "대사 자막 시작 - 겹치는 원음 말소리 시작(오디오 분석 필요)",
+      "method": "겹치는 원음 말소리 시작 − 대사 자막 시작(+ = 말보다 먼저 뜸; reference.textboxes.dialogue_lead, 렌더러·QA 와 같은 정의; 오디오 분석 필요)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3853,7 +3925,7 @@
       "resolution": null,
       "method": "영상 길이의 90% 이상 표시되면 whole_video",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -3871,7 +3943,7 @@
       "resolution": null,
       "method": "대사(dialogue) 자막 OCR 텍스트의 첫 글자·마지막 글자가 따옴표인지(textboxes.quote_pair): 양쪽 다 → 그 쌍, 양쪽 다 없음 → 없음([]), 한쪽만 → OCR 누락으로 보고 제외 → 영상별 최빈 쌍 → 영상 간 최빈(value = [여는 문자, 닫는 문자] 또는 []). 한계: 대사 역할 판정 자체가 따옴표를 근거로 쓰므로 따옴표 없는 대사는 말소리 겹침(audio/original.json)이나 글자색으로 대사로 잡힌 경우에만 관측됨; OCR 은 “ 와 \" 를 혼동할 수 있음(글자 모양 확인은 사람 관찰로)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T08:33:19+00:00",
+      "measured_at": "2026-09-25T11:47:18+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
