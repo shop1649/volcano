@@ -78,6 +78,13 @@ NON_MEASURED: dict[str, str] = {
     "audio.loudness.max_limiter_db": "rule",
 }
 
+# Infra keys whose VALUE locates a measurement-like artifact: the key stays infra (a path is not a style value), but
+# its registry entry shows the artifact's own state (status / blocker / evidence), so the chain "reference video,
+# time -> extracted record -> code -> QA check" stays visible for it.
+#   identity_exclusions.logo_templates_dir -> <dir>/manifest.json (`shortkit ref identity-templates`; QA
+#   identity.logo_templates reads the template images of that folder)
+ARTIFACT_RECORDS: dict[str, str] = {"identity_exclusions.logo_templates_dir": "manifest.json"}
+
 # What it costs production when a key stays unmeasured (못 잼). Pattern -> impact text.
 IMPACT: dict[str, str] = {
     "canvas.*": "화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치",
@@ -514,6 +521,31 @@ def load_measurement_items(preset_dir: Path, strict: bool = True) -> dict[str, d
 
 
 # ----------------------------------------------------------------------------- registry
+def artifact_record(key: str, value: Any, ident: Mapping | None = None) -> dict | None:
+    """State of the artifact an infra key points at (``ARTIFACT_RECORDS``), None for other keys."""
+    name = ARTIFACT_RECORDS.get(key)
+    if not name or not value:
+        return None
+    try:
+        f = paths.absp(str(value)) / name
+        rel = paths.relp(f)
+    except Exception:
+        return {"file": f"{value}/{name}", "status": "unmeasured", "blocker": "경로를 확인할 수 없음"}
+    m = read_json(f, None)
+    if not isinstance(m, dict):
+        return {"file": rel, "status": "unmeasured", "blocker": "기록 없음(`shortkit ref identity-templates` 미실행)"}
+    out = {"file": rel, "status": m.get("status", "unmeasured"), "blocker": m.get("blocker"),
+           "source_snapshot": m.get("source_snapshot"), "generated_by": m.get("generated_by"),
+           "templates": len(m.get("templates") or []), "review": len(m.get("review") or [])}
+    snap = (ident or {}).get("snapshot_captured_at")
+    if snap and m.get("source_snapshot") and m["source_snapshot"] != snap:
+        out.update({"status": "unmeasured", "stale": True,
+                    "blocker": f"기록의 스냅샷 {m['source_snapshot']} ≠ 현재 고정 스냅샷 {snap} → 다시 추출"})
+    out["evidence"] = [{"video_id": e.get("video_id"), "t": e.get("t"), "template": t.get("file")}
+                       for t in (m.get("templates") or []) for e in (t.get("evidence") or [])[:1]][:5]
+    return out
+
+
 def registry_path(name: str) -> Path:
     return paths.preset_dir(name) / "settings_registry.yaml"
 
@@ -1071,6 +1103,11 @@ def sync_registry(name: str, access_logs: list[str | Path] | None = None,
             e["measurement_route"] = route
         if na and status == "not_applicable_given":
             e["not_applicable"] = na
+        art = artifact_record(key, value, ident)
+        if art is not None:
+            e["artifact"] = art
+            if not e["evidence"] and art.get("evidence"):
+                e["evidence"] = art["evidence"]
         if key in bad_code:
             e["code_stale"] = [{"link": c, **v} for c, v in sorted(bad_code[key].items())]
         if m and m.get("status") != "measured" and m.get("blocker"):

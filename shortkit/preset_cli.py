@@ -289,14 +289,10 @@ def _stage_blockers(preset: str) -> list[dict]:
                                                          "needs_manual_observation"),
                     f"formats.yaml status={fm.get('status')}" + (f" preset_id={fo}(다른 프리셋)" if fo else "")
                     + (f" blocker={fm.get('blocker')}" if fst != "measured" and fm.get("blocker") else "")))
+    # ---- information-disclosure order (per format: beats / reveal_frac), labelled by people who watched
+    out.append(_disclosure_stage(fm, fo, net))
     # ---- SFX catalog / map
-    cat = read_json(d / "sfx_catalog.json", {}) or {}
-    co = _foreign(cat, pr)
-    cst = "unmeasured" if co else cat.get("status", "unmeasured")
-    out.append(_row("효과음 카탈로그(최신 50편 Demucs)", cst, "효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼",
-                    "resolved" if cst == "measured" else ("foreign_file" if co else "blocked_network" if net else "open"),
-                    f"sfx_catalog.json status={cat.get('status')} blocker={cat.get('blocker')}"
-                    + (f" preset_id={co}(다른 프리셋)" if co else "")))
+    out.append(_sfx_catalog_stage(d, pr, net))
     sm = read_yaml(d / "sfx_map.yaml", {}) or {}
     types = sm.get("types") or {}
     have = sum(1 for t in types.values() if isinstance(t, dict) and t.get("status") == "have")
@@ -311,7 +307,110 @@ def _stage_blockers(preset: str) -> list[dict]:
     out.append(_font_stage(pr, d, net))
     # ---- reverse trace
     out.append(_safe_stage(trace_sources.stage_status, preset, "레퍼런스 소재 출처·반복 계정·키워드 역추적"))
+    # ---- the reference channel's own identity marks (templates the QA identity check matches)
+    out.append(_safe_stage(lambda p: _identity_stage(p, pr, net), preset, IDENTITY_ITEM))
     return out
+
+
+DISCLOSURE_ITEM = "레퍼런스 정보 공개 순서(포맷별 beats·reveal_frac)"
+
+
+def _disclosure_stage(fm: dict, foreign: str | None, net: bool) -> dict:
+    """formats.yaml ``disclosure_order`` {status, blocker} + each format's ``disclosure`` status."""
+    do = (fm.get("disclosure_order") or {}) if not foreign else {}
+    st = "unmeasured" if foreign else (do.get("status") or "unmeasured")
+    per = [f"{r.get('format_id')}={(r.get('disclosure') or {}).get('status', 'unmeasured')}"
+           for r in fm.get("table") or [] if isinstance(r, dict)]
+    if st == "measured":
+        state = "resolved"
+    elif foreign:
+        state = "foreign_file"
+    elif net and not fm.get("table"):
+        state = "blocked_network"
+    else:
+        state = "needs_manual_observation"         # beats / reveal_t come only from people who watched (format_labels.csv)
+    impact = ("없음" if st == "measured" else
+              "포맷별 정보 공개 순서(구간 목적 순서·반전 시각 비율)를 몰라 반전을 앞당겨 말하는지 레퍼런스 기준으로 판정 불가 "
+              "(에피소드 reveal 가드는 계획의 reveal 로만 작동)")
+    return _row(DISCLOSURE_ITEM, st, impact, state,
+                f"formats.yaml disclosure_order status={do.get('status') if not foreign else '-'}"
+                + (f" preset_id={foreign}(다른 프리셋)" if foreign else "")
+                + (f"; 포맷별: {', '.join(per)}" if per else "; 포맷 없음")
+                + (f"; blocker={do.get('blocker')}" if st != "measured" and do.get("blocker") else ""))
+
+
+SFX_CATALOG_ITEM = "효과음 카탈로그(최신 50편 Demucs)"
+
+
+def _sfx_catalog_stage(d: Path, pr: config.Preset, net: bool) -> dict:
+    """sfx_catalog.json status incl. ``partial`` (every video analysed, but a required per-type column is not measured
+    for every type: ``unmeasured_columns`` {column: [type_id]})."""
+    from .reference.sfx_catalog import COLUMN_KO
+
+    cat = read_json(d / "sfx_catalog.json", {}) or {}
+    co = _foreign(cat, pr)
+    cst = "unmeasured" if co else cat.get("status", "unmeasured")
+    gaps = (cat.get("unmeasured_columns") or {}) if not co else {}
+    gap_txt = "; ".join(f"{COLUMN_KO.get(c, c)}: 종류 {len(v)}개({', '.join(map(str, v[:6]))}{'…' if len(v) > 6 else ''})"
+                        for c, v in gaps.items() if v)
+    if cst == "measured":
+        state, impact = "resolved", "없음"
+    elif co:
+        state, impact = "foreign_file", "효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼"
+    elif cst == "partial":
+        state = "needs_manual_observation" if "emotion" in gaps else "insufficient_data"
+        impact = (f"종류별 필수 열 일부 못 잼({', '.join(COLUMN_KO.get(c, c) for c in gaps)}) → 그 열로 정하는 자리 규칙·감정 "
+                  "검사는 못 잼, 카탈로그는 production 기준으로 쓰이지 않음")
+    else:
+        state = "blocked_network" if net else "open"
+        impact = "효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼"
+    ev = f"sfx_catalog.json status={cat.get('status')}"
+    if cat.get("column_status"):
+        ev += " column_status=" + ", ".join(f"{k}={v}" for k, v in cat["column_status"].items())
+    if gap_txt:
+        ev += f"; unmeasured_columns: {gap_txt}"
+    if cat.get("counts_are_lower_bounds"):
+        ev += "; 편당 개수는 하한값(대사 밑 효과음 못 잼)"
+    if cst != "measured" and cat.get("blocker"):
+        ev += f"; blocker={cat.get('blocker')}"
+    if co:
+        ev += f" preset_id={co}(다른 프리셋)"
+    return _row(SFX_CATALOG_ITEM, cst, impact, state, ev)
+
+
+IDENTITY_ITEM = "원 채널 식별 템플릿(로고·워터마크·핸들, QA identity.logo_templates)"
+
+
+def _identity_stage(preset: str, pr: config.Preset, net: bool) -> dict:
+    """``<identity_exclusions.logo_templates_dir>/manifest.json`` (``shortkit ref identity-templates``)."""
+    from .reference.identity_templates import manifest_status
+
+    m = manifest_status(preset)
+    foreign = m.get("preset_id") if m.get("preset_id") not in (None, pr.preset_id) else None
+    snap = config.preset_identity(pr.dir).get("snapshot_captured_at")
+    stale = bool(m.get("exists") and snap and m.get("source_snapshot") and m["source_snapshot"] != snap)
+    st = "unmeasured" if (foreign or stale) else m["status"]
+    if st == "measured":
+        state = "resolved"
+    elif foreign:
+        state = "foreign_file"
+    elif stale:
+        state = "remeasure"
+    elif net or config._NETWORK_RE.search(str(m.get("blocker") or "")):
+        state = "blocked_network"
+    elif m.get("review"):
+        state = "needs_manual_observation"
+    else:
+        state = "open"
+    impact = ("없음" if st == "measured" else
+              "원 채널의 글자 없는 로고·워터마크를 QA 가 대조할 템플릿이 없음(또는 일부) → identity.logo_templates 못 잼, "
+              "production 관문 통과 불가(글자 표식은 OCR 검사만)")
+    return _row(IDENTITY_ITEM, st, impact, state,
+                f"{m['file']} status={m['status'] if m.get('exists') else '없음'} templates={m['templates']} "
+                f"review={m['review']} manual_files={m['manual_files']}"
+                + (f" source_snapshot={m.get('source_snapshot')}≠{snap}(다시 추출)" if stale else "")
+                + (f" preset_id={foreign}(다른 프리셋)" if foreign else "")
+                + (f"; blocker={m.get('blocker')}" if st != "measured" and m.get("blocker") else ""))
 
 
 BGM_ID_KEYS = ("track_id", "title", "version", "tempo_ratio", "section_start_s")

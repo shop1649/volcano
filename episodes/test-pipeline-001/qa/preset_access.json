@@ -1,7 +1,7 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-25T07:02:10+00:00",
+  "saved_at": "2026-09-25T08:43:22+00:00",
   "reads": {
     "approval.first_episode_requires_approval": [
       "shortkit/edit/plan.py:approval_state_for"
@@ -174,6 +174,12 @@
     "presence.zoom": [
       "shortkit/qa/checks.py:pget"
     ],
+    "structure.cuts_per_10s.p10": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "structure.cuts_per_10s.p90": [
+      "shortkit/qa/checks.py:pget"
+    ],
     "structure.duration_s.p10": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -186,6 +192,12 @@
     "structure.formats_file": [
       "shortkit/qa/__init__.py:representative_for",
       "shortkit/qa/report.py:input_fingerprints"
+    ],
+    "structure.shot_len_s.p10": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "structure.shot_len_s.p90": [
+      "shortkit/qa/checks.py:pget"
     ],
     "text.roles.description.anchor.x": [
       "shortkit/qa/checks.py:pget"

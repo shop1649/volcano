@@ -9,9 +9,14 @@
                         frequency) that are NOT harmonics of one voice (two simultaneous sustained partials with no
                         common f0 in 70-500 Hz) -- chords / bass + melody.  A single voice (speech, TTS) has only
                         harmonics of its own f0.  present / absent / unmeasured (ambiguous) -- never a guess.
-- ``reference_stem_match`` a BGM file that is a copy of audio separated from the reference (stems under
-                        presets/*/analysis/*/stems/): same sha256, or a waveform copy (normalised cross-correlation of the
-                        decoded mono signal >= STEM_NCC_MATCH at the best lag, gain-invariant).
+- ``reference_stem_match`` a BGM file that is audio taken from a reference video.  ONE rule shared with the music
+                        library (``reference.audio_bgm.load_library``) and QA (row audio.bgm:clean_file):
+                        ``reference.audio_bgm.reference_audio_copy`` -- same sha256 as a stem file, a stem sha256 kept in
+                        a separation record (the stem cache may be gone) or the downloaded reference media; or the file lies
+                        INSIDE one stem at one lag (gain-invariant NCC >= audio_bgm.STEM_COPY_NCC) AND follows that stem's
+                        own level changes (ducking, fades, leaked SFX).  The clean song a stem was separated from is not a
+                        copy (a stem is an excerpt of it at some gain, with leaks: the old whole-file NCC >= 0.95 rule
+                        refused it -- false positive fixed 2026-09-25).
 
 Validation of the detectors (2026-09-25, this machine): espeak-ng Korean TTS lines (speech_01..03) and the
 generated classroom test source -> speech found / music "absent" (polyphonic share 0.0-0.015); the synthetic chord
@@ -21,7 +26,6 @@ measurements of the reference.
 """
 from __future__ import annotations
 
-import hashlib
 from functools import lru_cache
 from pathlib import Path
 
@@ -37,10 +41,6 @@ MUSIC_PROM_DB = 10.0            # spectral peak prominence over the local (41-bi
 MUSIC_PRESENT_SHARE = 0.10      # share of active frames with inharmonic sustained partials -> music present
 MUSIC_ABSENT_SHARE = 0.03       # below this -> absent; in between -> unmeasured (ambiguous)
 MUSIC_MIN_ACTIVE_S = 0.5        # less audible audio than this -> nothing to judge (absent if silent)
-STEM_NCC_MATCH = 0.95           # waveform copy of a reference stem
-STEM_SR = 8000
-STEM_MAX_S = 90.0
-STEM_EXT = (".wav", ".flac", ".mp3", ".m4a", ".ogg", ".aac")
 
 
 def _stat_key(p: Path) -> tuple:
@@ -238,71 +238,22 @@ def music_presence(stored: str, ranges: list[tuple[float, float]]) -> dict:
 
 # ----------------------------------------------------------------------------- reference stems
 def reference_stem_files() -> list[Path]:
-    """Audio separated from reference videos: presets/*/analysis/*/stems/** (any audio file)."""
-    base = paths.absp("presets")
-    out = []
-    for d in sorted(base.glob("*/analysis/*/stems")) if base.is_dir() else []:
-        for f in sorted(d.rglob("*")):
-            if f.is_file() and f.suffix.lower() in STEM_EXT:
-                out.append(f)
-    return out
+    """Audio separated from reference videos: presets/*/analysis/*/stems/** (``reference.audio_bgm``'s list)."""
+    from ..reference.audio_bgm import reference_stem_files as _files
 
-
-@lru_cache(maxsize=256)
-def _sha(key: tuple) -> str:
-    h = hashlib.sha256()
-    with open(key[0], "rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def _ncc_best(a: np.ndarray, b: np.ndarray) -> float:
-    """Max normalised cross-correlation of b sliding over a (gain invariant), full-overlap lags only."""
-    if len(a) < len(b):
-        a, b = b, a
-    n = len(b)
-    if n < STEM_SR:                      # < 1 s: not comparable
-        return 0.0
-    b = b - b.mean()
-    nb = float(np.linalg.norm(b))
-    if nb <= 1e-9:
-        return 0.0
-    m = 1 << int(np.ceil(np.log2(len(a) + n)))
-    corr = np.fft.irfft(np.fft.rfft(a, m) * np.conj(np.fft.rfft(b, m)), m)[: len(a) - n + 1]
-    c1 = np.concatenate([[0.0], np.cumsum(a, dtype=np.float64)])
-    c2 = np.concatenate([[0.0], np.cumsum(a.astype(np.float64) ** 2)])
-    s1 = c1[n:] - c1[:-n]
-    s2 = c2[n:] - c2[:-n]
-    na = np.sqrt(np.maximum(s2 - s1 * s1 / n, 1e-12))
-    return float(np.max(corr / (na * nb)))
+    return _files()
 
 
 def reference_stem_match(stored: str) -> dict | None:
-    """The reference stem that ``stored`` copies (same bytes or same waveform), or None.
-    -> {stem, method, sha256 | ncc}."""
+    """The reference audio that ``stored`` copies, or None.  Delegates to
+    ``reference.audio_bgm.reference_audio_copy`` (the library's rule, see the module docstring) so validate, QA and
+    the library refuse exactly the same files.  -> {stem (what was matched), kind, method, reason, ...}."""
     p = paths.absp(stored)
     if not p.is_file():
         return None
-    stems = reference_stem_files()
-    if not stems:
+    from ..reference.audio_bgm import reference_audio_copy
+
+    m = reference_audio_copy(p)
+    if not m:
         return None
-    mine = _sha(_stat_key(p))
-    for f in stems:
-        if _sha(_stat_key(f)) == mine:
-            return {"stem": paths.relp(f), "method": "sha256", "sha256": mine}
-    try:
-        x = _load(_stat_key(p), STEM_SR)[: int(STEM_MAX_S * STEM_SR)]
-    except Exception:
-        return None
-    for f in stems:
-        try:
-            y = _load(_stat_key(f), STEM_SR)[: int(STEM_MAX_S * STEM_SR)]
-        except Exception:
-            continue
-        # compare the shorter file (or its first 30 s) inside the other
-        a, b = (x, y) if len(x) >= len(y) else (y, x)
-        v = _ncc_best(a, b[: int(30 * STEM_SR)])
-        if v >= STEM_NCC_MATCH:
-            return {"stem": paths.relp(f), "method": f"파형 상관 {v:.3f} >= {STEM_NCC_MATCH}", "ncc": round(v, 4)}
-    return None
+    return {**m, "stem": m.get("matched")}

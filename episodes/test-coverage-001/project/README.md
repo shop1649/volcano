@@ -1,6 +1,6 @@
 # test-coverage-001 편집 프로젝트
 
-- 생성 2026-09-25T04:16:40+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
+- 생성 2026-09-25T08:23:44+00:00 · 프리셋 `joshuamagazine-v1` · 포맷 `UNCLASSIFIED` · 모드 `test` (테스트: 파이프라인 검증용, 게시용 아님)
 - 캔버스 1080x1920 @ 30fps · 길이 22.50s · 마스터 `episodes/test-coverage-001/output/test-coverage-001.mp4`
 - 이 문서는 내보내기 코드가 실제로 내린 결정(`export_decisions.json`)과 검증 결과(`verify.json`)로 자동 생성됨. 적혀 있지 않은 것은 확인하지 않은 것임.
 
@@ -163,11 +163,16 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
 - 자막 글꼴: `episodes/test-coverage-001/build/fonts` (git 에 없는 build 폴더). melt 는 이 폴더(프로젝트 폴더 기준 상대 경로 av.fontsdir)를 쓰는데, 이 상대 경로는 실행 위치 기준으로 해석되므로 Shotcut 에서 글꼴이 다르게 보이면 해당 글꼴을 시스템에 설치한다.
 - 계획 단계 경고:
   - [format_unclassified] 테스트 모드: 포맷 미분류(UNCLASSIFIED) — 포맷별 범위 검사는 못 함
+  - [intro_type_missing] 도입 방식(intro_type)이 없습니다: formats.yaml 의 이 포맷 intro_variants 중 하나를 적는다
+  - [intro_variants_unmeasured] 테스트 모드(포맷 미분류): 도입 방식을 레퍼런스 포맷의 도입 변형과 비교 못 함
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
   - [provenance_missing] warehouse_id 없음: 출처 기록(창고 레코드)이 연결되지 않았습니다
   - [clean_no_record] 오버레이 기록 없음(warehouse/overlays/18ffe8672d74….json) → `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` 후 `clean plan` 결과를 붙여야 함
   - [clean_no_record] 오버레이 기록 없음(warehouse/overlays/d88ab9aa0363….json) → `python -m shortkit clean detect --source assets/test/generated/video/face-demographics-walking-and-pause.mp4` 후 `clean plan` 결과를 붙여야 함
   - [duration_unmeasured] 영상 길이 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 22.50s 의 적합성 판정 불가
+  - [cuts_per_10s_unmeasured] structure.cuts_per_10s 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 계획의 컷 밀도(10초당 전환 수) 1.333개 (전환 3개: cut@4.80s, flash@13.50s, cut@18.50s / 22.50s) 적합성 판정 불가
+  - [shot_len_s_unmeasured] structure.shot_len_s 분포 미측정(못 잼, n=0, p10=None, p50=None, p90=None): 계획의 샷 길이 중앙값 4.9s (전환 3개: cut@4.80s, flash@13.50s, cut@18.50s / 22.50s) 적합성 판정 불가
+  - [first_caption_unmeasured] 첫 시간제 자막 시각(structure.first_caption_at_s = 0.0) 미측정(못 잼, 임시값): 이 plan 의 첫 시간제 자막 0.30s 을 레퍼런스와 비교 못 함
   - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
   - [watch_record_missing] 이 소스를 처음부터 끝까지 보고 들은 기록(sources[].watched: by, at, sha256)이 없습니다: 자막은 본 뒤에만 쓴다
   - [reveal_order_unmeasured] 테스트 모드(포맷 미분류): 정보 공개 순서를 레퍼런스 포맷과 비교 못 함
@@ -177,9 +182,9 @@ FCPXML 로 표현하지 못해 빠지거나 대체된 것:
   - [sfx_file_type_unmeasured] 명시 파일 assets/test/generated/sfx/ding.wav 이 종류 'ding' 소리인지 비교할 카탈로그 지문이 없음(못 잼)
   - [bgm_identity_unmeasured] 프리셋 BGM 제목·버전 미식별(못 잼: title=None, version=None): 쓰는 음악 파일이 레퍼런스 곡·버전과 같은지 판정 불가
   - [presence_unmeasured] 레퍼런스의 효과 사용 여부 못 잼: zoom(안 씀), freeze(씀), speed_change(씀), flash(씀), crossfade(안 씀), decorations(씀), bgm(씀), original_audio(안 씀), ducking(안 씀), intentional_silence(안 씀) — 이 plan 의 선택을 레퍼런스와 비교할 수 없음
-  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 262개로 렌더합니다(레퍼런스 일치 아님)
-- 프리셋 미측정(못 잼) 값 195개로 만든 편집이다(레퍼런스 일치 아님).
-- plan sha256 `4de6ebd52ede5e19a8352f3404cd8c5cef28f4743b66c648b465569e4ddb3084`
+  - [preset_unmeasured] 테스트 모드: 프리셋 미측정(못 잼) 키 270개로 렌더합니다(레퍼런스 일치 아님)
+- 프리셋 미측정(못 잼) 값 203개로 만든 편집이다(레퍼런스 일치 아님).
+- plan sha256 `1804b3d52d1ce50a547762ed7d6f89f73f2e5b41ab90f71fdaffa00c4a98857f`
 - 승인 상태: 필요=False 승인됨=False
 - 소스 v_room: `assets/test/generated/video/people-detection.mp4` sha256=18ffe8672d741e3e… 창고 id=None
 - 소스 v_face: `assets/test/generated/video/face-demographics-walking-and-pause.mp4` sha256=d88ab9aa03634f66… 창고 id=None

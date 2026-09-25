@@ -38,6 +38,10 @@ from .common import (ROLES, analysis_dir, basis_record, color_mode, load_snapsho
 SCHEMA = "shortkit.measurement/1"
 NARRATION_ROLES = ("title", "description", "situation", "reaction")
 REGISTER_MAP = {"반말": "반말_구어체", "해요체": "해요체", "음슴체": "음슴체", "합쇼체": "합쇼체"}
+# structure.first_caption_at_s = each video's first TIMED caption: roles that frame the whole video (title,
+# description), the channel's identity marks and unclassified lines are left out.  Shared definition: episode validate
+# (edit.validate.first_caption_excluded_roles) and QA (qa.checks.first_timed_caption) use the same roles.
+FIRST_CAPTION_EXCLUDED_ROLES = ("title", "description", "identity_mark", "unknown")
 
 
 # ============================================================================= item builders
@@ -670,6 +674,83 @@ def count_rows(videos: dict[str, dict]) -> tuple[list[dict], list[dict]]:
     return fr, zc
 
 
+# ============================================================================= cut structure (S2QA-15)
+# Transitions counted as shot boundaries: every type shots.json records.  QA ``structure.cuts`` counts the same three
+# types in the output (grid.our_cuts), so the reference distribution and the output value share one definition.
+TRANSITION_TYPES = ("cut", "flash", "crossfade")
+PARTIAL_ANALYSIS_TOL_S = 1.5          # analysed span shorter than the platform duration by more -> partial analysis
+CUT_RATE_METHOD = ("영상별 전환 수(shots.json cuts 의 cut·flash·crossfade, 0초 < t < 분석 길이 — QA structure.cuts 가 출력에서 "
+                   "세는 것과 같은 정의) / 분석 길이(shots.json duration) × 10 → 영상 간 분포")
+SHOT_LEN_METHOD = ("영상별 샷 길이 = 전환 시각 사이 간격(0초~첫 전환, 마지막 전환~영상 끝 포함; 전환 없는 영상은 영상 길이 "
+                   "1개) → 영상별 중앙값 → 영상 간 분포 (QA structure.cuts 의 '샷 길이 중앙값'과 같은 단위)")
+
+
+def cut_structure_rows(videos: dict[str, dict], platform_durations: dict[str, float]) -> dict:
+    """Per-video cut density and median shot length from ``shots.json``.
+
+    -> {"rate": rows, "shot_len": rows, "excluded": [{video_id, reason}], "pooled_shot_len": [all shot lengths],
+        "types": Counter of counted transition types, "per_video": {vid: {...}}}.
+    A video is left out (with the reason) when its cuts were not measured (no shots.json, too few frames, no
+    duration) or when shots.json covers only part of the video (analysed span shorter than the platform duration by
+    more than PARTIAL_ANALYSIS_TOL_S or 5 %): a rate / last shot of a partial analysis would describe another length."""
+    rate, slen, excluded, pooled, per = [], [], [], [], {}
+    types: Counter = Counter()
+    for vid, d in videos.items():
+        sh = d.get("shots")
+        if not sh:
+            excluded.append({"video_id": vid, "reason": "shots.json 없음(`shortkit ref analyze --only shots`)"})
+            continue
+        pres = sh.get("presence") or {}
+        if pres and all(pres.get(k) == "unmeasured" for k in TRANSITION_TYPES):
+            excluded.append({"video_id": vid, "reason": f"컷 검출 못 잼({sh.get('note') or 'presence 전부 unmeasured'})"})
+            continue
+        try:
+            dur = float(sh.get("duration") or 0.0)
+        except (TypeError, ValueError):
+            dur = 0.0
+        if dur <= 0:
+            excluded.append({"video_id": vid, "reason": "shots.json duration 없음"})
+            continue
+        ref = platform_durations.get(vid)
+        if ref and dur < ref - max(PARTIAL_ANALYSIS_TOL_S, 0.05 * ref):
+            excluded.append({"video_id": vid, "reason": f"부분 분석: shots.json 분석 길이 {dur:.2f}s < 영상 길이 {ref:.2f}s "
+                                                        "(전체를 다시 분석해야 함)"})
+            continue
+        cuts = [c for c in sh.get("cuts") or [] if c.get("type") in TRANSITION_TYPES and c.get("t") is not None
+                and 0.0 < float(c["t"]) < dur]
+        ts = sorted(float(c["t"]) for c in cuts)
+        types.update(c["type"] for c in cuts)
+        edges = [0.0] + ts + [dur]
+        shots = [round(b - a, 3) for a, b in zip(edges, edges[1:]) if b - a > 1e-3]
+        pooled += shots
+        r = round(len(ts) / dur * 10.0, 3)
+        m = round(float(np.median(shots)), 3)
+        base = {"video_id": vid, "format_id": d["format_id"], "frame": None}
+        rate.append({**base, "value": r, "t": round(ts[0], 3) if ts else 0.0,
+                     "note": f"전환 {len(ts)}개 / {dur:.2f}s"})
+        slen.append({**base, "value": m, "t": round(ts[0], 3) if ts else 0.0,
+                     "note": f"샷 {len(shots)}개(첫·마지막 샷 포함), 중앙값 {m}s"})
+        per[vid] = {"format_id": d["format_id"], "duration": round(dur, 3), "n_transitions": len(ts),
+                    "cuts_per_10s": r, "shot_len_median_s": m, "n_shots": len(shots)}
+    return {"rate": rate, "shot_len": slen, "excluded": excluded, "pooled_shot_len": pooled, "types": types,
+            "per_video": per}
+
+
+def distribution_items(base: str, rows: list[dict], unit: str, method: str, blocker: str, digits: int,
+                       extra: dict | None = None) -> list[dict]:
+    """A preset distribution ``<base>.{p10,p50,p90,n}`` (the preset stores the distribution itself): one item per
+    leaf, each with overall + by_format {n, p10, p50, p90}; the ``n`` item's value is the sample count."""
+    out = [num_item(f"{base}.{leaf}", rows, unit, method + f" → {leaf}", blocker, rule=leaf, digits=digits, extra=extra)
+           for leaf in ("p10", "p50", "p90")]
+    # same distribution (same digits) as the leaf items; only the value is the sample count
+    n_item = num_item(f"{base}.n", rows, "videos", method + " → 표본 수", blocker, digits=digits, extra=extra)
+    if n_item["status"] == "measured":
+        n_item["value"] = int(n_item["overall"]["n"])
+        for st in n_item["by_format"].values():
+            st["value"] = int(st["n"])
+    return out + [n_item]
+
+
 # ============================================================================= target canvas (S1-09)
 def target_canvas(pr, canvas_items: dict[str, dict]) -> tuple[list[int], dict]:
     """Canvas the coordinates are scaled to: the MEASURED canvas (canvas.width / canvas.height mode of the
@@ -1062,19 +1143,25 @@ def aggregate(preset: str, ids: list[str] | None = None, include_long: bool = Fa
     dmethod = "latest100 스냅샷의 영상 길이(플랫폼 메타데이터)"
     dblk = (pb["blocker"] or snapshot_blocker(preset)) if not S else ""
     # the preset stores the distribution itself (structure.duration_s.{n,p10,p50,p90}): one item per leaf
-    for leaf in ("p10", "p50", "p90"):
-        groups["visual_structure"].append(num_item(f"structure.duration_s.{leaf}", S, "s", dmethod + f" → {leaf}",
-                                                   dblk, rule=leaf, digits=2))
-    n_item = num_item("structure.duration_s.n", S, "videos", dmethod + " → 표본 수", dblk, digits=0)
-    if n_item["status"] == "measured":
-        n_item["value"] = int(n_item["overall"]["n"])
-        for st in n_item["by_format"].values():
-            st["value"] = int(st["n"])
-    groups["visual_structure"].append(n_item)
+    groups["visual_structure"] += distribution_items("structure.duration_s", S, "s", dmethod, dblk, digits=2)
+    # cut density / shot length (S2QA-15): per-video values from shots.json of the snapshot members
+    pdur = {r["video_id"]: r["value"] for r in S}
+    cs = cut_structure_rows(videos, pdur)
+    cblk_s = blk("컷 분석(shots.json)이 전체 길이로 측정된 스냅샷 영상 없음"
+                 + (f" — 제외 {len(cs['excluded'])}편: " + "; ".join(f"{x['video_id']}: {x['reason']}"
+                                                                 for x in cs["excluded"][:5]) if cs["excluded"] else ""))
+    cextra = {"basis": {"n_videos": len(cs["per_video"]), "excluded": cs["excluded"],
+                        "transition_types": dict(cs["types"]), "per_video": cs["per_video"],
+                        "pooled_shot_len_s": pstats(cs["pooled_shot_len"], 3),
+                        "note": "pooled_shot_len_s = 모든 샷을 한데 모은 분포(참고). 제작·QA 값은 영상별 값(한 영상 = 1표본)의 분포"}}
+    groups["visual_structure"] += distribution_items("structure.cuts_per_10s", cs["rate"], "cuts/10s", CUT_RATE_METHOD,
+                                                     cblk_s, digits=3, extra=cextra)
+    groups["visual_structure"] += distribution_items("structure.shot_len_s", cs["shot_len"], "s", SHOT_LEN_METHOD,
+                                                     cblk_s, digits=3, extra=cextra)
     F = []
     for vid, d in videos.items():
         items = [c for c in (d.get("captions") or {}).get("items") or []
-                 if c["role"] not in ("title", "description", "identity_mark", "unknown")]
+                 if c["role"] not in FIRST_CAPTION_EXCLUDED_ROLES]
         if items:
             first = min(items, key=lambda c: c["start"])
             F.append({"video_id": vid, "format_id": d["format_id"], "value": first["start"], "t": first["start"],

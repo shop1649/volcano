@@ -48,3 +48,6 @@ presets/*/analysis/*/review/*.jpg
 
 # login cookies (never commit or bundle)
 cookies/
+
+# identity-template review crops can contain third-party footage (templates/manifest stay tracked)
+presets/*/reference/identity_templates/review/

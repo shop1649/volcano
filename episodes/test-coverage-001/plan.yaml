@@ -157,3 +157,9 @@ bgm:                             # section_start_s / tempo_ratio / gain_db 를 �
   enabled: true
   path: assets/test/generated/music_bed_b.wav
   silences: []
+reveal:                          # 반전 보호: 이 이야기에는 숨길 반전이 없다(1초 격자 접촉 시트로 출력 전체를 보고 확인)
+  none: true
+  reason: >-
+    빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics
+    5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖
+    사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음

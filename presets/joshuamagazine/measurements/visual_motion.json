@@ -4,7 +4,7 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-25T03:06:17+00:00",
+  "generated_at": "2026-09-25T08:33:19+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
@@ -37,7 +37,7 @@
       "resolution": null,
       "method": "영상별 확대(zoom_in) 배율 중앙값(ORB 유사변환 누적; 원본 카메라 줌과 구분 못 함)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -62,7 +62,7 @@
       "resolution": null,
       "method": "영상별 확대 길이 중앙값(ease 곡선 맞춤이 판정된 사건은 맞춘 곡선의 전체 길이 — 느린 시작·끝 포함, 아니면 프레임당 0.3% 이상 변하는 구간 길이)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -81,7 +81,7 @@
       "resolution": null,
       "method": "확대 사건마다 누적 배율 곡선(사건 ±0.5초, 같은 샷)을 렌더러 ease(linear=u, in=u^3, out=1-(1-u)^3, inout) 곡선 c0+A*ease((t-t0)/dur) 에 맞춤(t0·dur 1/4프레임 격자, c0·A 최소제곱) → 두 번째로 좋은 곡선보다 SSE 1.5배 이상 좋고 잔차 ≤ 진폭 8% 일 때만 그 ease → 영상별 최빈 → 영상 간 최빈",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -105,7 +105,7 @@
       "resolution": null,
       "method": "확대 사건의 누적 유사변환 T_k 와 (1-z_k) 로 겉보기 고정점 맞춤: 순수 확대이고 고정점이 영상 영역 안(중심 근처 제외) → false(고정점 제자리 = 렌더러 recenter=false 로 그대로 재현), 고정점이 영역 밖이거나 확대 중 화면 중심 쪽으로 이동 → true(렌더러 recenter=true: 목표점이 같은 ease 로 중심으로 이동). 중심 근처 확대는 두 방식 결과가 같아 제외. 한계: 목표점이 중심 가까이 있던 recenter=true 확대도 '영역 안 고정점'으로 보임",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -129,7 +129,7 @@
       "resolution": null,
       "method": "영상별로 전환(cut/flash/crossfade) 사이 샷을 순서대로 보고 확대(zoom_in/zoom_out) 사건이 시작되는 샷이 연속되는 최대 개수(episode validate 의 zoom_stacked·QA video.zoom 과 같은 정의: 연속 세그먼트의 줌) → 영상 간 p90(value_rule=p90, 정수; 확대 판정이 있다/없다로 측정된 영상만, 0 포함). 한계: 원본 카메라 줌도 확대로 보임",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -148,7 +148,7 @@
       "resolution": null,
       "method": "영상별 정지 화면(프레임 반복, 앞뒤 움직임 있음) 횟수 → 영상 간 p90(value_rule=p90, 정수; 정지 판정이 있다/없다로 측정된 영상만, 0회 포함; episode validate 의 freeze_count 와 같은 단위)",
       "value_rule": "p90",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -167,7 +167,7 @@
       "resolution": null,
       "method": "영상별 정지(프레임 반복, 앞뒤 움직임 있음) 길이 중앙값",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -186,7 +186,7 @@
       "resolution": null,
       "method": "프레임 복제율 변화로 본 재생 속도 비(프레임 보간 슬로모션은 검출 못 함)",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -205,7 +205,7 @@
       "resolution": null,
       "method": "영상별 가장 많은 전환 종류(cut/flash/crossfade)",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -223,7 +223,7 @@
       "resolution": null,
       "method": "플래시(밝기 급등) 길이 중앙값",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -242,7 +242,7 @@
       "resolution": null,
       "method": "플래시 최고 밝기 프레임의 평균 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -260,7 +260,7 @@
       "resolution": null,
       "method": "플래시 최고 밝기 프레임 vs 앞뒤 0.1~0.25초 프레임 중앙값: 영상 영역 밖(가장자리 2% 제외, 밝아질 여유 있는 픽셀) 중 영역 안 평균 상승의 40%(최소 15) 이상 밝아진 비율 ≥ 0.6 → canvas(화면 전체), ≤ 0.15 → region(영상 영역만), 그 사이·영상이 화면 전체 → 판정 안 함 → 영상별 최빈 → 영상 간 최빈",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -278,7 +278,7 @@
       "resolution": null,
       "method": "섞임 구간(블렌드 가중치 0→1) 길이 중앙값",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {

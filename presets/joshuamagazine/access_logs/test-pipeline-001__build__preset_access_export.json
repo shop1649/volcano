@@ -3,8 +3,8 @@
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
   "source": "episodes/test-pipeline-001/build/preset_access_export.json",
-  "saved_at": "2026-09-25T02:15:36+00:00",
-  "archived_at": "2026-09-25T03:46:41+00:00",
+  "saved_at": "2026-09-25T04:15:07+00:00",
+  "archived_at": "2026-09-25T08:08:50+00:00",
   "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
   "reads": {
     "approval.first_episode_requires_approval": [
@@ -14,7 +14,7 @@
   "callers": {
     "shortkit/edit/plan.py:approval_state_for": {
       "fp": "76cb216c1917c673",
-      "basis": "archived"
+      "basis": "recorded"
     }
   }
 }

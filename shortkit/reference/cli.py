@@ -136,6 +136,21 @@ def cmd_trace(args) -> int:
     return 0 if r["traced_now"] else 3
 
 
+def cmd_identity_templates(args) -> int:
+    from .identity_templates import decide, extract
+    if args.accept or args.reject:
+        if not args.by:
+            warn("--accept/--reject 에는 --by <후보 크롭을 실제로 본 사람> 이 필요합니다.")
+            return 2
+        m = decide(args.preset, args.accept or args.reject, "accept" if args.accept else "reject", args.by, args.note)
+        return {"measured": 0, "partial": 4}.get(m["status"], 3)
+    ids = _ids(args) if (args.ids or args.set) else None
+    r = extract(args.preset, ids, include_long=args.include_long, ocr=not args.no_ocr)
+    if r.get("kept_previous"):
+        return 3
+    return {"measured": 0, "partial": 4}.get(r["status"], 3)
+
+
 def cmd_high_views_report(args) -> int:
     from .high_views import build_report
     r = build_report(args.preset)
@@ -217,6 +232,21 @@ def register(p) -> None:
     t.add_argument("--no-ocr", action="store_true")
     t.add_argument("--no-lens", action="store_true")
     t.set_defaults(func=cmd_trace)
+
+    it = sub.add_parser("identity-templates",
+                        help="레퍼런스 채널 자체의 지속 표식(로고·워터마크·핸들)을 스냅샷 영상에서 추출 → "
+                             "identity_exclusions.logo_templates_dir 의 템플릿 PNG + manifest.json (QA identity.logo_templates 가 "
+                             "읽음). shortkit.clean.detect(저장 안 함) + forbidden_text OCR 일치 + 여러 영상 반복. 영상이 없으면 "
+                             "못 잼 manifest(수집 차단 사유). 종료 코드 0=측정, 4=일부(사람 확인·누락), 3=레퍼런스 없음")
+    _sel(it, default_set=None)
+    it.add_argument("--include-long", action="store_true", help="긴 영상(kind=video)도 포함(기본: 쇼츠만)")
+    it.add_argument("--no-ocr", action="store_true", help="OCR 없이(글자 표식·forbidden_text 확인은 못 잼으로 기록)")
+    it.add_argument("--accept", default=None, metavar="ID",
+                    help="사람 확인 후보(manifest review[].id)를 채널 식별 표식으로 확정(템플릿이 됨; 다시 스캔하지 않음)")
+    it.add_argument("--reject", default=None, metavar="ID", help="사람 확인 후보를 식별 표식 아님(편집 스타일·장면 일부)으로 판정")
+    it.add_argument("--by", default=None, help="후보 크롭을 실제로 본 사람(--accept/--reject 필수)")
+    it.add_argument("--note", default=None)
+    it.set_defaults(func=cmd_identity_templates)
 
     hv = sub.add_parser("high-views-report",
                         help="조회수 기준 이상 영상 전부의 분석 범위(받기·시각·오디오·추적)와 참고용 요약 → "

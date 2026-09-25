@@ -1,0 +1,39 @@
+{
+  "schema": "shortkit.identity_templates/1",
+  "preset_id": "joshuamagazine-v1",
+  "source_snapshot": "2026-09-24T17:56:07+00:00",
+  "source_snapshot_status": "blocked",
+  "generated_at": "2026-09-25T08:33:20+00:00",
+  "generated_by": "shortkit ref identity-templates",
+  "method": "shortkit.clean.detect(레퍼런스 파일, 저장 안 함) → 채널 식별 표식 = (a) OCR 글자가 identity_exclusions.forbidden_text 와 일치(정규화 부분 문자열 또는 창 유사도 ≥ 0.85) + ref analyze 의 identity_mark 자막, (b) 서로 다른 영상 ≥ max(2, 스캔 영상의 20%)에서 같은 자리(정규화 사각형 IoU ≥ 0.5)·같은 모양(32x32 회색 NCC ≥ 0.6)으로 반복되는 고정 오버레이(채널 자막과 겹치거나 자막 분석이 없으면 사람 확인) → 그룹마다 가장 큰 해상도 사례의 원본 픽셀 크롭",
+  "rule": "QA identity.logo_templates 가 이 폴더의 *.png/*.jpg 를 출력 프레임과 정규화 상관으로 대조한다(review/ 하위 폴더는 읽지 않음). 템플릿은 원 채널 식별 요소를 '복제하지 않았는지' 검사하는 데만 쓰고 제작에 쓰지 않는다",
+  "templates_dir": "presets/joshuamagazine/reference/identity_templates",
+  "status": "unmeasured",
+  "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용",
+  "basis": {
+    "snapshot_status": "blocked",
+    "captured_at": "2026-09-24T17:56:07+00:00",
+    "n_members": 0,
+    "missing_members": [],
+    "excluded_non_snapshot": [],
+    "excluded_long_form": [],
+    "rule": "제작 측정 = 고정된 최신 100편 스냅샷(latest100.json) 구성원만. 그 밖의 영상(80만+ 과거 영상 등)은 참고용 보고서(reference/high_views_report.json)에만 쓰고 제작 측정에 섞지 않음",
+    "targets": [],
+    "scanned": [],
+    "not_downloaded": [],
+    "failed": [],
+    "checks": {},
+    "forbidden_text": [
+      "조슈아매거진",
+      "조슈아 매거진",
+      "joshuamagazine",
+      "joshua magazine",
+      "JOSHUA MAGAZINE"
+    ]
+  },
+  "templates": [],
+  "review": [],
+  "rejected": [],
+  "partial_reasons": [],
+  "manual_files": []
+}

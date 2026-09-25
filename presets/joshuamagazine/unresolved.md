@@ -1,6 +1,6 @@
 # 미확정 항목·제작 영향·해결 상태
 
-자동 생성: `shortkit preset unresolved` (2026-09-25T03:56:50+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물(단계 표는 유효 프리셋 = preset.yaml + measured.yaml + requested_changes.yaml 과 각 단계 파일에서 다시 평가).
+자동 생성: `shortkit preset unresolved` (2026-09-25T08:33:24+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물(단계 표는 유효 프리셋 = preset.yaml + measured.yaml + requested_changes.yaml 과 각 단계 파일에서 다시 평가).
 
 못 잼 = 측정하지 못함. 못 잼 항목은 임시값으로만 테스트 렌더가 가능하고, QA 에서 완료로 승격되지 않는다.
 
@@ -10,12 +10,14 @@
 |---|---|---|---|---|
 | 최신 100편 목록·게시일 고정 | 못 잼 | 포맷 분류·모든 측정의 기준 표본이 없음 → 모든 스타일 값이 임시값 | blocked_network | presets/joshuamagazine/reference/latest100.json status=blocked videos=0 blocker=https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError("('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))")); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U |
 | 조회수 80만 이상 영상 전체 분석 | 못 잼 | 고조회 영상의 공통 구조·BGM·효과음·출처를 확인하지 못한 영상이 있음 → 고조회 소재 제외 목록·참고 보고서가 불완전 | blocked_network | reference/high_views_report.json: 목록 0편(high_views.json status=blocked, 확인 못 함 0편), 영상 받기 0/0, 시각 분석(ref analyze) 0/0, 오디오 분석(ref audio-analyze) 0/0, 출처 추적·지문(ref trace) 0/0 |
-| 포맷 분류표·포맷별 대표 영상 | 못 잼 | 포맷별 p10/p50/p90, 효과음 개수 범위, 대표 영상 비교(QA)를 쓸 수 없음 → 에피소드는 test 모드(UNCLASSIFIED)만 가능 | blocked_network | formats.yaml status=unmeasured blocker=2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함 |
-| 효과음 카탈로그(최신 50편 Demucs) | 못 잼 | 효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼 | blocked_network | sfx_catalog.json status=unmeasured blocker=2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단 |
+| 포맷 분류표·포맷별 대표 영상 | 못 잼 | 포맷별 p10/p50/p90, 효과음 개수 범위, 대표 영상 비교(QA)를 쓸 수 없음 → 에피소드는 test 모드(UNCLASSIFIED)만 가능 | blocked_network | formats.yaml status=unmeasured blocker=2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷 표를 만들 수 없음(포맷은 스냅샷 구성원으로만) |
+| 레퍼런스 정보 공개 순서(포맷별 beats·reveal_frac) | 못 잼 | 포맷별 정보 공개 순서(구간 목적 순서·반전 시각 비율)를 몰라 반전을 앞당겨 말하는지 레퍼런스 기준으로 판정 불가 (에피소드 reveal 가드는 계획의 reveal 로만 작동) | blocked_network | formats.yaml disclosure_order status=unmeasured; 포맷 없음; blocker=포맷 표 없음(라벨 없음) — 정보 공개 순서 못 잼 |
+| 효과음 카탈로그(최신 50편 Demucs) | 못 잼 | 효과음 종류·편당 개수·자리 규칙이 없음 → 효과음 개수/분포 검사는 못 잼 | blocked_network | sfx_catalog.json status=unmeasured; blocker=2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단 |
 | 효과음 창고 연결(sfx_map) | 못 잼 | 제작에 쓸 효과음 파일이 정해지지 않음 → production 렌더 불가 | open_user_asset | sfx_map.yaml library_status=not_provided have=0/0 |
 | BGM 곡·버전·속도·사용 구간 식별 | 못 잼 | 음악 구간 일치 판정 불가, 깨끗한 음악 파일 확보 불가 | blocked_network | track_id=None(provisional), title=None(provisional), version=None(provisional), tempo_ratio=1.0(provisional), section_start_s=0.0(provisional); presence.bgm=unmeasured(provisional); 못 잰 항목=['track_id', 'title', 'version', 'tempo_ratio', 'section_start_s']; 음악 라이브러리 트랙 없음 |
 | 글꼴 식별(IoU 상한 + 후보 검증) | 못 잼 | 글꼴이 레퍼런스와 같은지 판정 불가(동일 판정 없는 역할은 임시 글꼴) | blocked_network | fonts_report.json status=ceiling_only: reference crops unmeasured (못 잼); 역할별 판정/값 출처: title=못 잼/provisional, description=못 잼/provisional, situation=못 잼/provisional, speaker=못 잼/provisional, dialogue=못 잼/provisional, reaction=못 잼/provisional |
 | 레퍼런스 소재 출처·반복 계정·키워드 역추적 | 못 잼 | 새 소재 검색어/계정 목록이 없음, 레퍼런스 촬영본 제외 목록이 비어 있음 | blocked_network | warehouse/source_accounts.json stage: 추적 기록 없음; 제외 지문 0건; accounts=0 |
+| 원 채널 식별 템플릿(로고·워터마크·핸들, QA identity.logo_templates) | 못 잼 | 원 채널의 글자 없는 로고·워터마크를 QA 가 대조할 템플릿이 없음(또는 일부) → identity.logo_templates 못 잼, production 관문 통과 불가(글자 표식은 OCR 검사만) | blocked_network | presets/joshuamagazine/reference/identity_templates/manifest.json status=unmeasured templates=0 review=0 manual_files=0; blocker=레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError("('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용 |
 
 ## 2. 모션·전환·BGM·원음 있다/없다/못 잼 (채널 단위, 전체·포맷별)
 
@@ -34,9 +36,9 @@
 
 ## 3. 프리셋 설정 키 단위
 
-상태별 개수: fixed_by_rule=14, not_applicable=24, not_applicable_given=5, unmeasured=262
+상태별 개수: fixed_by_rule=14, not_applicable=24, not_applicable_given=5, unmeasured=270
 
-못 잼 키의 해결 상태: blocked_network=260, no_method=2
+못 잼 키의 해결 상태: blocked_network=268, no_method=2
 
 | 제작 영향 | 못 잼 키 수 | 해결 상태 | 키 |
 |---|---|---|---|
@@ -49,6 +51,7 @@
 | 외곽선 두께·색 불일치 | 12 | blocked_network | `text.roles.description.outline_color`, `text.roles.description.outline_px`, `text.roles.dialogue.outline_color`, `text.roles.dialogue.outline_px`, `text.roles.reaction.outline_color`, `text.roles.reaction.outline_px`, `text.roles.situation.outline_color`, `text.roles.situation.outline_px`, `text.roles.speaker.outline_color`, `text.roles.speaker.outline_px`, `text.roles.title.outline_color`, `text.roles.title.outline_px` |
 | 확대·정지·전환의 크기/길이 불일치 | 11 | blocked_network | `motion.freeze.hold_s`, `motion.speed.slowmo_factor`, `motion.transitions.crossfade.dur_s`, `motion.transitions.default`, `motion.transitions.flash.color`, `motion.transitions.flash.dur_s`, `motion.transitions.flash.scope`, `motion.zoom.dur_s`, `motion.zoom.ease`, `motion.zoom.recenter`, `motion.zoom.scale_to` |
 | 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음 | 10 | blocked_network | `presence.bgm`, `presence.crossfade`, `presence.decorations`, `presence.ducking`, `presence.flash`, `presence.freeze`, `presence.intentional_silence`, `presence.original_audio`, `presence.speed_change`, `presence.zoom` |
+| 영상 길이·전개 구조 불일치 | 9 | blocked_network | `structure.cuts_per_10s.n`, `structure.cuts_per_10s.p10`, `structure.cuts_per_10s.p50`, `structure.cuts_per_10s.p90`, `structure.first_caption_at_s`, `structure.shot_len_s.n`, `structure.shot_len_s.p10`, `structure.shot_len_s.p50`, `structure.shot_len_s.p90` |
 | 자막 등장 타이밍 불일치 | 7 | blocked_network | `text.roles.description.timing.min_dur_s`, `text.roles.dialogue.timing.lead_s`, `text.roles.dialogue.timing.min_dur_s`, `text.roles.reaction.timing.min_dur_s`, `text.roles.situation.timing.min_dur_s`, `text.roles.speaker.timing.min_dur_s`, `text.roles.title.timing.min_dur_s` |
 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 | 7 | blocked_network | `audio.bgm.fade_in_s`, `audio.bgm.fade_out_s`, `audio.bgm.gain_db`, `audio.bgm.loop`, `audio.bgm.section_start_s`, `audio.bgm.tempo_ratio`, `audio.bgm.track_id` |
 | 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치 | 6 | blocked_network | `text.roles.description.font_name`, `text.roles.dialogue.font_name`, `text.roles.reaction.font_name`, `text.roles.situation.font_name`, `text.roles.speaker.font_name`, `text.roles.title.font_name` |
@@ -70,7 +73,6 @@
 | 원음 켜고 끄는 경계 처리 불일치 | 1 | blocked_network | `audio.original.fade_s` |
 | 효과음 크기 불일치 | 1 | blocked_network | `audio.sfx.gain_db_default` |
 | 의도적 정적 처리 불일치 | 1 | blocked_network | `audio.silence.fade_s` |
-| 영상 길이·전개 구조 불일치 | 1 | blocked_network | `structure.first_caption_at_s` |
 
 ### 자동 측정 방법이 없는 키(관찰 경로)
 

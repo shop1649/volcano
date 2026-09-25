@@ -119,6 +119,57 @@ def check_format(plan: dict, preset: config.Preset, out: list[dict]) -> None:
             out.append(issue("warn", "format_unknown", f"format_id '{fid}' 가 {rel} 표에 없습니다", "format_id"))
 
 
+INTRO_UNRECORDED = ("미기재", "", "unmeasured", "못 잼")    # classify writes 미기재 for a blank intro label
+
+
+def format_intro_variants(preset: config.Preset, format_id: str) -> tuple[list[str] | None, str]:
+    """The measured intro variants (도입 방식) of ``format_id``: formats.yaml ``table[].intro_variants[].intro_type``
+    (``reference.classify``: videos whose structure is the same and only the intro differs).  -> (variants, why):
+    variants None = unmeasured (format table not measured, format missing, no variants, or a member whose intro was
+    not recorded -- the set of variants is then incomplete)."""
+    rel = preset.get("structure.formats_file")
+    fm = read_yaml(paths.absp(rel), None) or {}
+    if fm.get("status") != "measured":
+        return None, f"{rel} 상태 {fm.get('status')}(못 잼): {str(fm.get('blocker') or '')[:160]}"
+    row = next((e for e in fm.get("table") or [] if isinstance(e, dict)
+                and (e.get("format_id") or e.get("id")) == format_id), None)
+    if row is None:
+        return None, f"포맷 {format_id} 가 {rel} 표에 없음"
+    iv = row.get("intro_variants") or []
+    names = [str(v.get("intro_type") if isinstance(v, dict) else v).strip() for v in iv]
+    if not names:
+        return None, f"포맷 {format_id} 의 intro_variants 가 비어 있음"
+    blank = [n for n in names if n.casefold() in INTRO_UNRECORDED]
+    if blank:
+        return None, f"포맷 {format_id} 구성원 중 도입 방식이 기록되지 않은 영상이 있음(intro_type {blank[0]!r}) — 도입 변형 목록 불완전"
+    return names, ""
+
+
+def check_intro_type(plan: dict, preset: config.Preset, out: list[dict], allow_unmeasured: bool) -> None:
+    """plan.intro_type must be one of the intro variants the reference shows for the plan's format (user: 도입 방식만
+    다른 것과 전개 구조가 실제로 다른 것을 구분).  Production: missing / not a variant -> error; variants unmeasured
+    -> error unless --allow-unmeasured.  Test mode: warnings."""
+    prod = plan["mode"] == "production"
+    sev = "error" if prod else "warn"
+    un_sev = "error" if (prod and not allow_unmeasured) else "warn"
+    it = str(plan.get("intro_type") or "").strip()
+    if not it:
+        out.append(issue(sev, "intro_type_missing",
+                         "도입 방식(intro_type)이 없습니다: formats.yaml 의 이 포맷 intro_variants 중 하나를 적는다", "intro_type"))
+    if plan["format_id"] == TEST_FORMAT_ID:
+        out.append(issue("warn", "intro_variants_unmeasured",
+                         "테스트 모드(포맷 미분류): 도입 방식을 레퍼런스 포맷의 도입 변형과 비교 못 함", "intro_type"))
+        return
+    variants, why = format_intro_variants(preset, plan["format_id"])
+    if variants is None:
+        out.append(issue(un_sev, "intro_variants_unmeasured",
+                         f"포맷 {plan['format_id']} 의 도입 변형(intro_variants) 미측정(못 잼): {why} — "
+                         f"intro_type {it or '(없음)'!r} 이 레퍼런스에 있는 도입인지 판정 불가", "intro_type"))
+    elif it and it not in variants:
+        out.append(issue(sev, "intro_type_unknown",
+                         f"도입 방식 {it!r} 은 포맷 {plan['format_id']} 의 레퍼런스 도입 변형 {variants} 에 없습니다", "intro_type"))
+
+
 # ----------------------------------------------------------------------------- sources / provenance
 def _norm_url(u: str | None) -> str | None:
     return u.strip().rstrip("/") if isinstance(u, str) and u.strip() else None
@@ -562,10 +613,23 @@ def check_protected_framing(plan: dict, ctx: ResolveContext, out: list[dict]) ->
                     out.append(issue(sev, code, f"{why} 때문에 보호 영역 '{p['label']}' 이 화면 밖으로 잘립니다", where))
 
 
+FIRST_CAPTION_TOL_S = 0.25
+
+
+def first_caption_excluded_roles() -> tuple[str, ...]:
+    """Caption roles the reference analyzer leaves out of structure.first_caption_at_s (title, description,
+    identity marks, unknown): ``reference.aggregate.FIRST_CAPTION_EXCLUDED_ROLES`` itself (never a copy)."""
+    from ..reference.aggregate import FIRST_CAPTION_EXCLUDED_ROLES
+
+    return tuple(FIRST_CAPTION_EXCLUDED_ROLES)
+
+
 def check_structure(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
     """Planned duration vs the measured range structure.duration_s p10..p90 (of this plan's format when
     the preset was loaded for a format): outside -> error in production / warning in test.  All four
-    keys are read through the preset every time (unmeasured -> the unmeasured warning)."""
+    keys are read through the preset every time (unmeasured -> the unmeasured warning).  Cut density and median
+    shot length: ``check_cut_structure``.  First caption: the reference analyzer's definition (first TIMED caption,
+    roles in ``reference.aggregate.FIRST_CAPTION_EXCLUDED_ROLES`` left out)."""
     pr, r = ctx.preset, ctx.resolved
     prod = plan["mode"] == "production"
     ds = pr.section("structure.duration_s")
@@ -580,11 +644,88 @@ def check_structure(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
         out.append(issue("error" if prod else "warn", "duration_range",
                          f"길이 {r.duration:.2f}s 가 관측 범위 p10..p90 ({p10}..{p90}, 중앙값 {p50}, n={n}"
                          f"{', 포맷 ' + str(pr.format_id) if pr.format_id else ''}) 밖", "timeline"))
-    fc = float(pr.get("structure.first_caption_at_s"))
-    if r.captions:
-        first = min(c.start for c in r.captions)
-        if abs(first - fc) > 0.25:
-            out.append(issue("warn", "first_caption_timing", f"첫 자막 {first:.2f}s ≠ 프리셋 {fc:.2f}s", "captions"))
+    check_cut_structure(plan, ctx, out)
+    # first caption: the reference analyzer's definition (structure.first_caption_at_s = start of each video's first
+    # TIMED caption; title / description / identity marks frame the whole video and are left out)
+    excluded = first_caption_excluded_roles()
+    fc = pr.get("structure.first_caption_at_s")
+    timed = [c for c in r.captions if c.role not in excluded]
+    if pr.origin("structure.first_caption_at_s") not in ("measured", "requested_change") or fc is None:
+        out.append(issue("warn", "first_caption_unmeasured",
+                         f"첫 시간제 자막 시각(structure.first_caption_at_s = {fc!r}) 미측정(못 잼, 임시값): 이 plan 의 "
+                         + (f"첫 시간제 자막 {min(c.start for c in timed):.2f}s" if timed else "시간제 자막 없음")
+                         + " 을 레퍼런스와 비교 못 함", "captions"))
+    elif timed:
+        first = min(timed, key=lambda c: c.start)
+        if abs(first.start - float(fc)) > FIRST_CAPTION_TOL_S:
+            out.append(issue("warn", "first_caption_timing",
+                             f"첫 시간제 자막({first.id}, {first.role}) {first.start:.2f}s ≠ 프리셋 {float(fc):.2f}s "
+                             f"(±{FIRST_CAPTION_TOL_S}s; 제목·설명 제외 — 레퍼런스 분석기와 같은 정의)", "captions"))
+    else:
+        out.append(issue("warn", "first_caption_timing",
+                         f"시간제 자막(제목·설명 외)이 없음: 레퍼런스 첫 자막 {float(fc):.2f}s 와 비교할 자막 없음", "captions"))
+
+
+def planned_transitions(r) -> list[dict]:
+    """Shot boundaries of the planned edit in the reference analyzer's vocabulary (``reference.aggregate``
+    TRANSITION_TYPES cut / flash / crossfade at each clip start).  A hard cut that continues the same shot (same
+    source, next source frame, same speed and geometry: ``qa.probes_video.continuous_edit``, the rule QA uses on the
+    output) shows no picture change and is not a boundary.  -> [{t, type, clip_id}]."""
+    from ..qa.probes_video import continuous_edit
+
+    out = []
+    for prev, c in zip(r.clips, r.clips[1:]):
+        typ = c.transition_in.type
+        if typ == "cut" and continuous_edit(prev, c):
+            continue
+        out.append({"t": float(c.out_start), "type": typ, "clip_id": c.id})
+    return out
+
+
+def cut_structure(times: list[float], duration: float) -> dict:
+    """Cut density and median shot length of ONE video from its transition times -- the definition of
+    ``reference.aggregate.cut_structure_rows`` (transitions with 0 < t < duration; shots = gaps between 0, the
+    transitions and the end; median over the video's shots).  Used for the plan (validate) and the output (QA)."""
+    ts = sorted(float(t) for t in times if 0.0 < float(t) < duration)
+    edges = [0.0] + ts + [float(duration)]
+    shots = [round(b - a, 3) for a, b in zip(edges, edges[1:]) if b - a > 1e-3]
+    shots_sorted = sorted(shots)
+    k = len(shots_sorted)
+    med = (shots_sorted[k // 2] if k % 2 else 0.5 * (shots_sorted[k // 2 - 1] + shots_sorted[k // 2])) if k else None
+    return {"cuts_per_10s": round(len(ts) / duration * 10.0, 3) if duration > 0 else None, "n_cuts": len(ts),
+            "shot_len_median_s": None if med is None else round(med, 3), "shots_s": shots, "duration": round(duration, 3)}
+
+
+def check_cut_structure(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
+    """The plan's cut density (transitions per 10 s) and median shot length vs the reference distributions
+    ``structure.cuts_per_10s`` / ``structure.shot_len_s`` p10..p90 (per-video values of the format's snapshot videos
+    when the preset was loaded for a format): outside -> error in production / warning in test; unmeasured ->
+    warning (못 잼).  Keys read through the preset every time."""
+    pr, r = ctx.preset, ctx.resolved
+    prod = plan["mode"] == "production"
+    if r.duration <= 0:
+        return
+    tr = planned_transitions(r)
+    cs = cut_structure([x["t"] for x in tr], r.duration)
+    fmt = f", 포맷 {pr.format_id}" if pr.format_id else ""
+    for key, val, what, unit in (("structure.cuts_per_10s", cs["cuts_per_10s"], "컷 밀도(10초당 전환 수)", "개"),
+                                 ("structure.shot_len_s", cs["shot_len_median_s"], "샷 길이 중앙값", "s")):
+        try:
+            st = pr.section(key)
+            n, p10, p50, p90 = st.get("n"), st.get("p10"), st.get("p50"), st.get("p90")
+        except (KeyError, TypeError):     # a preset from before the key existed: 못 잼, never a pass
+            n = p10 = p50 = p90 = None
+        n = int(n or 0)
+        code = key.split(".")[1]
+        desc = (f"{what} {val}{unit} (전환 {cs['n_cuts']}개: " + ", ".join(f"{x['type']}@{x['t']:.2f}s" for x in tr[:8])
+                + ("…" if len(tr) > 8 else "") + f" / {r.duration:.2f}s)")
+        if n == 0 or p10 is None or p90 is None:
+            out.append(issue("warn", f"{code}_unmeasured", f"{key} 분포 미측정(못 잼, n={n}, p10={p10}, p50={p50}, "
+                             f"p90={p90}): 계획의 {desc} 적합성 판정 불가", key))
+        elif val is None or not (float(p10) - 1e-6 <= float(val) <= float(p90) + 1e-6):
+            out.append(issue("error" if prod else "warn", f"{code}_range",
+                             f"계획의 {desc} 가 레퍼런스 관측 범위 p10..p90 ({p10}..{p90}, 중앙값 {p50}, n={n}{fmt}) 밖",
+                             "timeline"))
 
 
 # ----------------------------------------------------------------------------- captions
@@ -1380,12 +1521,21 @@ def check_sfx(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasured
     # observed ranges from the catalog
     cat = sfxmap.load_catalog(pr)
     fid = None if plan["format_id"] == TEST_FORMAT_ID else plan["format_id"]
+    counts_ok = catalog_counts_measured(cat)
     if cat.get("status") != "measured":
+        # production stays blocked while the catalog is not fully measured (unless --allow-unmeasured)
         sev = "error" if (prod and not allow_unmeasured) else "warn"
-        out.append(issue(sev, "sfx_range_unmeasured",
-                         f"효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 "
-                         f"({cat.get('blocker') or cat.get('_path')})", "sfx"))
-    else:
+        if counts_ok:
+            gaps = catalog_unmeasured_columns(cat)
+            out.append(issue(sev, "sfx_catalog_partial",
+                             "효과음 카탈로그 일부 못 잼(status partial): 편당 개수는 모든 대상 영상에서 셌으므로 개수 규칙은 "
+                             "검사하지만, 종류별 열 " + (", ".join(f"{c}({len(v)}종류)" for c, v in gaps.items()) or "?")
+                             + f" 이 측정되지 않아 카탈로그가 완성되지 않음 ({cat.get('blocker') or '-'})", "sfx"))
+        else:
+            out.append(issue(sev, "sfx_range_unmeasured",
+                             f"효과음 카탈로그 미측정(못 잼): 종류별 개수·분포가 포맷 관측 범위 안인지 판정 불가 "
+                             f"({cat.get('blocker') or cat.get('_path')})", "sfx"))
+    if counts_ok:
         check_sfx_counts(plan, ctx, cat, fid, by_type, out, prod and not allow_unmeasured)
     check_sfx_catalog_rules(plan, ctx, cat, out, allow_unmeasured)
     check_sfx_files(plan, ctx, cat, out, allow_unmeasured)
@@ -1471,11 +1621,50 @@ def _prev_caption_role(r, t: float) -> str:
     return max(prev, key=lambda c: c.start).role if prev else "none"
 
 
+def catalog_counts_measured(cat: dict) -> bool:
+    """The catalog's per-video counts cover every target video: status 'measured', or 'partial' (every target video
+    analysed and counted; only a per-type column such as emotion is not measured for every event) with
+    ``column_status.per_video_count == 'measured'`` (never 'lower_bound').  'unmeasured' (a target video missing, or
+    SFX under speech not measurable) -> False."""
+    cs = cat.get("column_status") or {}
+    if cat.get("status") == "measured":
+        return cs.get("per_video_count", "measured") == "measured"
+    return cat.get("status") == "partial" and cs.get("per_video_count") == "measured"
+
+
+def catalog_column_state(t: dict, col: str) -> str:
+    """measured | partial | unmeasured of one per-type catalog column: ``types[].columns[col]`` (written by
+    ``ref sfx-catalog``), else derived the same way (``sfx_catalog._column_status``: no value -> unmeasured, some
+    events without a value -> partial)."""
+    cols = t.get("columns") or {}
+    if col in cols:
+        return str(cols[col])
+    c = t.get(col) or {}
+    if not c.get("n"):
+        return "unmeasured"
+    return "partial" if c.get("n_missing") or c.get("status") == "partial" else "measured"
+
+
+def catalog_unmeasured_columns(cat: dict) -> dict[str, list[str]]:
+    """{column: [type ids whose column is not measured]} over the catalog's required per-type columns
+    (``reference.sfx_catalog.REQUIRED_COLUMNS``)."""
+    from ..reference.sfx_catalog import REQUIRED_COLUMNS
+
+    out: dict[str, list[str]] = {}
+    for t in cat.get("types") or []:
+        for c in REQUIRED_COLUMNS:
+            if catalog_column_state(t, c) != "measured":
+                out.setdefault(c, []).append(str(t.get("type_id")))
+    return out
+
+
 def check_sfx_catalog_rules(plan: dict, ctx: ResolveContext, cat: dict, out: list[dict], allow_unmeasured: bool) -> None:
     """The catalog's per-type placement rules are production rules (S4-06): the sound's emotion (tagged after the
     event was checked) must be one the reference shows for that type; the screen event at the sound and the role of
-    the caption before it must be among those observed for the type.  sfx[].emotion is required in production;
-    a type whose emotion was never labelled is 못 잼 (error in production unless --allow-unmeasured)."""
+    the caption before it must be among those observed for the type.  sfx[].emotion is required in production.
+    The catalog is used when its counts are measured (status measured, or partial: ``catalog_counts_measured``) and
+    each column only when ``types[].columns`` marks it 'measured' -- a 'partial' column (some events without a value)
+    is NOT a rule: 못 잼 (error in production unless --allow-unmeasured)."""
     prod = plan["mode"] == "production"
     sev = "error" if prod else "warn"
     un_sev = "error" if (prod and not allow_unmeasured) else "warn"
@@ -1485,38 +1674,50 @@ def check_sfx_catalog_rules(plan: dict, ctx: ResolveContext, cat: dict, out: lis
             out.append(issue(sev, "sfx_emotion_missing",
                              "효과음 감정(emotion)이 없습니다: 사건을 확인한 뒤 감정을 붙이고 카탈로그 규칙에 맞는 소리를 고른다",
                              f"sfx[{s['id']}]"))
-    if cat.get("status") != "measured":
+    if not catalog_counts_measured(cat):
         return
     types = {t.get("type_id"): t for t in cat.get("types") or []}
     evs = planned_screen_events(r)
+    ko = {"emotion": "감정", "screen_event": "화면 사건 분포", "prev_caption_role": "직전 자막 역할 분포"}
+
+    def unmeasured(s: dict, col: str, where: str) -> None:
+        c = types[s["type"]].get(col) or {}
+        state = catalog_column_state(types[s["type"]], col)
+        why = (f"일부 이벤트만 값이 있음(partial: {c.get('n_missing')}/{c.get('n_events')} 누락)" if state == "partial"
+               else str(c.get("blocker") or "값 없음"))
+        out.append(issue(un_sev, f"sfx_{col}_unmeasured",
+                         f"카탈로그 '{s['type']}' 의 {ko[col]} 못 잼({why}): 이 자리의 효과음이 레퍼런스 규칙에 맞는지 판정 불가",
+                         where))
+
     for s in plan.get("sfx") or []:
         t = types.get(s["type"])
         if not t:
             continue
         where = f"sfx[{s['id']}]"
         emo = t.get("emotion") or {}
-        if not emo.get("n"):
-            out.append(issue(un_sev, "sfx_emotion_unmeasured",
-                             f"카탈로그 '{s['type']}' 의 감정이 라벨되지 않음(못 잼: {emo.get('blocker') or '라벨 없음'}): 이 소리가 "
-                             "이 감정에 맞는지 판정 불가", where))
+        if catalog_column_state(t, "emotion") != "measured":
+            unmeasured(s, "emotion", where)
         elif str(s.get("emotion") or "").strip() and s["emotion"] not in (emo.get("share") or {}):
             out.append(issue(sev, "sfx_emotion_mismatch",
-                             f"감정 '{s['emotion']}' 은 레퍼런스의 '{s['type']}' 감정 {sorted(emo['share'])} 에 없습니다", where))
+                             f"감정 '{s['emotion']}' 은 레퍼런스의 '{s['type']}' 감정 {sorted(emo.get('share') or {})} 에 없습니다",
+                             where))
         se = t.get("screen_event") or {}
-        if se.get("n"):
+        if catalog_column_state(t, "screen_event") != "measured":
+            unmeasured(s, "screen_event", where)
+        else:
             got = _plan_screen_event_at(evs, float(s["t"]), float(t.get("event_window_s") or SCREEN_EVENT_WINDOW_S))
             if got not in (se.get("share") or {}):
                 out.append(issue(sev, "sfx_screen_event_mismatch",
-                                 f"'{s['type']}' 는 레퍼런스에서 화면 사건 {se['share']} 에 맞춰 나오는데 이 자리({float(s['t']):.2f}s)의 "
-                                 f"화면 사건은 '{got}' 입니다", where))
-        else:
-            out.append(issue("warn", "sfx_screen_event_unmeasured", f"'{s['type']}' 의 화면 사건 분포 못 잼", where))
+                                 f"'{s['type']}' 는 레퍼런스에서 화면 사건 {se.get('share')} 에 맞춰 나오는데 이 자리"
+                                 f"({float(s['t']):.2f}s)의 화면 사건은 '{got}' 입니다", where))
         pc = t.get("prev_caption_role") or {}
-        if pc.get("n"):
+        if catalog_column_state(t, "prev_caption_role") != "measured":
+            unmeasured(s, "prev_caption_role", where)
+        else:
             got = _prev_caption_role(r, float(s["t"]))
             if got not in (pc.get("share") or {}):
                 out.append(issue(sev, "sfx_prev_caption_mismatch",
-                                 f"'{s['type']}' 앞 자막 역할이 레퍼런스에서는 {pc['share']} 인데 여기서는 '{got}' 입니다", where))
+                                 f"'{s['type']}' 앞 자막 역할이 레퍼런스에서는 {pc.get('share')} 인데 여기서는 '{got}' 입니다", where))
 
 
 def check_sfx_files(plan: dict, ctx: ResolveContext, cat: dict, out: list[dict], allow_unmeasured: bool) -> None:
@@ -1526,7 +1727,8 @@ def check_sfx_files(plan: dict, ctx: ResolveContext, cat: dict, out: list[dict],
     prod = plan["mode"] == "production"
     sev = "error" if prod else "warn"
     un_sev = "error" if (prod and not allow_unmeasured) else "warn"
-    types = {t.get("type_id"): t for t in cat.get("types") or []} if cat.get("status") == "measured" else {}
+    # the fingerprint centroids come from clustering every target video: usable when the counts are (partial too)
+    types = {t.get("type_id"): t for t in cat.get("types") or []} if catalog_counts_measured(cat) else {}
     for sp in ctx.resolved.audio.sfx:
         x = next((s for s in plan.get("sfx") or [] if s["id"] == sp.id), {})
         if not x.get("file") or not sp.path:
@@ -1823,11 +2025,12 @@ def check_audio(plan: dict, ctx: ResolveContext, out: list[dict], allow_unmeasur
             out.append(issue("error", "bgm_from_reference",
                              f"BGM 은 깨끗한 음악 파일이어야 합니다(레퍼런스에서 분리한 stem 금지): {b.path}", "bgm.path"))
         else:
+            # one rule with the music library and QA (reference.audio_bgm.reference_audio_copy)
             m = reference_stem_match(b.path)
             if m:
                 out.append(issue("error", "bgm_from_reference",
-                                 f"BGM 파일 {b.path} 이 레퍼런스에서 분리한 음원 {m['stem']} 의 사본입니다({m['method']}): "
-                                 "깨끗한 음악 파일만 쓴다", "bgm.path"))
+                                 f"BGM 파일 {b.path}: {m.get('reason') or m['stem']} (방법 {m.get('method')}, "
+                                 f"대상 {m['stem']}): 깨끗한 음악 파일만 쓴다", "bgm.path"))
     if b is not None:
         # the preset's BGM identity (title AND version); the library entry / plan file is compared
         # against it in ``audio.check_bgm_identity`` (resolve)
@@ -2049,6 +2252,7 @@ def validate(plan: dict, preset: config.Preset | None = None, *, preset_name: st
     out += ctx.issues
     check_paths(plan, out)
     check_format(plan, preset, out)
+    check_intro_type(plan, preset, out, allow_unmeasured)
     check_sources(plan, ctx, out)
     check_clean_coverage(plan, ctx, out)
     check_crop_faces(plan, ctx, out)

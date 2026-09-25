@@ -5,7 +5,7 @@
   "preset_name": "joshuamagazine",
   "format_id": "UNCLASSIFIED",
   "mode": "test",
-  "measured_at": "2026-09-25T07:06:03+00:00",
+  "measured_at": "2026-09-25T08:48:03+00:00",
   "principle": "최종 MP4 만 측정(타임라인/코드가 맞다고 출력이 맞다고 보지 않음)",
   "output": {
     "path": "episodes/test-coverage-001/output/test-coverage-001.mp4",
@@ -40,14 +40,14 @@
     ]
   },
   "inputs": {
-    "presets/joshuamagazine/preset.yaml": "a4c6cd2a1d097231f862d2a43922ff9db3bfae48e6f60842018aef6865788f61",
+    "presets/joshuamagazine/preset.yaml": "b0d6ab95f0782a3c5ae56674fe76e701241a65ebb5e972748a47949d2447a283",
     "presets/joshuamagazine/measured.yaml": null,
     "presets/joshuamagazine/requested_changes.yaml": "c0193d7599bf3db1ef63ace30db84eb4a8f049e8bccb6d16a0f293b9ebee51ce",
     "presets/joshuamagazine/formats.yaml": "0c7cc5745e6fcaea197a9b24ff838cb507080d6b5bebe858906fc4b70d3cbea4",
     "presets/joshuamagazine/sfx_catalog.json": "ce14925c85f5b55304996fc777d26d8253e8cb640a79f769a00fd2291794537c",
     "presets/joshuamagazine/sfx_map.yaml": "3de8a99f24504e7a4aee8dcc3290dedcead8e4356369a4556425aac62bd3ae0f",
-    "episodes/test-coverage-001/plan.yaml": "fc11d2c89c97066437e675d8145dca1d4dc1e97043fff667db086092e39d69b3",
-    "episodes/test-coverage-001/build/resolved.json": "fd52861a5c1c2bdfdf9ce46f9a9b9cac627ac60d6199e3e489e3ffa360b95b61",
+    "episodes/test-coverage-001/plan.yaml": "c5650c5c27caaf7448a3e5761f038db3fe7cc2b44005803875e1e5b743d2a7b6",
+    "episodes/test-coverage-001/build/resolved.json": "8a8993cd8f1dc648b07dd7d52efd7dd8fe7beb0e4c65b73ba4519f57472096b5",
     "episodes/test-coverage-001/build/captions.ass": "ff2088752d97ee487e7b2144c70d9d1bc7912b2126c50abb48aae97f54a441fa",
     "episodes/test-coverage-001/qa/human_checks.jsonl": null
   },
@@ -58,10 +58,10 @@
     "clean_verify": true
   },
   "timing_s": {
-    "text_s": 169.0,
-    "video_s": 41.7,
-    "audio_s": 8.6,
-    "total_s": 232.4
+    "text_s": 182.6,
+    "video_s": 45.7,
+    "audio_s": 9.2,
+    "total_s": 251.3
   },
   "summary": {
     "total": 213,
@@ -238,7 +238,7 @@
       "item": "반전 전에 반전 내용을 미리 말하지 않음",
       "required": true,
       "kind": "output_vs_plan",
-      "reason": "plan 에 반전 보호(reveal: t, keywords)도 '반전 없음'(reveal.none) 선언도 없음 — 반전을 미리 말하는지 출력에서 판정할 기준이 없음",
+      "reason": "plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics 5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖 사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음)이라고 적었을 뿐 출력에서 잰 것이 아님 — 보호할 키워드가 없어 자막을 대조할 수 없음; 사람이 보고 `shortkit qa human-check --kind watch` 로 기록",
       "impact": "자막 문구·말투를 확인하지 못함",
       "covered_by": null
     },
@@ -571,7 +571,7 @@
       "item": "BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지)",
       "required": false,
       "kind": "output_vs_plan",
-      "reason": "레퍼런스 분리 음원(presets/*/analysis/*/stems)이 하나도 없어 지문 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사",
+      "reason": "레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사",
       "impact": "BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가",
       "covered_by": null
     },
@@ -667,11 +667,11 @@
     },
     {
       "row_id": "structure.cuts:rate_ref",
-      "item": "컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비)",
+      "item": "컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "프리셋에 해당 키 없음(structure.cuts_per_10s.p10, structure.cuts_per_10s.p90) — 출력에서 잰 컷(계획 경계에서 보인 컷 + 계획 밖 컷) 기준. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)",
-      "impact": "컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "impact": "영상 길이·전개 구조 불일치",
       "covered_by": null
     },
     {
@@ -679,8 +679,8 @@
       "item": "샷 길이 중앙값 (레퍼런스 포맷 분포 대비)",
       "required": false,
       "kind": "style_vs_reference",
-      "reason": "프리셋에 해당 키 없음(structure.shot_len_s.p10, structure.shot_len_s.p90) — 출력에서 잰 컷 사이 간격의 중앙값. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)",
-      "impact": "컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음",
+      "reason": "레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
+      "impact": "영상 길이·전개 구조 불일치",
       "covered_by": null
     },
     {
@@ -918,7 +918,7 @@
     }
   },
   "preset_unmeasured_keys": {
-    "count": 262,
+    "count": 270,
     "keys": [
       "audio.bgm.fade_in_s",
       "audio.bgm.fade_out_s",
@@ -992,11 +992,19 @@
       "presence.original_audio",
       "presence.speed_change",
       "presence.zoom",
+      "structure.cuts_per_10s.n",
+      "structure.cuts_per_10s.p10",
+      "structure.cuts_per_10s.p50",
+      "structure.cuts_per_10s.p90",
       "structure.duration_s.n",
       "structure.duration_s.p10",
       "structure.duration_s.p50",
       "structure.duration_s.p90",
       "structure.first_caption_at_s",
+      "structure.shot_len_s.n",
+      "structure.shot_len_s.p10",
+      "structure.shot_len_s.p50",
+      "structure.shot_len_s.p90",
       "text.roles.description.anchor.align",
       "text.roles.description.anchor.valign",
       "text.roles.description.anchor.x",
@@ -4392,7 +4400,10 @@
       "kind": "output_vs_plan",
       "reference": null,
       "expected": {
-        "reveal": null
+        "reveal": {
+          "none": true,
+          "reason": "빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics 5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖 사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음"
+        }
       },
       "observed": null,
       "tolerance": "반전 시각 전 자막에 반전 키워드 0건",
@@ -4400,7 +4411,7 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "plan 에 반전 보호(reveal: t, keywords)도 '반전 없음'(reveal.none) 선언도 없음 — 반전을 미리 말하는지 출력에서 판정할 기준이 없음",
+      "note": "plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics 5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖 사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음)이라고 적었을 뿐 출력에서 잰 것이 아님 — 보호할 키워드가 없어 자막을 대조할 수 없음; 사람이 보고 `shortkit qa human-check --kind watch` 로 기록",
       "required": true,
       "keys": [],
       "impact": "자막 문구·말투를 확인하지 못함"
@@ -7766,20 +7777,21 @@
       "reference": null,
       "expected": {
         "clean_music_file": true,
-        "not_a_copy_of": "presets/*/analysis/*/stems/*"
+        "not_a_copy_of": "presets/*/analysis/*/stems/*, reference media"
       },
       "observed": {
         "path": "assets/test/generated/music_bed_b.wav",
         "reference_stems_compared": 0,
+        "reference_hashes_compared": 0,
         "stem_match": null,
         "stem_dirs": []
       },
-      "tolerance": "sha256 같음 또는 파형 상관 ≥ 0.95 인 레퍼런스 분리 음원 0개",
+      "tolerance": "레퍼런스 음원과 sha256 같음, 또는 한 스템 안에 포함(상관 ≥ 0.98)되고 그 스템의 음량 변화를 따라가는 파일 0개 (reference.audio_bgm.reference_audio_copy)",
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "레퍼런스 분리 음원(presets/*/analysis/*/stems)이 하나도 없어 지문 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사",
+      "note": "레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사",
       "required": false,
       "keys": [],
       "impact": "BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가"
@@ -8866,25 +8878,35 @@
     {
       "check_id": "structure.cuts",
       "row_id": "structure.cuts:rate_ref",
-      "item": "컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비)",
+      "item": "컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비)",
       "category": "컷",
       "kind": "style_vs_reference",
       "reference": "못 잼",
-      "expected": null,
+      "expected": {
+        "structure.cuts_per_10s.p10": null,
+        "structure.cuts_per_10s.p90": null
+      },
       "observed": {
         "cuts_per_10s": 1.333,
         "n_cuts": 3,
-        "duration": 22.5
+        "duration": 22.5,
+        "types": [
+          "cut",
+          "flash"
+        ]
       },
       "tolerance": null,
       "status": "unmeasured",
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "프리셋에 해당 키 없음(structure.cuts_per_10s.p10, structure.cuts_per_10s.p90) — 출력에서 잰 컷(계획 경계에서 보인 컷 + 계획 밖 컷) 기준. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)",
+      "note": "레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
       "required": false,
-      "keys": [],
-      "impact": "컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음"
+      "keys": [
+        "structure.cuts_per_10s.p10",
+        "structure.cuts_per_10s.p90"
+      ],
+      "impact": "영상 길이·전개 구조 불일치"
     },
     {
       "check_id": "structure.cuts",
@@ -8893,7 +8915,10 @@
       "category": "컷",
       "kind": "style_vs_reference",
       "reference": "못 잼",
-      "expected": null,
+      "expected": {
+        "structure.shot_len_s.p10": null,
+        "structure.shot_len_s.p90": null
+      },
       "observed": {
         "shot_len_median_s": 4.917,
         "shots_s": [
@@ -8908,10 +8933,13 @@
       "intended_change": false,
       "change_ref": null,
       "evidence": {},
-      "note": "프리셋에 해당 키 없음(structure.shot_len_s.p10, structure.shot_len_s.p90) — 출력에서 잰 컷 사이 간격의 중앙값. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)",
+      "note": "레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)",
       "required": false,
-      "keys": [],
-      "impact": "컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음"
+      "keys": [
+        "structure.shot_len_s.p10",
+        "structure.shot_len_s.p90"
+      ],
+      "impact": "영상 길이·전개 구조 불일치"
     },
     {
       "check_id": "cover.frame",
@@ -9350,7 +9378,7 @@
     "complete": false,
     "mode": "test",
     "production_rules": false,
-    "checked_at": "2026-09-25T07:06:03+00:00",
+    "checked_at": "2026-09-25T08:48:03+00:00",
     "failures": [
       {
         "rule": "G2",
@@ -9368,7 +9396,7 @@
       },
       {
         "rule": "P1",
-        "message": "프리셋 미측정(임시값) 키 262개",
+        "message": "프리셋 미측정(임시값) 키 270개",
         "rows": [
           "audio.bgm.fade_in_s",
           "audio.bgm.fade_out_s",
@@ -9522,7 +9550,7 @@
         "approved_by": null,
         "approved_at": null,
         "approved_plan_sha256": null,
-        "plan_sha256": "4de6ebd52ede5e19a8352f3404cd8c5cef28f4743b66c648b465569e4ddb3084",
+        "plan_sha256": "1804b3d52d1ce50a547762ed7d6f89f73f2e5b41ab90f71fdaffa00c4a98857f",
         "first_episode": false,
         "changed_since_approval": false,
         "rule_key": "approval.later_episodes_require_approval"
@@ -9538,12 +9566,12 @@
     "verdict_ko": "불합격 — 못 잼 68건(필수 1, 참고 67)"
   },
   "defects": {
-    "new": 1,
+    "new": 0,
     "verified_now": 0,
-    "reopened": 0,
+    "reopened": 1,
     "still_open": 0,
     "not_rechecked": 0,
-    "resolved_without_fix": 1,
+    "resolved_without_fix": 0,
     "unmeasured_now": 0,
     "superseded": 0,
     "reclassified": 0,

@@ -30,6 +30,11 @@
       "type": "string",
       "description": "id from presets/<p>/formats.yaml; 'UNCLASSIFIED' only allowed in mode=test"
     },
+    "intro_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "how this episode opens (도입 방식): one of formats.yaml table[format_id].intro_variants[].intro_type (measured from watched reference labels); production requires it (episode validate check_intro_type)"
+    },
     "mode": {
       "enum": [
         "production",

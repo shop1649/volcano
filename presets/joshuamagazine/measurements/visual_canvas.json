@@ -4,7 +4,7 @@
   "preset_id": "joshuamagazine-v1",
   "source_snapshot": "2026-09-24T17:56:07+00:00",
   "source_snapshot_status": "blocked",
-  "generated_at": "2026-09-25T03:06:17+00:00",
+  "generated_at": "2026-09-25T08:33:19+00:00",
   "generated_by": "shortkit ref aggregate",
   "basis": {
     "n_videos_analyzed": 0,
@@ -40,7 +40,7 @@
       ],
       "method": "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -70,7 +70,7 @@
       ],
       "method": "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -100,7 +100,7 @@
       ],
       "method": "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -130,7 +130,7 @@
       ],
       "method": "영상 밖 정적 배경 대비 움직이는 영역(프레임 간 변화 비율 >50% 행·열) → 캔버스 해상도로 환산",
       "value_rule": "p50",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -157,7 +157,7 @@
       "resolution": null,
       "method": "영상 밖 영역: 정지+단색 → color, 변하지만 흐림 → blur_source",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -175,7 +175,7 @@
       "resolution": null,
       "method": "영상 밖 정지 영역의 중앙값 색",
       "value_rule": "mode of color clusters (RGB distance <= 28)",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -202,7 +202,7 @@
       "by_format": {},
       "evidence": [],
       "method": null,
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
@@ -220,7 +220,7 @@
       "by_format": {},
       "evidence": [],
       "method": null,
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "blocker": "레퍼런스 목록 수집 차단(2026-09-24T17:56:07+00:00, yt-dlp 2026.08.19): https://youtube.com/@joshuamagazine/shorts: DownloadError: ERROR: [youtube:tab] @joshuamagazine/shorts: Unable to download API page: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')) (caused by ProxyError(\"('Unable to connect to proxy', OSError('Tunnel connection fai — 제작 측정은 고정된 최신 100편 스냅샷 구성원만 사용"
     },
     {
@@ -229,7 +229,7 @@
       "resolution": null,
       "method": "reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 너비 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode; n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080 은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상 너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]), y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -253,7 +253,7 @@
       "resolution": null,
       "method": "reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 높이 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode; n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080 은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상 너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]), y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -277,7 +277,7 @@
       "resolution": null,
       "method": "reference/downloads.jsonl 의 영상별 최신 기록(파일이 있으면 ffprobe 로 다시 확인)의 프레임률 → 스냅샷 쇼츠 영상 간 최빈값(value_rule=mode; n/p10/p50/p90 은 분포 확인용). 형식 제한(height<=N 등)이 걸려 짧은 변이 1080 미만인 파일은 낮은 렌디션일 수 있어 제외(excluded; 세로 영상의 height<=1080 은 608x1080·480x854 가 됨). 좌표 규칙: 모든 좌표·크기 항목은 각 영상 자신의 해상도에서 측정되고, 종횡비가 캔버스와 같은 영상만 x·폭 ×(canvas.width/영상 너비), y·높이 ×(canvas.height/영상 높이) 로 환산해 그 항목의 resolution 과 함께 저장된다. 캔버스가 그 resolution 과 다르면 소비하는 쪽이 x·폭 ×(canvas.width/resolution[0]), y·높이 ×(canvas.height/resolution[1]) 로 다시 환산한다(종횡비가 다른 영상은 좌표 집계에서 제외).",
       "value_rule": "mode",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -304,7 +304,7 @@
       ],
       "method": "영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe 와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다 안쪽에 자막을 둠)",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -334,7 +334,7 @@
       ],
       "method": "영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe 와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다 안쪽에 자막을 둠)",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -364,7 +364,7 @@
       ],
       "method": "영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe 와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다 안쪽에 자막을 둠)",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {
@@ -394,7 +394,7 @@
       ],
       "method": "영상별로 모든 자막 역할(제목·설명·상황·인물·대사·반응; 채널 식별 문구 제외)의 잉크 상자 ∪ 배경 박스(episode validate 의 caption_outside_safe 와 같은 사각형)의 최소/최대 끝 → 화면 가장자리까지 거리(영상별 최소 여백) → 캔버스 해상도로 환산 → 영상 간 p10(value_rule=p10: 레퍼런스 영상의 90% 가 이 여백보다 안쪽에 자막을 둠)",
       "value_rule": "p10",
-      "measured_at": "2026-09-25T03:06:17+00:00",
+      "measured_at": "2026-09-25T08:33:19+00:00",
       "status": "unmeasured",
       "value": null,
       "overall": {

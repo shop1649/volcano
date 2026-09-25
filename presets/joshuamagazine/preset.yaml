@@ -33,7 +33,9 @@ reference:
 identity_exclusions:
   # 최종 화면·오디오에 나오면 안 되는 원 채널 식별 요소. QA 가 OCR 로 검사한다.
   forbidden_text: ['조슈아매거진', '조슈아 매거진', 'joshuamagazine', 'joshua magazine', 'JOSHUA MAGAZINE']
-  logo_templates_dir: presets/joshuamagazine/reference/identity_templates   # 레퍼런스에서 추출(미측정)
+  logo_templates_dir: presets/joshuamagazine/reference/identity_templates   # `shortkit ref identity-templates` 가 스냅샷
+                          #   영상에서 채널 자체 표식(로고·워터마크·핸들)을 잘라 넣음. 상태·근거(영상·시각)는 그 폴더의
+                          #   manifest.json(측정 기록과 같은 형식). QA identity.logo_templates 가 폴더의 *.png/*.jpg 를 대조
   own_branding: none      # 규칙(측정 대상 아님): 우리 채널 브랜딩은 이 프리셋에서 넣지 않는다(요청 시 requested_changes 로).
                           #   none 이면 episode validate(check_own_branding)가 제목·설명·상황·반응 자막의 @핸들/주소 형태 문구를
                           #   오류로 막는다(화면 속 글자를 옮긴 자막 grounding.kind=on_screen_text 는 예외)
@@ -277,8 +279,12 @@ structure:
   formats_file: presets/joshuamagazine/formats.yaml
   duration_s: {p10: null, p50: null, p90: null, n: 0}   # episode validate(check_structure): 계획 길이가 p10..p90 밖이면
                                                         #   production 오류 / test 경고, 미측정이면 경고
-  cuts_per_10s: {p10: null, p50: null, p90: null, n: 0}   # 컷 빈도(10초당 컷 수). 레퍼런스 측정 전 못 잼
-  shot_len_s: {p10: null, p50: null, p90: null, n: 0}     # 샷 길이 분포(초). 레퍼런스 측정 전 못 잼
+  cuts_per_10s: {p10: null, p50: null, p90: null, n: 0}   # 컷 빈도: 영상별 전환(cut·flash·crossfade) 수 / 길이 × 10 의
+                                                          #   영상 간 분포(ref aggregate, shots.json). QA structure.cuts 가
+                                                          #   출력의 같은 값을 p10..p90 과 비교. 레퍼런스 측정 전 못 잼
+  shot_len_s: {p10: null, p50: null, p90: null, n: 0}     # 샷 길이: 영상별 전환 사이 간격(첫·마지막 샷 포함)의 중앙값 →
+                                                          #   영상 간 분포(초). QA structure.cuts 가 출력의 샷 길이 중앙값과
+                                                          #   비교. 레퍼런스 측정 전 못 잼
   first_caption_at_s: 0.0
 
 presence:                  # 채널 단위 있다/없다/못 잼 (ref aggregate / audio-measure 의 visual_presence·audio 측정). 측정 전 unmeasured

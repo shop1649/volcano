@@ -90,8 +90,8 @@ def build_proposal(plan: dict, ctx: ResolveContext, issues: list[dict]) -> str:
     L: list[str] = []
     L.append(f"# 제안서 — {plan['episode_id']}")
     L.append("")
-    L.append(f"- 프리셋: `{plan['preset_id']}` / 포맷: `{plan['format_id']}` / 모드: `{plan['mode']}` / "
-             f"회차: {plan.get('episode_index') or MISSING}")
+    L.append(f"- 프리셋: `{plan['preset_id']}` / 포맷: `{plan['format_id']}` / 도입 방식: "
+             f"`{plan.get('intro_type') or MISSING}` / 모드: `{plan['mode']}` / 회차: {plan.get('episode_index') or MISSING}")
     L.append(f"- plan_sha256: `{sha}`")
     L.append(f"- 작성 시각(UTC): {now_iso()}")
     rule = f"`{ap['rule_key']}`={_peek(pr, ap['rule_key'])}"

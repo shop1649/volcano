@@ -3,8 +3,8 @@
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
   "source": "episodes/test-coverage-001/build/preset_access_validate.json",
-  "saved_at": "2026-09-24T20:46:10+00:00",
-  "archived_at": "2026-09-25T03:46:40+00:00",
+  "saved_at": "2026-09-25T08:21:15+00:00",
+  "archived_at": "2026-09-25T08:27:27+00:00",
   "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
   "reads": {
     "approval.later_episodes_require_approval": [
@@ -83,7 +83,8 @@
       "shortkit/edit/validate.py:check_preset_mixing"
     ],
     "audio.sfx.gain_db_default": [
-      "shortkit/edit/audio.py:build_audio_plan"
+      "shortkit/edit/audio.py:build_audio_plan",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "audio.sfx.map": [
       "shortkit/edit/sfxmap.py:load_map",
@@ -174,16 +175,18 @@
       "shortkit/edit/validate.py:check_own_branding"
     ],
     "motion.freeze.hold_s": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.freeze.max_per_video": [
       "shortkit/edit/validate.py:check_motion"
     ],
     "motion.speed.slowmo_factor": [
-      "shortkit/edit/validate.py:check_motion"
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.transitions.crossfade.dur_s": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.transitions.default": [
       "shortkit/edit/resolve.py:resolve_clips"
@@ -192,7 +195,8 @@
       "shortkit/edit/resolve.py:resolve_clips"
     ],
     "motion.transitions.flash.dur_s": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.transitions.flash.scope": [
       "shortkit/edit/resolve.py:resolve_clips"
@@ -201,10 +205,12 @@
       "shortkit/edit/validate.py:check_trim_tail"
     ],
     "motion.zoom.dur_s": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.zoom.ease": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
     ],
     "motion.zoom.max_consecutive": [
       "shortkit/edit/validate.py:check_motion"
@@ -213,10 +219,53 @@
       "shortkit/edit/resolve.py:resolve_clips"
     ],
     "motion.zoom.scale_to": [
-      "shortkit/edit/resolve.py:resolve_clips"
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "presence.bgm": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.crossfade": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.decorations": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.ducking": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.flash": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.freeze": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.intentional_silence": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.original_audio": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.speed_change": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.zoom": [
+      "shortkit/edit/validate.py:check_presence"
     ],
     "render.clean.blur_sigma_ratio": [
       "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "structure.cuts_per_10s.n": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p10": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p50": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p90": [
+      "shortkit/edit/validate.py:check_cut_structure"
     ],
     "structure.duration_s.n": [
       "shortkit/edit/validate.py:check_structure"
@@ -236,6 +285,18 @@
     "structure.formats_file": [
       "shortkit/edit/validate.py:check_format",
       "shortkit/edit/validate.py:check_preset_mixing"
+    ],
+    "structure.shot_len_s.n": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p10": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p50": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p90": [
+      "shortkit/edit/validate.py:check_cut_structure"
     ],
     "text.font_dirs": [
       "shortkit/edit/resolve.py:resolve_captions"
@@ -633,88 +694,100 @@
   },
   "callers": {
     "shortkit/edit/audio.py:build_audio_plan": {
-      "fp": "26e8d62cf398210a",
-      "basis": "archived"
+      "fp": "40a555743fee1e08",
+      "basis": "recorded"
     },
     "shortkit/edit/audio.py:check_bgm_identity": {
       "fp": "d278bdf2e752436c",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/plan.py:approval_state_for": {
       "fp": "76cb216c1917c673",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/resolve.py:read_canvas": {
       "fp": "88fb326fd18dd7dc",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/resolve.py:read_role_style_tree": {
       "fp": "35c0d0fe5f6bd19b",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/resolve.py:resolve_captions": {
       "fp": "de852a28ef25940e",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/resolve.py:resolve_clips": {
       "fp": "8bb990a88a85a96b",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/resolve.py:resolve_decorations": {
       "fp": "7b90b10a70e37ca2",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/sfxmap.py:load_catalog": {
       "fp": "4c6471fa257c0694",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/sfxmap.py:load_map": {
       "fp": "e72909f3e142adb5",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_audio": {
-      "fp": "487b577e11a3666a",
-      "basis": "archived"
+      "fp": "5632691e742cd8c3",
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_captions": {
       "fp": "9d67293d3b5cbe02",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_cover": {
       "fp": "5884a7cfbc786a9f",
-      "basis": "archived"
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_cut_structure": {
+      "fp": "58d267f4a757e2ca",
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_format": {
       "fp": "4b78813fa42cfe0b",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_motion": {
       "fp": "ab25d05751e5f087",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_own_branding": {
       "fp": "70566dff7557021d",
-      "basis": "archived"
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_presence": {
+      "fp": "8dc3914b1abf5704",
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_preset_mixing": {
       "fp": "67854921c8a92889",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_sfx": {
-      "fp": "1eb558a295b2e04b",
-      "basis": "archived"
+      "fp": "d4c53136d204c155",
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_structure": {
-      "fp": "3f4a0aba05c3123c",
-      "basis": "archived"
+      "fp": "79efee5e3b96ccd4",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_style_overrides": {
+      "fp": "9acd90757b44a427",
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_tone": {
       "fp": "8df1759bff981e75",
-      "basis": "archived"
+      "basis": "recorded"
     },
     "shortkit/edit/validate.py:check_trim_tail": {
       "fp": "322923601585a196",
-      "basis": "archived"
+      "basis": "recorded"
     }
   }
 }

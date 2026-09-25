@@ -5,12 +5,12 @@
 - 프리셋: joshuamagazine-v1 / 포맷 UNCLASSIFIED / 모드 **test**
 - 레퍼런스(같은 절대 시각 비교): 없음(못 잼) (분석 파일: 없음)
 - 포맷 UNCLASSIFIED 대표 영상(formats.yaml): 못 잼 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- 측정 시각: 2026-09-25T07:06:03+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
+- 측정 시각: 2026-09-25T08:48:03+00:00 / 도구: OCR=5.3.4, 얼굴검출=shortkit.clean.faces haar frontal+profile (shortkit.HaarCascade(numpy))
 
 ## 최종 관문: **불합격 — 못 잼 68건(필수 1, 참고 67)**
 - ✗ G2: 필수 항목 못 잼 1건 — 못 잼은 완료가 아님 — caption.reveal:reveal
 - △ R1: 레퍼런스 같은 시각 비교 없음/불충분: 레퍼런스 영상 없음 — 에피소드 포맷이 정해지지 않음(UNCLASSIFIED) — 대표 영상을 고를 수 없음 (formats.yaml 상태 unmeasured: 2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷)
-- △ P1: 프리셋 미측정(임시값) 키 262개
+- △ P1: 프리셋 미측정(임시값) 키 270개
 - △ P2: 레퍼런스 대비 못 잼 61건
 - △ P3: 테스트 모드 출력(파이프라인 검증용) — 게시 불가
 - △ P4: 필수 표시가 없는 못 잼 6건 — 못 잰 항목은 완료로 치지 않음
@@ -19,7 +19,7 @@
 - 전체 213행: 같다 145 / 다르다 0 (의도한 변경 0, 의도하지 않음 0) / 못 잼 68
 - 계획 대비(출력이 계획대로인가): {'same': 145, 'unmeasured': 7}
 - 레퍼런스 대비(레퍼런스와 같은가): {'unmeasured': 61}
-- 프리셋 미측정(임시값) 키: 262개
+- 프리셋 미측정(임시값) 키: 270개
 
 | 분류 | 같다 | 다르다 | 못 잼 |
 |---|---:|---:|---:|
@@ -97,7 +97,7 @@
 | 자막 문구(OCR) [c_rx·reaction] "빤히" | — | 빤히 | {"ocr":"","similarity":0.0,"match":"geometry(짧은 문구 OCR 실패)","shape":{"iou":0.9757,"glyph_… | 같다 | 아니오 | t=10.22s [프레임](frames/cap_c_rx_0010219.png) 짧은 문구를 OCR 이 읽지 못해 글자 모양으로 확인: 기대 문구를 기대 글꼴로 렌더한 모양과 글자별 IoU 모두 하한 이상… |
 | 자막 문구(OCR) [c_sit3·situation] "두 사람이 나란히 와서 선다" | — | 두 사람이 나란히 와서 선다 | {"ocr":"두 사 람 이 나란히 와서 선다","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=13.94s [프레임](frames/cap_c_sit3_0013939.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
 | 자막 문구(OCR) [c_sit4·situation] "그리고 둘 다 떠난다" | — | 그리고 둘 다 떠난다 | {"ocr":"그리고 둘 다 떠난다","similarity":1.0,"match":"ocr"} | 같다 | 아니오 | t=18.94s [프레임](frames/cap_c_sit4_0018940.png) 굵은 글꼴 OCR 오차가 있어 유사도로 판정 |
-| 반전 전에 반전 내용을 미리 말하지 않음 | — | {"reveal":null} | — | 못 잼 | 아니오 | plan 에 반전 보호(reveal: t, keywords)도 '반전 없음'(reveal.none) 선언도 없음 — 반전을 … |
+| 반전 전에 반전 내용을 미리 말하지 않음 | — | {"reveal":{"none":true,"reason":"빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 … | — | 못 잼 | 아니오 | plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~… |
 | 자막 말투(종결어미, OCR) | 못 잼 | 반말_구어체 | {"n":4,"counts":{"명사형/기타":2,"반말":4},"mode":"반말_구어체","items":[{"text":"빈 방 에 들어온 사람들","cla… | 같다 (참고) | 아니오 | OCR 문구의 종결 어미를 레퍼런스 분석기·validate 와 같은 분류기(reference.aggregate.ending_… |
 | 자막 이모지 사용 | — | {"text.tone.emoji":false} | — | 못 잼 (참고) | 아니오 | 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음 |
 | 자막 말투 (레퍼런스 대비) | 못 잼 | {"text.tone.register":"반말_구어체"} | {"register":"반말_구어체"} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 1개: text.tone.register — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 … |
@@ -191,8 +191,8 @@
 | 소스 구간 [s4] | — | {"src_in":32.0,"src_out":37.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.056,"samples":[{"t":14.636,"expected_src_t":33.136,"matched_src_t":33.083,… | 같다 | 아니오 | t=14.64s |
 | 소스 구간 [s5] | — | {"src_in":42.0,"src_out":44.0,"source":"assets/test/generated/video/face-demographics-wal… | {"offset_s":-0.037,"samples":[{"t":19.34,"expected_src_t":42.42,"matched_src_t":42.417,"n… | 같다 | 아니오 | t=19.34s |
 | 같은 원본 장면 반복(표시 없는 다시보기) 0 | — | {"unmarked_repeats":0,"min_overlap_s":0.05} | {"repeats":[],"not_measured":[]} | 같다 | 아니오 | 출력에서 잰 클립별 소스 구간이 서로 겹치지 않음 |
-| 컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비) | 못 잼 | — | {"cuts_per_10s":1.333,"n_cuts":3,"duration":22.5} | 못 잼 (참고) | 아니오 | 프리셋에 해당 키 없음(structure.cuts_per_10s.p10, structure.cuts_per_10s.p90) … |
-| 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) | 못 잼 | — | {"shot_len_median_s":4.917,"shots_s":[4.8,8.667,5.033,4.0]} | 못 잼 (참고) | 아니오 | 프리셋에 해당 키 없음(structure.shot_len_s.p10, structure.shot_len_s.p90) — 출력… |
+| 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.cuts_per_10s.p10":null,"structure.cuts_per_10s.p90":null} | {"cuts_per_10s":1.333,"n_cuts":3,"duration":22.5,"types":["cut","flash"]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10… |
+| 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) | 못 잼 | {"structure.shot_len_s.p10":null,"structure.shot_len_s.p90":null} | {"shot_len_median_s":4.917,"shots_s":[4.8,8.667,5.033,4.0]} | 못 잼 (참고) | 아니오 | 레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p9… |
 
 ### 모션(확대·정지·전환)
 
@@ -279,7 +279,7 @@
 
 | 항목 | 레퍼런스 | 기대 | 출력 측정 | 판정(같다/다르다/못 잼) | 의도한 변경 | 근거 |
 |---|---|---|---|---|---|---|
-| BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) | — | {"clean_music_file":true,"not_a_copy_of":"presets/*/analysis/*/stems/*"} | {"path":"assets/test/generated/music_bed_b.wav","reference_stems_compared":0,"stem_match"… | 못 잼 (참고) | 아니오 | 레퍼런스 분리 음원(presets/*/analysis/*/stems)이 하나도 없어 지문 대조 대상이 없음 — `ref au… |
+| BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) | — | {"clean_music_file":true,"not_a_copy_of":"presets/*/analysis/*/stems/*, reference media"} | {"path":"assets/test/generated/music_bed_b.wav","reference_stems_compared":0,"reference_h… | 못 잼 (참고) | 아니오 | 레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref… |
 | BGM 곡·버전 일치(파형 대조) | 못 잼 | {"path":"assets/test/generated/music_bed_b.wav","track_id":null} | {"presence":"present","waveform_ncc":0.9803,"local_match":{"n":90,"q95":0.9999,"q70":0.99… | 같다 | 아니오 | 출력 믹스에서 계획한 음악 파일의 파형을 찾음 ／ is_match 4요소: 곡=같다, 버전=같다, 속도=같다, 구간=같다 |
 | BGM 일치(곡 AND 버전 AND 속도 AND 구간, audio_bgm.is_match) | 못 잼 | {"track_id":"assets/test/generated/music_bed_b.wav","version":"file:assets/test/generated… | {"observed":{"track_id":"assets/test/generated/music_bed_b.wav","version":"file:assets/te… | 같다 | 아니오 | t=0.00s 곡=같다, 버전=같다, 속도=같다, 구간=같다 — 계획한 음원 파일의 파형이 출력에서 확인됨(같은 녹음 → 곡·버전 같음) |
 | BGM 속도(버전) | 못 잼 | 1.0 | 1.0 | 같다 | 아니오 | 후보 템포 상위: [[1.0, 0.9356], [0.995, 0.2539], [1.005, 0.251], [0.99, 0.1… |
@@ -370,7 +370,7 @@
 - 화면 해상도·프레임레이트 (레퍼런스 대비) (`canvas.format:format_ref`): 레퍼런스 미측정(임시값) 키 3개: canvas.width, canvas.height, canvas.fps — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 영상 영역 (레퍼런스 대비) (`canvas.video_region:region_ref`): 레퍼런스 미측정(임시값) 키 4개: canvas.video_region.x, canvas.video_region.y, canvas.video_region.w, canvas.video_region.h — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
 - 배경 (레퍼런스 대비) (`canvas.background:background_ref`): 레퍼런스 미측정(임시값) 키 2개: canvas.background.type, canvas.background.color — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 화면 비율·영상 영역·여백이 레퍼런스와 다를 수 있음 → 구도 불일치
-- **필수** 반전 전에 반전 내용을 미리 말하지 않음 (`caption.reveal:reveal`): plan 에 반전 보호(reveal: t, keywords)도 '반전 없음'(reveal.none) 선언도 없음 — 반전을 미리 말하는지 출력에서 판정할 기준이 없음 — 제작 영향: 자막 문구·말투를 확인하지 못함
+- **필수** 반전 전에 반전 내용을 미리 말하지 않음 (`caption.reveal:reveal`): plan 이 '반전 없음'(reveal.none: 빈 방에 사람이 들어와 걸어 나가고(people-detection 2.0~6.8s), 남성이 카메라 앞까지 와서 서 있다가(face-demographics 5.0~13.0s), 두 사람이 들어와 나란히 선 뒤 떠나는(32.0~37.0s, 42.0~44.0s) 순서대로 보이는 장면뿐 — 뒤에서 드러나는 예상 밖 사건·정체가 없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 context → build → reaction → build → outro 로 reveal 구간 없음)이라고 적었을 뿐 출력에서 잰 것이 아님 — 보호할 키워드가 없어 자막을 대조할 수 없음; 사람이 보고 `shortkit qa human-check --kind watch` 로 기록 — 제작 영향: 자막 문구·말투를 확인하지 못함
 - 자막 이모지 사용 (`caption.tone:emoji`): 출력 화면에서 이모지를 판별하는 방법 없음(OCR 미지원) — 검사 없음 — 제작 영향: 자막 문구·말투를 확인하지 못함
 - 자막 위치 [description] (레퍼런스 대비) (`caption.position:description_ref`): 레퍼런스 미측정(임시값) 키 2개: text.roles.description.anchor.x, text.roles.description.anchor.y — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 제목/자막 위치 불일치
 - 자막 크기 [description] (레퍼런스 대비) (`caption.size:description_ref`): 레퍼런스 미측정(임시값) 키 1개: text.roles.description.size_px — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 글자 크기 불일치 → 줄 수·가림 영역 변화
@@ -407,7 +407,7 @@
 - 레퍼런스와 같은 녹화(영상) 재사용 없음 (`identity.reference_footage:all`): 레퍼런스 영상 지문(exclusions.jsonl reference_footage) 없음 → 같은 녹화 여부 못 잼 (URL 규칙만 확인) — 제작 영향: 레퍼런스 채널 식별 요소·같은 녹화 재사용 여부를 확인하지 못함 → 게시 위험
 - 원본 오버레이 검출 기록 [v_room] (`clean.residual:prov:v_room`): 출처 기록 없음(warehouse/overlays/18ffe8672d74….json) — `python -m shortkit clean detect --source assets/test/generated/video/people-detection.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
 - 원본 오버레이 검출 기록 [v_face] (`clean.residual:prov:v_face`): 출처 기록 없음(warehouse/overlays/d88ab9aa0363….json) — `python -m shortkit clean detect --source assets/test/generated/video/face-demographics-walking-and-pause.mp4` — 원본 로고·오버레이가 남았는지 출처 기록으로 대조할 수 없음(모서리 OCR 검사만 적용) — 제작 영향: 원본 로고·출처 표기가 남아 있는지 확인하지 못함 → 게시 위험
-- BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) (`audio.bgm:clean_file`): 레퍼런스 분리 음원(presets/*/analysis/*/stems)이 하나도 없어 지문 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사 — 제작 영향: BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가
+- BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지) (`audio.bgm:clean_file`): 레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음 — `ref audio-analyze` 뒤 다시 검사 — 제작 영향: BGM 곡·구간·덕킹을 확인하지 못함 → 음악 일치 판정 불가
 - BGM 곡·버전·속도·구간 (레퍼런스 대비) (`audio.bgm:bgm_ref`): 레퍼런스 미측정(임시값) 키 5개: audio.bgm.track_id, audio.bgm.title, audio.bgm.version, audio.bgm.tempo_ratio, audio.bgm.section_start_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. audio_bgm.is_match: 곡(track_id/제목)·버전·속도·구간이 모두 레퍼런스와 같아야 같다; 계획이 파일 경로로 BGM 을 지정해 라이브러리 곡 id 가 없음 → 곡 일치는 못 잼 — 제작 영향: BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가
 - 보존 원음 크기 (레퍼런스 대비) (`audio.original:orig_ref`): 레퍼런스 미측정(임시값) 키 1개: audio.original.keep_gain_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 크기 = 보존 원음 통합 음량 − 프로그램 통합 음량(LU), ref audio-measure 와 같은 정의 — 제작 영향: 보존 원음 크기 불일치
 - 효과음 [fx1] 종류 = 소리 지문(카탈로그 대비) (`audio.sfx.type:fx1`): 소리 지문으로 종류를 정하지 못함: 효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음 — 제작 영향: 레퍼런스와의 일치 여부를 판정할 수 없음
@@ -418,8 +418,8 @@
 - 음량 (레퍼런스 대비) (`audio.loudness:loudness_ref`): 레퍼런스 미측정(임시값) 키 2개: audio.loudness.integrated_lufs, audio.loudness.true_peak_db — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 최종 음량 불일치
 - 영상 길이 (레퍼런스 분포 대비) (`structure.duration:duration_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.duration_s.p10, structure.duration_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. — 제작 영향: 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능
 - 첫 시간제 자막 시각 (레퍼런스 대비) (`structure.duration:first_caption_ref`): 레퍼런스 미측정(임시값) 키 1개: structure.first_caption_at_s — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 정의: 제목·설명을 뺀 첫 시간제 자막의 출력 등장 시각(레퍼런스 분석기 structure.first_caption_at_s 와 같음) — 제작 영향: 영상 길이·전개 구조 불일치
-- 컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비) (`structure.cuts:rate_ref`): 프리셋에 해당 키 없음(structure.cuts_per_10s.p10, structure.cuts_per_10s.p90) — 출력에서 잰 컷(계획 경계에서 보인 컷 + 계획 밖 컷) 기준. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청) — 제작 영향: 컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음
-- 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) (`structure.cuts:shot_len_ref`): 프리셋에 해당 키 없음(structure.shot_len_s.p10, structure.shot_len_s.p90) — 출력에서 잰 컷 사이 간격의 중앙값. `shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청) — 제작 영향: 컷 위치·소스 구간을 확인하지 못함 → 잘못된 구간이 쓰였을 수 있음
+- 컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비) (`structure.cuts:rate_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.cuts_per_10s.p10, structure.cuts_per_10s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD) — 제작 영향: 영상 길이·전개 구조 불일치
+- 샷 길이 중앙값 (레퍼런스 포맷 분포 대비) (`structure.cuts:shot_len_ref`): 레퍼런스 미측정(임시값) 키 2개: structure.shot_len_s.p10, structure.shot_len_s.p90 — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. 레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD) — 제작 영향: 영상 길이·전개 구조 불일치
 - 표지 구성 (레퍼런스 대비) (`cover.frame:cover_ref`): 레퍼런스 미측정(임시값) 키 2개: cover.source, cover.text_role — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 표지 프레임(cover.source: first_frame = 0초)에서 cover.text_role 역할 자막의 문구를 OCR 로 확인 — 제작 영향: 표지 구성 불일치
 - 확대(줌) 있다/없다 (레퍼런스 대비) (`presence:zoom`): 레퍼런스 미측정(임시값) 키 1개: presence.zoom — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스가 없다 → 우리도 없어야 같다; 레퍼런스 영상 모두 있다 → 우리도 있어야 같다; 일부 영상에만 있다 → 있다/없다 모두 관측 범위 안 — 제작 영향: 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음
 - 정지 있다/없다 (레퍼런스 대비) (`presence:freeze`): 레퍼런스 미측정(임시값) 키 1개: presence.freeze — 출력이 임시값과 같아도 레퍼런스와 같다고 판정하지 않음. 레퍼런스가 없다 → 우리도 없어야 같다; 레퍼런스 영상 모두 있다 → 우리도 있어야 같다; 일부 영상에만 있다 → 있다/없다 모두 관측 범위 안 — 제작 영향: 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음
@@ -441,7 +441,7 @@
 - `episodes/test-coverage-001/qa/compare_sheet_p02.png`
 
 ## 결함 기록 (defects.jsonl)
-- 열림 1 / 이번에 고침 확인 0 / 재발 0 / 새로 등록 1 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
+- 열림 1 / 이번에 고침 확인 0 / 재발 1 / 새로 등록 0 / 고침 기록 필요(resolved_without_fix·fixed_unrechecked) 1 / 못 잼으로 바뀌어 열린 채 0 / 이전 규칙으로 닫혔다가 재분류 0
 - 같은 검사 재확인: test-pipeline-001: caption.font=ok, caption.reveal=ok
 - 같은 검사 재확인: test-qa-bad: caption.font=problem, caption.reveal=problem
 - 같은 검사 재확인: test-qa-good: caption.font=ok, caption.reveal=problem

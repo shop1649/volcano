@@ -2250,43 +2250,51 @@ def rows_audio(b: RowBuilder, probes: dict) -> None:
 
 def _bgm_clean_file_row(b: RowBuilder, bgm, found: bool) -> None:
     """audio.bgm:clean_file -- the BGM heard in the output (its waveform found in the mix: row audio.bgm:file) is a
-    clean music file, not audio separated from a reference video: path rule + fingerprint against every reference
-    stem (presets/*/analysis/*/stems, ``edit.audio_checks.reference_stem_match``: same sha256 or waveform copy).
-    Without any reference stem there is nothing to compare with: 못 잼 (required in production)."""
+    clean music file, not audio taken from a reference video: path rule + the ONE rule shared with `episode validate`
+    and the music library (``edit.audio_checks.reference_stem_match`` = ``reference.audio_bgm.reference_audio_copy``:
+    sha256 against stem files, stem hashes kept in separation records and the reference media; waveform containment
+    inside one stem + following that stem's level changes).  The waveform rule needs stem FILES: without any, a
+    re-encoded stem copy cannot be excluded -> 못 잼 (required in production), even when a byte comparison ran."""
     ctx = b.ctx
     mode = getattr(ctx.resolved, "mode", "test")
     pth = str(bgm.path or "").replace("\\", "/")
     try:
         from ..edit.audio_checks import reference_stem_files, reference_stem_match
+        from ..reference.audio_bgm import STEM_COPY_NCC, ReferenceAudio
 
         stems = reference_stem_files()
-        match = reference_stem_match(pth) if stems else None
+        n_hashes = len(ReferenceAudio.scan().hashes)
+        match = reference_stem_match(pth) if (stems or n_hashes) else None
         err = None
     except Exception as e:  # never a silent pass
-        stems, match, err = [], None, f"{type(e).__name__}: {e}"
+        stems, n_hashes, match, err, STEM_COPY_NCC = [], 0, None, f"{type(e).__name__}: {e}", None
     from .. import paths
 
-    obs = {"path": pth, "reference_stems_compared": len(stems), "stem_match": match,
-           "stem_dirs": sorted({paths.relp(f.parent) for f in stems})[:10]}
+    obs = {"path": pth, "reference_stems_compared": len(stems), "reference_hashes_compared": n_hashes,
+           "stem_match": match, "stem_dirs": sorted({paths.relp(f.parent) for f in stems})[:10]}
     # the path rule of edit.validate check_audio (bgm_from_reference)
     path_bad = (pth.startswith("presets/") and ("/analysis/" in pth or "/reference/" in pth)) or "/stems/" in pth
     if path_bad or match:
         st = "different"
         note = ("레퍼런스 분석 폴더/스템 경로의 파일을 BGM 으로 사용함" if path_bad else
-                f"BGM 파일이 레퍼런스에서 분리한 음원 {match['stem']} 의 사본({match['method']})")
+                f"BGM 파일이 레퍼런스에서 나온 음원: {match.get('reason') or match['stem']} (방법 {match.get('method')})")
     elif err:
         st, note = "unmeasured", f"레퍼런스 분리 음원과 대조하지 못함: {err}"
     elif not stems:
-        st, note = "unmeasured", ("레퍼런스 분리 음원(presets/*/analysis/*/stems)이 하나도 없어 지문 대조 대상이 없음 — "
-                                  "`ref audio-analyze` 뒤 다시 검사")
+        st, note = "unmeasured", ("레퍼런스 분리 음원 파일(presets/*/analysis/*/stems)이 하나도 없어 파형 대조 대상이 없음"
+                                  + (f"(sha256 {n_hashes}개와는 대조: 같은 바이트 아님)" if n_hashes else "")
+                                  + " — `ref audio-analyze` 뒤 다시 검사")
     else:
-        st, note = "same", f"레퍼런스 분리 음원 {len(stems)}개와 sha256·파형 상관 대조: 사본 아님"
+        st, note = "same", (f"레퍼런스 분리 음원 {len(stems)}개·sha256 {n_hashes}개와 대조(바이트 동일·스템 안에 포함되며 "
+                            "음량 변화까지 따라가는 파형): 사본 아님")
     if not found and st == "same":
         note += " (단, 출력에서 이 파일의 파형을 찾지 못함 — audio.bgm:file 행)"
     b.add("audio.bgm", "clean_file", "BGM 은 깨끗한 음원(레퍼런스에서 분리한 스템 금지)", CAT["music"],
-          expected={"clean_music_file": True, "not_a_copy_of": "presets/*/analysis/*/stems/*"}, observed=obs,
-          tolerance="sha256 같음 또는 파형 상관 ≥ 0.95 인 레퍼런스 분리 음원 0개", status=st,
-          required=(mode == "production") or st == "different", note=note)
+          expected={"clean_music_file": True, "not_a_copy_of": "presets/*/analysis/*/stems/*, reference media"},
+          observed=obs,
+          tolerance=("레퍼런스 음원과 sha256 같음, 또는 한 스템 안에 포함(상관 ≥ "
+                     f"{STEM_COPY_NCC})되고 그 스템의 음량 변화를 따라가는 파일 0개 (reference.audio_bgm.reference_audio_copy)"),
+          status=st, required=(mode == "production") or st == "different", note=note)
 
 
 def _bgm_loop_row(b: RowBuilder, bgm, bi: dict) -> None:
@@ -2936,13 +2944,6 @@ def _rows_sfx_catalog(b: RowBuilder, ap: dict, obs_c) -> None:
     cat = _catalog(b)
     mode = getattr(ctx.resolved, "mode", "test")
     req = mode == "production"
-    if not cat or cat.get("status") != "measured" or not cat.get("types"):
-        b.add("audio.sfx.count", "catalog", "효과음 종류별 개수 (레퍼런스 포맷 범위 대비)", CAT["sfx_count"], kind="style_vs_reference",
-              expected="레퍼런스 카탈로그의 포맷별 관측 범위",
-              observed={("종류 못 정함" if k is None else str(k)): v for k, v in obs_c.items()}, status="unmeasured",
-              keys=["audio.sfx.catalog"], required=req, reference="못 잼",
-              note="sfx_catalog.json 미측정: " + str((cat or {}).get("blocker") or "카탈로그 없음"))
-        return
     try:
         from ..edit import sfxmap
         from ..edit import validate as V
@@ -2952,6 +2953,27 @@ def _rows_sfx_catalog(b: RowBuilder, ap: dict, obs_c) -> None:
               kind="style_vs_reference", status="unmeasured", keys=["audio.sfx.catalog"], required=req,
               note=f"shortkit.edit.validate 의 개수 규칙을 쓸 수 없음: {type(e).__name__}: {e}"[:300])
         return
+    # the count rule runs whenever the per-video counts cover every target video: status measured, or partial
+    # (every video counted; a per-type column such as emotion unmeasured) -- validate's catalog_counts_measured
+    if not cat or not cat.get("types") or not V.catalog_counts_measured(cat):
+        b.add("audio.sfx.count", "catalog", "효과음 종류별 개수 (레퍼런스 포맷 범위 대비)", CAT["sfx_count"], kind="style_vs_reference",
+              expected="레퍼런스 카탈로그의 포맷별 관측 범위",
+              observed={("종류 못 정함" if k is None else str(k)): v for k, v in obs_c.items()}, status="unmeasured",
+              keys=["audio.sfx.catalog"], required=req, reference="못 잼",
+              note="sfx_catalog.json 미측정: " + str((cat or {}).get("blocker") or "카탈로그 없음"))
+        return
+    if cat.get("status") != "measured":
+        # partial: the count rows below are real verdicts, but the catalog itself is not complete -> production stays
+        # blocked by this required 못 잼 row until every per-type column is measured
+        gaps = V.catalog_unmeasured_columns(cat)
+        b.add("audio.sfx.count", "catalog", "효과음 카탈로그 완성도 (종류별 열 전부 측정)", CAT["sfx_count"],
+              kind="style_vs_reference", expected={"status": "measured"},
+              observed={"status": cat.get("status"), "unmeasured_columns": gaps,
+                        "column_status": cat.get("column_status")},
+              status="unmeasured", keys=["audio.sfx.catalog"], required=req, reference="못 잼",
+              note=("카탈로그 일부 못 잼(partial): 편당 개수는 모든 대상 영상에서 셌으므로 아래 개수 행은 판정함. 못 잰 열: "
+                    + (", ".join(f"{c}({len(v)}종류)" for c, v in gaps.items()) or "?")
+                    + f" — {str(cat.get('blocker') or '')[:200]}"))
     fid = ctx.resolved.format_id
     types = {t.get("type_id"): t for t in cat.get("types") or [] if t.get("type_id")}
     bi = ap.get("bgm") or {}
@@ -2982,7 +3004,7 @@ def _rows_sfx_catalog(b: RowBuilder, ap: dict, obs_c) -> None:
     counted_types = [t for t, e in types.items() if e.get("class") in counted]
     has_silence_type = any(types[t].get("class") == V.SILENCE_CLASS for t in counted_types)
 
-    def verdict(what, cnt, st, basis, pv):
+    def verdict1(what, cnt, st, basis, pv):
         out: list[dict] = []
         V._count_verdict(out, what, cnt, st, basis, pv, obs["lower_bound"], obs_ok, "sfx_count_range", "warn")
         if not out:
@@ -2993,6 +3015,16 @@ def _rows_sfx_catalog(b: RowBuilder, ap: dict, obs_c) -> None:
         if iss.get("severity") == "error":
             return "different", msg
         return "unmeasured", msg + (" (하한값 영상에서만 관측된 개수 — 범위 안이라고 확정 못 함)" if code.endswith("lower_bound") else "")
+
+    def verdict(what, cnt, st, basis, pv):
+        """Detections whose type could not be told (n_blind) may belong to any type: the true count lies in
+        [cnt, cnt + n_blind].  same / different only when every count in that interval gets the same verdict."""
+        res = [verdict1(what, c, st, basis, pv) for c in range(cnt, cnt + n_blind + 1)]
+        sts = {r_[0] for r_ in res}
+        if len(sts) == 1:
+            return res[0]
+        return "unmeasured", (f"종류를 정하지 못한 효과음 {n_blind}개 때문에 실제 개수는 {cnt}~{cnt + n_blind}개 — "
+                              "그 사이에서 판정이 갈림: " + "; ".join(f"{c}개→{r_[0]}" for c, r_ in zip(range(cnt, cnt + n_blind + 1), res)))
     if sil_obs and not has_silence_type:
         b.add("audio.sfx.count", "catalog:intentional_silence", "의도적 정적 개수 (레퍼런스 포맷 범위 대비)", CAT["sfx_count"],
               kind="style_vs_reference", expected=0, observed=len(sil_obs), status="different", keys=["audio.sfx.catalog"],
@@ -3003,7 +3035,7 @@ def _rows_sfx_catalog(b: RowBuilder, ap: dict, obs_c) -> None:
         cnt = len(sil_obs) if is_sil else int(obs_c.get(tid, 0))
         st, basis = sfxmap.count_range(ent.get("per_video_count"), fid)
         pv = (obs["types"] if basis.startswith("by_format") else obs["all_types"]).get(tid)
-        status, msg = verdict(f"'{tid}'", cnt, st, basis, pv)
+        status, msg = (verdict1 if is_sil else verdict)(f"'{tid}'", cnt, st, basis, pv)
         if is_sil and not sil_measurable:
             status, msg = "unmeasured", "BGM 을 출력에서 찾지 못해 의도적 정적(BGM 끊김)을 셀 수 없음"
         lo_hi = V.allowed_count_range(st) if st and st.get("p10") is not None and st.get("p90") is not None else None
@@ -3119,10 +3151,14 @@ CUT_STRUCTURE_KEYS = ("structure.cuts_per_10s.p10", "structure.cuts_per_10s.p90"
 
 
 def _rows_cut_structure(b: RowBuilder, probes: dict) -> None:
-    """Cut structure of the OUTPUT (cuts per 10 s, median shot length, from the cuts measured in the MP4) vs the
-    format's reference distribution.  The preset keys are per-video values of the format's snapshot videos
-    (p10 / p90 of 'cuts per 10 s' and of 'median shot length'); while the preset has no such keys the rows are 못 잼
-    (`ref aggregate` must emit them -- not guessed here)."""
+    """Cut structure of the OUTPUT vs the format's reference distribution (S2QA-15).  One definition for the reference
+    (``reference.aggregate.cut_structure_rows``: per video, transitions cut/flash/crossfade with 0 < t < duration ->
+    transitions per 10 s, and the median of the shot lengths between 0, the transitions and the end), the plan
+    (``edit.validate.check_cut_structure``) and the output here (``edit.validate.cut_structure`` over the transitions
+    MEASURED in the MP4: planned boundaries seen in the output + unplanned cuts, ``grid.our_cuts``).  Keys compared,
+    exactly: structure.cuts_per_10s.p10/.p90 and structure.shot_len_s.p10/.p90 (inside [p10, p90] = same); unmeasured
+    preset keys -> 못 잼."""
+    from ..edit.validate import cut_structure
     from .grid import our_cuts
 
     ctx = b.ctx
@@ -3130,22 +3166,22 @@ def _rows_cut_structure(b: RowBuilder, probes: dict) -> None:
     cuts = our_cuts(probes.get("video") or {})
     obs_rate = obs_len = None
     if cuts is not None and d_obs > 0:
-        ts = sorted(float(c["t"]) for c in cuts if 0.0 < float(c["t"]) < d_obs)
-        edges = [0.0] + ts + [d_obs]
-        shots = [round(y - x, 3) for x, y in zip(edges, edges[1:]) if y - x > 1e-3]
-        obs_rate = {"cuts_per_10s": _r(len(ts) / d_obs * 10.0, 3), "n_cuts": len(ts), "duration": _r(d_obs, 3)}
-        obs_len = {"shot_len_median_s": _r(_median(shots), 3), "shots_s": shots}
-    need = "`shortkit ref aggregate` 가 포맷별로 영상당 10초 컷 수·샷 길이 중앙값의 p10/p90 을 내야 함(요청)"
-    b.style_row("structure.cuts", "rate_ref", "컷 밀도: 10초당 컷 수 (레퍼런스 포맷 분포 대비)", CAT["cut"],
+        cs = cut_structure([float(c["t"]) for c in cuts], d_obs)
+        obs_rate = {"cuts_per_10s": cs["cuts_per_10s"], "n_cuts": cs["n_cuts"], "duration": cs["duration"],
+                    "types": sorted({c["type"] for c in cuts if 0.0 < float(c["t"]) < d_obs})}
+        obs_len = {"shot_len_median_s": cs["shot_len_median_s"], "shots_s": cs["shots_s"]}
+    how = ("레퍼런스 값 = `shortkit ref aggregate` 의 영상별 값(한 영상 = 1표본) 분포, 출력 값 = 같은 정의로 출력 MP4 에서 잰 값"
+           "(reference.aggregate.CUT_RATE_METHOD / SHOT_LEN_METHOD)")
+    b.style_row("structure.cuts", "rate_ref", "컷 밀도: 10초당 전환 수 (레퍼런스 포맷 분포 대비)", CAT["cut"],
                 list(CUT_STRUCTURE_KEYS[:2]), obs_rate,
                 lambda o, r: _all(float(r["structure.cuts_per_10s.p10"]) <= o["cuts_per_10s"],
                                   o["cuts_per_10s"] <= float(r["structure.cuts_per_10s.p90"])),
-                note="출력에서 잰 컷(계획 경계에서 보인 컷 + 계획 밖 컷) 기준. " + need)
+                note="출력에서 잰 전환(cut·flash·crossfade: 계획 경계에서 보인 것 + 계획 밖 컷) 기준. " + how)
     b.style_row("structure.cuts", "shot_len_ref", "샷 길이 중앙값 (레퍼런스 포맷 분포 대비)", CAT["cut"],
                 list(CUT_STRUCTURE_KEYS[2:]), obs_len,
                 lambda o, r: _all(float(r["structure.shot_len_s.p10"]) <= o["shot_len_median_s"],
                                   o["shot_len_median_s"] <= float(r["structure.shot_len_s.p90"])),
-                note="출력에서 잰 컷 사이 간격의 중앙값. " + need)
+                note="출력에서 잰 전환 사이 샷 길이(첫·마지막 샷 포함)의 중앙값. " + how)
 
 
 # ----------------------------------------------------------------------------- presence (있다/없다/못 잼)
