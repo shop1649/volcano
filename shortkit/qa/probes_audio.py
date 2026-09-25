@@ -275,6 +275,119 @@ def window_ls(y: np.ndarray, cols: list[np.ndarray], sr: int, win: float) -> tup
     return tc, G, resid.astype(np.float32)
 
 
+def fitted_part(cols: list[np.ndarray], G: np.ndarray, idx: list[int], n: int, sr: int, win: float) -> np.ndarray:
+    """Sum over the columns ``idx`` of (per-window gain x column), as ``window_ls`` fitted them."""
+    L = max(1, int(round(win * sr)))
+    out = np.zeros(n, np.float64)
+    for w in range(G.shape[0]):
+        a, b = w * L, min(n, (w + 1) * L)
+        for k in idx:
+            g = G[w, k]
+            if np.isfinite(g):
+                out[a:b] += g * cols[k][a:b].astype(np.float64)
+    return out.astype(np.float32)
+
+
+def kept_audio_checks(ctx: QAContext, voice_out: np.ndarray, sr: int, bgm_found: bool) -> dict:
+    """What the kept original sound IS in the output: ``voice_out`` = output mix minus the fitted BGM and SFX (the
+    kept originals + whatever else is not ours).  On it, with the SAME detectors ``episode validate`` uses on the
+    source (``shortkit.edit.audio_checks``):
+      * music_presence per kept range (music left in the kept voice: embedded music not removed);
+      * speech_spans over the whole programme (output seconds) -- speech inside kept ranges and under ducked BGM.
+    Without the BGM located in the mix the BGM cannot be removed: both are unmeasured (never judged on the mix)."""
+    from ..edit.audio_checks import music_presence, speech_spans
+
+    res = ctx.resolved
+    out: dict = {"method": "출력 믹스 − (찾은 BGM·효과음의 창별 최소제곱 맞춤) = 보존 원음 + 설명되지 않은 소리; "
+                           "edit.audio_checks 의 음악·음성 검출기로 측정(합성 음원으로만 검증된 공학 규칙)"}
+    planned_bgm = res.audio.bgm is not None and bool(getattr(res.audio.bgm, "path", None))
+    if planned_bgm and not bgm_found:
+        why = "계획한 BGM 을 출력에서 찾지 못해 믹스에서 뺄 수 없음(음악 판정을 BGM 과 구별 못 함)"
+        out["music"] = [{"index": i, "clip_id": o.clip_id, "range_out": [rnd(o.out_start), rnd(o.out_end)],
+                         "status": "unmeasured", "reason": why} for i, o in enumerate(res.audio.originals)]
+        out["speech"] = {"status": "unmeasured", "spans": [], "reason": why}
+        return out
+    import os
+    import tempfile
+
+    from scipy.io import wavfile
+
+    fd, tmp = tempfile.mkstemp(suffix=".wav", prefix="qa_voice_out_")
+    os.close(fd)
+    try:
+        wavfile.write(tmp, sr, np.clip(voice_out, -1.0, 1.0).astype(np.float32))
+        items = []
+        for i, o in enumerate(res.audio.originals):
+            fade = float(getattr(o, "fade_s", 0.0) or 0.0)
+            rng = (float(o.out_start) + fade, float(o.out_end) - fade)
+            m = music_presence(tmp, [rng]) if rng[1] > rng[0] else {"status": "unmeasured", "reason": "구간 없음"}
+            items.append({"index": i, "clip_id": o.clip_id, "range_out": [rnd(rng[0]), rnd(rng[1])],
+                          **{k: m.get(k) for k in ("status", "polyphonic_share", "sustained_share", "active_s", "reason")},
+                          "method": m.get("method")})
+        out["music"] = items
+        sp = speech_spans(tmp)
+        out["speech"] = {"status": sp["status"], "spans": [[rnd(a), rnd(b)] for a, b in sp.get("spans") or []],
+                         "reason": sp.get("reason"), "method": sp.get("method")}
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    return out
+
+
+def classify_sfx_detections(ctx: QAContext, dets: list[dict]) -> dict:
+    """The catalog TYPE of every detected SFX, from its sound: the detected file's log-mel fingerprint against every
+    catalog type's centroid (``presets/<p>/sfx_fp/<type>.npy``; the method and threshold of ``reference.sfx_map`` and
+    ``edit.validate.sfx_file_similarity``) -- never the plan's label.  Adds ``catalog_type`` {status, type_id,
+    similarity, runner_up} to each detection; returns the summary."""
+    from .. import paths
+    from ..util.jsonio import read_json
+
+    try:
+        rel = ctx.preset.get("audio.sfx.catalog")
+    except KeyError:
+        rel = None
+    cat = read_json(paths.absp(rel)) if rel else None
+    if not cat or cat.get("status") != "measured":
+        why = "효과음 카탈로그 미측정(" + str((cat or {}).get("blocker") or "없음")[:160] + ") — 종류 지문 없음"
+        for d in dets:
+            d["catalog_type"] = {"status": "unmeasured", "type_id": None, "reason": why}
+        return {"status": "unmeasured", "reason": why}
+    cents = []
+    for t in cat.get("types") or []:
+        c = (t.get("fingerprint") or {}).get("centroid")
+        if t.get("type_id") and c and paths.absp(c).is_file():
+            cents.append((t["type_id"], t.get("class"), c))
+    if not cents:
+        why = "카탈로그에 지문(centroid) 파일이 있는 종류가 없음"
+        for d in dets:
+            d["catalog_type"] = {"status": "unmeasured", "type_id": None, "reason": why}
+        return {"status": "unmeasured", "reason": why}
+    from ..edit.validate import sfx_file_similarity
+    from ..reference.sfx_map import MATCH_THRESHOLD
+
+    by_file: dict = {}
+    for d in dets:
+        f = d.get("file")
+        if f in by_file:
+            d["catalog_type"] = dict(by_file[f])
+            continue
+        try:
+            sims = sorted(((sfx_file_similarity(f, c), tid, cls) for tid, cls, c in cents), reverse=True)
+        except Exception as e:  # never a silent pass
+            ent = {"status": "unmeasured", "type_id": None, "reason": f"지문 계산 실패: {type(e).__name__}: {e}"[:200]}
+        else:
+            best = sims[0]
+            ent = {"status": "measured", "type_id": best[1] if best[0] >= MATCH_THRESHOLD else None,
+                   "class": best[2] if best[0] >= MATCH_THRESHOLD else None, "similarity": round(float(best[0]), 3),
+                   "best_candidate": best[1], "threshold": MATCH_THRESHOLD,
+                   "runner_up": ({"type_id": sims[1][1], "similarity": round(float(sims[1][0]), 3)} if len(sims) > 1 else None)}
+        by_file[f] = ent
+        d["catalog_type"] = dict(ent)
+    return {"status": "measured", "types_with_centroid": len(cents), "files": len(by_file)}
+
+
 def db(v, floor: float = -120.0):
     v = np.asarray(v, float)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -928,6 +1041,14 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
         out["originals"]["levels"] = kept_levels_obs(ctx, orig_rows, (out.get("loudness") or {}).get("integrated_lufs"))
     except Exception as e:
         out["errors"]["original_levels"] = f"{type(e).__name__}: {e}"
+    # ---------------- the kept voice as it is in the output (mix minus fitted BGM and SFX): music left in it, speech
+    try:
+        ours = [k for k, nm in enumerate(names) if not nm.startswith("orig:")] + list(range(len(cols), len(all_cols)))
+        voice_out = (y.astype(np.float64) - fitted_part(all_cols, Gf, ours, n, sr, FINE)).astype(np.float32) \
+            if all_cols else y.copy()
+        out["originals"]["voice_out"] = kept_audio_checks(ctx, voice_out, sr, bgm_al is not None)
+    except Exception as e:
+        out["errors"]["voice_out"] = f"{type(e).__name__}: {e}"
     # ---------------- SFX gains relative to the BGM heard at the same moment
     env = _planned_bgm_env(ctx)
     y_lp = lowpass(y, sr) if dets else y
@@ -959,8 +1080,14 @@ def probe_audio(ctx: QAContext, sr: int = SR) -> dict:
     for d in subaudible:
         d["why_dropped"] = f"믹스 대비 {d['contrib_db_rel_mix']} dB < {SFX_MIN_CONTRIB_DB:g} dB: 가려져 들리지 않는 잔차 일치(배치된 소리 아님)"
     dets = [d for d in dets if d not in subaudible]
+    try:
+        cls_sum = classify_sfx_detections(ctx, dets)
+    except Exception as e:  # a failed classification leaves the types unmeasured, never the plan's labels
+        cls_sum = {"status": "unmeasured", "reason": f"{type(e).__name__}: {e}"[:200]}
+        for d in dets:
+            d["catalog_type"] = {"status": "unmeasured", "type_id": None, "reason": cls_sum["reason"]}
     out["sfx"] = {"detections": dets, "threshold_ncc": 0.45, "min_contrib_db_rel_mix": SFX_MIN_CONTRIB_DB,
-                  "subaudible_matches": subaudible}
+                  "subaudible_matches": subaudible, "catalog_classification": cls_sum}
     # ---------------- unexplained onsets in the final residual
     exclude = [(d["t"] - 0.05, d["t"] + d["len"] + 0.05) for d in dets] + [(a - 0.1, b + 0.1) for a, b in kept]
     # fast gain changes of the BGM itself (edges of measured ducks/silences, planned envelope steps,

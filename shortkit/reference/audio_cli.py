@@ -26,7 +26,7 @@ from ..util.stats import TRI_KO
 from .separation import DEFAULT_PRESET
 
 STATUS_KO = {"measured": "측정됨", "unmeasured": "못 잼", "ambiguous": "구간 모호(후보 여럿)",
-             "have": "있음", "none": "없음"}
+             "partial": "일부만 측정(못 잰 열 있음 — 측정 완료 아님)", "have": "있음", "none": "없음"}
 
 
 def _ko(s) -> str:
@@ -237,6 +237,9 @@ def cmd_sfx_catalog(a) -> int:
     print(f"[카탈로그] 상태 {_ko(c['status'])}  분석 영상 {b['n_videos']}/{b['target_n']}  종류 {len(c['types'])}개")
     if c.get("blocker"):
         print(f"  사유: {c['blocker']}")
+    for col, st in (c.get("column_status") or {}).items():
+        if st != "measured":
+            print(f"  열 '{col}': {_ko(st)}")
     for t in c["types"]:
         print(f"  {t['type_id']:<12} {t['class']:<20} {t['n_events']}회/{t['n_videos']}편  {t['label']}")
     if a.emotion_template and c["types"]:

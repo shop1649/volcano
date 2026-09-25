@@ -16,6 +16,18 @@ visual analysis files ``shots.json`` / ``motion.json`` / ``captions.json`` of th
 
 Labels are acoustic descriptions computed from the fingerprints ("짧은 고역 타격음 ..."), never a
 listening judgement.  With no analysed video the catalog stays ``unmeasured`` with the blocker.
+
+Status (user: 종류마다 "종류 / 편당 개수 p10·p50·p90 / 직전 자막 종류 / 화면 사건 / 감정 / 자리 규칙 / 표본 3편의 시각"):
+  ``unmeasured``  a target video was not analysed, or SFX under speech could not be measured (counts are lower
+                  bounds) -- see ``blocker``;
+  ``partial``     every target video analysed, but a required column (REQUIRED_COLUMNS: previous caption role,
+                  screen event, emotion) is not measured for EVERY event of some type (no visual analysis of the
+                  video, no watched emotion label for the event) -- ``unmeasured_columns`` lists the types per
+                  column, ``types[].columns`` their state and ``column_status`` the catalog-level state;
+  ``measured``    everything above measured.
+Per type, ``per_video_count.videos`` {video_id: count} (zeros included) holds the counts behind the statistics;
+the catalog stores ``per_video_total`` (class edit_sfx) and ``per_video_total_incl_silence`` (edit_sfx +
+intentional_silence) with the same shape (overall, by_format, videos, classes).
 """
 from __future__ import annotations
 
@@ -39,6 +51,12 @@ XCORR_SNIPPET_S = 0.4
 XCORR_NEIGHBOURS = 8
 EMOTION_MATCH_S = 0.2
 CUT_KINDS = ("cut", "crossfade")
+# per-type columns the user requires besides the counts (a type missing one of them is not fully catalogued)
+REQUIRED_COLUMNS = ("prev_caption_role", "screen_event", "emotion")
+COLUMN_KO = {"per_video_count": "편당 개수", "prev_caption_role": "직전 자막 종류", "screen_event": "화면 사건",
+             "emotion": "감정(영상을 본 사람의 라벨)"}
+TOTAL_CLASSES = ("edit_sfx",)                              # what an editor ADDS (validate's counted class)
+TOTAL_CLASSES_SILENCE = ("edit_sfx", "intentional_silence")
 
 
 # ============================================================================ inputs
@@ -448,9 +466,36 @@ def build_catalog(preset_name: str = DEFAULT_PRESET, video_ids: list[str] | None
     if partial:
         blockers.append(f"Demucs 분리 없음: 대사 밑 효과음 못 잼({len(partial)}편: {', '.join(partial[:10])}"
                         + ("…" if len(partial) > 10 else "") + ") — 종류별 편당 개수는 하한값")
-    out.update({"status": "unmeasured" if blockers else "measured", "blocker": "; ".join(blockers) or None,
+    # a required per-type column that is unmeasured keeps the catalog from 'measured' (status partial): the
+    # emotion column exists only when someone who watched labelled the events (sfx_emotion_labels.csv)
+    for t in types:
+        t["columns"] = {"per_video_count": "measured",
+                        **{c: _column_status(t.get(c) or {}) for c in REQUIRED_COLUMNS}}
+    gaps = {c: [t["type_id"] for t in types if t["columns"][c] != "measured"] for c in REQUIRED_COLUMNS}
+    gaps = {c: v for c, v in gaps.items() if v}
+    col_status = {"per_video_count": "lower_bound" if partial else "measured",
+                  **{c: ("unmeasured" if types and all(t["columns"][c] == "unmeasured" for t in types) else
+                         "partial" if gaps.get(c) else "measured") for c in REQUIRED_COLUMNS}}
+    col_blocker = "; ".join(f"{COLUMN_KO[c]} 못 잼 — 종류 {len(v)}/{len(types)}개: {', '.join(v[:10])}"
+                            + ("…" if len(v) > 10 else "")
+                            + (f" ({emo_src})" if c == "emotion" and labels_rows is None else "")
+                            for c, v in gaps.items())
+    if blockers:
+        status = "unmeasured"
+        blocker = "; ".join(blockers + ([col_blocker] if col_blocker else []))
+    elif gaps:
+        status, blocker = "partial", col_blocker
+    else:
+        status, blocker = "measured", None
+    out.update({"status": status, "blocker": blocker,
                 "counts_are_lower_bounds": bool(partial),
+                "column_status": col_status, "unmeasured_columns": gaps,
+                "per_video_total": _per_video_total(types, analyzed, fmts, TOTAL_CLASSES),
+                "per_video_total_incl_silence": _per_video_total(types, analyzed, fmts, TOTAL_CLASSES_SILENCE),
                 "types": types, "xcorr_samples": pair_logs[:30]})
+    if partial:
+        for k in ("per_video_total", "per_video_total_incl_silence"):
+            out[k]["lower_bound_videos"] = partial
     if write:
         write_json(catalog_path(preset_name), out)
         for vid in analyzed:                      # write type ids back to the per-video event files
@@ -461,6 +506,21 @@ def build_catalog(preset_name: str = DEFAULT_PRESET, video_ids: list[str] | None
             d["catalog"] = {"file": paths.relp(catalog_path(preset_name)), "assigned_at": now_iso()}
             write_json(sfx_events_path(preset_name, vid), d)
     return out
+
+
+def _column_status(col: dict) -> str:
+    """measured = every event of the type has a value; partial = some; unmeasured = none."""
+    if not col.get("n"):
+        return "unmeasured"
+    return "partial" if col.get("n_missing") else "measured"
+
+
+def _per_video_total(types: list[dict], analyzed: list[str], fmts: dict, classes: tuple[str, ...]) -> dict:
+    """Per-video total of the types of ``classes`` (from each type's per_video_count.videos) + its statistics."""
+    vids = {v: sum(int(t["per_video_count"]["videos"].get(v, 0)) for t in types if t["class"] in classes)
+            for v in analyzed}
+    st = pstats_by_group([{"video_id": v, "format_id": fmts.get(v), "count": c} for v, c in vids.items()], "count")
+    return {**st, "videos": vids, "classes": list(classes)}
 
 
 def _pst(rows: list[dict]) -> dict:
@@ -525,6 +585,7 @@ def _type_stats(tid: str, cls: str, mem: list[dict], analyzed: list[str], fmts: 
     counts = Counter(m["video_id"] for m in mem)
     rows = [{"video_id": v, "format_id": fmts.get(v), "count": counts.get(v, 0)} for v in analyzed]
     pvc = pstats_by_group(rows, "count")
+    pvc["videos"] = {r["video_id"]: int(r["count"]) for r in rows}     # the counts behind the statistics
     roles, kinds, offsets, emos = [], [], [], []
     for m in mem:
         se = se_cache[m["video_id"]]
@@ -533,9 +594,8 @@ def _type_stats(tid: str, cls: str, mem: list[dict], analyzed: list[str], fmts: 
         kinds.append(kind)
         if et is not None:
             offsets.append({"format_id": fmts.get(m["video_id"]), "v": round(m["t"] - et, 4)})
-        if labels_rows is not None:
-            cand = [r for r in labels_rows if r["video_id"] == m["video_id"] and abs(r["t"] - m["t"]) <= EMOTION_MATCH_S]
-            emos.append(min(cand, key=lambda r: abs(r["t"] - m["t"]))["emotion"] if cand else None)
+        cand = [r for r in labels_rows or [] if r["video_id"] == m["video_id"] and abs(r["t"] - m["t"]) <= EMOTION_MATCH_S]
+        emos.append(min(cand, key=lambda r: abs(r["t"] - m["t"]))["emotion"] if cand else None)
     emo = _cat(emos)
     if not emo["n"]:
         emo["blocker"] = emo_src if labels_rows is None else "라벨 파일에 이 종류의 이벤트와 맞는 행 없음"
@@ -547,6 +607,15 @@ def _type_stats(tid: str, cls: str, mem: list[dict], analyzed: list[str], fmts: 
     pc = _cat(roles)
     if not pc["n"]:
         pc["blocker"] = "captions.json 없음"
+    # per-event coverage of each required column: an event without a value (video without visual analysis /
+    # captions, event without a watched label) leaves the column only partly measured for this type
+    for col, vals in ((emo, emos), (se_cat, kinds), (pc, roles)):
+        col["n_events"] = len(vals)
+        col["n_missing"] = sum(1 for v in vals if v is None)
+        if col["n"] and col["n_missing"]:
+            col["status"] = "partial"
+            col["missing_examples"] = [{"video_id": m["video_id"], "t": round(float(m["t"]), 3)}
+                                       for m, v in zip(mem, vals) if v is None][:5]
     ex, seen = [], set()
     for m in sorted(mem, key=lambda m: (m["video_id"], m["t"])):
         if m["video_id"] not in seen:

@@ -238,7 +238,8 @@ def run_and_write(episode_id: str, reference: str | None = None, sheet_seconds: 
     rep["gate"] = gate_mod.evaluate(rows, mode=ctx.resolved.mode, mp4_sha_measured=sha, mp4_sha_now=sha,
                                     unmeasured_preset_keys=unmeasured_keys, plan=ctx.plan, reference=reference_rec,
                                     measured_path=paths.relp(ctx.mp4), deliverable_path=deliverable,
-                                    inputs_measured=inputs, inputs_now=inputs)
+                                    inputs_measured=inputs, inputs_now=inputs,
+                                    approval=gate_mod.approval_facts(ctx.plan, ctx.preset))
     write_json(ctx.qa_dir / "report.json", rep)
     if ctx.deliverable:
         try:

@@ -190,7 +190,9 @@ def register(p) -> None:
                                        "(기본: 최신 100편 스냅샷 — 포맷 표는 스냅샷 구성원만으로 만든다)")
     _sel(kp, default_set="latest100")
     kp.set_defaults(func=cmd_classify_prepare)
-    kb = ks.add_parser("build", help="본 사람이 채운 라벨로 formats.yaml 생성(라벨 없으면 못 잼 유지)")
+    kb = ks.add_parser("build", help="본 사람이 채운 라벨(format_labels.csv: intro_type, structure_type, beats=구간 목적 순서, "
+                                     "reveal_t=반전 시각 초 또는 none, labeled_by, watched=yes)로 formats.yaml 생성 — 포맷별 "
+                                     "대표 영상 + 정보 공개 순서(beats, reveal_frac p10/p50/p90). 라벨 없으면 못 잼 유지")
     kb.add_argument("--preset", default=DEFAULT_PRESET)
     kb.set_defaults(func=cmd_classify_build)
 

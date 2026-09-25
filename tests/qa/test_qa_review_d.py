@@ -100,7 +100,10 @@ def test_a_covered_informational_row_does_not_block_but_an_uncovered_one_does():
     per = _row("caption.font", "t1", "unmeasured", required=False, category=checks.CAT["font"],
                covered_by="caption.font:role_title")
     ne = _row("audio.sfx.no_event", "all", "same")
-    kw = dict(mode="production", mp4_sha_measured="a", mp4_sha_now="a", unmeasured_preset_keys=[], production=True)
+    approved = {"state": {"required": True, "approved": True, "first_episode": True}, "series": {"ok": True},
+                "episode_index": 1}          # the facts gate.approval_facts gives for an approved first episode
+    kw = dict(mode="production", mp4_sha_measured="a", mp4_sha_now="a", unmeasured_preset_keys=[], production=True,
+              approval=approved)
     assert gate.evaluate([role, per, ne], **kw)["complete"] is True
     # the covering row itself unmeasured (and required) -> the per-caption row counts again (and G2 fails)
     g = gate.evaluate([dict(role, status="unmeasured"), per, ne], **kw)
@@ -129,8 +132,11 @@ def _orig_builder(mode, hem, stem, human=None, sha="abc"):
 
 
 def test_embedded_music_verdict_is_never_the_plan_declaration(temp_root):
+    # no output measurement of the kept voice (probes without voice_out): 못 잼 whatever the plan declares
     r = _orig_builder("production", False, "raw")
-    assert r["status"] == "unmeasured" and r["required"] is True and "선언" in r["note"]
+    assert r["status"] == "unmeasured" and r["required"] is True and r["observed"]["basis"] == "못 잼"
+    assert r["observed"]["has_embedded_music_plan"] is False     # shown, never the verdict
+    # (the output measurement itself: tests/qa/test_qa_finish.py::test_embedded_music_row_is_the_output_measurement...)
     r = _orig_builder("production", True, "vocals")
     assert r["status"] == "unmeasured" and r["required"] is True
     assert _orig_builder("production", True, "raw")["status"] == "different"

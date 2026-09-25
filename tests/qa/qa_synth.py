@@ -10,15 +10,19 @@ ground truth we control exactly, plus the matching ``build/resolved.json`` and `
   text    title (whole video), situation (pop 0.85), speaker label (box, fade), dialogue,
           reaction (pop 1.35) rendered by libass from our own ASS file
   deco    red circle ring moving (200,600)->(400,650) over 3.0-4.5 s, blinking 2 Hz
-  audio   music_bed_a from 12.0 s at -16 dB, ducked -10 dB under the kept original line
-          (dirty_source 8.0-10.3 s at out 2.7-5.0), intentional silence 6.3-6.8, 0.5 s fade out,
-          SFX pop/whoosh/ding/boom at known times, then one linear loudness gain
+  audio   music_bed_a from 12.0 s at -16 dB, ducked -10 dB under the SPEECH of the kept original line
+          (dirty_source 8.0-10.3 s at out 2.7-5.0; the kept sound is a separated voice track = speech_01 where the
+          dirty source has it, without the source's embedded music_bed_b -- written to build/synth_vocals_c2.wav; its
+          speech spans come from shortkit.edit.audio.kept_speech like the resolver's), intentional silence 6.3-6.8,
+          0.5 s fade out, SFX pop/whoosh/ding/boom at known times, then one linear loudness gain
 
 The BAD variant contains deliberate mistakes (the IR stays the GOOD plan):
   situation caption drawn 353 px higher (over the declared male face), BGM from 17.0 s
   (wrong section), extra ducking 1.2-1.9 s (outside kept dialogue), an extra planned-type SFX
   (pop at 6.9 s, no event), an unknown SFX (click at 1.6 s), watermark left in (no delogo),
-  decoration drawn 40 px to the right (blink kept).
+  decoration drawn 40 px to the right (blink kept).  (The kept voice is the same separated voice as in GOOD: raw
+  source sound with its embedded music under the IR's voice track would also bend the BGM gain fit -- the music-left-
+  in-the-voice detection is tested on its own in tests/qa/test_qa_finish.py.)
 """
 from __future__ import annotations
 
@@ -82,13 +86,44 @@ SFX = [
 ]
 BGM = dict(path=f"{GEN}/music_bed_a.wav", section=12.0, tempo=1.0, gain=-16.0, fade_out=0.5, duck=[(2.7, 5.0)],
            silences=[(6.3, 6.8)], depth=10.0, attack=0.08, release=0.3, sil_fade=0.05)
-ORIG = dict(clip_id="c2", path=f"{GEN}/dirty_source.mp4", src=(8.0, 10.3), out=(2.7, 5.0), gain=0.0, fade=0.04)
+ORIG = dict(clip_id="c2", path=f"{GEN}/dirty_source.mp4", src=(8.0, 10.3), out=(2.7, 5.0), gain=0.0, fade=0.04,
+            speech=f"{GEN}/speech_01.wav", speech_at=8.0)    # dirty_source.truth.json: speech_01 at 8.0 s
 TARGET_LUFS = -18.0
 PROTECTED = dict(label="남성 얼굴", x=456, y=80, w=136, h=170, start=10.0, end=12.5)
 
 BAD = dict(caption_dy={"s1": -353}, bgm_section=17.0, extra_duck=[(1.2, 1.9)],
            extra_sfx=[dict(type="pop", t=6.9, gain=-6.0), dict(type="click", t=1.6, gain=-3.0)],
-           no_delogo=True, deco_dx=40.0)
+           no_delogo=True, deco_dx=40.0, raw_original=False)
+
+
+def vocals_rel(episode_id: str) -> str:
+    return f"episodes/{episode_id}/build/synth_vocals_c2.wav"
+
+
+def make_vocals(episode_id: str) -> dict:
+    """The SYNTHETIC separated voice of the kept source: speech_01 where dirty_source has it, silence elsewhere (the
+    source's embedded music_bed_b is not in it), over the source's whole duration.  Speech spans and duck ranges come
+    from the production functions (edit.audio.kept_speech / duck_pieces) so the IR matches what the resolver does."""
+    from shortkit.edit.audio import duck_pieces, kept_speech
+    from shortkit.util.media import write_wav
+
+    root = paths.project_root()
+    rel = vocals_rel(episode_id)
+    dur = float(probe(root / ORIG["path"]).duration)
+    sp = read_audio(root / ORIG["speech"], sr=SR, mono=True)
+    x = np.zeros(int(round(dur * SR)), np.float32)
+    a = int(round(ORIG["speech_at"] * SR))
+    x[a:a + len(sp)] = sp[: len(x) - a]
+    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+    write_wav(root / rel, x, SR)
+    ks = kept_speech(rel, ORIG["src"][0], ORIG["src"][1])
+    probe_o = OriginalAudio(clip_id=ORIG["clip_id"], path=rel, stem="vocals", src_start=ORIG["src"][0],
+                            src_end=ORIG["src"][1], out_start=ORIG["out"][0], out_end=ORIG["out"][1], speed=1.0,
+                            gain_db=ORIG["gain"], fade_s=ORIG["fade"], speech=ks["spans"], speech_status=ks["status"])
+    from shortkit.qa import merge_ranges
+
+    return {"path": rel, "speech": ks["spans"], "speech_status": ks["status"],
+            "duck": [tuple(r) for r in merge_ranges(duck_pieces([probe_o]))]}
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -239,10 +274,10 @@ def _db(x):
     return 10 ** (x / 20.0)
 
 
-def _bgm_env(n: int, bad: bool) -> np.ndarray:
+def _bgm_env(n: int, bad: bool, duck: list | None = None) -> np.ndarray:
     t = np.arange(n) / SR
     g = np.zeros(n)                         # dB
-    ducks = list(BGM["duck"]) + (BAD["extra_duck"] if bad else [])
+    ducks = list(BGM["duck"] if duck is None else duck) + (BAD["extra_duck"] if bad else [])
     for a, b in ducks:
         down = np.clip((t - (a - BGM["attack"])) / BGM["attack"], 0, 1)
         up = np.clip(1 - (t - b) / BGM["release"], 0, 1)
@@ -258,7 +293,7 @@ def _bgm_env(n: int, bad: bool) -> np.ndarray:
     return lin
 
 
-def build_audio(bad: bool, out_wav: Path) -> dict:
+def build_audio(bad: bool, out_wav: Path, voc: dict | None = None) -> dict:
     n = int(round(DUR * SR))
     root = paths.project_root()
     music = read_audio(root / BGM["path"], sr=SR, mono=False)
@@ -266,9 +301,11 @@ def build_audio(bad: bool, out_wav: Path) -> dict:
     a = int(round(sec * SR))
     bgm = music[a:a + n]
     mix = np.zeros((n, 2), np.float64)
-    mix[:len(bgm)] += bgm * _db(BGM["gain"]) * _bgm_env(n, bad)[:len(bgm), None]
-    # the kept line is placed like the production renderer places it: the stereo source channels as they are
-    o = read_audio(root / ORIG["path"], sr=SR, mono=False, start=ORIG["src"][0],
+    mix[:len(bgm)] += bgm * _db(BGM["gain"]) * _bgm_env(n, bad, (voc or {}).get("duck"))[:len(bgm), None]
+    # the kept line is placed like the production renderer places it: the stereo channels of the kept file as they
+    # are -- GOOD: the separated voice (no embedded music); BAD: the raw source sound with its embedded music
+    kept_file = ORIG["path"] if (bad and BAD["raw_original"]) or voc is None else voc["path"]
+    o = read_audio(root / kept_file, sr=SR, mono=False, start=ORIG["src"][0],
                    duration=ORIG["src"][1] - ORIG["src"][0])
     k = len(o)
     fl = int(ORIG["fade"] * SR)
@@ -329,7 +366,7 @@ def caption_truth_bboxes(work: Path) -> dict[str, list[float]]:
 
 
 # ----------------------------------------------------------------------------- IR / plan
-def build_resolved(episode_id: str, bboxes: dict) -> ResolvedEdit:
+def build_resolved(episode_id: str, bboxes: dict, voc: dict | None = None) -> ResolvedEdit:
     clips = []
     for c in CLIPS:
         z = c.get("zoom")
@@ -360,10 +397,12 @@ def build_resolved(episode_id: str, bboxes: dict) -> ResolvedEdit:
                       blink_hz=d["blink_hz"], style={"color": d["color"], "stroke_px": d["stroke"], "blink_hz": 0.0})
     bgm = Bgm(path=BGM["path"], track_id="synthetic_bed_a", section_start_s=BGM["section"], tempo_ratio=BGM["tempo"],
               gain_db=BGM["gain"], fade_in_s=0.0, fade_out_s=BGM["fade_out"], envelope=[], silences=list(BGM["silences"]),
-              duck_ranges=list(BGM["duck"]))
-    orig = OriginalAudio(clip_id=ORIG["clip_id"], path=ORIG["path"], stem="raw", src_start=ORIG["src"][0], src_end=ORIG["src"][1],
+              duck_ranges=[list(r) for r in (voc["duck"] if voc else BGM["duck"])])
+    orig = OriginalAudio(clip_id=ORIG["clip_id"], path=voc["path"] if voc else ORIG["path"],
+                         stem="vocals" if voc else "raw", src_start=ORIG["src"][0], src_end=ORIG["src"][1],
                          out_start=ORIG["out"][0], out_end=ORIG["out"][1], speed=1.0, gain_db=ORIG["gain"], fade_s=ORIG["fade"],
-                         reason="말하는 사람의 실제 대사")
+                         reason="말하는 사람의 실제 대사", speech=list((voc or {}).get("speech") or []),
+                         speech_status=(voc or {}).get("speech_status") or "unmeasured")
     sfx = [SfxPlacement(id=s["id"], type=s["type"], path=f"{GEN}/sfx/{s['type']}.wav", t=s["t"], gain_db=s["gain"],
                         event_t=s["event_t"], event_desc=s["desc"], emotion=None, map_status="have") for s in SFX]
     audio = AudioPlan(sample_rate=SR, target_lufs=TARGET_LUFS, true_peak_db=-1.0, bgm=bgm, originals=[orig], sfx=sfx)
@@ -377,16 +416,18 @@ def build_resolved(episode_id: str, bboxes: dict) -> ResolvedEdit:
                         output_path=f"episodes/{episode_id}/output/{episode_id}.mp4")
 
 
-def build_plan(episode_id: str, orig_rel_lu: float | None = None) -> dict:
+def build_plan(episode_id: str, orig_rel_lu: float | None = None, voc: dict | None = None) -> dict:
     """``orig_rel_lu``: the kept line's true level re programme (``build_audio``), declared as the plan's level
     for it (original_audio.gain_db, LU) so QA compares its measurement with the synthetic ground truth."""
     tl = [] if orig_rel_lu is None else [{"id": ORIG["clip_id"], "original_audio": {
-        "keep": True, "gain_db": orig_rel_lu, "stem": "raw", "reason": "합성 정답: 살린 대사 한 줄"}}]
+        "keep": True, "gain_db": orig_rel_lu, "stem": "vocals" if voc else "raw", "reason": "합성 정답: 살린 대사 한 줄"}}]
     return {"schema": "shortkit.plan/1", "episode_id": episode_id, "preset_id": "joshuamagazine-v1",
             "format_id": "UNCLASSIFIED", "mode": "test", "notes": "SYNTHETIC QA test episode (tests/qa/qa_synth.py)",
             "cover": {"text": "실험 영상 모음", "frame_t": 0.0},
             "sources": [{"id": c["id"] + "_src", "path": c["source"],
-                         **({"protected": [PROTECTED]} if c["id"] == "c1" else {})} for c in CLIPS],
+                         **({"protected": [PROTECTED]} if c["id"] == "c1" else {}),
+                         **({"has_embedded_music": True, **({"vocals_path": voc["path"]} if voc else {})}
+                            if c["id"] == ORIG["clip_id"] else {})} for c in CLIPS],
             "timeline": tl, "captions": [],
             "sfx": [{"id": s["id"], "type": s["type"], "t": s["t"],
                      "event": {"t": s["event_t"], "desc": s["desc"], "kind": s["kind"]}} for s in SFX]}
@@ -400,13 +441,14 @@ def render_episode(episode_id: str, bad: bool = False) -> dict:
     (ep / "build").mkdir(parents=True, exist_ok=True)
     (ep / "output").mkdir(parents=True, exist_ok=True)
     bboxes = caption_truth_bboxes(ep / "build")
-    res = build_resolved(episode_id, bboxes)
+    voc = make_vocals(episode_id)
+    res = build_resolved(episode_id, bboxes, voc)
     write_json(ep / "build" / "resolved.json", res.to_dict())
     ass = ep / "build" / "captions.ass"
     ass.write_text(build_ass(bad), encoding="utf-8")
     wav = ep / "build" / "synthetic_mix.wav"
-    ainfo = build_audio(bad, wav)
-    write_yaml(ep / "plan.yaml", build_plan(episode_id, ainfo["orig_rel_lu"]))
+    ainfo = build_audio(bad, wav, voc)
+    write_yaml(ep / "plan.yaml", build_plan(episode_id, ainfo["orig_rel_lu"], voc))
     # sources, decoded once at region size
     srcs = {}
     for c in CLIPS:

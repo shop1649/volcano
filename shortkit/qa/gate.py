@@ -12,7 +12,10 @@ The gate passes only when
   R1  (production) the output was compared with a reference video at the same absolute times: the format's
       representative video from formats.yaml (or another video with a recorded override reason), its analysis
       files, and the compare sheet (test mode: warning)
-  A1  (production) a first episode (episode_index 1) was rendered without an approved proposal
+  A1  (production) the approval gate of ``shortkit.edit.plan``: ``approval_state_for(plan, preset)`` (the preset rule
+      for this episode's index; an approval counts only with its evidence -- a hand-written ``approval: {approved:
+      true}`` is not an approval) and, for episode_index > 1, ``series_first_episode(plan)`` (an approved AND
+      rendered first production episode of the same preset must exist).  No approval facts = A1 fails.
 Production additionally requires (``complete``):
   P1  no preset key is still unmeasured (provisional) -- unmeasured never becomes complete
   P2  no style-vs-reference row is ``unmeasured``
@@ -23,6 +26,48 @@ Production additionally requires (``complete``):
 from __future__ import annotations
 
 from .checks import CAT
+
+
+def approval_facts(plan: dict | None, preset) -> dict | None:
+    """The approval facts the gate judges A1 on, from the SAME functions render and validate use
+    (``shortkit.edit.plan.approval_state_for`` / ``series_first_episode``).  None when there is no plan."""
+    if not isinstance(plan, dict):
+        return None
+    from ..edit.plan import PlanError, approval_state_for, series_first_episode
+
+    try:
+        st = approval_state_for(plan, preset)
+    except (PlanError, KeyError) as e:
+        return {"error": f"승인 규칙을 읽지 못함: {e}"}
+    try:
+        ser = series_first_episode(plan)
+    except Exception as e:  # never a silent pass
+        ser = {"ok": False, "first": [], "problems": [f"첫 편 확인 실패: {type(e).__name__}: {e}"]}
+    keep = ("required", "approved", "approval_claimed", "evidence_problems", "approved_by", "approved_at",
+            "approved_plan_sha256", "plan_sha256", "first_episode", "changed_since_approval", "rule_key")
+    return {"state": {k: st.get(k) for k in keep}, "series": ser, "mode": plan.get("mode"),
+            "episode_index": plan.get("episode_index")}
+
+
+def approval_problems(approval: dict | None, mode: str) -> list[str]:
+    """Why the approval gate (A1) fails for a production episode (empty = it passes).  Test mode never needs one."""
+    if mode != "production":
+        return []
+    if approval is None:
+        return ["승인 상태를 확인하지 못함(plan·프리셋으로 approval_state_for 를 실행하지 않음)"]
+    if approval.get("error"):
+        return [approval["error"]]
+    st = approval.get("state") or {}
+    out = []
+    if st.get("required") and not st.get("approved"):
+        who = "첫 에피소드" if st.get("first_episode") else f"{approval.get('episode_index')}번째 에피소드({st.get('rule_key')}=true)"
+        why = ("" if not st.get("approval_claimed") else
+               " — approval 블록에 승인이 적혀 있지만 증거 없음: " + "; ".join(st.get("evidence_problems") or []))
+        out.append(f"{who} 제안서가 승인되지 않은 채 렌더됨{why}")
+    ser = approval.get("series") or {}
+    if not ser.get("ok", False):
+        out.append(f"{approval.get('episode_index')}번째 에피소드인데 승인·렌더된 첫 편이 없음: " + "; ".join(ser.get("problems") or []))
+    return out
 
 
 def covered(row: dict, by_id: dict[str, dict]) -> bool:
@@ -64,7 +109,7 @@ def evaluate(rows: list[dict], *, mode: str, mp4_sha_measured: str | None, mp4_s
              unmeasured_preset_keys: list[str], production: bool | None = None, checked_at: str | None = None,
              plan: dict | None = None, reference: dict | None = None, measured_path: str | None = None,
              deliverable_path: str | None = None, inputs_measured: dict | None = None,
-             inputs_now: dict | None = None) -> dict:
+             inputs_now: dict | None = None, approval: dict | None = None) -> dict:
     from ..util.jsonio import now_iso
 
     production = (mode == "production") if production is None else production
@@ -112,10 +157,13 @@ def evaluate(rows: list[dict], *, mode: str, mp4_sha_measured: str | None, mp4_s
             (fails if production else warns).append(
                 {"rule": "R1", "message": "레퍼런스 같은 시각 비교 없음/불충분: " + "; ".join(rp), "rows": []})
 
-    # first episode of a preset: the proposal must have been approved before rendering
-    ap = (plan or {}).get("approval") or {}
-    if mode == "production" and (plan or {}).get("episode_index") == 1 and ap.get("required", True) and not ap.get("approved"):
-        fails.append({"rule": "A1", "message": "첫 에피소드 제안서가 승인되지 않은 채 렌더됨", "rows": []})
+    # approval gate (plan.approval_state_for + plan.series_first_episode): the proposal approved with evidence, and a
+    # later episode only after an approved, rendered first episode
+    for msg in approval_problems(approval, mode):
+        fails.append({"rule": "A1", "message": msg, "rows": []})
+    if approval and (approval.get("state") or {}).get("changed_since_approval"):
+        warns.append({"rule": "A2", "message": "승인 뒤 plan 이 수정됨(재승인은 요구하지 않음 — validate 경고에 바뀐 부분 기록)",
+                      "rows": []})
     style_un = [r for r in rows if r.get("kind") == "style_vs_reference" and r["status"] == "unmeasured"]
     other_un = [r for r in rows if r["status"] == "unmeasured" and not r.get("required")
                 and r.get("kind") != "style_vs_reference" and not covered(r, by_id)]
@@ -151,7 +199,7 @@ def evaluate(rows: list[dict], *, mode: str, mp4_sha_measured: str | None, mp4_s
             "checked_at": checked_at or now_iso(), "failures": fails, "warnings": warns,
             "unmeasured": {"total": n_un, "required": n_un - n_un_nonreq, "not_required": n_un_nonreq,
                            "not_required_uncovered": len(other_un) + len(style_un)},
-            "verdict_ko": verdict}
+            "approval": approval, "verdict_ko": verdict}
 
 
 def gate_episode(episode_id: str, production: bool | None = None) -> dict:
@@ -178,8 +226,9 @@ def gate_episode(episode_id: str, production: bool | None = None) -> dict:
         inputs_now = input_fingerprints(episode_id, pr)
     except Exception as e:  # a fingerprint that cannot be taken is a reason to re-run, never to pass silently
         inputs_now = {"error": f"{type(e).__name__}: {e}"}
+    plan = read_yaml(ep / "plan.yaml")
     return evaluate(rep["rows"], mode=rep.get("mode", "test"), mp4_sha_measured=rep["output"].get("sha256"),
                     mp4_sha_now=sha_now, unmeasured_preset_keys=pr.unmeasured_keys(), production=production,
-                    plan=read_yaml(ep / "plan.yaml"), reference=rep.get("reference") or {},
+                    plan=plan, reference=rep.get("reference") or {},
                     measured_path=rep["output"].get("path"), deliverable_path=paths.relp(mp4),
-                    inputs_measured=rep.get("inputs"), inputs_now=inputs_now)
+                    inputs_measured=rep.get("inputs"), inputs_now=inputs_now, approval=approval_facts(plan, pr))

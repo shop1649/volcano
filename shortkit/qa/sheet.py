@@ -8,7 +8,8 @@ Layout per page (``seconds`` columns, one per second t = page*seconds + k):
     레퍼런스 효과음       two 0.5 s cells per second, SFX type ids (audio/sfx_events.json) or '못 잼'
     우리 프레임           frame at t (output MP4)
     우리 자막             caption text active at t (measured onset/offset; '?' = timing not measured)
-    우리 효과음           two 0.5 s cells per second, SFX type ids detected in the output mix
+    우리 효과음           two 0.5 s cells per second, catalog type ids of the SFX detected in the output mix
+                          (sound fingerprint; the plan's label + '?' when the sound could not be classified)
 """
 from __future__ import annotations
 
@@ -160,7 +161,11 @@ def make_sheets(ctx: QAContext, text_probe: dict | None, audio_probe: dict | Non
         ref_fr = _frames_at(ctx.reference_mp4, times, CELL_W)
     ours_caps = ours_caption_track(ctx, text_probe)
     ref_caps = reference_caption_track(ctx) if ref_info is not None else None
-    ours_sfx = [{"t": d["t"], "type": d["type"]} for d in ((audio_probe or {}).get("sfx") or {}).get("detections") or []]
+    from .checks import catalog_type_of
+
+    # our SFX by their catalog type (fingerprint); the plan's label with '?' when the sound could not be classified
+    ours_sfx = [{"t": d["t"], "type": catalog_type_of(d) or f"{d['type']}?"}
+                for d in ((audio_probe or {}).get("sfx") or {}).get("detections") or []]
     ours_sfx_measured = (audio_probe or {}).get("status") == "measured"
     ref_sfx = reference_sfx_track(ctx) if ref_info is not None else None
     pages = max(1, int(math.ceil(n_sec / seconds)))

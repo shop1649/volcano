@@ -220,8 +220,8 @@ def test_prepare_packets_and_label_template(proj):
     md = (rv / "timeline.md").read_text("utf-8")
     assert "실제로 보고" in md and "자막 타임라인" in md and "컷 목록" in md
     rows = list(csv.DictReader((proj / P / "format_labels.csv").open(encoding="utf-8")))
-    assert rows == [{"video_id": "vid0000001", "intro_type": "", "structure_type": "", "notes": "", "labeled_by": "",
-                     "watched": "no"}]
+    assert rows == [{"video_id": "vid0000001", "intro_type": "", "structure_type": "", "beats": "", "reveal_t": "",
+                     "notes": "", "labeled_by": "", "watched": "no"}]
     # a human label is never touched by a later prepare
     write_labels(proj, [lab("vid0000001", "setup-reveal")])
     K.prepare("joshuamagazine", ["vid0000001"])

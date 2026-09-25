@@ -112,7 +112,11 @@ def library_roots() -> list[tuple[str | None, Path]]:
     return roots
 
 
-def load_library(roots: list[tuple[str | None, Path]] | None = None) -> list[LibraryTrack]:
+def load_library(roots: list[tuple[str | None, Path]] | None = None, *, rejected: list[dict] | None = None,
+                 check_reference_audio: bool = True) -> list[LibraryTrack]:
+    """Clean-music library files.  A file that is audio taken from a reference video -- a separated stem
+    (same bytes, or the same waveform: ``reference_audio_copy``) or the reference's own media -- is NOT a clean
+    music file (user rule) and is left out; each such file is appended to ``rejected`` with the reason."""
     out: list[LibraryTrack] = []
     seen: set[Path] = set()
     for token, root in roots or library_roots():
@@ -142,7 +146,187 @@ def load_library(roots: list[tuple[str | None, Path]] | None = None) -> list[Lib
                 seen.add(f.resolve())
                 out.append(LibraryTrack(track_id=f.stem, title=None, version=None, file=f.resolve(),
                                         stored=store_path(f, token, root), meta={"indexed": False}))
+    if not check_reference_audio or not out:
+        return out
+    ref = ReferenceAudio.scan()
+    kept = []
+    for tr in out:
+        hit = ref.copy_of(tr.file)
+        if hit is None:
+            kept.append(tr)
+        elif rejected is not None:
+            rejected.append({"file": tr.stored, "track_id": tr.track_id, **hit})
+    return kept
+
+
+# ============================================================================ reference-audio guard
+# A clean music file must never be audio taken from a reference video (a separated stem, or the reference's
+# own audio).  Same bytes -> refused.  Same waveform -> refused when the library file lies INSIDE one stem at
+# one lag (a trimmed / re-encoded / resampled / gain-changed copy) AND follows that stem's own level changes.
+# The clean source a stem was separated from is not refused: a whole song is longer than the stem (it cannot
+# lie inside it), and a clean excerpt does not follow the stem's ducking, fades, cuts and leaked SFX.  Limit:
+# when the stem has no level change and no leak at all over the excerpt, a clean excerpt and a stem copy are
+# the same signal and the excerpt is refused (the safe side).  Time-stretched or re-edited stems (pieces
+# re-ordered / looped past the stem length) are not detected by the waveform rule.  Engineering thresholds,
+# validated on SYNTHETIC stems only (tests/reference_audio/test_library_stem_guard.py).
+STEM_COPY_SR = 8000
+STEM_COPY_NCC = 0.98          # whole library file vs the stem segment at the best lag (gain-invariant)
+STEM_COPY_WIN_S = 0.25        # level-following test windows
+STEM_COPY_DEV_DB = 3.0        # a window "does not follow" the stem when levels differ by more than this ...
+STEM_COPY_MAX_DEV_WIN = 1     # ... and a copy has at most this many such windows
+STEM_COPY_ACTIVE_DB = -40.0   # windows quieter than this (re the loudest window of either) are ignored
+STEM_COPY_LEN_TOL_S = 0.5     # a file longer than the stem + this cannot lie inside it
+STEM_COPY_MIN_S = 1.0         # shorter files are not comparable by waveform (bytes only)
+STEM_EXT = (".wav", ".flac", ".mp3", ".m4a", ".ogg", ".aac", ".opus", ".aif", ".aiff")
+_DECODED: dict[tuple, np.ndarray] = {}
+_SHA: dict[tuple, str] = {}
+_COPY_CACHE: dict[tuple, dict | None] = {}
+
+
+def _stat_key(p: Path) -> tuple:
+    st = p.stat()
+    return (str(p.resolve()), st.st_size, st.st_mtime_ns)
+
+
+def _sha_cached(p: Path) -> str:
+    k = _stat_key(p)
+    if k not in _SHA:
+        _SHA[k] = sha256_file(p)
+    return _SHA[k]
+
+
+def _decoded(p: Path) -> np.ndarray:
+    k = _stat_key(p)
+    if k not in _DECODED:
+        if len(_DECODED) > 64:
+            _DECODED.clear()
+        x = load_mono(p, STEM_COPY_SR).astype(np.float64)
+        nz = np.nonzero(np.abs(x) > 1e-4)[0]                 # digital silence at the ends is not content
+        _DECODED[k] = x[nz[0]:nz[-1] + 1] if nz.size else x[:0]
+    return _DECODED[k]
+
+
+def reference_stem_files() -> list[Path]:
+    """Audio separated from reference videos: presets/*/analysis/*/stems/** (every preset of this project)."""
+    base = paths.absp("presets")
+    out: list[Path] = []
+    for d in sorted(base.glob("*/analysis/*/stems")) if base.is_dir() else []:
+        out += [f for f in sorted(d.rglob("*")) if f.is_file() and f.suffix.lower() in STEM_EXT]
     return out
+
+
+def reference_media_files() -> list[Path]:
+    base = paths.absp("presets")
+    out: list[Path] = []
+    for d in sorted(base.glob("*/reference/videos")) if base.is_dir() else []:
+        out += [f for f in sorted(d.iterdir()) if f.is_file() and f.suffix.lower() in AUDIO_EXT]
+    return out
+
+
+def _ncc_inside(a: np.ndarray, b: np.ndarray) -> tuple[float, int]:
+    """(max gain-invariant NCC, lag) of ``b`` slid fully inside ``a`` (len(a) >= len(b))."""
+    n = len(b)
+    b = b - b.mean()
+    nb = float(np.linalg.norm(b))
+    if nb <= 1e-9 or len(a) < n:
+        return 0.0, 0
+    m = 1 << int(np.ceil(np.log2(len(a) + n)))
+    corr = np.fft.irfft(np.fft.rfft(a, m) * np.conj(np.fft.rfft(b, m)), m)[: len(a) - n + 1]
+    c1 = np.concatenate([[0.0], np.cumsum(a)])
+    c2 = np.concatenate([[0.0], np.cumsum(a * a)])
+    s1 = c1[n:] - c1[:-n]
+    s2 = c2[n:] - c2[:-n]
+    na = np.sqrt(np.maximum(s2 - s1 * s1 / n, 1e-12))
+    v = corr / (na * nb)
+    k = int(np.argmax(v))
+    return float(v[k]), k
+
+
+def _level_deviations(seg: np.ndarray, x: np.ndarray) -> tuple[int, int]:
+    """Windows where the gain-matched file does NOT follow the stem segment's level (> STEM_COPY_DEV_DB),
+    over the windows where either is active.  -> (deviating, active)."""
+    g = float(np.dot(seg, x) / max(float(np.dot(x, x)), 1e-12))
+    y = g * x
+    w = int(STEM_COPY_WIN_S * STEM_COPY_SR)
+    k = len(x) // w
+    if k < 1:
+        return 0, 0
+    es = 10 * np.log10(np.mean(seg[: k * w].reshape(k, w) ** 2, axis=1) + 1e-12)
+    ey = 10 * np.log10(np.mean(y[: k * w].reshape(k, w) ** 2, axis=1) + 1e-12)
+    top = max(float(es.max()), float(ey.max()))
+    act = np.maximum(es, ey) > top + STEM_COPY_ACTIVE_DB
+    dev = np.abs(ey - es)[act]
+    return int(np.sum(dev > STEM_COPY_DEV_DB)), int(act.sum())
+
+
+@dataclass
+class ReferenceAudio:
+    """What counts as reference audio here: stem files, stem sha256s kept in separation records (the stem cache
+    is git-ignored and may be gone), and the downloaded reference media."""
+    stems: list[Path]
+    hashes: dict[str, tuple[str, str]]          # sha256 -> (kind, what)
+
+    @classmethod
+    def scan(cls) -> "ReferenceAudio":
+        stems = reference_stem_files()
+        hashes: dict[str, tuple[str, str]] = {}
+        base = paths.absp("presets")
+        for rec in sorted(base.glob("*/analysis/*/audio/separation.json")) if base.is_dir() else []:
+            for name, sha in ((read_json(rec) or {}).get("stems_sha256") or {}).items():
+                if isinstance(sha, str) and len(sha) == 64:
+                    hashes.setdefault(sha, ("separation_record", f"{paths.relp(rec)}#{name}"))
+        for f in reference_media_files():
+            hashes[_sha_cached(f)] = ("reference_media", paths.relp(f))
+        for f in stems:
+            hashes[_sha_cached(f)] = ("stem", paths.relp(f))
+        return cls(stems=stems, hashes=hashes)
+
+    def copy_of(self, f: Path) -> dict | None:
+        """{kind, matched, method, reason, ...} when ``f`` is reference audio, else None."""
+        sha = _sha_cached(f)
+        if sha in self.hashes:
+            kind, what = self.hashes[sha]
+            return {"kind": kind, "matched": what, "method": "sha256", "sha256": sha,
+                    "reason": f"레퍼런스에서 나온 음원과 같은 파일(sha256 동일: {what}) — 깨끗한 음악 파일이 아님"}
+        if not self.stems:
+            return None
+        key = (_stat_key(f), tuple(_stat_key(s) for s in self.stems))
+        if key in _COPY_CACHE:
+            return _COPY_CACHE[key]
+        res = None
+        try:
+            x = _decoded(f)
+        except Exception:                        # undecodable: identify() reports it; bytes were compared
+            x = np.zeros(0)
+        if len(x) >= STEM_COPY_MIN_S * STEM_COPY_SR:
+            tol = int(STEM_COPY_LEN_TOL_S * STEM_COPY_SR)
+            for s in self.stems:
+                try:
+                    y = _decoded(s)
+                except Exception:
+                    continue
+                if len(x) > len(y) + tol:        # longer than the stem: cannot be a (trimmed) copy of it
+                    continue
+                a = np.concatenate([np.zeros(tol), y, np.zeros(tol)])
+                ncc, lag = _ncc_inside(a, x)
+                if ncc < STEM_COPY_NCC:
+                    continue
+                dev, act = _level_deviations(a[lag:lag + len(x)], x)
+                if act and dev <= STEM_COPY_MAX_DEV_WIN:
+                    res = {"kind": "stem", "matched": paths.relp(s), "method": "waveform", "ncc": round(ncc, 4),
+                           "lag_s": round((lag - tol) / STEM_COPY_SR, 3), "deviating_windows": dev,
+                           "active_windows": act,
+                           "reason": (f"레퍼런스 분리 음원 {paths.relp(s)} 의 일부와 같은 파형(상관 {ncc:.3f} >= "
+                                      f"{STEM_COPY_NCC}, 음량 변화까지 따라감: 어긋난 창 {dev}/{act}) — 깨끗한 음악 "
+                                      "파일이 아님")}
+                    break
+        _COPY_CACHE[key] = res
+        return res
+
+
+def reference_audio_copy(path: str | os.PathLike) -> dict | None:
+    """Public check: is ``path`` audio taken from a reference video (stem copy or reference media)?"""
+    return ReferenceAudio.scan().copy_of(Path(path))
 
 
 # ============================================================================ features
@@ -1048,8 +1232,10 @@ def analyze_bgm(preset_name: str, video_id: str, audio_path: str | os.PathLike |
     out.update({"audio_file": rel_or_none(src), "audio_sha256": sha256_file(src), "duration_s": round(len(mix) / SR, 3),
                 "separator": sep,
                 "signal": "mix - vocals stem" if vocals is not None else "mix (vocals stem 없음)"})
-    lib = load_library() if library is None else library
-    out["library"] = {"n_files": len(lib), "roots": [tok or rel_or_none(p) for tok, p in library_roots()]}
+    refused: list[dict] = []
+    lib = load_library(rejected=refused) if library is None else library
+    out["library"] = {"n_files": len(lib), "roots": [tok or rel_or_none(p) for tok, p in library_roots()],
+                      "refused_reference_audio": refused}
     ident = identify(bgm_sig, SR, lib)
     cands_json = []
     for c in ident.get("candidates", [])[:8]:

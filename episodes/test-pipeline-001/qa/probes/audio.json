@@ -2476,7 +2476,37 @@
         "mix_lufs": -14.6,
         "rel_lu_obs": 0.24
       }
-    ]
+    ],
+    "voice_out": {
+      "method": "출력 믹스 − (찾은 BGM·효과음의 창별 최소제곱 맞춤) = 보존 원음 + 설명되지 않은 소리; edit.audio_checks 의 음악·음성 검출기로 측정(합성 음원으로만 검증된 공학 규칙)",
+      "music": [
+        {
+          "index": 0,
+          "clip_id": "s3",
+          "range_out": [
+            10.04,
+            12.26
+          ],
+          "status": "absent",
+          "polyphonic_share": 0.0,
+          "sustained_share": 0.31,
+          "active_s": 1.856,
+          "reason": null,
+          "method": "지속 부분음 검사: 0.4s 이상 같은 주파수로 이어지는 스펙트럼 봉우리 중 한 목소리의 배음으로 설명되지 않는 동시 부분음(화음·베이스+선율) 비율 >= 0.1 → 음악 있음, < 0.03 → 없음, 사이 → 못 잼 (합성 음악·TTS 로만 검증됨)"
+        }
+      ],
+      "speech": {
+        "status": "measured",
+        "spans": [
+          [
+            9.997,
+            12.103
+          ]
+        ],
+        "reason": null,
+        "method": "음성 판정: 유성음(75-400 Hz 자기상관 >= 0.5) + 음절 속도 레벨 변화(초당 6 dB 골 2회 이상), 범위: 에너지 구간(최대 대비 30 dB 안) — reference.audio_original"
+      }
+    }
   },
   "sfx": {
     "detections": [
@@ -2494,7 +2524,12 @@
         "bgm_local_gain_db_rel_plateau": -0.02,
         "gain_db_mix_scale": -12.31,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -8.6
+        "contrib_db_rel_mix": -8.6,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 6.8,
@@ -2509,7 +2544,12 @@
         "gain_db_rel_bgm_plateau": -8.05,
         "gain_db_mix_scale": -8.05,
         "gain_reference": "bgm_plateau (BGM 없음/정적 구간)",
-        "contrib_db_rel_mix": 0.1
+        "contrib_db_rel_mix": 0.1,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 7.7501,
@@ -2525,7 +2565,12 @@
         "bgm_local_gain_db_rel_plateau": -0.0,
         "gain_db_mix_scale": -8.05,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -3.6
+        "contrib_db_rel_mix": -3.6,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 10.9,
@@ -2541,7 +2586,12 @@
         "bgm_local_gain_db_rel_plateau": -10.0,
         "gain_db_mix_scale": -8.04,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -7.7
+        "contrib_db_rel_mix": -7.7,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 15.0,
@@ -2557,12 +2607,21 @@
         "bgm_local_gain_db_rel_plateau": 0.0,
         "gain_db_mix_scale": -8.04,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -5.0
+        "contrib_db_rel_mix": -5.0,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       }
     ],
     "threshold_ncc": 0.45,
     "min_contrib_db_rel_mix": -24.0,
-    "subaudible_matches": []
+    "subaudible_matches": [],
+    "catalog_classification": {
+      "status": "unmeasured",
+      "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+    }
   },
   "unexplained_onsets": [],
   "residual_rms_db_rel_mix": -27.18,

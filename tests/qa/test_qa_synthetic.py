@@ -139,6 +139,14 @@ def test_good_audio(reports):
         assert status(rep, f"audio.sfx.placement:{fx}:gain") == "same", fx
     sec = rows(rep, row_id="audio.bgm:section")["observed"]["section_start_s"]
     assert sec == pytest.approx(12.0, abs=0.01)
+    # the kept voice as it is in the output (mix minus BGM and SFX): a separated voice without the source's music,
+    # speech over the kept range, BGM ducked only under that speech -- all machine measurements, no listening
+    for rid in ("audio.original:music0", "audio.original:speech0", "audio.ducking:speech"):
+        assert status(rep, rid) == "same", rid
+    assert rows(rep, row_id="audio.original:music0")["observed"]["basis"] == "출력 측정"
+    # the synthetic voice track has no separation quality record: 못 잼 (required), never a claimed pass
+    q = rows(rep, row_id="audio.original:vocals_qc0")
+    assert q["status"] == "unmeasured" and q["required"] is True
     # user rule through audio_bgm.is_match: track AND version AND tempo AND section
     m = rows(rep, row_id="audio.bgm:match")
     assert m["status"] == "same"
@@ -230,6 +238,15 @@ def test_bad_sfx_without_event_and_unknown_sound(reports):
         assert status(rep, f"audio.sfx.placement:{fx}") == "same", fx
 
 
+def test_bad_ducking_without_speech_in_the_output(reports):
+    rep = reports["test-qa-bad"]
+    assert status(rep, "audio.original:music0") == "same"          # the same separated voice as GOOD
+    d = rows(rep, row_id="audio.ducking:speech")
+    assert d["status"] == "different"
+    assert any(it["range"][0] <= 1.3 and it["range"][1] >= 1.8 and it["without_speech_s"] > 0.25
+               for it in d["observed"]["ducks"]), d["observed"]
+
+
 def test_bad_leftover_watermark(reports):
     rep = reports["test-qa-bad"]
     r = _op_rows(rep)
@@ -254,7 +271,7 @@ def test_bad_gate_fails_and_defects_recorded(reports):
     items = [json.loads(l) for l in (ROOT / "episodes/test-qa-bad/qa/defects.jsonl").read_text().splitlines() if l.strip()]
     ids = {d["row_id"] for d in items}
     for rid in ("caption.position:s1", "audio.bgm:section", "audio.ducking:outside", "audio.sfx.no_event:all",
-                "decor.position:dc1"):
+                "decor.position:dc1", "audio.ducking:speech"):
         assert rid in ids, rid
     assert all(d["status"] == "open" and d["final_gate"]["pass"] is False for d in items)
 

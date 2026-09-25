@@ -521,13 +521,10 @@ def _load_videos(preset: str, ids: list[str], membership: dict[str, str]) -> dic
 
 
 # ============================================================================= channel-level presence
-# Keys emitted here before the preset/config owner adds them (presence.* leaves) or reclassifies them from
-# 'rule' to a measured style key (the two per-video count limits) -- review-fix wave 2.  Tests allow exactly
-# these, nothing else.
+# presence.* are preset style keys (added in review-fix wave 2, together with the reclassification of
+# motion.zoom.max_consecutive / motion.freeze.max_per_video from 'rule' to measured style keys).
 PRESENCE_VISUAL_KEYS = tuple(f"presence.{k}" for k in ("zoom", "freeze", "speed_change", "flash", "crossfade",
                                                        "decorations"))
-PENDING_PRESET_KEYS = PRESENCE_VISUAL_KEYS
-PENDING_STYLE_KEYS = ("motion.zoom.max_consecutive", "motion.freeze.max_per_video")
 PRESENCE_RULE = ("영상별 있다/없다/못 잼 → 채널 값: 측정된 영상 중 한 편이라도 있다 → present, 측정된 영상이 모두 없다 → absent, "
                  "측정된 영상 없음 → 못 잼(unmeasured). n = 있다/없다가 측정된 영상 수, n_present·share = 있다 영상 수·비율 "
                  "(n_unmeasured = 못 잰 영상 수, 포맷별도 같은 규칙)")

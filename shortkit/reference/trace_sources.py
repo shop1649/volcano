@@ -544,7 +544,12 @@ def trace(preset: str, ids: list[str], ocr_fps: float = 0.5, do_ocr: bool = True
         add_url(v.get("url") or f"https://www.youtube.com/watch?v={vid_all}", "레퍼런스 채널 자체 업로드(all_videos)",
                 vid_all, source="all_videos")
     pr = load_preset(preset)
-    if not any(e.get("kind") == "account" and e.get("added_by") == ADDED_BY for e in existing):
+    # the channel itself: a new row whenever no earlier row already carries this handle, page and EVERY channel id
+    # known now (ids learned after a blocked first trace -- meta/<id>.json from collect -- must reach sourcing)
+    if not any(e.get("kind") == "account" and e.get("added_by") == ADDED_BY
+               and e.get("handle") == pr.get("reference.channel_handle", None)
+               and e.get("channel_url") == pr.get("reference.channel_url", None)
+               and own_ch <= set(e.get("channel_ids") or []) for e in existing):
         url_rows.append({"kind": "account", "platform": "youtube", "handle": pr.get("reference.channel_handle", None),
                          "channel_url": pr.get("reference.channel_url", None), "channel_ids": sorted(own_ch),
                          "reason": "레퍼런스 채널 자체 — 이 채널의 업로드는 소재 후보가 될 수 없음(재게시 포함)",

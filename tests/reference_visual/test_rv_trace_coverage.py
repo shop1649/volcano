@@ -191,3 +191,23 @@ def test_transcribe_writes_transcript_only_with_an_engine(proj, monkeypatch):
     assert "사람이 들어 확인한 것이 아님" in tj["note"]
     kw = T.transcript_keywords("joshuamagazine", vid)
     assert kw["status"] == "measured" and "강아지" in kw["keywords"] and kw["times"]["강아지"] == 1.25
+
+
+def test_account_row_gains_channel_ids_learned_later(proj):
+    """S5-02 (finish): a first trace without channel metadata (e.g. collect blocked) writes the account row with
+    no channel id; once collect has written meta/<id>.json with the channel id, the next trace must add a row that
+    carries it -- sourcing matches candidates by channel id too (a re-upload under another handle)."""
+    _snap(proj, ["REFLATEST01"])
+    T.trace("joshuamagazine", ["REFLATEST01"], do_ocr=False, lens=False)
+    acc = [r for r in _rows(proj) if r["kind"] == "account"]
+    assert len(acc) == 1 and "UCSYNTHETIC0000000000001" not in acc[0]["channel_ids"]     # only the preset hint
+    write_json(proj / P / "reference/meta/REFLATEST01.json", {"video_id": "REFLATEST01", "channel_id": "UCSYNTHETIC0000000000001",
+                                                               "description": "SYNTHETIC"})
+    cand = {"platform": "youtube", "uploader": "someone else", "channel_id": "UCSYNTHETIC0000000000001"}
+    assert X.check_account(cand) is None
+    T.trace("joshuamagazine", ["REFLATEST01"], do_ocr=False, lens=False)
+    acc = [r for r in _rows(proj) if r["kind"] == "account"]
+    assert any("UCSYNTHETIC0000000000001" in (r.get("channel_ids") or []) for r in acc), acc
+    assert X.check_account(cand)["excluded"] is True
+    T.trace("joshuamagazine", ["REFLATEST01"], do_ocr=False, lens=False)     # nothing new -> no duplicate row
+    assert len([r for r in _rows(proj) if r["kind"] == "account"]) == len(acc)

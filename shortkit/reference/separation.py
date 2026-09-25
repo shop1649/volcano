@@ -393,6 +393,12 @@ def separate_reference(preset_name: str, video_id: str, audio_path: str | os.Pat
             and meta.get("mode") == mode and (separator is None or meta.get("model") == sep.name):
         cached = load_cached_stems(preset_name, video_id, sr, audio_path=src)
         if cached is not None:
+            rec = read_json(rec_path) or {}
+            if rec.get("status") == "measured" and not rec.get("stems_sha256"):    # records made before stem hashing
+                hashes = {n: sha256_file(paths.absp(f)) for n, f in (meta.get("files") or {}).items()
+                          if paths.absp(f).is_file()}
+                if hashes:
+                    write_json(rec_path, rec | {"stems_sha256": hashes})
             return cached
     try:
         stems_raw, ssr = sep.separate(src, two_stems=two_stems)
@@ -409,17 +415,20 @@ def separate_reference(preset_name: str, video_id: str, audio_path: str | os.Pat
                                   "separator": sep.name, "input": rel_or_none(src), "input_sha256": sha,
                                   "checked_at": now_iso()})
         raise
-    files = {}
+    files, hashes = {}, {}
     for name, arr in stems_raw.items():
         out = sdir / f"{name}.wav"
         write_wav(out, np.asarray(arr, np.float32), ssr)
         files[name] = paths.relp(out)
+        hashes[name] = sha256_file(out)
+    # stems_sha256 is kept in the (tracked) separation record too: the stem cache is git-ignored, and a stem
+    # copied into the music library must stay recognisable after the cache is gone (audio_bgm.load_library)
     meta = {"video_id": video_id, "status": "measured", "model": sep.name, "model_version": sep.version,
             "mode": mode, "sample_rate": ssr, "input": rel_or_none(src), "input_sha256": sha, "files": files,
-            "created_at": now_iso()}
+            "stems_sha256": hashes, "created_at": now_iso()}
     write_json(sdir / "stems.json", meta)
     write_json(rec_path, {k: meta[k] for k in ("video_id", "status", "model", "model_version", "mode", "input",
-                                                "input_sha256", "created_at")}
+                                                "input_sha256", "stems_sha256", "created_at")}
                | {"blocker": None, "stems_dir": paths.relp(sdir), "note": "stems 는 git 에 올리지 않는 캐시"})
     st = load_cached_stems(preset_name, video_id, sr, audio_path=src)
     assert st is not None

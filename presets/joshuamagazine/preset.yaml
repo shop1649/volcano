@@ -275,7 +275,9 @@ audio:
 
 structure:
   formats_file: presets/joshuamagazine/formats.yaml
-  duration_s: {p10: null, p50: null, p90: null, n: 0}   # episode validate(check_structure): 계획 길이가 p10..p90 밖이면
+  duration_s: {p10: null, p50: null, p90: null, n: 0}
+  cuts_per_10s: {p10: null, p50: null, p90: null, n: 0}   # 컷 빈도(10초당 컷 수). 레퍼런스 측정 전 못 잼
+  shot_len_s: {p10: null, p50: null, p90: null, n: 0}     # 샷 길이 분포(초). 레퍼런스 측정 전 못 잼   # episode validate(check_structure): 계획 길이가 p10..p90 밖이면
                                                         #   production 오류 / test 경고, 미측정이면 경고
   first_caption_at_s: 0.0
 

@@ -1,8 +1,11 @@
 {
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "saved_at": "2026-09-25T05:15:46+00:00",
+  "saved_at": "2026-09-25T07:10:33+00:00",
   "reads": {
+    "approval.later_episodes_require_approval": [
+      "shortkit/edit/plan.py:approval_state_for"
+    ],
     "audio.bgm.section_start_s": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -48,6 +51,7 @@
     ],
     "audio.sfx.catalog": [
       "shortkit/qa/checks.py:pget",
+      "shortkit/qa/probes_audio.py:classify_sfx_detections",
       "shortkit/qa/report.py:input_fingerprints"
     ],
     "audio.sfx.gain_db_default": [
@@ -401,6 +405,9 @@
     ]
   },
   "callers": {
+    "shortkit/edit/plan.py:approval_state_for": {
+      "fp": "76cb216c1917c673"
+    },
     "shortkit/qa/__init__.py:representative_for": {
       "fp": "cae45c74cd38f8b2"
     },
@@ -410,8 +417,11 @@
     "shortkit/qa/probes_audio.py:_sfx_templates": {
       "fp": "fa8bc1858240664f"
     },
+    "shortkit/qa/probes_audio.py:classify_sfx_detections": {
+      "fp": "ac2e2dd8fd1922ff"
+    },
     "shortkit/qa/probes_audio.py:probe_audio": {
-      "fp": "96a0978bdec10b0c"
+      "fp": "165c051e4c914a4c"
     },
     "shortkit/qa/probes_text.py:probe_cover": {
       "fp": "06895fb791687973"

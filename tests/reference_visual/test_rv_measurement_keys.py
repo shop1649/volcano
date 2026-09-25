@@ -50,19 +50,22 @@ def test_every_emitted_key_is_a_preset_style_key(proj):
     base = config.flatten(read_yaml(proj / P / "preset.yaml"))
     keys = [it["key"] for it in _items(proj)]
     assert len(keys) == len(set(keys))
-    # the ONLY tolerated gaps are the keys the preset/config owner adds / reclassifies in review-fix wave 2
-    # (A.PENDING_*): channel-level presence.* leaves and the two measured per-video count limits
-    missing = [k for k in keys if k not in base and k not in A.PENDING_PRESET_KEYS]
+    # no tolerated gaps any more (wave 2 added presence.* and reclassified the two per-video count limits)
+    missing = [k for k in keys if k not in base]
     assert not missing, f"measurement keys with no preset key: {missing}"
-    non_style = [k for k in keys if k in base and config.classify_key(k) and k not in A.PENDING_STYLE_KEYS]
+    non_style = [k for k in keys if config.classify_key(k)]
     assert not non_style, f"measurement keys that are meta/infra/rule keys: {non_style}"
-    assert set(A.PENDING_PRESET_KEYS) <= set(keys) and set(A.PENDING_STYLE_KEYS) <= set(keys)
-    # and the registry picks every one of them up
+    assert set(A.PRESENCE_VISUAL_KEYS) <= set(keys)
+    assert {"motion.zoom.max_consecutive", "motion.freeze.max_per_video"} <= set(keys)
+    # and the registry picks every one of them up: unmeasured with the blocker, or -- only by the registry's
+    # DEFINITION rule (config.APPLICABILITY, given '정의') -- not applicable (timing.lead_s of non-dialogue roles)
     reg = config.sync_registry("joshuamagazine", access_logs=[], qa_declarations={})
+    na = []
     for k in keys:
-        if k not in base:
-            continue
         e = reg["entries"][k]
-        if k in A.PENDING_STYLE_KEYS and e["status"] not in ("unmeasured",):
-            continue                                      # still a 'rule' key until wave 2
+        if e["status"] == "not_applicable_given":
+            assert (e.get("not_applicable") or {}).get("given") == "정의", (k, e.get("not_applicable"))
+            na.append(k)
+            continue
         assert e["status"] == "unmeasured" and e.get("blocker"), k
+    assert na and all(k.endswith(".timing.lead_s") and ".dialogue." not in k for k in na), na

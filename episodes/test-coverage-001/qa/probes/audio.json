@@ -2714,7 +2714,17 @@
     "expected_gain_db": {},
     "windows": [],
     "present_ranges_obs": [],
-    "levels": []
+    "levels": [],
+    "voice_out": {
+      "method": "출력 믹스 − (찾은 BGM·효과음의 창별 최소제곱 맞춤) = 보존 원음 + 설명되지 않은 소리; edit.audio_checks 의 음악·음성 검출기로 측정(합성 음원으로만 검증된 공학 규칙)",
+      "music": [],
+      "speech": {
+        "status": "measured",
+        "spans": [],
+        "reason": null,
+        "method": "음성 판정: 유성음(75-400 Hz 자기상관 >= 0.5) + 음절 속도 레벨 변화(초당 6 dB 골 2회 이상), 범위: 에너지 구간(최대 대비 30 dB 안) — reference.audio_original"
+      }
+    }
   },
   "sfx": {
     "detections": [
@@ -2732,7 +2742,12 @@
         "bgm_local_gain_db_rel_plateau": -0.01,
         "gain_db_mix_scale": -8.99,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -5.2
+        "contrib_db_rel_mix": -5.2,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 10.8,
@@ -2748,7 +2763,12 @@
         "bgm_local_gain_db_rel_plateau": -0.04,
         "gain_db_mix_scale": -8.11,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -6.0
+        "contrib_db_rel_mix": -6.0,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       },
       {
         "t": 16.3,
@@ -2764,12 +2784,21 @@
         "bgm_local_gain_db_rel_plateau": -0.01,
         "gain_db_mix_scale": -8.01,
         "gain_reference": "local_bgm",
-        "contrib_db_rel_mix": -5.4
+        "contrib_db_rel_mix": -5.4,
+        "catalog_type": {
+          "status": "unmeasured",
+          "type_id": null,
+          "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+        }
       }
     ],
     "threshold_ncc": 0.45,
     "min_contrib_db_rel_mix": -24.0,
-    "subaudible_matches": []
+    "subaudible_matches": [],
+    "catalog_classification": {
+      "status": "unmeasured",
+      "reason": "효과음 카탈로그 미측정(2026-09-24: 레퍼런스 최신 50편 다운로드 불가(youtube 차단), Demucs 가중치 호스트(dl.fbaipublicfiles.com) 차단) — 종류 지문 없음"
+    }
   },
   "unexplained_onsets": [],
   "residual_rms_db_rel_mix": -23.45,

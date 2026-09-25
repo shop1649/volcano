@@ -80,10 +80,13 @@ def sfx_cells(ref_events: list[dict], ref_blind: list, ours: list[dict], dur_ref
     out = []
     for a, b in _cells(n, 0.5):
         rr = sorted(str(e["type"]) for e in ref_events if a <= float(e["t"]) < b)
-        oo = sorted(str(e["type"]) for e in ours if a <= float(e["t"]) < b)
+        mine = [e for e in ours if a <= float(e["t"]) < b]
+        oo = sorted(str(e["type"]) for e in mine)
         blind = any(float(x) < b and float(y) > a for x, y in ref_blind or [])
-        st = "unmeasured" if blind else ("same" if rr == oo else "different")
-        out.append({"t": a, "reference": rr, "ours": oo, "status": st, **({"reference_not_measured": True} if blind else {})})
+        ours_blind = any(e.get("type") is None for e in mine)
+        st = "unmeasured" if (blind or ours_blind) else ("same" if rr == oo else "different")
+        out.append({"t": a, "reference": rr, "ours": oo, "status": st, **({"reference_not_measured": True} if blind else {}),
+                    **({"ours_type_not_measured": True} if ours_blind else {})})
     return {"cells": out, "past_shorter_video": extra}
 
 
@@ -150,10 +153,15 @@ def our_cuts(video_probe: dict) -> list[dict] | None:
 
 
 def our_sfx(audio_probe: dict) -> list[dict] | None:
+    """Our SFX by CATALOG type (the fingerprint classification of each detected sound, never the plan's label): type
+    None = not classified (the cell is 못 잼); checks.UNCLASSIFIED = a sound matching no catalog type."""
+    from .checks import catalog_type_of
+
     ap = audio_probe or {}
     if ap.get("status") != "measured":
         return None
-    out = [{"t": float(d["t"]), "type": d["type"]} for d in (ap.get("sfx") or {}).get("detections") or []]
+    out = [{"t": float(d["t"]), "type": catalog_type_of(d), "plan_label": d.get("type")}
+           for d in (ap.get("sfx") or {}).get("detections") or []]
     for a, _b in ((ap.get("bgm") or {}).get("silent_ranges_obs") or []):
         out.append({"t": float(a), "type": SILENCE})
     return out

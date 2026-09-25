@@ -2,7 +2,7 @@ schema: shortkit.formats/1
 preset_id: joshuamagazine-v1
 status: unmeasured
 blocker: '2026-09-24: youtube.com/googlevideo.com 차단으로 최신 100편 목록·영상 미확보 → 포맷 분류 못 함; 라벨 파일 없음 — `shortkit ref classify
-  prepare` 후 영상을 본 사람이 채워야 함'
+  prepare` 후 영상을 본 사람이 채워야 함; 고정된 최신 100편 스냅샷이 없어 포맷 표를 만들 수 없음(포맷은 스냅샷 구성원으로만)'
 basis:
   snapshot_file: presets/joshuamagazine/reference/latest100.json
   captured_at: '2026-09-24T17:56:07+00:00'
@@ -11,7 +11,34 @@ basis:
   labeled: 0
   labels_file: presets/joshuamagazine/format_labels.csv
   rejected_labels: 0
+  outside_snapshot_labels: 0
+  missing_members: []
+  rule: 포맷 표·비율·대표 영상은 고정된 최신 100편 스냅샷 구성원의 라벨만으로 만든다(그 밖의 라벨은 참고로만 보관)
 rule: 전개 구조가 실제로 다른 것만 별도 포맷. 도입 방식만 다른 것은 같은 포맷의 intro_variants 로 기록
 table: []
 assignments: {}
-built_at: '2026-09-24T18:30:14+00:00'
+disclosure_order:
+  status: unmeasured
+  blocker: 포맷 표 없음(라벨 없음) — 정보 공개 순서 못 잼
+  vocabulary:
+  - hook
+  - context
+  - build
+  - reveal
+  - reaction
+  - outro
+  rule: 포맷별 구간 목적 순서(beats)와 반전 시각 비율(reveal_frac = reveal_t / 영상 길이)은 영상을 본 사람의 라벨로만 잰다. 포맷 구성원 전부가 유효한 라벨을 가질
+    때만 값을 싣고(아니면 partial_stats 에만), beats 는 구성원의 순서가 하나의 전체 순서로 정해질 때만(순서 충돌·모르는 쌍이면 None)
+label_columns:
+  video_id: 레퍼런스 영상 ID(최신 100편 스냅샷 구성원만 포맷 표에 쓰임)
+  intro_type: 도입 방식(도입만 다른 영상은 같은 포맷의 intro_variants)
+  structure_type: 전개 구조(전개 구조가 실제로 다를 때만 다른 포맷)
+  beats: '구간 목적 순서: hook / context / build / reveal / reaction / outro 중에서 ''>'' 로 이음(예: hook>build>reveal>reaction).
+    한국어 별칭: 훅=hook, 후킹=hook, 도입=hook, 상황=context, 배경=context, 맥락=context, 설명=context, 전개=build, 빌드업=build, 고조=build,
+    반전=reveal, 공개=reveal, 반응=reaction, 리액션=reaction, 마무리=outro, 아웃트로=outro, 끝=outro'
+  reveal_t: '반전이 처음 보이는 시각(영상 시작부터 초, 예: 17.5). 반전이 없는 영상은 none'
+  notes: 메모(선택)
+  labeled_by: 영상을 끝까지 보고 들은 사람 이름(필수)
+  watched: yes = 실제로 보고 들음(그 외 값의 행은 쓰지 않음)
+outside_snapshot_labels: []
+built_at: '2026-09-25T06:17:32+00:00'
