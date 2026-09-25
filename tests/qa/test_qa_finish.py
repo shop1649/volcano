@@ -121,6 +121,17 @@ def _rows_from_saved_probes(ep: str, monkeypatch) -> tuple[list[dict], list[tupl
     pdir = REAL_ROOT / "episodes" / ep / "qa" / "probes"
     if not (pdir / "text.json").is_file():
         pytest.skip(f"{ep}: saved probes missing (run `shortkit qa run --episode {ep}`)")
+    if not (REAL_ROOT / "episodes" / ep / "build" / "resolved.json").is_file():
+        # build/ is not in git or the bundle (a fresh clone / clean restore): re-derive the IR from the plan
+        import os
+        import subprocess
+        import sys
+
+        r = subprocess.run([sys.executable, "-m", "shortkit", "episode", "resolve", ep], cwd=str(REAL_ROOT),
+                           env={**os.environ, "SHORTKIT_ROOT": str(REAL_ROOT)}, capture_output=True, text=True)
+        if r.returncode != 0 or not (REAL_ROOT / "episodes" / ep / "build" / "resolved.json").is_file():
+            pytest.skip(f"{ep}: build/resolved.json missing and `shortkit episode resolve {ep}` failed: "
+                        f"{(r.stderr or r.stdout)[-300:]}")
     orig = checks.RowBuilder.reference_of
     monkeypatch.setattr(checks.RowBuilder, "reference_of",
                         lambda self, keys: (({k: "SYNTHETIC-measured" for k in keys} if keys else None), [],
@@ -227,13 +238,13 @@ def test_font_reference_row_compares_the_bold_key(temp_root, monkeypatch):
 
 
 def test_timing_reference_row_reads_persist_with_the_analyzer_definition(temp_root):
-    import json
-
     from shortkit.edit.ir import ResolvedEdit
 
     from .test_qa_review_d import REAL_ROOT
 
-    res = ResolvedEdit.from_dict(json.loads((REAL_ROOT / "episodes/test-qa-good/build/resolved.json").read_text()))
+    from .test_qa_review_d import synthetic_resolved
+
+    res = ResolvedEdit.from_dict(synthetic_resolved())
     title = next(c for c in res.captions if c.role == "title")          # SYNTHETIC render: 0.0-7.8 s of 7.8 s
 
     def run(offset):

@@ -70,10 +70,10 @@ def test_clean_sources_are_kept_and_stem_copies_are_dropped(tmp_project):
     # 2) trimmed (3..15 s), gain -6 dB, resampled to 44.1 kHz 16-bit: same waveform, different bytes
     from scipy.signal import resample_poly
 
-    import soundfile as sf
+    from shortkit.util.media import write_wav     # 16-bit PCM via ffmpeg (no extra audio-file dependency)
 
     part = stem[int(3 * S.SR):int(15 * S.SR)] * 0.5
-    sf.write(music / "bgm_edit.wav", resample_poly(part, 2, 1).astype(np.float32), 2 * S.SR, subtype="PCM_16")
+    write_wav(music / "bgm_edit.wav", resample_poly(part, 2, 1).astype(np.float32), 2 * S.SR)
     # 3) a short excerpt of the CLEAN file covering the same span (legit short clean file) -> kept
     clean = S._read(lib["bed_a.wav"])
     S._write(music / "bed_a_excerpt.wav", clean[int((SEC + 3) * S.SR):int((SEC + 15) * S.SR)] * 0.7)

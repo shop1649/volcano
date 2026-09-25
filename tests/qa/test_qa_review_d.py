@@ -372,11 +372,24 @@ def test_representative_video_comes_from_formats_yaml(temp_root):
     assert r["path"] == f"{P}/reference/videos/refvid00001.mp4" and r["intro_variants"][0]["intro_type"] == "cold_open"
 
 
+def synthetic_resolved(episode_id: str = "test-qa-good") -> dict:
+    """The SYNTHETIC QA episode's resolved IR (tests/qa/qa_synth.py) built in memory -- the episodes' build/ folders are
+    not in git or the bundle, so a fresh clone / clean restore has no resolved.json to read.  Caption bboxes are
+    placeholders (callers that need measured boxes render the episode)."""
+    import sys
+
+    sys.path.insert(0, str(REAL_ROOT / "tests" / "qa"))
+    import qa_synth
+
+    bb = {c["id"]: [100.0, 100.0, 400.0, 80.0] for c in qa_synth.CAPTIONS}
+    return qa_synth.build_resolved(episode_id, bb).to_dict()
+
+
 def _episode(root, ep="e1", fmt="F1", mode="production"):
     """SYNTHETIC episode: resolved.json + a tiny output MP4 (enough for load_context / gate_episode)."""
     from shortkit.util.jsonio import write_json, write_yaml
 
-    res = json.loads((REAL_ROOT / "episodes/test-qa-good/build/resolved.json").read_text())
+    res = synthetic_resolved()
     res.update(episode_id=ep, format_id=fmt, mode=mode, output_path=f"episodes/{ep}/output/{ep}.mp4",
                ass_path=f"episodes/{ep}/build/captions.ass")
     write_json(root / "episodes" / ep / "build" / "resolved.json", res)
