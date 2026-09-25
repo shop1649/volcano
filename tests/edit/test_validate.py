@@ -401,3 +401,45 @@ def test_paths_must_be_root_relative(root, plan):
     assert "path_not_root_relative" in codes(run(root, plan), "error")
     plan["output"] = {"path": "episodes/t1/output/t1.mp4"}
     assert "path_not_root_relative" not in codes(run(root, plan))
+
+
+# ----------------------------------------------------------------------------- clean ops over protected regions
+def test_cleanup_over_a_protected_region_is_reported_only_while_both_are_on_screen(root, plan):
+    """test-restore-001: a burned subtitle inpainted over the walking man's hands smeared them; nothing flagged it."""
+    src = plan["sources"][0]                                     # face 140,20 40x40 on source a (used 0.5-3.5 s)
+    src["clean"]["inpaint"] = [{"x": 130, "y": 15, "w": 60, "h": 50, "start": None, "end": None, "reason": "ov1 subtitle"}]
+    assert "clean_overlaps_protected" in codes(run(root, plan), "warn")
+    src["protected"][0].update(start=0.0, end=0.4)               # the face is gone before the clip starts (src 0.5)
+    assert "clean_overlaps_protected" not in codes(run(root, plan))
+    src["protected"][0].update(start=None, end=None)
+    src["clean"]["inpaint"][0].update(start=3.6, end=4.0)        # the subtitle only after the last used source second
+    assert "clean_overlaps_protected" not in codes(run(root, plan))
+    src["clean"]["inpaint"] = [{"x": 10, "y": 120, "w": 60, "h": 30, "start": None, "end": None, "reason": "ov2 logo"}]
+    assert "clean_overlaps_protected" not in codes(run(root, plan))  # elsewhere in the frame
+
+
+def test_zoom_does_not_report_a_protected_region_gone_before_the_zoom_starts(root, plan):
+    """validate's zoom_cuts_protected ignored the protected region's time window (test-restore-001: hands that leave
+    the frame 3 s before the zoom were reported as cut by it)."""
+    src = plan["sources"][0]
+    src["protected"] = [{"label": "손", "x": 20, "y": 2, "w": 30, "h": 20}]      # top-left corner: a 1.5x zoom cuts it
+    plan["timeline"][0]["zoom"] = {"center": [240, 150], "start": 1.2, "scale_to": 1.5}
+    assert "zoom_cuts_protected" in codes(run(root, plan), "warn")
+    src["protected"][0].update(start=0.5, end=1.0)                # zoom starts at local 1.2 s = source 1.7 s
+    assert "zoom_cuts_protected" not in codes(run(root, plan))
+
+
+def test_cleanup_protected_overlaps_helper():
+    from types import SimpleNamespace
+
+    from shortkit.clean.strategy import cleanup_protected_overlaps
+    from shortkit.edit.ir import TimedRect
+
+    clip = SimpleNamespace(src_in=2.8, src_out=12.3, delogo=[], blur=[],
+                           inpaint=[TimedRect(239, 354, 283, 51, 2.0, 6.083, "ov2 burned_subtitle")])
+    hands = [{"label": "두 손 1", "x": 390, "y": 295, "w": 110, "h": 60, "start": 4.5, "end": 5.4},
+             {"label": "두 손 2", "x": 300, "y": 320, "w": 185, "h": 85, "start": 5.3, "end": 6.2}]
+    ov = cleanup_protected_overlaps(clip, hands)
+    assert [o["label"] for o in ov] == ["두 손 2"]                  # 두 손 1 touches the subtitle rect by 1 px only
+    assert ov[0]["src_t"] == [5.3, 6.083] and ov[0]["op"] == "inpaint" and ov[0]["covered_frac"] == 0.6
+    assert cleanup_protected_overlaps(SimpleNamespace(**{**vars(clip), "src_in": 6.2}), hands) == []

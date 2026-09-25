@@ -84,6 +84,37 @@ def _disjoint(a: dict, b: dict) -> bool:
             a["y"] + a["h"] <= b["y"] or b["y"] + b["h"] <= a["y"])
 
 
+PROTECTED_OVERLAP_MIN_FRAC = 0.05     # share of a protected rect a clean op may paint over before it counts
+
+
+def cleanup_protected_overlaps(clip, protected: list[dict], min_frac: float = PROTECTED_OVERLAP_MIN_FRAC) -> list[dict]:
+    """Clean ops of one timeline clip (``clip.inpaint`` / ``delogo`` / ``blur``: SOURCE px, SOURCE time) that paint over
+    a protected region (plan ``sources[].protected``: face / hand / key object, SOURCE px and time) while the clip shows
+    it.  Local restoration invents the pixels inside its rect, so whatever it covers is smeared -- the person is damaged
+    as surely as by a crop (test-restore-001 s1: the burned subtitle over the walking man's hands, 5.3-6.1 s).  Used by
+    ``edit.validate`` (warning) and QA (required row, a person judges the output).  -> [{op, reason, rect, label,
+    protected, src_t: [t0, t1], covered_frac}] for overlaps covering more than ``min_frac`` of the protected rect."""
+    out: list[dict] = []
+    for kind in ("inpaint", "delogo", "blur"):
+        for r in getattr(clip, kind, None) or []:
+            rr = {"x": float(r.x), "y": float(r.y), "w": float(r.w), "h": float(r.h)}
+            for p in protected or []:
+                t0 = max([float(clip.src_in)] + [float(v) for v in (r.start, p.get("start")) if v is not None])
+                t1 = min([float(clip.src_out)] + [float(v) for v in (r.end, p.get("end")) if v is not None])
+                if t1 - t0 <= 1e-3:
+                    continue
+                pr = {k: float(p[k]) for k in ("x", "y", "w", "h")}
+                if _disjoint(rr, pr) or pr["w"] * pr["h"] <= 0:
+                    continue
+                ix = (min(rr["x"] + rr["w"], pr["x"] + pr["w"]) - max(rr["x"], pr["x"])) * \
+                     (min(rr["y"] + rr["h"], pr["y"] + pr["h"]) - max(rr["y"], pr["y"]))
+                frac = ix / (pr["w"] * pr["h"])
+                if frac > min_frac:
+                    out.append({"op": kind, "reason": r.reason, "rect": rr, "label": p.get("label", "protected"),
+                                "protected": pr, "src_t": [round(t0, 3), round(t1, 3)], "covered_frac": round(frac, 3)})
+    return out
+
+
 def _activity_in(act: dict | None, r: dict, W: int, H: int) -> float:
     if not act or not act.get("values"):
         return 0.0

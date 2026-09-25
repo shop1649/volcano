@@ -581,10 +581,18 @@ def check_style_overrides(plan: dict, preset: config.Preset, out: list[dict]) ->
 def check_protected_framing(plan: dict, ctx: ResolveContext, out: list[dict]) -> None:
     """Never crop away the important person/action: protected rects (faces/hands/key objects)
     must survive the clean crop and the region fit; a zoom that cuts one is reported."""
-    from .resolve import base_fit, effective_src_rect, src_to_region
+    from ..clean.strategy import cleanup_protected_overlaps
+    from .resolve import base_fit, effective_src_rect, src_time_at, src_to_region
 
     prot = {s["id"]: s.get("protected") or [] for s in plan["sources"]}
     for clip in ctx.resolved.clips:
+        # local restoration (inpaint / delogo / blur) painting over a face / hand / key object smears it
+        for ov in cleanup_protected_overlaps(clip, prot.get(clip.source_id, [])):
+            out.append(issue("warn", "clean_overlaps_protected",
+                             f"원본 정리({ov['op']} {ov['reason']})가 보호 영역 '{ov['label']}' 의 {ov['covered_frac']:.0%} 를 "
+                             f"원본 {ov['src_t'][0]:.2f}~{ov['src_t'][1]:.2f}s 동안 덮습니다: 국소 복원은 그 안을 지어내므로 인물·동작이 "
+                             "번집니다 → 깨끗한 원본(`source link-original`)을 먼저 찾고, 없으면 그 구간을 쓰지 않는 편을 검토. "
+                             "QA 가 이 부분을 사람 확인 필수(못 잼)로 남깁니다", f"timeline[{clip.id}]"))
         if not all(clip.src_size):
             continue
         for p in prot.get(clip.source_id, []):
@@ -604,6 +612,9 @@ def check_protected_framing(plan: dict, ctx: ResolveContext, out: list[dict]) ->
                     s_, tx, ty = base_fit(clip)
                 else:
                     if not clip.zoom:
+                        continue
+                    # the zoom holds from its start to the clip end: a protected region gone before it starts is not cut
+                    if p.get("end") is not None and float(p["end"]) <= src_time_at(clip, clip.zoom.start) + 1e-3:
                         continue
                     s_, tx, ty = src_to_region(clip, clip.zoom.start + clip.zoom.dur)
                 x0 = tx + s_ * (p["x"] - ex)

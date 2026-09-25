@@ -7,7 +7,10 @@ never stand in for the reference channel's measurements.
     shortkit testassets synth              music bed, SFX set, Korean TTS lines (espeak-ng if present)
     shortkit testassets fetch-video        CC-BY 4.0 Intel sample clips (sha256-pinned)
     shortkit testassets dirty-source       a source clip with a fake watermark, burned-in English
-                                           subtitles, embedded music + speech (for clean/audio tests)
+                                           subtitles, embedded music + speech (for clean/audio tests);
+                                           --video <Intel clip> --out <name> for another base clip
+                                           (test-restore-001: face-demographics-walking-and-pause.mp4 ->
+                                           dirty_source_facewalk)
 
 Everything lands in assets/test/generated/ (git-ignored) and a manifest.json with sha256.
 """
@@ -240,10 +243,14 @@ def cmd_dirty(args) -> int:
     if not vid.exists():
         print(f"missing {vid}; run `shortkit testassets fetch-video` first")
         return 1
-    dst = paths.absp(f"{OUT}/dirty_source.mp4")
+    name = args.out or "dirty_source"
+    if "/" in name or name.endswith(".mp4"):
+        print("--out 은 확장자 없는 파일 이름(assets/test/generated/<이름>.mp4)")
+        return 2
+    dst = paths.absp(f"{OUT}/{name}.mp4")
     gt = make_dirty_source(vid, dst, args.seconds)
     gt["sha256"] = sha256_file(dst)
-    write_json(paths.absp(f"{OUT}/dirty_source.truth.json"), gt)
+    write_json(paths.absp(f"{OUT}/{name}.truth.json"), gt)
     print(f"dirty source -> {paths.relp(dst)}")
     return 0
 
@@ -272,4 +279,6 @@ def register(p: argparse.ArgumentParser) -> None:
     d = sub.add_parser("dirty-source")
     d.add_argument("--video", default="classroom.mp4")
     d.add_argument("--seconds", type=float, default=20.0)
+    d.add_argument("--out", default=None,
+                   help="출력 이름(기본 dirty_source → assets/test/generated/dirty_source.mp4; 테스트 픽스처가 이 기본 파일을 씀)")
     d.set_defaults(func=cmd_dirty)

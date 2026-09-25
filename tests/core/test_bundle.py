@@ -27,6 +27,10 @@ def proj(tmp_path):
     (root / "episodes/e1/build/resolved.json").write_text("{}", encoding="utf-8")
     (root / "episodes/e1/plan.yaml").write_text("episode_id: e1\n", encoding="utf-8")
     (root / "run.log").write_text("/abs/path", encoding="utf-8")
+    (root / "docs/validation/mockloop").mkdir(parents=True)
+    (root / "docs/validation/mockloop/build_scratch.py").write_text("print('scratch')\n", encoding="utf-8")
+    (root / "docs/validation/mockloop.md").write_text("python docs/validation/mockloop/build_scratch.py\n", encoding="utf-8")
+    (root / "docs/validation/sheet.png").write_bytes(b"\x89PNG" + b"\x00" * 100)
     return root
 
 
@@ -35,6 +39,9 @@ def test_selection_keeps_preset_assets_and_never_packs_secrets(proj):
     assert "presets/p/sfx_fp/edit_01.npy" in files
     assert "presets/p/measurements/visual_text.json" in files          # > 400 kB text is kept
     assert "episodes/e1/plan.yaml" in files
+    # the validation scripts a bundled doc tells the reader to run are packed (the restore found them missing)
+    assert "docs/validation/mockloop/build_scratch.py" in files and "docs/validation/mockloop.md" in files
+    assert "docs/validation/sheet.png" not in files
     for secret in ("cookies/youtube.txt", "local.yaml", "my_ig_cookie.dat", "run.log", "episodes/e1/build/resolved.json"):
         assert secret not in files
 

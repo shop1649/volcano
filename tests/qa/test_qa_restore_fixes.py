@@ -160,3 +160,38 @@ def test_zoom_row_trusts_the_geometry_only_with_in_ramp_evidence():
     assert (eff["measured_final_ratio"], eff["measured_dur"], eff["measured_ease"], eff["observed_by"]) == \
         (1.25, 0.35, "out", "geometry")
     assert _zoom_effective(dict(fooled, geometry=dict(geo, confirmed=False)))["measured_final_ratio"] == 1.89
+
+
+# ----------------------------------------------------------------------------- clean ops over protected regions
+def test_cleanup_over_a_protected_region_is_a_required_row_a_person_must_judge():
+    """test-restore-001 s1: the inpainted burned subtitle smeared the walking man's hands; QA passed it silently."""
+    from shortkit.edit.ir import TimedRect
+    from shortkit.qa import checks
+
+    from .test_qa_review_d import _builder
+
+    plan = {"sources": [{"id": "v_hall", "protected": [
+        {"label": "남성 두 손", "x": 300, "y": 320, "w": 185, "h": 85, "start": 5.3, "end": 6.2}]}]}
+    clip = SimpleNamespace(id="s1", source_id="v_hall", src_in=2.8, src_out=12.3, delogo=[], blur=[],
+                           inpaint=[TimedRect(239, 354, 283, 51, 2.0, 6.083, "ov2 burned_subtitle 'WAIT FOR IT'")])
+    b = _builder(plan=plan)
+    b.ctx.resolved.clips = [clip]
+    checks._clean_protected_rows(b)
+    r = next(x for x in b.rows if x["check_id"] == "clean.protected_overlap")
+    assert r["row_id"] == "clean.protected_overlap:s1#0" and r["status"] == "unmeasured" and r["required"] is True, r
+    assert "human-check" in r["note"] and r["observed"]["covered_frac"] == 0.6
+    # a person who watched the final MP4 records the verdict
+    b = _builder(plan=plan)
+    b.ctx.resolved.clips = [clip]
+    b.ctx.options = {"mp4_sha256": "abc", "human_checks": [
+        {"row_id": "clean.protected_overlap:s1#0", "mp4_sha256": "abc", "kind": "watch", "verdict": "different",
+         "by": "tester", "at": "2026-09-25", "note": "손이 번져 보임"}]}
+    checks._clean_protected_rows(b)
+    r = next(x for x in b.rows if x["check_id"] == "clean.protected_overlap")
+    assert r["status"] == "different" and "tester" in r["note"]
+    # no overlap -> one 'same' row naming what was compared
+    b = _builder(plan={"sources": [{"id": "v_hall", "protected": []}]})
+    b.ctx.resolved.clips = [clip]
+    checks._clean_protected_rows(b)
+    r = next(x for x in b.rows if x["check_id"] == "clean.protected_overlap")
+    assert r["row_id"] == "clean.protected_overlap:all" and r["status"] == "same" and r["observed"]["clean_ops"] == 1

@@ -110,6 +110,7 @@ _DECL: dict[str, list[str]] = {
     "clean.residual": ["render.clean.blur_sigma_ratio"],   # blur ops: the blurred overlay must not be readable
     "cover_up.protected": [],
     "cover_up.faces": [],
+    "clean.protected_overlap": [],
     "audio.bgm": ["audio.bgm.track_id", "audio.bgm.title", "audio.bgm.version", "audio.bgm.tempo_ratio",
                   "audio.bgm.section_start_s", "audio.bgm.fade_in_s", "audio.bgm.fade_out_s", "audio.bgm.loop",
                   "audio.bgm.gain_db"],
@@ -1919,17 +1920,21 @@ def rows_video(b: RowBuilder, probes: dict) -> None:
               evidence={"t": (it.get("samples") or [{}])[0].get("t")})
         if abs(float(c.speed or 1.0) - 1.0) > 1e-3 or it.get("speed_obs") is not None:
             so = it.get("speed_obs")
-            if abs(float(c.speed or 1.0) - 1.0) > 1e-3 or (so is not None and abs(so - 1.0) > 0.1):
-                # the slope comes from matched WHOLE source frames: it cannot be known better than one source frame
-                # over the sampled source span (measured: 12 fps source, 1.08 s span -> 7.7 %)
-                qf = float(it.get("speed_quant_frac") or 0.0)
-                tolf = max(TOL["speed_frac"], qf)
-                b.add("video.speed", c.id, f"재생 속도 [{c.id}]", CAT["motion"], expected=c.speed,
-                      observed={"speed": so, "samples": it.get("speed_samples"), "quantisation_frac": it.get("speed_quant_frac")}
-                      if so is not None else None,
-                      tolerance=f"±{tolf * 100:.1f}% (기본 {int(TOL['speed_frac'] * 100)}%, 소스 1프레임/표본 구간 {qf * 100:.1f}% 중 큰 값)",
-                      status="unmeasured" if so is None else ("same" if abs(so - c.speed) <= tolf * c.speed else "different"),
-                      keys=["motion.speed.slowmo_factor"] if c.speed < 1 else [])
+            changed = abs(float(c.speed or 1.0) - 1.0) > 1e-3
+            # the slope comes from matched WHOLE source frames: it cannot be known better than one source frame
+            # over the sampled source span (measured: 12 fps source, 1.08 s span -> 7.7 %).  A clip played at 1x is
+            # judged "no speed change" within 10 % (a real slow motion is 0.5x-0.8x); the row is written whenever the
+            # speed was measured, so a defect on it can be re-checked (test-restore-001 s3)
+            qf = float(it.get("speed_quant_frac") or 0.0)
+            base = TOL["speed_frac"] if changed else SPEED_UNCHANGED_FRAC
+            tolf = max(base, qf)
+            b.add("video.speed", c.id, f"재생 속도 [{c.id}]", CAT["motion"], expected=c.speed,
+                  observed={"speed": so, "samples": it.get("speed_samples"), "quantisation_frac": it.get("speed_quant_frac")}
+                  if so is not None else None,
+                  tolerance=(f"±{tolf * 100:.1f}% (기본 {int(base * 100)}%{'' if changed else '(1배속 클립: 속도 변화 없음 판정)'}, "
+                             f"소스 1프레임/표본 구간 {qf * 100:.1f}% 중 큰 값); 정지(freeze) 구간은 재생 시계에서 뺌"),
+                  status="unmeasured" if so is None else ("same" if abs(so - c.speed) <= tolf * c.speed else "different"),
+                  keys=["motion.speed.slowmo_factor"] if c.speed < 1 else [])
     _rows_replay(b, mp, err)
     # zoom
     zm = vp.get("zoom")
@@ -2645,8 +2650,44 @@ def _protected_none_row(b: RowBuilder) -> None:
           observed={"human_check": rec} if rec else None, status=st, required=True, note=note)
 
 
+def _clean_protected_rows(b: RowBuilder) -> None:
+    """Local restoration painting over a protected region (``clean.strategy.cleanup_protected_overlaps``, the same
+    function validate warns with): the pixels there are invented, so the face / hand / object is smeared in the output.
+    Whether that is visible cannot be measured from the file (no clean truth to compare with) -> one required row per
+    overlap, 못 잼 until a person who watched the final MP4 records the verdict (kind watch); no overlap -> one 'same'
+    row saying what was checked."""
+    from ..clean.strategy import PROTECTED_OVERLAP_MIN_FRAC, cleanup_protected_overlaps
+
+    plan = b.ctx.plan or {}
+    prot = {s.get("id"): s.get("protected") or [] for s in plan.get("sources") or []}
+    n_ops, found = 0, []
+    for clip in b.ctx.resolved.clips:
+        n_ops += sum(len(getattr(clip, k, None) or []) for k in ("inpaint", "delogo", "blur"))
+        found += [(clip, ov) for ov in cleanup_protected_overlaps(clip, prot.get(clip.source_id, []))]
+    tol = f"보호 영역 면적의 {PROTECTED_OVERLAP_MIN_FRAC:.0%} 초과를 덮는 국소 복원 0건"
+    if not found:
+        b.add("clean.protected_overlap", "all", "원본 정리(국소 복원)가 보호 영역을 덮지 않음", CAT["cover_up"],
+              expected={"overlaps": 0}, observed={"clean_ops": n_ops, "overlaps": 0}, tolerance=tol, status="same",
+              note="plan 의 정리 영역(inpaint/delogo/blur)과 보호 영역을 원본 좌표·시각으로 대조")
+        return
+    for k, (clip, ov) in enumerate(found):
+        rid = f"{clip.id}#{k}"
+        rec = _human_record(b, f"clean.protected_overlap:{rid}", "watch")
+        if rec is not None:
+            st, note = rec["verdict"], f"사람이 최종 MP4 를 보고 기록({rec['by']}, {rec['at']}): {rec['note']}"
+        else:
+            st, note = "unmeasured", (f"{ov['op']} '{ov['reason']}' 가 '{ov['label']}' 의 {ov['covered_frac']:.0%} 를 원본 "
+                                      f"{ov['src_t'][0]}~{ov['src_t'][1]}s 동안 덮음 — 복원 결과(번짐)는 파일에서 잴 수 없음(깨끗한 정답 없음); "
+                                      f"사람이 보고 `shortkit qa human-check --kind watch --row clean.protected_overlap:{rid}` 로 기록. "
+                                      "고치는 길: 깨끗한 원본(`source link-original`) → 그 구간을 쓰지 않음")
+        b.add("clean.protected_overlap", rid, f"국소 복원이 보호 영역을 덮음 [{ov['label']}·{clip.id}]", CAT["cover_up"],
+              expected={"overlaps": 0}, observed={**ov, "human_check": rec} if rec else ov, tolerance=tol, status=st,
+              required=True, note=note)
+
+
 def rows_cover_up(b: RowBuilder, probes: dict) -> None:
     ctx = b.ctx
+    _clean_protected_rows(b)
     tp = probes.get("text") or {}
     vp = probes.get("video") or {}
     overlays = []
@@ -3975,6 +4016,9 @@ def _zoom_effective(it: dict) -> dict:
         return it
     return dict(it, measured_final_ratio=it.get("expected_final_ratio"), measured_dur=exp.get("dur"),
                 measured_ease=exp.get("ease"), observed_by="geometry")
+
+
+SPEED_UNCHANGED_FRAC = 0.10      # a 1x clip measured within 10 % is "no speed change" (slow motion is 0.5x-0.8x)
 
 
 def _no_zoom_status(it: dict) -> tuple[str, str]:

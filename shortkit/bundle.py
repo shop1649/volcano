@@ -39,7 +39,8 @@ MEDIA_EXCLUDE = ["warehouse/sources/**", "warehouse/cache/**", "warehouse/overla
                  "presets/*/analysis/*/review/**", "presets/*/analysis/*/lens/**", "presets/*/analysis/*/audio/sfx_fp/**",
                  "episodes/*/build/**", "episodes/*/output/**", "episodes/*/project/media/**", "episodes/*/qa/frames/**",
                  "episodes/*/qa/*.png", "assets/test/generated/**", "assets/fonts/*.ttf", "assets/fonts/*.otf",
-                 "assets/fonts/*.ttc", "assets/library/music/**", "assets/library/sfx/**", "docs/validation/mockloop/**", "docs/**/*.png"]
+                 "assets/fonts/*.ttc", "assets/library/music/**", "assets/library/sfx/**", "docs/**/*.png"]
+# (docs/validation/mockloop/*.py and its accuracy JSON ARE packed: docs/validation/mockloop.md tells the reader to run them)
 # Always packed even when binary: small preset assets production needs (SFX catalog fingerprints, logo templates).
 ALWAYS_INCLUDE = ["presets/*/sfx_fp/*", "presets/*/reference/identity_templates/*",
                   "assets/library/music/README.md", "assets/library/music/index.yaml", "assets/library/sfx/README.md"]
