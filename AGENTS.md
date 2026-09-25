@@ -86,22 +86,24 @@ python -m shortkit ref collect                     # 최신 100편·게시일·�
                                                    #   + all_videos.json(참고), high_views.json(조회수 ≥ 800,000, 확인일 포함)
 python -m shortkit ref download --set latest100    # 영상 받기(≤1080p, 소리 포함) → reference/videos/, downloads.jsonl(sha256)
 python -m shortkit ref download --set high_views   # 80만 이상 영상 전부
-python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/색/외곽선/박스/모션/역할)·화면 모션 → analysis/<id>/
-python -m shortkit ref audio-analyze --all         # 최신 50편: Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트
+python -m shortkit ref audio-analyze --all         # 먼저 오디오: Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트 (대사 역할·lead_s 에 필요)
+python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/색/외곽선/박스/모션/역할)·화면 모션·장식 → analysis/<id>/
 python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자료 + format_labels.csv(빈 줄)
 #  ▶ 에이전트/사람이 analysis/<id>/review/ 를 "실제로 보고" format_labels.csv 를 채운다
 #    (intro_type=도입 방식, structure_type=전개 구조, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
 python -m shortkit ref classify build              # formats.yaml: 전개 구조별 포맷, 도입만 다른 것은 intro_variants, 대표 영상
+python -m shortkit ref fonts                       # 글꼴: IoU 상한(같은 글꼴의 한계) 먼저 → 후보 검증(동일/유사/다름)
+python -m shortkit preset apply-measurements       # (글꼴이 '동일'로 확정된 역할이 있으면) 반영 후
+python -m shortkit ref analyze --set downloaded --only text   # 확정 글꼴로 크기(em px)·줄 간격 다시 환산
 python -m shortkit ref aggregate                   # measurements/visual_*.json (전체·포맷별 n/p10/p50/p90, 해상도, 근거 시각)
+python -m shortkit ref sfx-catalog --emotion-template   # 효과음 카탈로그(편당 개수 p10/p50/p90, 직전 자막, 화면 사건, 감정, 자리 규칙, 표본 3편)
+#  ▶ 감정(emotion)은 영상을 본 사람이 sfx_emotion_labels.csv 에 채운 것만 사용
+python -m shortkit ref sfx-map                     # 효과음 창고(local.yaml sfx_library_root)와 연결: 있음/없음/못 잼 (audio-measure 전에)
+python -m shortkit ref bgm-identify --video <id>   # 깨끗한 음악 창고(assets/library/music/index.yaml)와 대조
 python -m shortkit ref audio-measure               # measurements/audio.json (BGM 곡·버전·속도·구간·크기·반복, 덕킹, 음량, 원음·정적 페이드, 효과음 크기)
 #  ▶ 자동 측정이 안 되는 항목(장식 스타일·이모지·표지)은 영상을 본 사람이 manual_observations.csv 에 (video_id, t, key, value,
 #    observed_by, watched=yes) 로 기록 → 
 python -m shortkit ref manual-aggregate            # measurements/manual.json
-python -m shortkit ref fonts                       # 글꼴: IoU 상한(같은 글꼴의 한계) 먼저 → 후보 검증(동일/유사/다름)
-python -m shortkit ref sfx-catalog --emotion-template   # 효과음 카탈로그(편당 개수 p10/p50/p90, 직전 자막, 화면 사건, 감정, 자리 규칙, 표본 3편)
-#  ▶ 감정(emotion)은 영상을 본 사람이 sfx_emotion_labels.csv 에 채운 것만 사용
-python -m shortkit ref sfx-map                     # 효과음 창고(local.yaml sfx_library_root)와 연결: 있음/없음/못 잼
-python -m shortkit ref bgm-identify --video <id>   # 깨끗한 음악 창고(assets/library/music/index.yaml)와 대조
 python -m shortkit ref trace                       # 설명란·워터마크 OCR·렌즈용 키프레임 → warehouse/source_accounts.json, exclusions.jsonl
 python -m shortkit preset apply-measurements       # 측정값 → measured.yaml (preset.yaml 은 그대로, 층으로 덮음)
 python -m shortkit preset sync                     # 레지스트리: 근거→측정값→코드→검사 연결 갱신
