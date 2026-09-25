@@ -53,8 +53,6 @@ NON_MEASURED: dict[str, str] = {
     "audio.ducking.only_under_kept_dialogue": "rule",
     "audio.original.default": "rule",
     "audio.original.remove_embedded_music": "rule",
-    "motion.zoom.max_consecutive": "rule",
-    "motion.freeze.max_per_video": "rule",
     "motion.trim.tail_after_meaning_s": "rule",
     # render parameter of OUR cleaning step (blur strength over a removed overlay), not a reference style
     "render.clean.blur_sigma_ratio": "rule",
@@ -95,6 +93,9 @@ IMPACT: dict[str, str] = {
     "audio.silence.*": "의도적 정적 처리 불일치",
     "structure.duration_s.*": "영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능",
     "structure.*": "영상 길이·전개 구조 불일치",
+    "presence.*": "레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음",
+    "motion.zoom.max_consecutive": "연속 확대 허용 횟수가 레퍼런스와 다를 수 있음(임시값 1)",
+    "motion.freeze.max_per_video": "편당 정지 허용 횟수가 레퍼런스와 다를 수 있음(임시값 2)",
     "cover.*": "표지 구성 불일치",
 }
 
