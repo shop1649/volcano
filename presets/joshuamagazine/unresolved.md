@@ -1,6 +1,6 @@
 # 미확정 항목·제작 영향·해결 상태
 
-자동 생성: `shortkit preset unresolved` (2026-09-25T08:33:24+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물(단계 표는 유효 프리셋 = preset.yaml + measured.yaml + requested_changes.yaml 과 각 단계 파일에서 다시 평가).
+자동 생성: `shortkit preset unresolved` (2026-09-25T15:13:16+00:00). 손으로 고치지 말 것 — 원본은 settings_registry.yaml 과 각 산출물(단계 표는 유효 프리셋 = preset.yaml + measured.yaml + requested_changes.yaml 과 각 단계 파일에서 다시 평가).
 
 못 잼 = 측정하지 못함. 못 잼 항목은 임시값으로만 테스트 렌더가 가능하고, QA 에서 완료로 승격되지 않는다.
 
@@ -36,9 +36,9 @@
 
 ## 3. 프리셋 설정 키 단위
 
-상태별 개수: fixed_by_rule=14, not_applicable=24, not_applicable_given=5, unmeasured=270
+상태별 개수: fixed_by_rule=14, not_applicable=28, not_applicable_given=5, unmeasured=266
 
-못 잼 키의 해결 상태: blocked_network=268, no_method=2
+못 잼 키의 해결 상태: blocked_network=264, no_method=2
 
 | 제작 영향 | 못 잼 키 수 | 해결 상태 | 키 |
 |---|---|---|---|
@@ -51,19 +51,18 @@
 | 외곽선 두께·색 불일치 | 12 | blocked_network | `text.roles.description.outline_color`, `text.roles.description.outline_px`, `text.roles.dialogue.outline_color`, `text.roles.dialogue.outline_px`, `text.roles.reaction.outline_color`, `text.roles.reaction.outline_px`, `text.roles.situation.outline_color`, `text.roles.situation.outline_px`, `text.roles.speaker.outline_color`, `text.roles.speaker.outline_px`, `text.roles.title.outline_color`, `text.roles.title.outline_px` |
 | 확대·정지·전환의 크기/길이 불일치 | 11 | blocked_network | `motion.freeze.hold_s`, `motion.speed.slowmo_factor`, `motion.transitions.crossfade.dur_s`, `motion.transitions.default`, `motion.transitions.flash.color`, `motion.transitions.flash.dur_s`, `motion.transitions.flash.scope`, `motion.zoom.dur_s`, `motion.zoom.ease`, `motion.zoom.recenter`, `motion.zoom.scale_to` |
 | 레퍼런스에 이 효과가 있는지 없는지 몰라 과용/누락을 판정할 수 없음 | 10 | blocked_network | `presence.bgm`, `presence.crossfade`, `presence.decorations`, `presence.ducking`, `presence.flash`, `presence.freeze`, `presence.intentional_silence`, `presence.original_audio`, `presence.speed_change`, `presence.zoom` |
-| 영상 길이·전개 구조 불일치 | 9 | blocked_network | `structure.cuts_per_10s.n`, `structure.cuts_per_10s.p10`, `structure.cuts_per_10s.p50`, `structure.cuts_per_10s.p90`, `structure.first_caption_at_s`, `structure.shot_len_s.n`, `structure.shot_len_s.p10`, `structure.shot_len_s.p50`, `structure.shot_len_s.p90` |
 | 자막 등장 타이밍 불일치 | 7 | blocked_network | `text.roles.description.timing.min_dur_s`, `text.roles.dialogue.timing.lead_s`, `text.roles.dialogue.timing.min_dur_s`, `text.roles.reaction.timing.min_dur_s`, `text.roles.situation.timing.min_dur_s`, `text.roles.speaker.timing.min_dur_s`, `text.roles.title.timing.min_dur_s` |
 | BGM 곡/버전/속도/구간/크기 불일치 → 음악 일치 판정 불가 | 7 | blocked_network | `audio.bgm.fade_in_s`, `audio.bgm.fade_out_s`, `audio.bgm.gain_db`, `audio.bgm.loop`, `audio.bgm.section_start_s`, `audio.bgm.tempo_ratio`, `audio.bgm.track_id` |
+| 영상 길이·전개 구조 불일치 | 7 | blocked_network | `structure.cuts_per_10s.p10`, `structure.cuts_per_10s.p50`, `structure.cuts_per_10s.p90`, `structure.first_caption_at_s`, `structure.shot_len_s.p10`, `structure.shot_len_s.p50`, `structure.shot_len_s.p90` |
 | 글꼴이 레퍼런스와 다를 수 있음 → 글자 인상·폭·줄바꿈 불일치 | 6 | blocked_network | `text.roles.description.font_name`, `text.roles.dialogue.font_name`, `text.roles.reaction.font_name`, `text.roles.situation.font_name`, `text.roles.speaker.font_name`, `text.roles.title.font_name` |
 | 글자 크기 불일치 → 줄 수·가림 영역 변화 | 6 | blocked_network | `text.roles.description.size_px`, `text.roles.dialogue.size_px`, `text.roles.reaction.size_px`, `text.roles.situation.size_px`, `text.roles.speaker.size_px`, `text.roles.title.size_px` |
 | 글자 색 불일치 | 6 | blocked_network | `text.roles.description.color`, `text.roles.dialogue.color`, `text.roles.reaction.color`, `text.roles.situation.color`, `text.roles.speaker.color`, `text.roles.title.color` |
 | 강조 색 불일치 | 6 | blocked_network | `text.roles.description.highlight_color`, `text.roles.dialogue.highlight_color`, `text.roles.reaction.highlight_color`, `text.roles.situation.highlight_color`, `text.roles.speaker.highlight_color`, `text.roles.title.highlight_color` |
-| 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능 | 4 | blocked_network | `structure.duration_s.n`, `structure.duration_s.p10`, `structure.duration_s.p50`, `structure.duration_s.p90` |
 | 보존 대사 구간의 BGM 덕킹 깊이·속도 불일치 | 3 | blocked_network | `audio.ducking.attack_s`, `audio.ducking.depth_db`, `audio.ducking.release_s` |
+| 영상 길이 관측 범위(p10..p90)가 없어 길이 적합성 판정 불가 → 너무 길거나 짧은 편집 가능 | 3 | blocked_network | `structure.duration_s.p10`, `structure.duration_s.p50`, `structure.duration_s.p90` |
 | 최종 음량 불일치 | 2 | blocked_network | `audio.loudness.integrated_lufs`, `audio.loudness.true_peak_db` |
 | 표지 구성 불일치 | 2 | blocked_network | `cover.source`, `cover.text_role` |
 | 자막 종결 어미(말투) 검사 기준이 임시값 → 대본 말투가 레퍼런스와 다를 수 있음 | 1 | blocked_network | `text.tone.register` |
-| 제안서의 말투 안내(종결 어미 예시)가 비어 있음 → 대본 말투가 레퍼런스와 다를 수 있음 | 1 | blocked_network | `text.tone.sentence_end_examples` |
 | 자막 이모지 허용 여부가 임시값 → 이모지 사용이 레퍼런스와 다를 수 있음 | 1 | blocked_network | `text.tone.emoji` |
 | 연속 확대 허용 횟수가 레퍼런스와 다를 수 있음(임시값 1) | 1 | blocked_network | `motion.zoom.max_consecutive` |
 | 편당 정지 허용 횟수가 레퍼런스와 다를 수 있음(임시값 2) | 1 | blocked_network | `motion.freeze.max_per_video` |
@@ -102,11 +101,11 @@
 
 | 키 | 근거 키 = 값 | 이유 | 제작에서 |
 |---|---|---|---|
-| `text.roles.description.timing.lead_s` | `정의` = None | 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
-| `text.roles.reaction.timing.lead_s` | `정의` = None | 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
-| `text.roles.situation.timing.lead_s` | `정의` = None | 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
-| `text.roles.speaker.timing.lead_s` | `정의` = None | 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
-| `text.roles.title.timing.lead_s` | `정의` = None | 정의: lead_s = 대사 자막 시작 − 겹치는 말소리 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
+| `text.roles.description.timing.lead_s` | `정의` = None | 정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
+| `text.roles.reaction.timing.lead_s` | `정의` = None | 정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
+| `text.roles.situation.timing.lead_s` | `정의` = None | 정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
+| `text.roles.speaker.timing.lead_s` | `정의` = None | 정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
+| `text.roles.title.timing.lead_s` | `정의` = None | 정의: lead_s = 겹치는 말소리 시작 − 대사 자막 시작 → 대사(dialogue) 외 역할에는 기준 사건이 없음 | 0(계획 plan 의 자막 시각 그대로) |
 
 ## 4. 해결 방법
 

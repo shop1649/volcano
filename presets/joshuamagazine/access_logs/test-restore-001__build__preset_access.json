@@ -1,0 +1,867 @@
+{
+  "schema": "shortkit.access_log/1",
+  "preset_id": "joshuamagazine-v1",
+  "format_id": null,
+  "source": "episodes/test-restore-001/build/preset_access.json",
+  "saved_at": "2026-09-25T13:14:23+00:00",
+  "archived_at": "2026-09-25T15:13:12+00:00",
+  "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
+  "reads": {
+    "approval.first_episode_requires_approval": [
+      "shortkit/edit/plan.py:approval_state_for"
+    ],
+    "audio.bgm.fade_in_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.fade_out_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.gain_db": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.loop": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.section_start_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.tempo_ratio": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.title": [
+      "shortkit/edit/audio.py:check_bgm_identity",
+      "shortkit/edit/validate.py:check_audio"
+    ],
+    "audio.bgm.track_id": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.bgm.version": [
+      "shortkit/edit/audio.py:check_bgm_identity",
+      "shortkit/edit/validate.py:check_audio"
+    ],
+    "audio.ducking.attack_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.ducking.depth_db": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.ducking.only_under_kept_dialogue": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.ducking.release_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.loudness.integrated_lufs": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.loudness.max_limiter_db": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.loudness.tolerance_lu": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.loudness.true_peak_db": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.original.default": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.original.fade_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.original.keep_gain_db": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.original.remove_embedded_music": [
+      "shortkit/edit/validate.py:check_audio"
+    ],
+    "audio.sample_rate": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "audio.sfx.catalog": [
+      "shortkit/edit/sfxmap.py:load_catalog",
+      "shortkit/edit/validate.py:check_preset_mixing"
+    ],
+    "audio.sfx.gain_db_default": [
+      "shortkit/edit/audio.py:build_audio_plan",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "audio.sfx.map": [
+      "shortkit/edit/sfxmap.py:load_map",
+      "shortkit/edit/validate.py:check_preset_mixing"
+    ],
+    "audio.sfx.max_event_offset_s": [
+      "shortkit/edit/validate.py:check_sfx"
+    ],
+    "audio.sfx.require_event": [
+      "shortkit/edit/validate.py:check_sfx"
+    ],
+    "audio.silence.fade_s": [
+      "shortkit/edit/audio.py:build_audio_plan"
+    ],
+    "canvas.background.blur_sigma": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.background.color": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.background.type": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.fps": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.height": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.safe_margin.bottom": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.safe_margin.left": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.safe_margin.right": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.safe_margin.top": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.video_region.fit": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.video_region.h": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.video_region.w": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.video_region.x": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.video_region.y": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "canvas.width": [
+      "shortkit/edit/resolve.py:read_canvas"
+    ],
+    "cover.source": [
+      "shortkit/edit/validate.py:check_cover"
+    ],
+    "cover.text_role": [
+      "shortkit/edit/validate.py:check_cover"
+    ],
+    "identity_exclusions.forbidden_text": [
+      "shortkit/edit/validate.py:check_captions"
+    ],
+    "identity_exclusions.own_branding": [
+      "shortkit/edit/validate.py:check_own_branding"
+    ],
+    "motion.freeze.hold_s": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.freeze.max_per_video": [
+      "shortkit/edit/validate.py:check_motion"
+    ],
+    "motion.speed.slowmo_factor": [
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.transitions.crossfade.dur_s": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.transitions.default": [
+      "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "motion.transitions.flash.color": [
+      "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "motion.transitions.flash.dur_s": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.transitions.flash.scope": [
+      "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "motion.trim.tail_after_meaning_s": [
+      "shortkit/edit/validate.py:check_trim_tail"
+    ],
+    "motion.zoom.dur_s": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.zoom.ease": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "motion.zoom.max_consecutive": [
+      "shortkit/edit/validate.py:check_motion"
+    ],
+    "motion.zoom.recenter": [
+      "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "motion.zoom.scale_to": [
+      "shortkit/edit/resolve.py:resolve_clips",
+      "shortkit/edit/validate.py:check_style_overrides"
+    ],
+    "presence.bgm": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.crossfade": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.decorations": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.ducking": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.flash": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.freeze": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.intentional_silence": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.original_audio": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.speed_change": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "presence.zoom": [
+      "shortkit/edit/validate.py:check_presence"
+    ],
+    "render.clean.blur_sigma_ratio": [
+      "shortkit/edit/resolve.py:resolve_clips"
+    ],
+    "structure.cuts_per_10s.n": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p10": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p50": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.cuts_per_10s.p90": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.duration_s.n": [
+      "shortkit/edit/validate.py:check_structure"
+    ],
+    "structure.duration_s.p10": [
+      "shortkit/edit/validate.py:check_structure"
+    ],
+    "structure.duration_s.p50": [
+      "shortkit/edit/validate.py:check_structure"
+    ],
+    "structure.duration_s.p90": [
+      "shortkit/edit/validate.py:check_structure"
+    ],
+    "structure.first_caption_at_s": [
+      "shortkit/edit/validate.py:check_structure"
+    ],
+    "structure.formats_file": [
+      "shortkit/edit/validate.py:check_format",
+      "shortkit/edit/validate.py:check_preset_mixing"
+    ],
+    "structure.shot_len_s.n": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p10": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p50": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "structure.shot_len_s.p90": [
+      "shortkit/edit/validate.py:check_cut_structure"
+    ],
+    "text.font_dirs": [
+      "shortkit/edit/resolve.py:resolve_captions"
+    ],
+    "text.roles.description.anchor.align": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.anchor.valign": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.anchor.x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.anchor.y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.bold": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.box.alpha": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.box.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.box.enabled": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.box.pad_x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.box.pad_y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.font_file": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.font_name": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.highlight_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.line_spacing": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.max_chars_per_line": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.max_lines": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.max_width_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_in.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_in.offset_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_in.scale_from": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_in.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_out.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.motion_out.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.outline_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.outline_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.persist": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.shadow_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.shadow_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.size_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.timing.lead_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.description.timing.min_dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.anchor.align": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.anchor.valign": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.anchor.x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.anchor.y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.bold": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.box.alpha": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.box.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.box.enabled": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.box.pad_x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.box.pad_y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.font_file": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.font_name": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.highlight_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.line_spacing": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.max_chars_per_line": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.max_lines": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.max_width_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_in.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_in.offset_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_in.scale_from": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_in.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_out.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.motion_out.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.outline_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.outline_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.persist": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.shadow_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.shadow_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.size_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.timing.lead_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.reaction.timing.min_dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.anchor.align": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.anchor.valign": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.anchor.x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.anchor.y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.bold": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.box.alpha": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.box.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.box.enabled": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.box.pad_x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.box.pad_y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.font_file": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.font_name": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.highlight_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.line_spacing": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.max_chars_per_line": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.max_lines": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.max_width_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_in.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_in.offset_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_in.scale_from": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_in.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_out.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.motion_out.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.outline_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.outline_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.persist": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.shadow_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.shadow_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.size_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.timing.lead_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.situation.timing.min_dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.anchor.align": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.anchor.valign": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.anchor.x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.anchor.y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.bold": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.box.alpha": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.box.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.box.enabled": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.box.pad_x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.box.pad_y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.font_file": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.font_name": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.highlight_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.line_spacing": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.max_chars_per_line": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.max_lines": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.max_width_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_in.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_in.offset_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_in.scale_from": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_in.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_out.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.motion_out.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.outline_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.outline_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.persist": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.shadow_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.shadow_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.size_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.timing.lead_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.speaker.timing.min_dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.anchor.align": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.anchor.valign": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.anchor.x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.anchor.y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.bold": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.box.alpha": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.box.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.box.enabled": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.box.pad_x": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.box.pad_y": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.font_file": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.font_name": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.highlight_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.line_spacing": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.max_chars_per_line": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.max_lines": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.max_width_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_in.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_in.offset_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_in.scale_from": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_in.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_out.dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.motion_out.type": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.outline_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.outline_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.persist": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.shadow_color": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.shadow_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.size_px": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.timing.lead_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.roles.title.timing.min_dur_s": [
+      "shortkit/edit/resolve.py:read_role_style_tree"
+    ],
+    "text.tone.emoji": [
+      "shortkit/edit/validate.py:check_tone"
+    ],
+    "text.tone.register": [
+      "shortkit/edit/validate.py:check_tone"
+    ]
+  },
+  "callers": {
+    "shortkit/edit/audio.py:build_audio_plan": {
+      "fp": "40a555743fee1e08",
+      "basis": "recorded"
+    },
+    "shortkit/edit/audio.py:check_bgm_identity": {
+      "fp": "d278bdf2e752436c",
+      "basis": "recorded"
+    },
+    "shortkit/edit/plan.py:approval_state_for": {
+      "fp": "76cb216c1917c673",
+      "basis": "recorded"
+    },
+    "shortkit/edit/resolve.py:read_canvas": {
+      "fp": "88fb326fd18dd7dc",
+      "basis": "recorded"
+    },
+    "shortkit/edit/resolve.py:read_role_style_tree": {
+      "fp": "35c0d0fe5f6bd19b",
+      "basis": "recorded"
+    },
+    "shortkit/edit/resolve.py:resolve_captions": {
+      "fp": "7e5e4567cbc193dc",
+      "basis": "recorded"
+    },
+    "shortkit/edit/resolve.py:resolve_clips": {
+      "fp": "8bb990a88a85a96b",
+      "basis": "recorded"
+    },
+    "shortkit/edit/sfxmap.py:load_catalog": {
+      "fp": "4c6471fa257c0694",
+      "basis": "recorded"
+    },
+    "shortkit/edit/sfxmap.py:load_map": {
+      "fp": "e72909f3e142adb5",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_audio": {
+      "fp": "5632691e742cd8c3",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_captions": {
+      "fp": "9d67293d3b5cbe02",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_cover": {
+      "fp": "5884a7cfbc786a9f",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_cut_structure": {
+      "fp": "66bf3e7b14f41a9d",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_format": {
+      "fp": "4b78813fa42cfe0b",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_motion": {
+      "fp": "ab25d05751e5f087",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_own_branding": {
+      "fp": "70566dff7557021d",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_presence": {
+      "fp": "8dc3914b1abf5704",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_preset_mixing": {
+      "fp": "67854921c8a92889",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_sfx": {
+      "fp": "d4c53136d204c155",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_structure": {
+      "fp": "79efee5e3b96ccd4",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_style_overrides": {
+      "fp": "9acd90757b44a427",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_tone": {
+      "fp": "8df1759bff981e75",
+      "basis": "recorded"
+    },
+    "shortkit/edit/validate.py:check_trim_tail": {
+      "fp": "322923601585a196",
+      "basis": "recorded"
+    }
+  }
+}

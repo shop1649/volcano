@@ -2,8 +2,8 @@
   "schema": "shortkit.access_log/1",
   "preset_id": "joshuamagazine-v1",
   "format_id": null,
-  "source": "episodes/test-qa-bad/qa/preset_access.json",
-  "saved_at": "2026-09-25T15:00:53+00:00",
+  "source": "episodes/test-restore-001/qa/preset_access.json",
+  "saved_at": "2026-09-25T14:27:09+00:00",
   "archived_at": "2026-09-25T15:13:12+00:00",
   "note": "shortkit preset sync 가 명령별 접근 기록을 복사(추적 파일). 레지스트리 code 링크는 이 폴더에서만 다시 만든다",
   "reads": {
@@ -33,7 +33,6 @@
     ],
     "audio.ducking.depth_db": [
       "shortkit/qa/checks.py:pget",
-      "shortkit/qa/probes_audio.py:_planned_bgm_env",
       "shortkit/qa/probes_audio.py:probe_audio"
     ],
     "audio.ducking.release_s": [
@@ -113,15 +112,6 @@
       "shortkit/qa/checks.py:pget",
       "shortkit/qa/probes_text.py:probe_cover"
     ],
-    "decorations.circle.blink_hz": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.circle.color": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "decorations.circle.stroke_px": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "identity_exclusions.forbidden_text": [
       "shortkit/qa/probes_text.py:probe_identity"
     ],
@@ -132,9 +122,6 @@
       "shortkit/qa/checks.py:pget"
     ],
     "motion.freeze.max_per_video": [
-      "shortkit/qa/checks.py:pget"
-    ],
-    "motion.transitions.crossfade.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "motion.transitions.default": [
@@ -225,58 +212,58 @@
     "structure.shot_len_s.p90": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.anchor.x": [
+    "text.roles.description.anchor.x": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.anchor.y": [
+    "text.roles.description.anchor.y": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.bold": [
+    "text.roles.description.bold": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.box.enabled": [
+    "text.roles.description.box.enabled": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.color": [
+    "text.roles.description.color": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.font_name": [
+    "text.roles.description.font_name": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.max_chars_per_line": [
+    "text.roles.description.max_chars_per_line": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.max_lines": [
+    "text.roles.description.max_lines": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.max_width_px": [
+    "text.roles.description.max_width_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.motion_in.type": [
+    "text.roles.description.motion_in.dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.motion_out.type": [
+    "text.roles.description.motion_in.type": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.outline_px": [
+    "text.roles.description.motion_out.type": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.persist": [
+    "text.roles.description.outline_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.quote_marks": [
+    "text.roles.description.persist": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.shadow_px": [
+    "text.roles.description.shadow_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.size_px": [
+    "text.roles.description.size_px": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.timing.lead_s": [
+    "text.roles.description.timing.lead_s": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.dialogue.timing.min_dur_s": [
+    "text.roles.description.timing.min_dur_s": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.reaction.anchor.x": [
@@ -378,9 +365,6 @@
     "text.roles.situation.motion_out.type": [
       "shortkit/qa/checks.py:pget"
     ],
-    "text.roles.situation.outline_color": [
-      "shortkit/qa/checks.py:pget"
-    ],
     "text.roles.situation.outline_px": [
       "shortkit/qa/checks.py:pget"
     ],
@@ -415,6 +399,12 @@
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.box.enabled": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_x": [
+      "shortkit/qa/checks.py:pget"
+    ],
+    "text.roles.speaker.box.pad_y": [
       "shortkit/qa/checks.py:pget"
     ],
     "text.roles.speaker.color": [
@@ -528,10 +518,6 @@
     },
     "shortkit/qa/checks.py:pget": {
       "fp": "b2e4524ed0b7b0ff",
-      "basis": "recorded"
-    },
-    "shortkit/qa/probes_audio.py:_planned_bgm_env": {
-      "fp": "b257aa5fc5bc9c5f",
       "basis": "recorded"
     },
     "shortkit/qa/probes_audio.py:_sfx_templates": {

@@ -1,6 +1,6 @@
 schema: shortkit.registry/1
 preset_id: joshuamagazine-v1
-synced_at: '2026-09-25T12:11:24+00:00'
+synced_at: '2026-09-25T15:13:14+00:00'
 access_logs:
 - episodes/test-coverage-001/build/preset_access.json
 - episodes/test-coverage-001/build/preset_access_all.json
@@ -18,6 +18,14 @@ access_logs:
 - episodes/test-pipeline-001/qa/preset_access.json
 - episodes/test-qa-bad/qa/preset_access.json
 - episodes/test-qa-good/qa/preset_access.json
+- episodes/test-restore-001/build/preset_access.json
+- episodes/test-restore-001/build/preset_access_export.json
+- episodes/test-restore-001/build/preset_access_new.json
+- episodes/test-restore-001/build/preset_access_proposal.json
+- episodes/test-restore-001/build/preset_access_render.json
+- episodes/test-restore-001/build/preset_access_resolve.json
+- episodes/test-restore-001/build/preset_access_validate.json
+- episodes/test-restore-001/qa/preset_access.json
 access_log_archive: presets/joshuamagazine/access_logs
 legend:
   status:
@@ -244,6 +252,7 @@ entries:
       measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
+    - shortkit/edit/cli.py:cmd_new
     - shortkit/edit/resolve.py:read_canvas
     - shortkit/qa/checks.py:pget
     qa_checks:
@@ -282,6 +291,7 @@ entries:
       measured_at: '2026-09-25T11:47:18+00:00'
       unit: px
     code:
+    - shortkit/edit/cli.py:cmd_new
     - shortkit/edit/resolve.py:read_canvas
     - shortkit/qa/checks.py:pget
     qa_checks:
@@ -9560,6 +9570,7 @@ entries:
     evidence: []
     measurement: null
     code:
+    - shortkit/edit/cli.py:cmd_new
     - shortkit/edit/validate.py:check_sfx
     - shortkit/qa/checks.py:pget
     qa_checks:
