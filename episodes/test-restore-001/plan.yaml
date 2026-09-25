@@ -1,0 +1,234 @@
+# 깨끗한 별도 폴더 복원 검증용 테스트 에피소드 (mode: test — 게시용 아님, 승인 불필요) — 2026-09-25
+# 목적: PRESET_BUNDLE.md 하나로 복원한 폴더에서, 기존 예제가 쓰지 않은 소스로 MP4 + 편집 프로젝트 + QA 를 실제로 만든다.
+# 소재(둘 다 Intel sample-videos, CC BY 4.0 기반):
+#   v_hall  = assets/test/generated/dirty_source_facewalk.mp4 — 복원 폴더에서 새로 만든 "더러운" 소스:
+#             `python -m shortkit testassets dirty-source --video face-demographics-walking-and-pause.mp4` 결과
+#             (assets/test/generated/dirty_source.mp4)를 이 이름으로 복사한 것(기본 dirty_source.mp4 는 pytest 픽스처가
+#             classroom 기반을 기대하므로 이름을 나눔). 가짜 워터마크 '@fake_repost'(좌상단, 전체 구간), 번인 영어 자막
+#             'WAIT FOR IT...'(하단, 2.0~6.0s), 붙은 음악(music_bed_b, 전체 구간), 합성 말소리 한 줄(speech_01, 8.0s~) 포함.
+#             sha256 은 이 컴퓨터의 ffmpeg 6.1.1-3ubuntu5 / libx264 빌드 값(다른 빌드면 다시 만든 파일의 sha256 이 달라짐).
+#   v_room  = assets/test/generated/video/people-detection.mp4 — test-coverage-001 과 같은 파일이지만 다른 구간(28.0~34.6s)만 쓴다.
+# 보고 들은 방법(에이전트): 프레임만 봤다 — 0.5s 간격 접촉 시트(v_hall 0~20s 전체, v_room 0~49s 1s 간격 + 27.5~35.5s 0.5s 간격)와
+#   0.25s 간격 얼굴 검출(`clean faces --sample-fps 4`). 소리는 듣지 못했다: 오디오는 기계 측정만 했다
+#   (v_hall: volumedetect mean -21.7 dB / max -3.7 dB, -20.3 LUFS, 0.5s RMS 가 전 구간 약 -21.7 dB(음악)이고
+#    8.0~10.5s 만 -19.2~-20.8 dB 로 올라감(말소리); v_room: 무음 -91.0 dB).
+# 본 장면(원본 시각):
+#   v_hall  0.0~3.3s 빈 복도 / 3.4s 복도 끝 유리문 쪽에 남성이 처음 보임 → 3.5~8.2s 카메라 쪽으로 걸어옴 →
+#           8.3~18.2s 카메라 바로 앞에서 정면을 보고 가만히 서 있음 → 18.3~19.4s 오른쪽으로 빠르게 걸어 화면 밖 → 19.5s 빈 복도
+#   v_room  28.0s 아래쪽에서 머리가 보이기 시작 → 28.5~30.5s 세 사람(회색 셔츠 남성·검은 옷 여성·흰 셔츠에 모자 쓴 사람)이 들어와
+#           걸어감 → 31.0s 회색 셔츠 남성은 왼쪽, 나머지 둘은 오른쪽으로 갈라짐 → 33.0s 왼쪽 남성 화면 밖 → 34.5s 모두 화면 밖
+schema: shortkit.plan/1
+episode_id: test-restore-001
+preset_id: joshuamagazine-v1
+format_id: UNCLASSIFIED
+mode: test
+episode_index: 1
+notes: 테스트 모드(복원 검증). 프리셋 스타일 값은 전부 임시값(못 잼)이라 레퍼런스와 같다고 말할 수 없음. 소리는 에이전트가 듣지
+  못했음(기계 측정만) — 청취 검수 완료 아님.
+cover:                           # 표지 문구 = 표지 프레임(0.0s)에 실제로 보이는 제목 자막(c_title)과 같은 글자
+  text: 카메라 앞에 선 남자
+  frame_t: 0.0
+title_candidates:
+- 카메라 앞에 선 남자
+- 복도 끝에서 걸어온 남자
+- 다가와 멈췄다가 떠난 사람들
+sources:
+- id: v_hall
+  path: assets/test/generated/dirty_source_facewalk.mp4
+  sha256: b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971
+  warehouse_id: null
+  vocals_path: null
+  has_embedded_music: true       # 만든 과정(dirty_source_facewalk.truth.json: music_bed_b ×0.5 전체 구간)과 기계 측정(0.5s RMS 가
+                                 #   전 구간 약 -21.7 dB)으로 확인
+  watched:
+    by: Claude Code (final-restore validation subagent)
+    at: '2026-09-25T12:45:00+00:00'
+    sha256: b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971
+    note: 프레임만 봄(0.5s 접촉 시트 0~20s 전체 + 0.25s 얼굴 검출). 소리는 듣지 못함 — volumedetect·ebur128·0.5s RMS 기계 측정만
+  # --- `shortkit clean plan --source assets/test/generated/dirty_source_facewalk.mp4` 출력 블록(그대로 붙임) ---
+  clean:
+    crop: null
+    delogo: []
+    inpaint:
+    - x: 13
+      y: 11
+      w: 218
+      h: 50
+      start: null
+      end: null
+      reason: ov1 watermark '@fake repost'
+    - x: 239
+      y: 354
+      w: 283
+      h: 51
+      start: 2.0
+      end: 6.083
+      reason: ov2 burned_subtitle 'WAIT FOR IT'
+    - x: 468
+      y: 378
+      w: 53
+      h: 21
+      start: 2.0
+      end: 6.083
+      reason: ov3 burned_subtitle 'O00'
+    blur: []
+    notes: 'shortkit clean plan (b861fc2d9ea5, 좌표 768x432 원본 px 기준): ov1:국소 복원(inpaint); ov2:국소 복원(inpaint); ov3:국소 복원(inpaint)'
+  protected:                     # 원본 768x432 px / 원본 시각 — 남성 얼굴. 0.25s 얼굴 검출(clean faces --sample-fps 4) 결과를
+                                 #   구간별로 묶고 여백을 더함(clean plan 의 0.5 fps 검출 3개보다 촘촘함)
+  - {label: 남성 얼굴(복도 끝), x: 470, y: 170, w: 90, h: 50, start: 3.3, end: 4.1}
+  - {label: 남성 얼굴(걸어옴 1), x: 420, y: 165, w: 95, h: 57, start: 4.0, end: 4.9}
+  - {label: 남성 얼굴(걸어옴 2), x: 360, y: 155, w: 90, h: 70, start: 4.8, end: 5.9}
+  - {label: 남성 얼굴(걸어옴 3), x: 325, y: 145, w: 100, h: 82, start: 5.8, end: 7.1}
+  - {label: 남성 얼굴(가까이 옴), x: 310, y: 128, w: 122, h: 100, start: 7.0, end: 8.1}
+  - {label: 남성 얼굴(정면으로 섬), x: 310, y: 120, w: 140, h: 125, start: 8.0, end: 18.3}
+  - {label: 남성 얼굴(오른쪽으로 나감), x: 340, y: 95, w: 300, h: 180, start: 18.2, end: 18.9}
+  - {label: 남성 얼굴(화면 가장자리), x: 640, y: 40, w: 128, h: 200, start: 18.9, end: 19.5}
+  # 손: 걸어오는 동안 몸 옆에서 흔들리는 두 손(0.5s 접촉 시트 + 원본 4.5·5.0·5.5·6.0s 원본 크기 프레임에 상자를 그려 위치 확인). 6.2s 뒤로는 화면 아래로 빠짐.
+  #   주의(에이전트가 출력 프레임으로 확인): 번인 자막 ov2(원본 y 354~405, 2.0~6.08s)가 원본 5.3~6.08s 에 이 손·허리 위에 겹쳐
+  #   있어 국소 복원(inpaint)이 그 부분을 번지게 한다(출력 약 2.5~3.3s). 깨끗한 원본(face-demographics-walking-and-pause.mp4)을
+  #   쓰면 없어지지만, 이 에피소드는 워터마크·원어 자막 제거 경로를 검증하려고 일부러 더러운 소스를 썼다.
+  - {label: 남성 두 손(걸어올 때 1), x: 390, y: 295, w: 110, h: 60, start: 4.5, end: 5.4}
+  - {label: 남성 두 손(걸어올 때 2), x: 300, y: 320, w: 185, h: 85, start: 5.3, end: 6.2}
+- id: v_room
+  path: assets/test/generated/video/people-detection.mp4
+  sha256: 18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693
+  warehouse_id: null
+  vocals_path: null
+  has_embedded_music: false      # 오디오 트랙이 무음(volumedetect mean/max -91.0 dB, -70.0 LUFS)
+  watched:
+    by: Claude Code (final-restore validation subagent)
+    at: '2026-09-25T12:45:00+00:00'
+    sha256: 18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693
+    note: 프레임만 봄(0~49s 1s 접촉 시트 + 27.5~35.5s 0.5s 접촉 시트). 소리는 듣지 못함 — volumedetect 기계 측정만(무음)
+  # --- `shortkit clean detect` + `clean plan --source assets/test/generated/video/people-detection.mp4` 출력: 오버레이 없음 ---
+  clean:
+    crop: null
+    delogo: []
+    inpaint: []
+    blur: []
+    notes: 'shortkit clean plan (18ffe8672d74, 좌표 768x432 원본 px 기준): 오버레이 없음'
+  # clean plan 의 얼굴 검출 7개(0~1s, 9~13s, 19~26s, 44~49s 의 x≈52/600, y≈3~31)는 접촉 시트로 보니 사람이 없는 시각의
+  #   창문(오탐)이고 쓰는 구간(28.0~34.6s) 밖이라 넣지 않았다. 아래는 직접 본 사람 영역.
+  protected:                     # 원본 768x432 px / 원본 시각 — 위에서 찍힌 세 사람(얼굴은 안 보임: 머리·등), 구간별 합집합
+  - {label: 들어오는 세 사람, x: 150, y: 120, w: 500, h: 312, start: 28.2, end: 29.6}
+  - {label: 걸어가는 세 사람, x: 170, y: 95, w: 430, h: 337, start: 29.5, end: 30.6}
+  - {label: 갈라지기 직전 세 사람, x: 180, y: 55, w: 430, h: 330, start: 30.5, end: 31.6}
+  - {label: 왼쪽으로 가는 남성, x: 90, y: 30, w: 130, h: 240, start: 31.5, end: 32.6}
+  - {label: 오른쪽으로 가는 두 사람, x: 460, y: 60, w: 220, h: 270, start: 31.5, end: 32.6}
+  - {label: 왼쪽 벽 앞 남성, x: 0, y: 60, w: 140, h: 200, start: 32.5, end: 33.1}
+  - {label: 오른쪽 벽 앞 두 사람, x: 560, y: 60, w: 208, h: 250, start: 32.5, end: 34.6}
+timeline:
+- id: s1
+  source: v_hall
+  src_in: 2.8
+  src_out: 12.3                  # 걸어오는 동작(a1, 3.3~8.3s)과 멈춰 선 모습을 한 구간으로(중간에 나누면 보이지 않는 '컷'이 생겨
+                                 #   8.3s 멈춤 효과음이 컷 경계에 붙음 — plan v2 의 sfx_event_at_cut 경고). 12.3~17.9s 는 같은 자세로
+                                 #   서 있기만 하는 구간(자막·사건 없음) → 의미 끝난 꼬리로 잘라냄
+  purpose: hook
+  zoom: {center: [380, 182], start: 5.8, reason: 카메라 바로 앞에 멈춰 선 남성의 얼굴 쪽으로 확대(원본 8.6s)}
+  # 원음: 끔(OFF). 이 구간(원본 8.0~10.6s)에 합성 말소리 한 줄이 있지만 소스에 음악(music_bed_b)이 섞여 있다
+  #   (has_embedded_music: true). plan v1 에서 stem: raw 로 살리려 하자 `episode validate` 가
+  #   "[오류] embedded_music_raw: 소스에 음악이 섞여 있는데 원음(raw)을 그대로 씁니다: 분리한 vocals stem 을 쓰세요" 로 막았다.
+  #   이 환경에는 demucs/torch 가 없고 가중치 호스트(dl.fbaipublicfiles.com)도 403 으로 막혀 vocals stem 을 만들 수 없다.
+  #   정답 파일(speech_01.wav)을 vocals 로 가장하는 것은 분리가 아니므로 쓰지 않는다 → 원음은 끄고, 들리지 않는 말을 대사
+  #   자막으로 옮기지도 않는다(말소리는 합성 TTS 라 화면 인물의 말도 아님). 덕킹도 걸리지 않는다(살린 대사 없음).
+- id: s2
+  source: v_hall
+  src_in: 17.9
+  src_out: 19.6
+  purpose: build
+- id: s3
+  source: v_room
+  src_in: 28.0
+  src_out: 34.6                  # 세 사람이 들어와 갈라져 나가는 동작(a3) 전체를 한 구간으로
+  purpose: outro
+  transition_in: {type: flash}
+  freeze: {at: src_t, src_t: 31.0, reason: 세 사람이 양쪽으로 갈라지기 직전 순간 정지}
+captions:
+- {id: c_title, role: title, text: 카메라 앞에 선 남자, start: 0.0, end: 18.5,
+   grounding: {kind: framing, note: '편집 틀 제목 — v_hall 8.3~18.2s 남성이 카메라 바로 앞에 서 있음'}}
+- {id: c_desc, role: description, text: 복원 검증용 테스트 영상, start: 0.0, end: 4.0,
+   grounding: {kind: framing, note: 이 영상이 깨끗한 폴더 복원 검증용 테스트라는 설명}}
+- id: c_sit1
+  role: situation
+  text: 복도 끝에서 한 남자가 걸어온다
+  start: 0.7
+  end: 5.2
+  grounding: {kind: seen, source: v_hall, src_t: 5.0, note: 3.4s 복도 끝에 처음 보이고 카메라 쪽으로 걸어옴}
+- id: c_spk
+  role: speaker
+  text: 남색 티셔츠 남성
+  start: 5.7
+  end: 8.2
+  pos: [540, 720]
+  grounding: {kind: seen, source: v_hall, src_t: 9.0, note: 남색 반팔 티셔츠를 입은 안경 쓴 남성}
+- id: c_sit2
+  role: situation
+  text: 카메라 바로 앞에서 멈춰 선다
+  start: 5.3
+  end: 9.3
+  grounding: {kind: seen, source: v_hall, src_t: 8.5}
+- id: c_rx
+  role: reaction
+  text: 멀뚱멀뚱
+  start: 6.8
+  end: 9.3
+  grounding: {kind: seen, source: v_hall, src_t: 10.5, note: 정면을 보고 가만히 서 있음}
+- id: c_sit3
+  role: situation
+  text: 그러더니 옆으로 휙 나간다
+  start: 9.5
+  end: 11.1
+  grounding: {kind: seen, source: v_hall, src_t: 18.7}
+- id: c_sit4
+  role: situation
+  text: 빈 방에 세 명이 들어온다
+  start: 11.4
+  end: 14.8
+  grounding: {kind: seen, source: v_room, src_t: 29.5}
+- id: c_sit5
+  role: situation
+  text: 한 명은 왼쪽, 둘은 오른쪽
+  start: 15.0
+  end: 18.3
+  grounding: {kind: seen, source: v_room, src_t: 32.0}
+decorations: []
+sfx:
+- id: fx1
+  type: pop
+  t: 0.6
+  event: {t: 0.6, desc: 복도 끝 유리문 쪽에 남성이 처음 보임, kind: action, source: v_hall, src_t: 3.4}
+  emotion: curiosity              # 사건을 프레임으로 확인한 뒤 붙인 편집 감정(테스트 plan 의 선택, 레퍼런스 측정 아님)
+  file: assets/test/generated/sfx/pop.wav
+- id: fx2
+  type: ding
+  t: 5.5
+  event: {t: 5.5, desc: 카메라 바로 앞에서 걸음을 멈춤, kind: action, source: v_hall, src_t: 8.3}
+  emotion: emphasis
+  file: assets/test/generated/sfx/ding.wav
+- id: fx3
+  type: whoosh
+  t: 10.05
+  event: {t: 10.1, desc: 남성이 오른쪽으로 빠르게 걸어 화면을 벗어남, kind: action, source: v_hall, src_t: 18.5}
+  emotion: surprise
+  file: assets/test/generated/sfx/whoosh.wav
+- id: fx4
+  type: click
+  t: 14.2
+  event: {t: 14.2, desc: 세 사람이 양쪽으로 갈라지기 직전 화면이 멈춤, kind: freeze, source: v_room, src_t: 31.0}
+  emotion: emphasis
+  file: assets/test/generated/sfx/click.wav
+actions:                         # 자르면 안 되는 중요한 동작(원본 시각)
+- {id: a1, source: v_hall, src_start: 3.3, src_end: 8.3, desc: 남성이 복도 끝에서 카메라 앞까지 걸어옴}
+- {id: a2, source: v_hall, src_start: 18.2, src_end: 19.5, desc: 남성이 오른쪽으로 걸어 화면 밖으로 나감}
+- {id: a3, source: v_room, src_start: 28.2, src_end: 34.5, desc: 세 사람이 들어와 양쪽으로 갈라져 나감}
+bgm:                             # section_start_s / tempo_ratio / gain_db 를 쓰지 않음 → 프리셋 audio.bgm.* 값 사용
+  enabled: true
+  path: assets/test/generated/music_bed_a.wav     # v_hall 에 붙은 음악(music_bed_b)과 다른 깨끗한 합성 음원
+  silences: []
+reveal:                          # 반전 보호: 숨길 반전이 없다
+  none: true
+  reason: >-
+    남성이 복도 끝에서 걸어와(v_hall 3.4~8.2s) 카메라 앞에 서 있다가(8.3~18.2s) 옆으로 나가고(18.3~19.4s), 빈 방에 세 사람이
+    들어와 양쪽으로 갈라져 나가는(v_room 28.0~34.5s) 장면이 보이는 순서대로 나올 뿐 — 뒤에서 드러나는 정체·예상 밖 사건이
+    없어 앞 자막이 미리 말할 반전이 없음. 구간 목적도 hook → build → outro 로 reveal 구간 없음

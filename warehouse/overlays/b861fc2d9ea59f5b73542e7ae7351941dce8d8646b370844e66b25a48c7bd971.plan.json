@@ -1,0 +1,178 @@
+{
+  "schema": "shortkit.clean_plan/1",
+  "created_at": "2026-09-25T12:37:26+00:00",
+  "source": {
+    "path": "assets/test/generated/dirty_source_facewalk.mp4",
+    "sha256": "b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971",
+    "resolution": [
+      768,
+      432
+    ],
+    "duration": 20.0
+  },
+  "region": {
+    "aspect": 1.776316,
+    "fit": "cover",
+    "size": [
+      1080.0,
+      608.0
+    ],
+    "source": "preset:canvas.video_region"
+  },
+  "policy": {
+    "margin_frac": 0.2,
+    "crop_pad_px": 6.0,
+    "protected_margin_frac": 0.1,
+    "min_keep_frac": 0.7,
+    "min_activity_keep": 0.9,
+    "max_upscale": 1.5,
+    "delogo_max_area_frac": 0.02,
+    "inpaint_max_area_frac": 0.12,
+    "alt_match_iou": 0.3
+  },
+  "faces_status": "measured",
+  "protected": [
+    {
+      "label": "face",
+      "x": 417.4,
+      "y": 165.4,
+      "w": 57.2,
+      "h": 57.2,
+      "start": 3.0,
+      "end": 5.0
+    },
+    {
+      "label": "face",
+      "x": 323.4,
+      "y": 112.2,
+      "w": 135.2,
+      "h": 128.7,
+      "start": 5.0,
+      "end": 17.0
+    },
+    {
+      "label": "face",
+      "x": 492.4,
+      "y": 67.3,
+      "w": 222.3,
+      "h": 222.3,
+      "start": 17.0,
+      "end": 19.0
+    }
+  ],
+  "replace_source": null,
+  "clean": {
+    "crop": null,
+    "delogo": [],
+    "inpaint": [
+      {
+        "x": 13,
+        "y": 11,
+        "w": 218,
+        "h": 50,
+        "start": null,
+        "end": null,
+        "reason": "ov1 watermark '@fake repost'"
+      },
+      {
+        "x": 239,
+        "y": 354,
+        "w": 283,
+        "h": 51,
+        "start": 2.0,
+        "end": 6.083,
+        "reason": "ov2 burned_subtitle 'WAIT FOR IT'"
+      },
+      {
+        "x": 468,
+        "y": 378,
+        "w": 53,
+        "h": 21,
+        "start": 2.0,
+        "end": 6.083,
+        "reason": "ov3 burned_subtitle 'O00'"
+      }
+    ],
+    "blur": [],
+    "notes": "shortkit clean plan (b861fc2d9ea5, 좌표 768x432 원본 px 기준): ov1:국소 복원(inpaint); ov2:국소 복원(inpaint); ov3:국소 복원(inpaint)"
+  },
+  "decisions": [
+    {
+      "overlay_id": "ov1",
+      "kind": "watermark",
+      "action": "crop_rejected",
+      "side": "top",
+      "reason": "보호 영역을 모두 담는 비율 맞는 잘라내기 불가"
+    },
+    {
+      "overlay_id": "ov2",
+      "kind": "burned_subtitle",
+      "action": "crop_rejected",
+      "side": "bottom",
+      "reason": "남는 면적 65% < 최소 70% (확대가 너무 큼); 움직임(중요 동작) 65% 만 남음 < 90%; 확대 배율 1.74 > 1.5"
+    },
+    {
+      "overlay_id": "ov3",
+      "kind": "burned_subtitle",
+      "action": "crop_rejected",
+      "side": "bottom",
+      "reason": "움직임(중요 동작) 75% 만 남음 < 90%; 확대 배율 1.63 > 1.5"
+    },
+    {
+      "overlay_id": "ov1",
+      "kind": "watermark",
+      "action": "inpaint",
+      "reason": "글자/오버레이(면적 2.97%) → 국소 복원 inpaint, 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움",
+      "rect": {
+        "x": 13,
+        "y": 11,
+        "w": 218,
+        "h": 50
+      },
+      "start": null,
+      "end": null
+    },
+    {
+      "overlay_id": "ov2",
+      "kind": "burned_subtitle",
+      "action": "inpaint",
+      "reason": "글자/오버레이(면적 3.95%) → 국소 복원 inpaint(시간 한정), 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움",
+      "rect": {
+        "x": 239,
+        "y": 354,
+        "w": 283,
+        "h": 51
+      },
+      "start": 2.0,
+      "end": 6.083
+    },
+    {
+      "overlay_id": "ov3",
+      "kind": "burned_subtitle",
+      "action": "inpaint",
+      "reason": "글자/오버레이(면적 0.25%) → 국소 복원 inpaint(시간 한정), 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움",
+      "rect": {
+        "x": 468,
+        "y": 378,
+        "w": 53,
+        "h": 21
+      },
+      "start": 2.0,
+      "end": 6.083
+    }
+  ],
+  "rationale": [
+    "잘라내기 후보 모두 규칙 위반(보호 영역 잘림/남는 면적 부족/움직임 손실/비율) → 국소 복원",
+    "ov1 워터마크 (좌상단, 0.00~20.00s): 깨끗한 원본 없음 → 잘라내기 불가(top: 보호 영역을 모두 담는 비율 맞는 잘라내기 불가) → 글자/오버레이(면적 2.97%) → 국소 복원 inpaint, 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움",
+    "ov2 원어 자막(번인) (하단, 2.00~6.08s): 깨끗한 원본 없음 → 잘라내기 불가(bottom: 남는 면적 65% < 최소 70% (확대가 너무 큼); 움직임(중요 동작) 65% 만 남음 < 90%; 확대 배율 1.74 > 1.5) → 글자/오버레이(면적 3.95%) → 국소 복원 inpaint(시간 한정), 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움",
+    "ov3 원어 자막(번인) (하단, 2.00~6.08s): 깨끗한 원본 없음 → 잘라내기 불가(bottom: 움직임(중요 동작) 75% 만 남음 < 90%; 확대 배율 1.63 > 1.5) → 글자/오버레이(면적 0.25%) → 국소 복원 inpaint(시간 한정), 정지 배경이면 앞뒤 프레임의 깨끗한 판으로 채움"
+  ],
+  "warnings": [
+    "글자 없는 고정 로고 검사 못 잼(고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함) → corners 캡처를 사람이 확인해야 함"
+  ],
+  "crop_check": null,
+  "status": "needs_review",
+  "review_reasons": [
+    "글자 없는 고정 로고 검사 못 잼(고정 카메라 단일 샷(또는 샷이 너무 짧음): 글자 없는 고정 로고를 배경과 구분할 수 없음 → 코너 캡처를 사람이 확인해야 함) → corners 캡처를 사람이 확인해야 함"
+  ]
+}

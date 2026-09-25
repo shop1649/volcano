@@ -1,0 +1,3597 @@
+{
+    "OTIO_SCHEMA": "Timeline.1",
+    "metadata": {
+        "shortkit": {
+            "canvas": {
+                "background": {
+                    "blur_sigma": 30.0,
+                    "color": "#000000",
+                    "type": "color"
+                },
+                "fps": 30.0,
+                "height": 1920,
+                "safe_margin": {
+                    "bottom": 250.0,
+                    "left": 54.0,
+                    "right": 54.0,
+                    "top": 110.0
+                },
+                "video_region": {
+                    "fit": "cover",
+                    "h": 608.0,
+                    "w": 1080.0,
+                    "x": 0.0,
+                    "y": 656.0
+                },
+                "width": 1080
+            },
+            "captions_file": "captions.ass",
+            "captions_srt": "captions.srt",
+            "duration_s": 18.5,
+            "episode_id": "test-restore-001",
+            "frames": 555,
+            "mode": "test",
+            "note": "자막·장식은 captions.ass 한 파일(libass)로 그려짐; OTIO 마커는 위치 표시용",
+            "preset_id": "joshuamagazine-v1",
+            "schema": "shortkit.otio/1"
+        }
+    },
+    "name": "test-restore-001",
+    "global_start_time": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "rate": 30.0,
+        "value": 0.0
+    },
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "metadata": {},
+        "name": "tracks",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "enabled": true,
+        "color": null,
+        "children": [
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V1 배경",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "background": {
+                                    "blur_sigma": 30.0,
+                                    "color": "#000000",
+                                    "type": "color"
+                                },
+                                "note": "blur_source 면 흐린 소스를 배경으로(마스터 기준)"
+                            }
+                        },
+                        "name": "배경",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 555.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "배경",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 555.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#000000"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V2 영상",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    330.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "편집 틀 제목 — v_hall 8.3~18.2s 남성이 카메라 바로 앞에 서 있음"
+                                },
+                                "id": "c_title",
+                                "kind": "caption",
+                                "lines": [
+                                    "카메라 앞에 선 남자"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "title",
+                                "size_px": 84.0
+                            }
+                        },
+                        "name": "카메라 앞에 선 남자",
+                        "color": "RED",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 555.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    500.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Bold",
+                                "grounding": {
+                                    "kind": "framing",
+                                    "note": "이 영상이 깨끗한 폴더 복원 검증용 테스트라는 설명"
+                                },
+                                "id": "c_desc",
+                                "kind": "caption",
+                                "lines": [
+                                    "복원 검증용 테스트 영상"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "description",
+                                "size_px": 46.0
+                            }
+                        },
+                        "name": "복원 검증용 테스트 영상",
+                        "color": "ORANGE",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "3.4s 복도 끝에 처음 보이고 카메라 쪽으로 걸어옴",
+                                    "source": "v_hall",
+                                    "src_t": 5.0
+                                },
+                                "id": "c_sit1",
+                                "kind": "caption",
+                                "lines": [
+                                    "복도 끝에서 한 남자가 걸어온다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "복도 끝에서 한 남자가 걸어온다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 135.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 21.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_hall",
+                                    "src_t": 8.5
+                                },
+                                "id": "c_sit2",
+                                "kind": "caption",
+                                "lines": [
+                                    "카메라 바로 앞에서 멈춰 선다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "카메라 바로 앞에서 멈춰 선다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 120.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 159.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    720.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Bold",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "남색 반팔 티셔츠를 입은 안경 쓴 남성",
+                                    "source": "v_hall",
+                                    "src_t": 9.0
+                                },
+                                "id": "c_spk",
+                                "kind": "caption",
+                                "lines": [
+                                    "남색 티셔츠 남성"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "speaker",
+                                "size_px": 40.0
+                            }
+                        },
+                        "name": "남색 티셔츠 남성",
+                        "color": "CYAN",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 75.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 171.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1140.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "note": "정면을 보고 가만히 서 있음",
+                                    "source": "v_hall",
+                                    "src_t": 10.5
+                                },
+                                "id": "c_rx",
+                                "kind": "caption",
+                                "lines": [
+                                    "멀뚱멀뚱"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "reaction",
+                                "size_px": 76.0
+                            }
+                        },
+                        "name": "멀뚱멀뚱",
+                        "color": "MAGENTA",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 75.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 204.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_hall",
+                                    "src_t": 18.7
+                                },
+                                "id": "c_sit3",
+                                "kind": "caption",
+                                "lines": [
+                                    "그러더니 옆으로 휙 나간다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "그러더니 옆으로 휙 나간다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 48.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 285.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_room",
+                                    "src_t": 29.5
+                                },
+                                "id": "c_sit4",
+                                "kind": "caption",
+                                "lines": [
+                                    "빈 방에 세 명이 들어온다"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "빈 방에 세 명이 들어온다",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 102.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 342.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "anchor": [
+                                    540.0,
+                                    1430.0
+                                ],
+                                "drawn_by": "captions.ass (libass)",
+                                "font_name": "Noto Sans CJK KR Black",
+                                "grounding": {
+                                    "kind": "seen",
+                                    "source": "v_room",
+                                    "src_t": 32.0
+                                },
+                                "id": "c_sit5",
+                                "kind": "caption",
+                                "lines": [
+                                    "한 명은 왼쪽, 둘은 오른쪽"
+                                ],
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "role": "situation",
+                                "size_px": 66.0
+                            }
+                        },
+                        "name": "한 명은 왼쪽, 둘은 오른쪽",
+                        "color": "YELLOW",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 99.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 450.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [
+                                        {
+                                            "end": null,
+                                            "h": 50.0,
+                                            "reason": "ov1 watermark '@fake repost'",
+                                            "start": null,
+                                            "w": 218.0,
+                                            "x": 13.0,
+                                            "y": 11.0
+                                        },
+                                        {
+                                            "end": 6.083,
+                                            "h": 51.0,
+                                            "reason": "ov2 burned_subtitle 'WAIT FOR IT'",
+                                            "start": 2.0,
+                                            "w": 283.0,
+                                            "x": 239.0,
+                                            "y": 354.0
+                                        },
+                                        {
+                                            "end": 6.083,
+                                            "h": 21.0,
+                                            "reason": "ov3 burned_subtitle 'O00'",
+                                            "start": 2.0,
+                                            "w": 53.0,
+                                            "x": 468.0,
+                                            "y": 378.0
+                                        }
+                                    ],
+                                    "inpaint_baked_into_source": true
+                                },
+                                "clip_id": "s1",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 9.5,
+                                "out_start": 0.0,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "1": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "10": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "100": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "101": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "102": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "103": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "104": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "105": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "106": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "107": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "108": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "109": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "11": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "110": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "111": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "112": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "113": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "114": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "115": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "116": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "117": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "118": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "119": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "12": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "120": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "121": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "122": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "123": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "124": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "125": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "126": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "127": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "128": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "129": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "13": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "130": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "131": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "132": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "133": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "134": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "135": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "136": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "137": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "138": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "139": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "14": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "140": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "141": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "142": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "143": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "144": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "145": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "146": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "147": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "148": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "149": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "15": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "150": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "151": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "152": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "153": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "154": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "155": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "156": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "157": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "158": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "159": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "16": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "160": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "161": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "162": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "163": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "164": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "165": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "166": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "167": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "168": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "169": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "17": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "170": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "171": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "172": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "173": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "174": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "175": [
+                                            -35.123,
+                                            639.391,
+                                            1150.976,
+                                            647.424
+                                        ],
+                                        "176": [
+                                            -63.218,
+                                            625.935,
+                                            1207.757,
+                                            679.363
+                                        ],
+                                        "177": [
+                                            -85.422,
+                                            615.3,
+                                            1252.634,
+                                            704.606
+                                        ],
+                                        "178": [
+                                            -102.429,
+                                            607.155,
+                                            1287.006,
+                                            723.941
+                                        ],
+                                        "179": [
+                                            -114.932,
+                                            601.166,
+                                            1312.275,
+                                            738.154
+                                        ],
+                                        "18": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "180": [
+                                            -123.623,
+                                            597.004,
+                                            1329.84,
+                                            748.035
+                                        ],
+                                        "181": [
+                                            -129.196,
+                                            594.335,
+                                            1341.103,
+                                            754.37
+                                        ],
+                                        "182": [
+                                            -132.343,
+                                            592.827,
+                                            1347.464,
+                                            757.948
+                                        ],
+                                        "183": [
+                                            -133.758,
+                                            592.15,
+                                            1350.323,
+                                            759.557
+                                        ],
+                                        "184": [
+                                            -134.134,
+                                            591.97,
+                                            1351.082,
+                                            759.984
+                                        ],
+                                        "185": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "186": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "187": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "188": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "189": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "19": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "190": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "191": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "192": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "193": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "194": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "195": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "196": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "197": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "198": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "199": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "2": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "20": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "200": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "201": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "202": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "203": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "204": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "205": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "206": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "207": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "208": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "209": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "21": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "210": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "211": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "212": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "213": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "214": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "215": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "216": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "217": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "218": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "219": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "22": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "220": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "221": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "222": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "223": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "224": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "225": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "226": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "227": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "228": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "229": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "23": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "230": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "231": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "232": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "233": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "234": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "235": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "236": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "237": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "238": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "239": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "24": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "240": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "241": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "242": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "243": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "244": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "245": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "246": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "247": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "248": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "249": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "25": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "250": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "251": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "252": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "253": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "254": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "255": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "256": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "257": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "258": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "259": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "26": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "260": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "261": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "262": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "263": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "264": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "265": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "266": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "267": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "268": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "269": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "27": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "270": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "271": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "272": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "273": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "274": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "275": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "276": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "277": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "278": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "279": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "28": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "280": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "281": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "282": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "283": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "284": [
+                                            -134.148,
+                                            591.963,
+                                            1351.111,
+                                            760.0
+                                        ],
+                                        "29": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "3": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "30": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "31": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "32": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "33": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "34": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "35": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "36": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "37": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "38": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "39": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "4": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "40": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "41": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "42": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "43": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "44": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "45": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "46": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "47": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "48": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "49": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "5": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "50": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "51": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "52": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "53": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "54": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "55": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "56": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "57": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "58": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "59": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "6": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "60": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "61": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "62": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "63": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "64": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "65": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "66": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "67": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "68": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "69": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "7": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "70": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "71": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "72": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "73": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "74": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "75": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "76": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "77": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "78": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "79": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "8": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "80": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "81": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "82": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "83": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "84": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "85": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "86": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "87": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "88": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "89": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "9": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "90": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "91": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "92": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "93": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "94": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "95": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "96": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "97": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "98": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ],
+                                        "99": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        0,
+                                        285
+                                    ],
+                                    "source_time_at_start": 2.8
+                                },
+                                "purpose": "hook",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_hall",
+                                "speed": 1.0,
+                                "src_in": 2.8,
+                                "src_out": 12.3,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": {
+                                    "center_src": [
+                                        380.0,
+                                        182.0
+                                    ],
+                                    "dur": 0.35,
+                                    "ease": "out",
+                                    "ease_curve": "cubic (render.py)",
+                                    "placement": "resolve.src_to_region (canvas_rect_by_frame 가 프레임별 결과)",
+                                    "recenter": false,
+                                    "scale_from": 1.0,
+                                    "scale_to": 1.25,
+                                    "start": 5.8
+                                }
+                            }
+                        },
+                        "name": "s1",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 285.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 84.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 600.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [
+                                        {
+                                            "end": null,
+                                            "h": 50.0,
+                                            "reason": "ov1 watermark '@fake repost'",
+                                            "start": null,
+                                            "w": 218.0,
+                                            "x": 13.0,
+                                            "y": 11.0
+                                        },
+                                        {
+                                            "end": 6.083,
+                                            "h": 51.0,
+                                            "reason": "ov2 burned_subtitle 'WAIT FOR IT'",
+                                            "start": 2.0,
+                                            "w": 283.0,
+                                            "x": 239.0,
+                                            "y": 354.0
+                                        },
+                                        {
+                                            "end": 6.083,
+                                            "h": 21.0,
+                                            "reason": "ov3 burned_subtitle 'O00'",
+                                            "start": 2.0,
+                                            "w": 53.0,
+                                            "x": 468.0,
+                                            "y": 378.0
+                                        }
+                                    ],
+                                    "inpaint_baked_into_source": true
+                                },
+                                "clip_id": "s2",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": null,
+                                "out_end": 11.2,
+                                "out_start": 9.5,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        285,
+                                        336
+                                    ],
+                                    "source_time_at_start": 17.9
+                                },
+                                "purpose": "build",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_hall",
+                                "speed": 1.0,
+                                "src_in": 17.9,
+                                "src_out": 19.6,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": null,
+                                    "dur": 0.0,
+                                    "scope": "region",
+                                    "type": "cut"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s2",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 51.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 537.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 600.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 14.2,
+                                    "src_t": 31.0
+                                },
+                                "out_end": 18.5,
+                                "out_start": 11.2,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        336,
+                                        426
+                                    ],
+                                    "source_time_at_start": 28.0
+                                },
+                                "purpose": "outro",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_room",
+                                "speed": 1.0,
+                                "src_in": 28.0,
+                                "src_out": 34.6,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "scope": "region",
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 90.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 840.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/people-detection.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1490.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/people-detection.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 14.2,
+                                    "src_t": 31.0
+                                },
+                                "out_end": 18.5,
+                                "out_start": 11.2,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "hold",
+                                    "out_frames": [
+                                        426,
+                                        447
+                                    ],
+                                    "source_time_at_start": 31.0
+                                },
+                                "purpose": "outro",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_room",
+                                "speed": 1.0,
+                                "src_in": 28.0,
+                                "src_out": 34.6,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "scope": "region",
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3 정지",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 21.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 930.0
+                            }
+                        },
+                        "effects": [
+                            {
+                                "OTIO_SCHEMA": "FreezeFrame.1",
+                                "metadata": {},
+                                "name": "freeze",
+                                "effect_name": "FreezeFrame",
+                                "enabled": true,
+                                "time_scalar": 0.0
+                            }
+                        ],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/people-detection.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1490.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/people-detection.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "blur_sigma_ratio": 0.166667,
+                                "canvas_resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "cleaning": {
+                                    "blur": [],
+                                    "crop": null,
+                                    "delogo": [],
+                                    "inpaint": [],
+                                    "inpaint_baked_into_source": false
+                                },
+                                "clip_id": "s3",
+                                "coordinates": "region/canvas_rect: canvas px (canvas_resolution); crop/delogo/inpaint/blur/zoom.center: SOURCE px (src_size)",
+                                "fit": "cover",
+                                "freeze": {
+                                    "hold": 0.7,
+                                    "out_start": 14.2,
+                                    "src_t": 31.0
+                                },
+                                "out_end": 18.5,
+                                "out_start": 11.2,
+                                "piece": {
+                                    "canvas_rect_by_frame": {
+                                        "0": [
+                                            -0.444,
+                                            656.0,
+                                            1080.889,
+                                            608.0
+                                        ]
+                                    },
+                                    "kind": "play",
+                                    "out_frames": [
+                                        447,
+                                        555
+                                    ],
+                                    "source_time_at_start": 31.0
+                                },
+                                "purpose": "outro",
+                                "region": {
+                                    "h": 608.0,
+                                    "w": 1080.0,
+                                    "x": 0.0,
+                                    "y": 656.0
+                                },
+                                "source_id": "v_room",
+                                "speed": 1.0,
+                                "src_in": 28.0,
+                                "src_out": 34.6,
+                                "src_size": [
+                                    768,
+                                    432
+                                ],
+                                "transition_in": {
+                                    "color": "#FFFFFF",
+                                    "dur": 0.12,
+                                    "scope": "region",
+                                    "type": "flash"
+                                },
+                                "zoom": null
+                            }
+                        },
+                        "name": "s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 108.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 930.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/video/people-detection.mp4",
+                                        "size": [
+                                            768,
+                                            432
+                                        ]
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1490.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/video/people-detection.mp4"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "V3 플래시",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 335.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "opacity_by_frame": [
+                                    0.4444,
+                                    1.0,
+                                    0.4444
+                                ],
+                                "rect": {
+                                    "h": 608,
+                                    "w": 1080,
+                                    "x": 0,
+                                    "y": 656
+                                },
+                                "resolution": [
+                                    1080,
+                                    1920
+                                ],
+                                "scope": "region"
+                            }
+                        },
+                        "name": "플래시 s3",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "GeneratorReference.1",
+                                "metadata": {},
+                                "name": "플래시 s3",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 3.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "generator_kind": "SolidColor",
+                                "parameters": {
+                                    "color": "#FFFFFF"
+                                }
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A1 BGM",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "duck_ranges": [],
+                                "envelope_db": [
+                                    [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        18.5,
+                                        0.0
+                                    ]
+                                ],
+                                "fade_in_s": 0.0,
+                                "fade_out_s": 0.8,
+                                "gain_db": 0.0,
+                                "loudness_gain_db": -0.126,
+                                "section_start_s": 0.0,
+                                "silences": [],
+                                "tempo_ratio": 1.0,
+                                "track_id": null
+                            }
+                        },
+                        "name": "BGM",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 555.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/music_bed_a.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 1800.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/music_bed_a.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            },
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "A2 효과음",
+                "source_range": null,
+                "effects": [],
+                "markers": [
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 0.6,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx1",
+                                "sfx_t": 0.6
+                            }
+                        },
+                        "name": "pop: 복도 끝 유리문 쪽에 남성이 처음 보임",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 18.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 5.5,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx2",
+                                "sfx_t": 5.5
+                            }
+                        },
+                        "name": "ding: 카메라 바로 앞에서 걸음을 멈춤",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 165.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 10.1,
+                                "kind": "sfx_event",
+                                "offset_s": -0.05,
+                                "sfx_id": "fx3",
+                                "sfx_t": 10.05
+                            }
+                        },
+                        "name": "whoosh: 남성이 오른쪽으로 빠르게 걸어 화면을 벗어남",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 303.0
+                            }
+                        },
+                        "comment": ""
+                    },
+                    {
+                        "OTIO_SCHEMA": "Marker.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_t": 14.2,
+                                "kind": "sfx_event",
+                                "offset_s": 0.0,
+                                "sfx_id": "fx4",
+                                "sfx_t": 14.2
+                            }
+                        },
+                        "name": "click: 세 사람이 양쪽으로 갈라지기 직전 화면이 멈춤",
+                        "color": "PINK",
+                        "marked_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 1.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 426.0
+                            }
+                        },
+                        "comment": ""
+                    }
+                ],
+                "enabled": true,
+                "color": null,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 18.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "복도 끝 유리문 쪽에 남성이 처음 보임",
+                                "event_t": 0.6,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx1",
+                                "loudness_gain_db": -0.126,
+                                "map_status": "unmeasured",
+                                "type": "pop"
+                            }
+                        },
+                        "name": "효과음 pop",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 4.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/pop.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 3.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/pop.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 143.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "카메라 바로 앞에서 걸음을 멈춤",
+                                "event_t": 5.5,
+                                "fg_limiter": {
+                                    "gain_db_by_frame": [
+                                        -0.72,
+                                        -0.55,
+                                        -0.12,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        -0.04,
+                                        -0.4,
+                                        -0.81,
+                                        -0.49,
+                                        -0.06,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        -0.01,
+                                        -0.62,
+                                        -1.94,
+                                        -1.71,
+                                        -0.41,
+                                        -0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "note": "마스터가 효과음/원본 소리에만 건 안전 리미터(BGM 제외); 가져오는 편집기에서 음량 키프레임으로 넣어야 함",
+                                    "source": "episodes/test-restore-001/build/fg_gain.json"
+                                },
+                                "gain_db": -8.0,
+                                "id": "fx2",
+                                "loudness_gain_db": -0.126,
+                                "map_status": "unmeasured",
+                                "type": "ding"
+                            }
+                        },
+                        "name": "효과음 ding",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 36.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/ding.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 36.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/ding.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 101.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "남성이 오른쪽으로 빠르게 걸어 화면을 벗어남",
+                                "event_t": 10.1,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx3",
+                                "loudness_gain_db": -0.126,
+                                "map_status": "unmeasured",
+                                "type": "whoosh"
+                            }
+                        },
+                        "name": "효과음 whoosh",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 14.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/whoosh.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 13.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/whoosh.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Gap.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 110.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {
+                            "shortkit": {
+                                "event_desc": "세 사람이 양쪽으로 갈라지기 직전 화면이 멈춤",
+                                "event_t": 14.2,
+                                "fg_limiter": null,
+                                "gain_db": -8.0,
+                                "id": "fx4",
+                                "loudness_gain_db": -0.126,
+                                "map_status": "unmeasured",
+                                "type": "click"
+                            }
+                        },
+                        "name": "효과음 click",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 3.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 0.0
+                            }
+                        },
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "color": null,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {
+                                    "shortkit": {
+                                        "has_audio": true,
+                                        "root_relative": "assets/test/generated/sfx/click.wav",
+                                        "size": null
+                                    }
+                                },
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 2.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "../../../assets/test/generated/sfx/click.wav"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Audio"
+            }
+        ]
+    }
+}

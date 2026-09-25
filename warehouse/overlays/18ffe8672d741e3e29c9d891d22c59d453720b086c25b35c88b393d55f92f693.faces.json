@@ -1,0 +1,347 @@
+{
+  "schema": "shortkit.faces/1",
+  "resolution": [
+    768,
+    432
+  ],
+  "duration": 49.666667,
+  "detected_at": "2026-09-25T12:45:56+00:00",
+  "cascades": {
+    "frontal": "haarcascade_frontalface_default.xml",
+    "profile": "haarcascade_profileface.xml"
+  },
+  "missing_cascades": [],
+  "status": "measured",
+  "method": "haar frontal+profile (shortkit.HaarCascade(numpy))",
+  "sample_fps": 0.4832,
+  "analysis_width": 768,
+  "min_face_px_source": 20,
+  "min_neighbors": 4,
+  "samples": [
+    {
+      "t": 0.0,
+      "faces": [
+        {
+          "x": 70.0,
+          "y": 44.0,
+          "w": 120.0,
+          "h": 120.0,
+          "kind": "profile_mirror",
+          "neighbors": 6
+        }
+      ]
+    },
+    {
+      "t": 2.069,
+      "faces": []
+    },
+    {
+      "t": 4.139,
+      "faces": []
+    },
+    {
+      "t": 6.208,
+      "faces": []
+    },
+    {
+      "t": 8.278,
+      "faces": []
+    },
+    {
+      "t": 10.347,
+      "faces": [
+        {
+          "x": 71.0,
+          "y": 46.0,
+          "w": 120.0,
+          "h": 120.0,
+          "kind": "profile_mirror",
+          "neighbors": 5
+        }
+      ]
+    },
+    {
+      "t": 12.417,
+      "faces": [
+        {
+          "x": 614.0,
+          "y": 23.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "profile",
+          "neighbors": 6
+        }
+      ]
+    },
+    {
+      "t": 14.486,
+      "faces": []
+    },
+    {
+      "t": 16.556,
+      "faces": []
+    },
+    {
+      "t": 18.625,
+      "faces": []
+    },
+    {
+      "t": 20.694,
+      "faces": [
+        {
+          "x": 74.0,
+          "y": 49.0,
+          "w": 118.0,
+          "h": 118.0,
+          "kind": "profile_mirror",
+          "neighbors": 5
+        }
+      ]
+    },
+    {
+      "t": 22.764,
+      "faces": []
+    },
+    {
+      "t": 24.833,
+      "faces": [
+        {
+          "x": 617.0,
+          "y": 18.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "profile",
+          "neighbors": 5
+        }
+      ]
+    },
+    {
+      "t": 26.903,
+      "faces": []
+    },
+    {
+      "t": 28.972,
+      "faces": []
+    },
+    {
+      "t": 31.042,
+      "faces": []
+    },
+    {
+      "t": 33.111,
+      "faces": []
+    },
+    {
+      "t": 35.181,
+      "faces": []
+    },
+    {
+      "t": 37.25,
+      "faces": []
+    },
+    {
+      "t": 39.319,
+      "faces": []
+    },
+    {
+      "t": 41.389,
+      "faces": []
+    },
+    {
+      "t": 43.458,
+      "faces": []
+    },
+    {
+      "t": 45.528,
+      "faces": [
+        {
+          "x": 617.0,
+          "y": 18.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "profile",
+          "neighbors": 5
+        }
+      ]
+    },
+    {
+      "t": 47.597,
+      "faces": [
+        {
+          "x": 71.0,
+          "y": 46.0,
+          "w": 120.0,
+          "h": 120.0,
+          "kind": "profile_mirror",
+          "neighbors": 5
+        }
+      ]
+    }
+  ],
+  "faces": [
+    {
+      "label": "face",
+      "x": 52.0,
+      "y": 26.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 0.0,
+      "end": 1.0347222291666667,
+      "hits": 1,
+      "kinds": [
+        "profile_mirror"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 53.0,
+      "y": 28.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 9.312277770833333,
+      "end": 11.381722229166666,
+      "hits": 1,
+      "kinds": [
+        "profile_mirror"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 599.0,
+      "y": 8.0,
+      "w": 130.0,
+      "h": 130.0,
+      "start": 11.382277770833333,
+      "end": 13.451722229166666,
+      "hits": 1,
+      "kinds": [
+        "profile"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 56.3,
+      "y": 31.3,
+      "w": 153.4,
+      "h": 153.4,
+      "start": 19.65927777083333,
+      "end": 21.728722229166667,
+      "hits": 1,
+      "kinds": [
+        "profile_mirror"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 602.1,
+      "y": 3.2,
+      "w": 128.7,
+      "h": 128.7,
+      "start": 23.79827777083333,
+      "end": 25.867722229166667,
+      "hits": 1,
+      "kinds": [
+        "profile"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 602.1,
+      "y": 3.2,
+      "w": 128.7,
+      "h": 128.7,
+      "start": 44.49327777083333,
+      "end": 46.56272222916667,
+      "hits": 1,
+      "kinds": [
+        "profile"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 53.0,
+      "y": 28.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 46.56227777083333,
+      "end": 48.63172222916667,
+      "hits": 1,
+      "kinds": [
+        "profile_mirror"
+      ]
+    }
+  ],
+  "protected": [
+    {
+      "label": "face",
+      "x": 52.0,
+      "y": 26.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 0.0,
+      "end": 1.0347222291666667
+    },
+    {
+      "label": "face",
+      "x": 53.0,
+      "y": 28.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 9.312277770833333,
+      "end": 11.381722229166666
+    },
+    {
+      "label": "face",
+      "x": 599.0,
+      "y": 8.0,
+      "w": 130.0,
+      "h": 130.0,
+      "start": 11.382277770833333,
+      "end": 13.451722229166666
+    },
+    {
+      "label": "face",
+      "x": 56.3,
+      "y": 31.3,
+      "w": 153.4,
+      "h": 153.4,
+      "start": 19.65927777083333,
+      "end": 21.728722229166667
+    },
+    {
+      "label": "face",
+      "x": 602.1,
+      "y": 3.2,
+      "w": 128.7,
+      "h": 128.7,
+      "start": 23.79827777083333,
+      "end": 25.867722229166667
+    },
+    {
+      "label": "face",
+      "x": 602.1,
+      "y": 3.2,
+      "w": 128.7,
+      "h": 128.7,
+      "start": 44.49327777083333,
+      "end": 46.56272222916667
+    },
+    {
+      "label": "face",
+      "x": 53.0,
+      "y": 28.0,
+      "w": 156.0,
+      "h": 156.0,
+      "start": 46.56227777083333,
+      "end": 48.63172222916667
+    }
+  ],
+  "source": {
+    "path": "assets/test/generated/video/people-detection.mp4",
+    "sha256": "18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693"
+  },
+  "requested": {
+    "sample_fps": 0.5,
+    "max_samples": 24
+  }
+}

@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.9">
+  <resources>
+    <format id="r1" name="FFVideoFormatRateUndefined" width="1080" height="1920" colorSpace="1-1-1 (Rec. 709)" frameDuration="1/30s" />
+    <effect id="r2" name="Cross Dissolve" uid="FxPlug:4731E73A-8DAC-4113-9A30-AE85B1761265" />
+    <format id="r4" name="FFVideoFormatRateUndefined" width="768" height="432" colorSpace="1-1-1 (Rec. 709)" frameDuration="1/12s" />
+    <asset id="r3" name="b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4" uid="51D1FA7D4D59C3A90C2262AB6CAFDD77" start="0s" hasVideo="1" hasAudio="1" duration="20s" format="r4" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../warehouse/cache/clean/b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971_49228aee588b7144.mp4" />
+    </asset>
+    <asset id="r5" name="people-detection.mp4" uid="488F1CD31C34223D4C0BA9EAB9B8ECC0" start="0s" hasVideo="1" hasAudio="1" duration="149/3s" format="r4" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/video/people-detection.mp4" />
+    </asset>
+    <asset id="r6" name="music_bed_a.wav" uid="DA7094926ED254EE12C8581C29B26F78" start="0s" hasVideo="0" hasAudio="1" duration="60s" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/music_bed_a.wav" />
+    </asset>
+    <asset id="r7" name="pop.wav" uid="D271EDE86AC832D76CB17AE15D7C6105" start="0s" hasVideo="0" hasAudio="1" duration="1/10s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/pop.wav" />
+    </asset>
+    <asset id="r8" name="ding.wav" uid="2A9FAE51E7D952C9790365E632DFBECD" start="0s" hasVideo="0" hasAudio="1" duration="6/5s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/ding.wav" />
+    </asset>
+    <asset id="r9" name="whoosh.wav" uid="72C218DCFFF3D73FF82533A2995F8115" start="0s" hasVideo="0" hasAudio="1" duration="13/30s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/whoosh.wav" />
+    </asset>
+    <asset id="r10" name="click.wav" uid="A4E2239AAAC2567620EFD44A5B24D1B2" start="0s" hasVideo="0" hasAudio="1" duration="1/15s" audioSources="1" audioChannels="1" audioRate="48000">
+      <media-rep kind="original-media" src="../../../assets/test/generated/sfx/click.wav" />
+    </asset>
+    <format id="r12" name="FFVideoFormatRateUndefined" width="1080" height="608" colorSpace="1-1-1 (Rec. 709)" />
+    <asset id="r11" name="flash_FFFFFF_1080x608.png" uid="19C07AB559AE1E8902DF5ADB44593108" start="0s" hasVideo="1" hasAudio="0" duration="0s" format="r12">
+      <media-rep kind="original-media" src="media/flash_FFFFFF_1080x608.png" />
+    </asset>
+  </resources>
+  <library>
+    <event name="shortkit test-restore-001">
+      <project name="test-restore-001">
+        <sequence format="r1" duration="37/2s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+            <asset-clip ref="r3" offset="0s" name="s1" start="14/5s" duration="19/2s" tcFormat="NDF" srcEnable="video">
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000">
+                  <param name="left">
+                    <keyframeAnimation>
+                      <keyframe time="14/5s" value="0.0411" interp="linear" />
+                      <keyframe time="43/5s" value="0.0411" interp="linear" />
+                      <keyframe time="259/30s" value="3.0516" interp="linear" />
+                      <keyframe time="26/3s" value="5.2343" interp="linear" />
+                      <keyframe time="87/10s" value="6.8194" interp="linear" />
+                      <keyframe time="131/15s" value="7.9587" interp="linear" />
+                      <keyframe time="263/30s" value="8.7582" interp="linear" />
+                      <keyframe time="44/5s" value="9.2961" interp="linear" />
+                      <keyframe time="53/6s" value="9.6336" interp="linear" />
+                      <keyframe time="133/15s" value="9.8217" interp="linear" />
+                      <keyframe time="89/10s" value="9.9057" interp="linear" />
+                      <keyframe time="134/15s" value="9.9279" interp="linear" />
+                      <keyframe time="269/30s" value="9.9287" interp="linear" />
+                      <keyframe time="184/15s" value="9.9287" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="top">
+                    <keyframeAnimation>
+                      <keyframe time="14/5s" value="0.0000" interp="linear" />
+                      <keyframe time="43/5s" value="0.0000" interp="linear" />
+                      <keyframe time="259/30s" value="2.5654" interp="linear" />
+                      <keyframe time="26/3s" value="4.4255" interp="linear" />
+                      <keyframe time="87/10s" value="5.7763" interp="linear" />
+                      <keyframe time="131/15s" value="6.7472" interp="linear" />
+                      <keyframe time="263/30s" value="7.4285" interp="linear" />
+                      <keyframe time="44/5s" value="7.8868" interp="linear" />
+                      <keyframe time="53/6s" value="8.1744" interp="linear" />
+                      <keyframe time="133/15s" value="8.3347" interp="linear" />
+                      <keyframe time="89/10s" value="8.4063" interp="linear" />
+                      <keyframe time="134/15s" value="8.4252" interp="linear" />
+                      <keyframe time="269/30s" value="8.4259" interp="linear" />
+                      <keyframe time="184/15s" value="8.4259" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="right">
+                    <keyframeAnimation>
+                      <keyframe time="14/5s" value="0.0411" interp="linear" />
+                      <keyframe time="43/5s" value="0.0411" interp="linear" />
+                      <keyframe time="259/30s" value="3.1150" interp="linear" />
+                      <keyframe time="26/3s" value="5.3437" interp="linear" />
+                      <keyframe time="87/10s" value="6.9622" interp="linear" />
+                      <keyframe time="131/15s" value="8.1256" interp="linear" />
+                      <keyframe time="263/30s" value="8.9419" interp="linear" />
+                      <keyframe time="44/5s" value="9.4911" interp="linear" />
+                      <keyframe time="53/6s" value="9.8357" interp="linear" />
+                      <keyframe time="133/15s" value="10.0278" interp="linear" />
+                      <keyframe time="89/10s" value="10.1135" interp="linear" />
+                      <keyframe time="134/15s" value="10.1362" interp="linear" />
+                      <keyframe time="269/30s" value="10.1371" interp="linear" />
+                      <keyframe time="184/15s" value="10.1371" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                  <param name="bottom">
+                    <keyframeAnimation>
+                      <keyframe time="14/5s" value="0.0000" interp="linear" />
+                      <keyframe time="43/5s" value="0.0000" interp="linear" />
+                      <keyframe time="259/30s" value="3.5239" interp="linear" />
+                      <keyframe time="26/3s" value="6.0790" interp="linear" />
+                      <keyframe time="87/10s" value="7.9344" interp="linear" />
+                      <keyframe time="131/15s" value="9.2681" interp="linear" />
+                      <keyframe time="263/30s" value="10.2039" interp="linear" />
+                      <keyframe time="44/5s" value="10.8336" interp="linear" />
+                      <keyframe time="53/6s" value="11.2286" interp="linear" />
+                      <keyframe time="133/15s" value="11.4488" interp="linear" />
+                      <keyframe time="89/10s" value="11.5471" interp="linear" />
+                      <keyframe time="134/15s" value="11.5731" interp="linear" />
+                      <keyframe time="269/30s" value="11.5741" interp="linear" />
+                      <keyframe time="184/15s" value="11.5741" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </trim-rect>
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0">
+                <param name="position">
+                  <keyframeAnimation>
+                    <keyframe time="14/5s" value="0.0000 -0.0000" interp="linear" />
+                    <keyframe time="43/5s" value="0.0000 -0.0000" interp="linear" />
+                    <keyframe time="259/30s" value="0.0190 -0.1616" interp="linear" />
+                    <keyframe time="26/3s" value="0.0344 -0.2925" interp="linear" />
+                    <keyframe time="87/10s" value="0.0466 -0.3960" interp="linear" />
+                    <keyframe time="131/15s" value="0.0559 -0.4753" interp="linear" />
+                    <keyframe time="263/30s" value="0.0628 -0.5335" interp="linear" />
+                    <keyframe time="44/5s" value="0.0675 -0.5740" interp="linear" />
+                    <keyframe time="53/6s" value="0.0706 -0.6000" interp="linear" />
+                    <keyframe time="133/15s" value="0.0723 -0.6147" interp="linear" />
+                    <keyframe time="89/10s" value="0.0731 -0.6213" interp="linear" />
+                    <keyframe time="134/15s" value="0.0733 -0.6230" interp="linear" />
+                    <keyframe time="269/30s" value="0.0733 -0.6231" interp="linear" />
+                    <keyframe time="184/15s" value="0.0733 -0.6231" interp="linear" />
+                  </keyframeAnimation>
+                </param>
+                <param name="scale">
+                  <keyframeAnimation>
+                    <keyframe time="14/5s" value="1.407407 1.407407" interp="linear" />
+                    <keyframe time="43/5s" value="1.407407 1.407407" interp="linear" />
+                    <keyframe time="259/30s" value="1.498666 1.498666" interp="linear" />
+                    <keyframe time="26/3s" value="1.572600 1.572600" interp="linear" />
+                    <keyframe time="87/10s" value="1.631033 1.631033" interp="linear" />
+                    <keyframe time="131/15s" value="1.675789 1.675789" interp="linear" />
+                    <keyframe time="263/30s" value="1.708691 1.708691" interp="linear" />
+                    <keyframe time="44/5s" value="1.731562 1.731562" interp="linear" />
+                    <keyframe time="53/6s" value="1.746228 1.746228" interp="linear" />
+                    <keyframe time="133/15s" value="1.754510 1.754510" interp="linear" />
+                    <keyframe time="89/10s" value="1.758233 1.758233" interp="linear" />
+                    <keyframe time="134/15s" value="1.759221 1.759221" interp="linear" />
+                    <keyframe time="269/30s" value="1.759259 1.759259" interp="linear" />
+                    <keyframe time="184/15s" value="1.759259 1.759259" interp="linear" />
+                  </keyframeAnimation>
+                </param>
+              </adjust-transform>
+              <asset-clip ref="r6" lane="-1" offset="14/5s" name="BGM" start="0s" duration="37/2s" audioRole="music">
+                <adjust-volume amount="-0.13dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-0.13dB" interp="linear" />
+                      <keyframe time="177/10s" value="-0.13dB" interp="linear" />
+                      <keyframe time="268/15s" value="-2.16dB" interp="linear" />
+                      <keyframe time="18s" value="-4.21dB" interp="linear" />
+                      <keyframe time="181/10s" value="-6.15dB" interp="linear" />
+                      <keyframe time="109/6s" value="-7.73dB" interp="linear" />
+                      <keyframe time="91/5s" value="-8.65dB" interp="linear" />
+                      <keyframe time="547/30s" value="-9.67dB" interp="linear" />
+                      <keyframe time="274/15s" value="-10.83dB" interp="linear" />
+                      <keyframe time="183/10s" value="-12.17dB" interp="linear" />
+                      <keyframe time="55/3s" value="-13.75dB" interp="linear" />
+                      <keyframe time="551/30s" value="-15.69dB" interp="linear" />
+                      <keyframe time="92/5s" value="-18.19dB" interp="linear" />
+                      <keyframe time="553/30s" value="-21.71dB" interp="linear" />
+                      <keyframe time="277/15s" value="-27.73dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
+              </asset-clip>
+              <asset-clip ref="r7" lane="-2" offset="17/5s" name="SFX pop" start="0s" duration="2/15s" audioRole="effects">
+                <adjust-volume amount="-8.13dB" />
+                <note>event 0.60s: 복도 끝 유리문 쪽에 남성이 처음 보임</note>
+              </asset-clip>
+              <asset-clip ref="r8" lane="-3" offset="83/10s" name="SFX ding" start="0s" duration="6/5s" audioRole="effects">
+                <adjust-volume amount="-8.13dB">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="-8.84dB" interp="linear" />
+                      <keyframe time="1/30s" value="-8.68dB" interp="linear" />
+                      <keyframe time="1/15s" value="-8.24dB" interp="linear" />
+                      <keyframe time="1/10s" value="-8.13dB" interp="linear" />
+                      <keyframe time="13/30s" value="-8.16dB" interp="linear" />
+                      <keyframe time="1/2s" value="-8.93dB" interp="linear" />
+                      <keyframe time="8/15s" value="-8.61dB" interp="linear" />
+                      <keyframe time="17/30s" value="-8.19dB" interp="linear" />
+                      <keyframe time="14/15s" value="-8.13dB" interp="linear" />
+                      <keyframe time="29/30s" value="-8.74dB" interp="linear" />
+                      <keyframe time="1s" value="-10.07dB" interp="linear" />
+                      <keyframe time="31/30s" value="-9.84dB" interp="linear" />
+                      <keyframe time="16/15s" value="-8.53dB" interp="linear" />
+                      <keyframe time="11/10s" value="-8.13dB" interp="linear" />
+                      <keyframe time="7/6s" value="-8.13dB" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-volume>
+                <note>event 5.50s: 카메라 바로 앞에서 걸음을 멈춤</note>
+              </asset-clip>
+              <caption lane="10" offset="14/5s" name="제목" start="3600s" duration="37/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="top">
+                  <text-style ref="ts1">카메라 앞에 선 남자</text-style>
+                </text>
+                <text-style-def id="ts1">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="84" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="11" offset="14/5s" name="설명" start="3600s" duration="4s" role="iTT?captionFormat=ITT.ko">
+                <text placement="top">
+                  <text-style ref="ts2">복원 검증용 테스트 영상</text-style>
+                </text>
+                <text-style-def id="ts2">
+                  <text-style font="Noto Sans CJK KR Bold" fontSize="46" fontColor="0.902 0.902 0.902 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="12" offset="7/2s" name="상황" start="3600s" duration="9/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts3">복도 끝에서 한 남자가 걸어온다</text-style>
+                </text>
+                <text-style-def id="ts3">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="13" offset="81/10s" name="상황" start="3600s" duration="4s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts4">카메라 바로 앞에서 멈춰 선다</text-style>
+                </text>
+                <text-style-def id="ts4">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="14" offset="17/2s" name="화자" start="3600s" duration="5/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="top">
+                  <text-style ref="ts5">남색 티셔츠 남성</text-style>
+                </text>
+                <text-style-def id="ts5">
+                  <text-style font="Noto Sans CJK KR Bold" fontSize="40" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="10" offset="48/5s" name="반응" start="3600s" duration="5/2s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts6">멀뚱멀뚱</text-style>
+                </text>
+                <text-style-def id="ts6">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="76" fontColor="1.000 0.894 0.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r3" offset="19/2s" name="s2" start="179/10s" duration="17/10s" tcFormat="NDF" srcEnable="video">
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <asset-clip ref="r9" lane="-2" offset="277/15s" name="SFX whoosh" start="0s" duration="7/15s" audioRole="effects">
+                <adjust-volume amount="-8.13dB" />
+                <note>event 10.10s: 남성이 오른쪽으로 빠르게 걸어 화면을 벗어남</note>
+              </asset-clip>
+              <video ref="r11" lane="2" offset="587/30s" name="플래시 s3" start="0s" duration="1/10s">
+                <adjust-conform type="none" />
+                <adjust-transform position="0.0000 -0.0000" scale="1 1" anchor="0 0" />
+                <adjust-blend amount="1">
+                  <param name="amount">
+                    <keyframeAnimation>
+                      <keyframe time="0s" value="0.4444" interp="linear" />
+                      <keyframe time="1/30s" value="1.0000" interp="linear" />
+                      <keyframe time="1/15s" value="0.4444" interp="linear" />
+                    </keyframeAnimation>
+                  </param>
+                </adjust-blend>
+              </video>
+              <caption lane="11" offset="179/10s" name="상황" start="3600s" duration="8/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts7">그러더니 옆으로 휙 나간다</text-style>
+                </text>
+                <text-style-def id="ts7">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+            <asset-clip ref="r5" offset="56/5s" name="s3" start="28s" duration="73/10s" tcFormat="NDF" srcEnable="video">
+              <timeMap>
+                <timept time="28s" value="28s" interp="linear" />
+                <timept time="31s" value="31s" interp="linear" />
+                <timept time="317/10s" value="31s" interp="linear" />
+                <timept time="353/10s" value="173/5s" interp="linear" />
+              </timeMap>
+              <adjust-conform type="none" />
+              <adjust-crop mode="trim">
+                <trim-rect left="0.0411" top="0.0000" right="0.0411" bottom="0.0000" />
+              </adjust-crop>
+              <adjust-transform position="0.0000 -0.0000" scale="1.407407 1.407407" anchor="0 0" />
+              <asset-clip ref="r10" lane="-3" offset="31s" name="SFX click" start="0s" duration="1/10s" audioRole="effects">
+                <adjust-volume amount="-8.13dB" />
+                <note>event 14.20s: 세 사람이 양쪽으로 갈라지기 직전 화면이 멈춤</note>
+              </asset-clip>
+              <caption lane="12" offset="141/5s" name="상황" start="3600s" duration="17/5s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts8">빈 방에 세 명이 들어온다</text-style>
+                </text>
+                <text-style-def id="ts8">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+              <caption lane="13" offset="159/5s" name="상황" start="3600s" duration="33/10s" role="iTT?captionFormat=ITT.ko">
+                <text placement="bottom">
+                  <text-style ref="ts9">한 명은 왼쪽, 둘은 오른쪽</text-style>
+                </text>
+                <text-style-def id="ts9">
+                  <text-style font="Noto Sans CJK KR Black" fontSize="66" fontColor="1.000 1.000 1.000 1" backgroundColor="0 0 0 0" />
+                </text-style-def>
+              </caption>
+            </asset-clip>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>

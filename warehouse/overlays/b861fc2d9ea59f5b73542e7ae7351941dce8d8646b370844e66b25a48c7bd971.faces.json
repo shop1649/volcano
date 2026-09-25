@@ -1,0 +1,1061 @@
+{
+  "schema": "shortkit.faces/1",
+  "resolution": [
+    768,
+    432
+  ],
+  "duration": 20.0,
+  "detected_at": "2026-09-25T12:39:45+00:00",
+  "cascades": {
+    "frontal": "haarcascade_frontalface_default.xml",
+    "profile": "haarcascade_profileface.xml"
+  },
+  "missing_cascades": [],
+  "status": "measured",
+  "method": "haar frontal+profile (shortkit.HaarCascade(numpy))",
+  "sample_fps": 4.0,
+  "analysis_width": 768,
+  "min_face_px_source": 20,
+  "min_neighbors": 4,
+  "samples": [
+    {
+      "t": 0.0,
+      "faces": []
+    },
+    {
+      "t": 0.25,
+      "faces": []
+    },
+    {
+      "t": 0.5,
+      "faces": []
+    },
+    {
+      "t": 0.75,
+      "faces": []
+    },
+    {
+      "t": 1.0,
+      "faces": []
+    },
+    {
+      "t": 1.25,
+      "faces": []
+    },
+    {
+      "t": 1.5,
+      "faces": []
+    },
+    {
+      "t": 1.75,
+      "faces": []
+    },
+    {
+      "t": 2.0,
+      "faces": []
+    },
+    {
+      "t": 2.25,
+      "faces": []
+    },
+    {
+      "t": 2.5,
+      "faces": []
+    },
+    {
+      "t": 2.75,
+      "faces": []
+    },
+    {
+      "t": 3.0,
+      "faces": []
+    },
+    {
+      "t": 3.25,
+      "faces": []
+    },
+    {
+      "t": 3.5,
+      "faces": [
+        {
+          "x": 520.0,
+          "y": 187.0,
+          "w": 26.0,
+          "h": 26.0,
+          "kind": "frontal",
+          "neighbors": 6
+        }
+      ]
+    },
+    {
+      "t": 3.75,
+      "faces": [
+        {
+          "x": 499.0,
+          "y": 181.0,
+          "w": 26.0,
+          "h": 26.0,
+          "kind": "frontal",
+          "neighbors": 10
+        }
+      ]
+    },
+    {
+      "t": 4.0,
+      "faces": [
+        {
+          "x": 481.0,
+          "y": 180.0,
+          "w": 29.0,
+          "h": 29.0,
+          "kind": "frontal",
+          "neighbors": 12
+        }
+      ]
+    },
+    {
+      "t": 4.25,
+      "faces": [
+        {
+          "x": 469.0,
+          "y": 181.0,
+          "w": 31.0,
+          "h": 31.0,
+          "kind": "frontal",
+          "neighbors": 14
+        }
+      ]
+    },
+    {
+      "t": 4.5,
+      "faces": [
+        {
+          "x": 455.0,
+          "y": 177.0,
+          "w": 29.0,
+          "h": 29.0,
+          "kind": "frontal",
+          "neighbors": 11
+        }
+      ]
+    },
+    {
+      "t": 4.75,
+      "faces": [
+        {
+          "x": 432.0,
+          "y": 180.0,
+          "w": 34.0,
+          "h": 34.0,
+          "kind": "frontal",
+          "neighbors": 10
+        }
+      ]
+    },
+    {
+      "t": 5.0,
+      "faces": [
+        {
+          "x": 409.0,
+          "y": 174.0,
+          "w": 33.0,
+          "h": 33.0,
+          "kind": "frontal",
+          "neighbors": 13
+        }
+      ]
+    },
+    {
+      "t": 5.25,
+      "faces": [
+        {
+          "x": 391.0,
+          "y": 171.0,
+          "w": 38.0,
+          "h": 38.0,
+          "kind": "frontal",
+          "neighbors": 18
+        }
+      ]
+    },
+    {
+      "t": 5.5,
+      "faces": [
+        {
+          "x": 382.0,
+          "y": 173.0,
+          "w": 44.0,
+          "h": 44.0,
+          "kind": "frontal",
+          "neighbors": 24
+        },
+        {
+          "x": 375.0,
+          "y": 131.0,
+          "w": 108.0,
+          "h": 108.0,
+          "kind": "profile",
+          "neighbors": 6
+        }
+      ]
+    },
+    {
+      "t": 5.75,
+      "faces": [
+        {
+          "x": 371.0,
+          "y": 164.0,
+          "w": 49.0,
+          "h": 49.0,
+          "kind": "frontal",
+          "neighbors": 21
+        }
+      ]
+    },
+    {
+      "t": 6.0,
+      "faces": [
+        {
+          "x": 356.0,
+          "y": 166.0,
+          "w": 53.0,
+          "h": 53.0,
+          "kind": "frontal",
+          "neighbors": 22
+        }
+      ]
+    },
+    {
+      "t": 6.25,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 162.0,
+          "w": 54.0,
+          "h": 54.0,
+          "kind": "frontal",
+          "neighbors": 25
+        },
+        {
+          "x": 267.0,
+          "y": 85.0,
+          "w": 158.0,
+          "h": 158.0,
+          "kind": "profile_mirror",
+          "neighbors": 5
+        }
+      ]
+    },
+    {
+      "t": 6.5,
+      "faces": [
+        {
+          "x": 331.0,
+          "y": 154.0,
+          "w": 59.0,
+          "h": 59.0,
+          "kind": "frontal",
+          "neighbors": 22
+        }
+      ]
+    },
+    {
+      "t": 6.75,
+      "faces": [
+        {
+          "x": 338.0,
+          "y": 161.0,
+          "w": 61.0,
+          "h": 61.0,
+          "kind": "frontal",
+          "neighbors": 35
+        }
+      ]
+    },
+    {
+      "t": 7.0,
+      "faces": [
+        {
+          "x": 350.0,
+          "y": 151.0,
+          "w": 69.0,
+          "h": 69.0,
+          "kind": "frontal",
+          "neighbors": 39
+        }
+      ]
+    },
+    {
+      "t": 7.25,
+      "faces": [
+        {
+          "x": 351.0,
+          "y": 145.0,
+          "w": 76.0,
+          "h": 76.0,
+          "kind": "frontal",
+          "neighbors": 36
+        }
+      ]
+    },
+    {
+      "t": 7.5,
+      "faces": [
+        {
+          "x": 344.0,
+          "y": 146.0,
+          "w": 78.0,
+          "h": 78.0,
+          "kind": "frontal",
+          "neighbors": 31
+        }
+      ]
+    },
+    {
+      "t": 7.75,
+      "faces": [
+        {
+          "x": 329.0,
+          "y": 139.0,
+          "w": 82.0,
+          "h": 82.0,
+          "kind": "frontal",
+          "neighbors": 27
+        }
+      ]
+    },
+    {
+      "t": 8.0,
+      "faces": [
+        {
+          "x": 315.0,
+          "y": 132.0,
+          "w": 90.0,
+          "h": 90.0,
+          "kind": "frontal",
+          "neighbors": 28
+        }
+      ]
+    },
+    {
+      "t": 8.25,
+      "faces": [
+        {
+          "x": 319.0,
+          "y": 130.0,
+          "w": 90.0,
+          "h": 90.0,
+          "kind": "frontal",
+          "neighbors": 27
+        }
+      ]
+    },
+    {
+      "t": 8.5,
+      "faces": [
+        {
+          "x": 330.0,
+          "y": 130.0,
+          "w": 91.0,
+          "h": 91.0,
+          "kind": "frontal",
+          "neighbors": 23
+        }
+      ]
+    },
+    {
+      "t": 8.75,
+      "faces": [
+        {
+          "x": 337.0,
+          "y": 129.0,
+          "w": 94.0,
+          "h": 94.0,
+          "kind": "frontal",
+          "neighbors": 33
+        }
+      ]
+    },
+    {
+      "t": 9.0,
+      "faces": [
+        {
+          "x": 341.0,
+          "y": 131.0,
+          "w": 95.0,
+          "h": 95.0,
+          "kind": "frontal",
+          "neighbors": 42
+        }
+      ]
+    },
+    {
+      "t": 9.25,
+      "faces": [
+        {
+          "x": 345.0,
+          "y": 132.0,
+          "w": 94.0,
+          "h": 94.0,
+          "kind": "frontal",
+          "neighbors": 34
+        }
+      ]
+    },
+    {
+      "t": 9.5,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 35
+        }
+      ]
+    },
+    {
+      "t": 9.75,
+      "faces": [
+        {
+          "x": 341.0,
+          "y": 128.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "frontal",
+          "neighbors": 33
+        }
+      ]
+    },
+    {
+      "t": 10.0,
+      "faces": [
+        {
+          "x": 338.0,
+          "y": 129.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "frontal",
+          "neighbors": 49
+        }
+      ]
+    },
+    {
+      "t": 10.25,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 130.0,
+          "w": 95.0,
+          "h": 95.0,
+          "kind": "frontal",
+          "neighbors": 40
+        }
+      ]
+    },
+    {
+      "t": 10.5,
+      "faces": [
+        {
+          "x": 337.0,
+          "y": 129.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 47
+        }
+      ]
+    },
+    {
+      "t": 10.75,
+      "faces": [
+        {
+          "x": 338.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 37
+        }
+      ]
+    },
+    {
+      "t": 11.0,
+      "faces": [
+        {
+          "x": 340.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 37
+        }
+      ]
+    },
+    {
+      "t": 11.25,
+      "faces": [
+        {
+          "x": 338.0,
+          "y": 129.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 47
+        }
+      ]
+    },
+    {
+      "t": 11.5,
+      "faces": [
+        {
+          "x": 338.0,
+          "y": 130.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 41
+        }
+      ]
+    },
+    {
+      "t": 11.75,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 41
+        }
+      ]
+    },
+    {
+      "t": 12.0,
+      "faces": [
+        {
+          "x": 340.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 46
+        }
+      ]
+    },
+    {
+      "t": 12.25,
+      "faces": [
+        {
+          "x": 340.0,
+          "y": 130.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 44
+        }
+      ]
+    },
+    {
+      "t": 12.5,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 129.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 47
+        }
+      ]
+    },
+    {
+      "t": 12.75,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 128.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "frontal",
+          "neighbors": 36
+        }
+      ]
+    },
+    {
+      "t": 13.0,
+      "faces": [
+        {
+          "x": 340.0,
+          "y": 128.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 46
+        }
+      ]
+    },
+    {
+      "t": 13.25,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 127.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "frontal",
+          "neighbors": 35
+        }
+      ]
+    },
+    {
+      "t": 13.5,
+      "faces": [
+        {
+          "x": 339.0,
+          "y": 129.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 42
+        }
+      ]
+    },
+    {
+      "t": 13.75,
+      "faces": [
+        {
+          "x": 341.0,
+          "y": 129.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "frontal",
+          "neighbors": 48
+        }
+      ]
+    },
+    {
+      "t": 14.0,
+      "faces": [
+        {
+          "x": 342.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 38
+        }
+      ]
+    },
+    {
+      "t": 14.25,
+      "faces": [
+        {
+          "x": 342.0,
+          "y": 128.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "frontal",
+          "neighbors": 49
+        }
+      ]
+    },
+    {
+      "t": 14.5,
+      "faces": [
+        {
+          "x": 346.0,
+          "y": 131.0,
+          "w": 95.0,
+          "h": 95.0,
+          "kind": "frontal",
+          "neighbors": 37
+        }
+      ]
+    },
+    {
+      "t": 14.75,
+      "faces": [
+        {
+          "x": 346.0,
+          "y": 131.0,
+          "w": 95.0,
+          "h": 95.0,
+          "kind": "frontal",
+          "neighbors": 39
+        }
+      ]
+    },
+    {
+      "t": 15.0,
+      "faces": [
+        {
+          "x": 345.0,
+          "y": 130.0,
+          "w": 96.0,
+          "h": 96.0,
+          "kind": "frontal",
+          "neighbors": 41
+        }
+      ]
+    },
+    {
+      "t": 15.25,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 128.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 47
+        }
+      ]
+    },
+    {
+      "t": 15.5,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 128.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 39
+        }
+      ]
+    },
+    {
+      "t": 15.75,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 127.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 40
+        }
+      ]
+    },
+    {
+      "t": 16.0,
+      "faces": [
+        {
+          "x": 344.0,
+          "y": 128.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 37
+        }
+      ]
+    },
+    {
+      "t": 16.25,
+      "faces": [
+        {
+          "x": 345.0,
+          "y": 128.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 37
+        }
+      ]
+    },
+    {
+      "t": 16.5,
+      "faces": [
+        {
+          "x": 345.0,
+          "y": 128.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 36
+        }
+      ]
+    },
+    {
+      "t": 16.75,
+      "faces": [
+        {
+          "x": 344.0,
+          "y": 127.0,
+          "w": 99.0,
+          "h": 99.0,
+          "kind": "frontal",
+          "neighbors": 44
+        }
+      ]
+    },
+    {
+      "t": 17.0,
+      "faces": [
+        {
+          "x": 344.0,
+          "y": 128.0,
+          "w": 97.0,
+          "h": 97.0,
+          "kind": "frontal",
+          "neighbors": 42
+        }
+      ]
+    },
+    {
+      "t": 17.25,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 127.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "frontal",
+          "neighbors": 44
+        }
+      ]
+    },
+    {
+      "t": 17.5,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 128.0,
+          "w": 98.0,
+          "h": 98.0,
+          "kind": "frontal",
+          "neighbors": 42
+        }
+      ]
+    },
+    {
+      "t": 17.75,
+      "faces": [
+        {
+          "x": 342.0,
+          "y": 126.0,
+          "w": 102.0,
+          "h": 102.0,
+          "kind": "frontal",
+          "neighbors": 47
+        }
+      ]
+    },
+    {
+      "t": 18.0,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 127.0,
+          "w": 100.0,
+          "h": 100.0,
+          "kind": "frontal",
+          "neighbors": 50
+        }
+      ]
+    },
+    {
+      "t": 18.25,
+      "faces": [
+        {
+          "x": 343.0,
+          "y": 124.0,
+          "w": 115.0,
+          "h": 115.0,
+          "kind": "frontal",
+          "neighbors": 51
+        }
+      ]
+    },
+    {
+      "t": 18.5,
+      "faces": [
+        {
+          "x": 390.0,
+          "y": 135.0,
+          "w": 116.0,
+          "h": 116.0,
+          "kind": "frontal",
+          "neighbors": 55
+        }
+      ]
+    },
+    {
+      "t": 18.75,
+      "faces": [
+        {
+          "x": 459.0,
+          "y": 98.0,
+          "w": 174.0,
+          "h": 174.0,
+          "kind": "profile_mirror",
+          "neighbors": 19
+        }
+      ]
+    },
+    {
+      "t": 19.0,
+      "faces": []
+    },
+    {
+      "t": 19.25,
+      "faces": []
+    },
+    {
+      "t": 19.5,
+      "faces": []
+    },
+    {
+      "t": 19.75,
+      "faces": []
+    }
+  ],
+  "faces": [
+    {
+      "label": "face",
+      "x": 516.1,
+      "y": 183.1,
+      "w": 33.8,
+      "h": 33.8,
+      "start": 3.375,
+      "end": 3.625,
+      "hits": 1,
+      "kinds": [
+        "frontal"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 444.5,
+      "y": 171.8,
+      "w": 91.0,
+      "h": 45.5,
+      "start": 3.625,
+      "end": 4.625,
+      "hits": 4,
+      "kinds": [
+        "frontal"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 426.9,
+      "y": 174.9,
+      "w": 44.2,
+      "h": 44.2,
+      "start": 4.625,
+      "end": 4.875,
+      "hits": 1,
+      "kinds": [
+        "frontal"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 231.2,
+      "y": 60.1,
+      "w": 310.7,
+      "h": 215.8,
+      "start": 4.875,
+      "end": 18.625,
+      "hits": 56,
+      "kinds": [
+        "frontal",
+        "profile_mirror"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 358.8,
+      "y": 114.8,
+      "w": 140.4,
+      "h": 140.4,
+      "start": 5.375,
+      "end": 5.625,
+      "hits": 1,
+      "kinds": [
+        "profile"
+      ]
+    },
+    {
+      "label": "face",
+      "x": 432.9,
+      "y": 71.9,
+      "w": 226.2,
+      "h": 226.2,
+      "start": 18.625,
+      "end": 18.875,
+      "hits": 1,
+      "kinds": [
+        "profile_mirror"
+      ]
+    }
+  ],
+  "protected": [
+    {
+      "label": "face",
+      "x": 516.1,
+      "y": 183.1,
+      "w": 33.8,
+      "h": 33.8,
+      "start": 3.375,
+      "end": 3.625
+    },
+    {
+      "label": "face",
+      "x": 444.5,
+      "y": 171.8,
+      "w": 91.0,
+      "h": 45.5,
+      "start": 3.625,
+      "end": 4.625
+    },
+    {
+      "label": "face",
+      "x": 426.9,
+      "y": 174.9,
+      "w": 44.2,
+      "h": 44.2,
+      "start": 4.625,
+      "end": 4.875
+    },
+    {
+      "label": "face",
+      "x": 231.2,
+      "y": 60.1,
+      "w": 310.7,
+      "h": 215.8,
+      "start": 4.875,
+      "end": 18.625
+    },
+    {
+      "label": "face",
+      "x": 358.8,
+      "y": 114.8,
+      "w": 140.4,
+      "h": 140.4,
+      "start": 5.375,
+      "end": 5.625
+    },
+    {
+      "label": "face",
+      "x": 432.9,
+      "y": 71.9,
+      "w": 226.2,
+      "h": 226.2,
+      "start": 18.625,
+      "end": 18.875
+    }
+  ],
+  "source": {
+    "path": "assets/test/generated/dirty_source_facewalk.mp4",
+    "sha256": "b861fc2d9ea59f5b73542e7ae7351941dce8d8646b370844e66b25a48c7bd971"
+  },
+  "requested": {
+    "sample_fps": 4.0,
+    "max_samples": 80
+  }
+}
