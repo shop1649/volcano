@@ -87,8 +87,10 @@ python -m shortkit ref collect                     # 최신 100편·게시일·�
                                                    #   + all_videos.json(참고), high_views.json(조회수 ≥ 800,000, 확인일 포함)
 python -m shortkit ref download --set latest100    # 영상 받기(≤1080p, 소리 포함) → reference/videos/, downloads.jsonl(sha256)
 python -m shortkit ref download --set high_views   # 80만 이상 영상 전부
-python -m shortkit ref audio-analyze --all         # 먼저 오디오: Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트 (대사 역할·lead_s 에 필요)
+python -m shortkit ref audio-analyze --set latest100            # 먼저 오디오(기준 표본): Demucs 분리 → BGM 식별 → 원음·덕킹 → 효과음 이벤트
+python -m shortkit ref audio-analyze --set high_views_outside   # 80만+ 중 최신 100편 밖 영상(참고용 보고서에만 사용)
 python -m shortkit ref analyze  --set downloaded   # 컷·자막(위치/크기/색/외곽선/박스/모션/역할)·화면 모션·장식 → analysis/<id>/
+python -m shortkit ref transcribe --set latest100  # (선택) faster-whisper 가 설치된 경우 음성 대본 → analysis/<id>/audio/transcript.json
 python -m shortkit ref classify prepare --set latest100   # 영상별 검토 자료 + format_labels.csv(빈 줄)
 #  ▶ 에이전트/사람이 analysis/<id>/review/ 를 "실제로 보고" format_labels.csv 를 채운다
 #    (intro_type=도입 방식, structure_type=전개 구조, watched=yes, labeled_by=이름). 안 본 영상은 채우지 않는다.
@@ -105,13 +107,17 @@ python -m shortkit ref audio-measure               # measurements/audio.json (BG
 #  ▶ 자동 측정이 안 되는 항목(장식 스타일·이모지·표지)은 영상을 본 사람이 manual_observations.csv 에 (video_id, t, key, value,
 #    observed_by, watched=yes) 로 기록 → 
 python -m shortkit ref manual-aggregate            # measurements/manual.json
-python -m shortkit ref trace                       # 설명란·워터마크 OCR·렌즈용 키프레임 → warehouse/source_accounts.json, exclusions.jsonl
+python -m shortkit ref trace                       # 기본 대상: 최신100 ∪ 80만+ ∪ 받은 영상. 설명란·자막(대본)·화면 전체 출처 OCR·렌즈 키프레임
+                                                   #   → warehouse/source_accounts.json(경로별 범위 stage), exclusions.jsonl(촬영본 지문·URL·레퍼런스 계정)
+python -m shortkit ref high-views-report           # 80만+ 전편 분석 현황·구조 요약 → reference/high_views_report.{json,md} (참고용, 제작 측정값에 섞지 않음)
 python -m shortkit preset apply-measurements       # 측정값 → measured.yaml (preset.yaml 은 그대로, 층으로 덮음)
 python -m shortkit preset sync                     # 레지스트리: 근거→측정값→코드→검사 연결 갱신
 python -m shortkit preset audit                    # 미측정·코드 미연결·검사 미연결 키 확인
 python -m shortkit preset unresolved               # unresolved.md 갱신
 ```
 
+- 제작 측정값(measurements/*, formats.yaml, 글꼴, 효과음 카탈로그)은 **최신 100편 스냅샷 멤버만** 쓴다(제외된 영상은 각 파일에 기록).
+  80만 이상 영상은 전부 분석하되 결과는 `reference/high_views_report.*` 에만 둔다.
 - `ref collect/download/analyze/aggregate/trace/classify` 의 종료 코드 3 = 레퍼런스 데이터 없음(차단/비어 있음). 못 잼 파일은 기록된다.
 - Google Lens 는 자동화하지 않는다: `analysis/<id>/lens/` 키프레임으로 사람이/에이전트가 검색한 결과를 `source add-url` 로 넣는다.
 - BGM 은 곡명만 맞으면 안 된다: `bgm.json` 의 track·version·tempo·section 네 항목이 모두 일치해야 일치.
@@ -123,15 +129,21 @@ python -m shortkit preset unresolved               # unresolved.md 갱신
 python -m shortkit source queries                  # 검색어: 레퍼런스 역추적분(source_accounts.json) + 사용자 추가분
 python -m shortkit source search -q "<키워드>" --platform youtube tiktok instagram reddit --limit 30 [--recent]
 python -m shortkit source log                      # 플랫폼별 접속 상태(ok/blocked/login_required) — 막히면 다른 플랫폼/수동 URL 로 계속
-python -m shortkit source add-url <URL> [--file <직접 받은 파일>]   # 수동 수집(렌즈·다른 경로로 찾은 원본)
+python -m shortkit source add-url <URL> --observed-by <이름> [--file <직접 받은 파일>] [--uploader/--original-author/--original-url
+       --published-at/--original-published-at/--views N --views-checked-at 날짜]   # 수동 수집(렌즈·다른 경로). 본 사람이 확인한 출처만 기록
+#  ▶ TikTok 키워드 검색(tiktok:tag)과 Instagram 계정 목록은 yt-dlp 가 '작동 안 함'으로 표시함 → @계정/영상 URL 또는 add-url 사용
 python -m shortkit source list --sort views        # 플랫폼별 "확인된" 조회수 순(조회수 모름은 뒤, 좋아요≠조회수, 확인일 표시)
 python -m shortkit source exclude-check <ID|파일>   # 레퍼런스가 쓴 촬영본과 같은 녹화면 제외(키워드는 같아도 됨)
 #  ▶ 후보 영상을 실제로 보고 기록(강도·반전·포맷 적합). 보지 않은 후보는 선택할 수 없다.
-python -m shortkit source review <ID> --watched-by <이름> --intensity 1-5 --reversal 1-5 --format-fit 1-5 --notes "몇 초에 무슨 일"
+python -m shortkit source review <ID> --watched-by <이름> --intensity 1-5 --reversal 1-5 --format-fit 1-5 --notes "몇 초에 무슨 일" \
+       --original-upload yes|no [--watermark-handle @다른계정]   # '최근' 표시는 원본 업로드 확인(yes)이 있어야 함
+python -m shortkit source link-original <오버레이 있는 ID> <깨끗한 원본 ID> --by <이름> --note "..."   # 로고 처리 1순위: 깨끗한 원본
 python -m shortkit source select <ID> --by <이름>   # 최신성·강도·반전·화질·포맷 적합으로 최종 선별(선정 이유 자동 기록)
 python -m shortkit source download <ID>            # warehouse/sources/ + sha256 + 제외 재검사 (원작자·재게시자·URL 기록 유지)
 python -m shortkit clean detect --source warehouse/sources/<파일>   # 원본 로고·출처 오버레이·원어 자막(상단 좌우·내부 컷)
 python -m shortkit clean plan   --source warehouse/sources/<파일>   # 깨끗한 원본 → 크롭(인물·동작 보호) → 국소 복원 순으로 결정
+#  ▶ 출력된 clean 블록(경로·sha256·warehouse_id 포함)을 plan.yaml 의 sources[] 에 통째로 붙인다. 그 뒤:
+python -m shortkit clean coverage --plan episodes/<id>/plan.yaml   # 모든 오버레이가 처리됐는지(episode validate 도 같은 검사를 강제)
 ```
 
 
