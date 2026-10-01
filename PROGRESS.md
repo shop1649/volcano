@@ -51,6 +51,9 @@
   Reddit 403 Blocked.
 - 효과음: 사용자가 알려 준 `W:\내 드라이브\효과음` 은 Drive 커넥터에서 보이지 않음(동기화 전일 수 있음).
 
+## 이어서 하기 (2026-10-01)
+- 클라우드 IP 는 YouTube 봇 확인에 계속 막힘(2026-10-01 재확인). 사용자 PC 에서 이어서: `HANDOFF_VSCODE.md`.
+
 ## 남은 일 (이 환경에서 할 수 없는 것 — 사용자/네트워크 필요)
 1. 레퍼런스: youtube.com·googlevideo.com 허용(또는 `YOUTUBE_API_KEY` 로 목록·조회수만) → AGENTS.md 5장 A.
 2. 사용자 자산: 깨끗한 효과음·음악 창고(`assets/library/`), "별도로 지정한 변경"(requested_changes.yaml).
